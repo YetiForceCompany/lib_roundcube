@@ -146,7 +146,6 @@ class yetiforce extends rcube_plugin
 		$db = $this->rc->get_dbh();
 		global $COMPOSE_ID;
 
-		$compose = &$_SESSION['compose_data_' . $COMPOSE_ID];
 		$composeKey = rcube_utils::get_input_value('_composeKey', rcube_utils::INPUT_GET);
 		$result = $db->query('SELECT * FROM `u_yf_mail_compose_data` WHERE `key` = ?', $composeKey);
 		$params = $db->fetch_assoc($result);
@@ -155,7 +154,7 @@ class yetiforce extends rcube_plugin
 			$params = json_decode($params['data'], true);
 
 			foreach ($params as $key => &$value) {
-				$compose['param'][$key] = $value;
+				$args['param'][$key] = $value;
 			}
 			if ((isset($params['crmmodule']) && $params['crmmodule'] == 'Documents') || (isset($params['filePath']) && $params['filePath'])) {
 				$userid = $this->rc->user->ID;
@@ -173,8 +172,8 @@ class yetiforce extends rcube_plugin
 			$mailId = $params['mailId'];
 			$result = $db->query('SELECT content,reply_to_email,date,from_email,to_email,cc_email,subject FROM vtiger_ossmailview WHERE ossmailviewid = ?;', $mailId);
 			$row = $db->fetch_assoc($result);
-			$compose['param']['type'] = $params['type'];
-			$compose['param']['mailData'] = $row;
+			$args['param']['type'] = $params['type'];
+			$args['param']['mailData'] = $row;
 			switch ($params['type']) {
 				case 'replyAll':
 					$cc = $row['to_email'];
@@ -196,8 +195,18 @@ class yetiforce extends rcube_plugin
 						$subject = 'Fwd: ' . $row['subject'];
 					break;
 			}
-			if (!empty($params['subject'])) {
-				$subject .= ' [' . $params['subject'] . ']';
+			if (!empty($params['recordNumber']) && !empty($params['crmmodule'])) {
+				$currentPath = getcwd();
+				chdir($this->rc->config->get('root_directory'));
+				$this->loadCurrentUser();
+
+				$subjectNumber = \includes\fields\Email::findCrmidByPrefix($subject, $params['crmmodule']);
+				$recordNumber = \includes\fields\Email::findCrmidByPrefix('[' . $params['recordNumber'] . ']', $params['crmmodule']);
+				if ($subject === false || ($subject !== false && $subjectNumber != $recordNumber)) {
+					$subject .= ' [' . $params['recordNumber'] . ']';
+				}
+
+				chdir($currentPath);
 			}
 			$args['param']['to'] = $to;
 			$args['param']['cc'] = $cc;
@@ -289,7 +298,7 @@ class yetiforce extends rcube_plugin
 	public function loadSignature($response)
 	{
 		global $OUTPUT, $MESSAGE;
-		if ($this->rc->config->get('enable_variables_in_signature')) {
+		if ($this->rc->config->get('enable_variables_in_signature') && !empty($OUTPUT->get_env('signatures'))) {
 			$signatures = [];
 			foreach ($OUTPUT->get_env('signatures') as $identityId => $signature) {
 				$signatures[$identityId]['text'] = $this->parseVariables($signature['text']);
