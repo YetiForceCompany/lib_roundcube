@@ -15,7 +15,7 @@ if (strlen($search)) {
 	if ($crmUserId) {
 		$addressBookFile = '../../../cache/addressBook/mails_' . $crmUserId . '.php';
 		if (is_file($addressBookFile)) {
-			$bookMails = require $addressBookFile;
+			include $addressBookFile;
 			foreach ($bookMails as $row) {
 				if (strpos($row, $search) !== false) {
 					$contacts[] = $row;
