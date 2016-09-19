@@ -12,6 +12,7 @@ class yetiforce extends rcube_plugin
 	private $rc;
 	private $autologin;
 	private $currentUser;
+	private $viewData = [];
 
 	public function init()
 	{
@@ -23,14 +24,30 @@ class yetiforce extends rcube_plugin
 		if ($this->rc->task == 'mail') {
 			$this->register_action('plugin.yetiforce.addFilesToMail', [$this, 'addFilesToMail']);
 			$this->rc->output->set_env('site_URL', $this->rc->config->get('site_URL'));
+			$this->include_stylesheet($this->rc->config->get('site_URL') . 'layouts/basic/skins/icons/userIcons.css');
 
 			if ($this->rc->action == 'compose') {
+				$currentPath = getcwd();
+				chdir($this->rc->config->get('root_directory'));
+				$this->loadCurrentUser();
+
+				$composeAddressModules = [];
+				foreach (AppConfig::module('Email', 'RC_COMPOSE_ADDRESS_MODULES') as $moduleName) {
+					if (\includes\Privileges::isPermitted($moduleName)) {
+						$composeAddressModules[$moduleName] = \includes\Language::translate($moduleName, $moduleName);
+					}
+				}
+				$this->viewData['compose']['composeAddressModules'] = $composeAddressModules;
+
+				chdir($currentPath);
+
 				$this->add_texts('localization/', false);
 				$this->include_script('compose.js');
 
 				$this->add_hook('message_compose_body', [$this, 'messageComposeBody']);
 				$this->add_hook('message_compose', [$this, 'messageComposeHead']);
 				$this->add_hook('render_page', [$this, 'loadSignature']);
+				$this->add_hook('template_object_yt_adress_button', [$this, 'ytAdressButton']);
 
 				$id = rcube_utils::get_input_value('_id', rcube_utils::INPUT_GPC);
 				if ($id && isset($_SESSION['compose_data_' . $id]['param']['crmmodule'])) {
@@ -46,7 +63,6 @@ class yetiforce extends rcube_plugin
 			if ($this->rc->action == 'preview' || $this->rc->action == 'show') {
 				$this->include_script('preview.js');
 				$this->include_stylesheet($this->rc->config->get('site_URL') . 'libraries/bootstrap3/css/glyphicon.css');
-				$this->include_stylesheet($this->rc->config->get('site_URL') . 'layouts/basic/skins/icons/userIcons.css');
 				$this->include_stylesheet('preview.css');
 				$this->add_hook('message_load', [$this, 'messageLoad']);
 			}
@@ -559,5 +575,19 @@ if (window && window.rcmail) {
 		$this->currentUser = $ownerObject;
 		vglobal('current_user', $ownerObject);
 		return true;
+	}
+
+	public function ytAdressButton($p)
+	{
+		if (empty($this->viewData['compose']['composeAddressModules'])) {
+			return $p;
+		}
+		$content = '';
+		foreach ($this->viewData['compose']['composeAddressModules'] as $moduleName => $value) {
+			$text = html::span(['class' => "userIcon-$moduleName"], '') . ' ' . $value;
+			$content .= html::a(['class' => 'button', 'data-input' => $p['part'], 'data-module' => $moduleName], $text);
+		}
+		$p['content'] = $content;
+		return $p;
 	}
 }

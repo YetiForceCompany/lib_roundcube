@@ -55,3 +55,11 @@
 body{
 	background: #dadada;
 }
+#yt_adress_buttons{
+    margin-top: 3px;
+}
+#yt_adress_buttons .button{
+    cursor: pointer;
+	color: #000;
+    font-weight: bold;
+}
