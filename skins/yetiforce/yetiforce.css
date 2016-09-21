@@ -55,11 +55,13 @@
 body{
 	background: #dadada;
 }
-#yt_adress_buttons{
-    margin-top: 3px;
+#mailview-bottom, #mailview-top{
+	height: 100% !important;
+	top: 0px !important;
 }
-#yt_adress_buttons .button{
-    cursor: pointer;
-	color: #000;
-    font-weight: bold;
+#mailpreviewtoggle.iconbutton.enabled{
+	background-position: -26px -224px !important;
+}
+#mailpreviewtoggle.iconbutton.closed{
+	background-position: -5px -224px !important;
 }
