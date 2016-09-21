@@ -26,11 +26,11 @@ class yetiforce extends rcube_plugin
 			$this->rc->output->set_env('site_URL', $this->rc->config->get('site_URL'));
 			$this->include_stylesheet($this->rc->config->get('site_URL') . 'layouts/basic/skins/icons/userIcons.css');
 
-			if ($this->rc->action == 'compose') {
-				$currentPath = getcwd();
-				chdir($this->rc->config->get('root_directory'));
-				$this->loadCurrentUser();
+			$currentPath = getcwd();
+			chdir($this->rc->config->get('root_directory'));
+			$this->loadCurrentUser();
 
+			if ($this->rc->action == 'compose') {
 				$composeAddressModules = [];
 				foreach (AppConfig::module('Email', 'RC_COMPOSE_ADDRESS_MODULES') as $moduleName) {
 					if (\includes\Privileges::isPermitted($moduleName)) {
@@ -38,8 +38,6 @@ class yetiforce extends rcube_plugin
 					}
 				}
 				$this->viewData['compose']['composeAddressModules'] = $composeAddressModules;
-
-				chdir($currentPath);
 
 				$this->add_texts('localization/', false);
 				$this->include_script('compose.js');
@@ -66,6 +64,9 @@ class yetiforce extends rcube_plugin
 				$this->include_stylesheet('preview.css');
 				$this->add_hook('message_load', [$this, 'messageLoad']);
 			}
+			$this->rc->output->set_env('orientationPanelView', AppConfig::module('Email', 'ORIENTATION_PANEL_VIEW'));
+
+			chdir($currentPath);
 		}
 	}
 
@@ -133,20 +134,6 @@ class yetiforce extends rcube_plugin
 		}
 		if ($row = $this->getAutoLogin()) {
 			$_SESSION['crm']['id'] = $row['cuid'];
-			if (isset($row['params']['language'])) {
-				$languages = $this->rc->list_languages();
-				$lang = explode('_', $row['params']['language']);
-				$lang[1] = strtoupper($lang[1]);
-				$lang = implode('_', $lang);
-				if (!isset($languages[$lang])) {
-					$lang = substr($lang, 0, 2);
-				}
-				if (isset($languages[$lang])) {
-					$this->rc->config->set('language', $lang);
-					$this->rc->load_language($lang);
-					$this->rc->user->save_prefs(['language' => $lang]);
-				}
-			}
 		}
 		return $args;
 	}
@@ -559,7 +546,6 @@ if (window && window.rcmail) {
 		$autologin = false;
 		if ($row = $db->fetch_assoc($sqlResult)) {
 			$autologin = $row;
-			$autologin['params'] = json_decode($autologin['params'], true);
 		}
 		$this->autologin = $autologin;
 		return $autologin;

@@ -83,7 +83,11 @@
 
 </div>
 
-<div id="mailview-right" role="main">
+<roundcube:if condition="env:orientationPanelView == h" />
+<div id="mailview-right " role="main">
+<roundcube:else />
+<div id="mailview-right" class="verticalPanel" role="main">
+<roundcube:endif />
 
 <roundcube:if condition="config:preview_pane == true" />
 <div id="mailview-top" class="uibox">

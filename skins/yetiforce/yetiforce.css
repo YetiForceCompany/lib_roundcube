@@ -55,13 +55,23 @@
 body{
 	background: #dadada;
 }
-#mailview-bottom, #mailview-top{
+#yt_adress_buttons{	
+	margin-top: 3px;		
+	top: 0px !important;
+}		
+#yt_adress_buttons .button{		
+	cursor: pointer;		
+	color: #000;		
+	font-weight: bold;
+}
+.verticalPanel #mailview-bottom, 
+.verticalPanel #mailview-top{
 	height: 100% !important;
 	top: 0px !important;
 }
-#mailpreviewtoggle.iconbutton.enabled{
-	background-position: -26px -224px !important;
+.verticalPanel #mailpreviewtoggle.iconbutton.enabled{
+    background-position: -26px -224px !important;
 }
-#mailpreviewtoggle.iconbutton.closed{
+.verticalPanel #mailpreviewtoggle.iconbutton.closed{
 	background-position: -5px -224px !important;
 }
