@@ -45,7 +45,7 @@ function registerEvents(content) {
 	registerRemoveRecord(content);
 	registerImportMail(content);
 
-	var block = content.find('.ytHeader > .data');
+	var block = content.find('.ytHeader .data');
 	content.find('.hideBtn').click(function () {
 		var button = $(this);
 		var icon = button.find('.glyphicon');

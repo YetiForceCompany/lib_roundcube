@@ -75,3 +75,19 @@ body{
 .verticalPanel #mailpreviewtoggle.iconbutton.closed{
 	background-position: -5px -224px !important;
 }
+@media only screen and (max-width:1040px){
+	.col-4{
+		float: left;
+		width: 100% !important;
+	}
+	.head{
+		height: auto !important;
+		padding-bottom: 2px; 
+	}
+	.relatedName{
+		font-size: 12px;
+	}
+}
+.actionBar{
+	background: #ecf6ff;
+}
