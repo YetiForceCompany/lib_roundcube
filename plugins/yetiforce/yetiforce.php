@@ -64,8 +64,13 @@ class yetiforce extends rcube_plugin
 				$this->include_stylesheet('preview.css');
 				$this->add_hook('message_load', [$this, 'messageLoad']);
 			}
-			$this->rc->output->set_env('orientationPanelView', AppConfig::module('Email', 'ORIENTATION_PANEL_VIEW'));
-
+			if(empty($this->rc->action)){
+				$this->rc->output->set_env('orientationPanelView', AppConfig::module('Email', 'ORIENTATION_PANEL_VIEW'));
+				$this->include_script('colResizable.js');
+				$this->include_script('list.js');
+			}
+			
+			
 			chdir($currentPath);
 		}
 	}
@@ -134,6 +139,20 @@ class yetiforce extends rcube_plugin
 		}
 		if ($row = $this->getAutoLogin()) {
 			$_SESSION['crm']['id'] = $row['cuid'];
+			if (isset($row['params']['language'])) {
+ 				$languages = $this->rc->list_languages();
+ 				$lang = explode('_', $row['params']['language']);
+ 				$lang[1] = strtoupper($lang[1]);
+ 				$lang = implode('_', $lang);
+ 				if (!isset($languages[$lang])) {
+ 					$lang = substr($lang, 0, 2);
+ 				}
+ 				if (isset($languages[$lang])) {
+ 					$this->rc->config->set('language', $lang);
+ 					$this->rc->load_language($lang);
+ 					$this->rc->user->save_prefs(['language' => $lang]);
+ 				}
+ 			}
 		}
 		return $args;
 	}
@@ -546,6 +565,7 @@ if (window && window.rcmail) {
 		$autologin = false;
 		if ($row = $db->fetch_assoc($sqlResult)) {
 			$autologin = $row;
+			$autologin['params'] = json_decode($autologin['params'], true);
 		}
 		$this->autologin = $autologin;
 		return $autologin;

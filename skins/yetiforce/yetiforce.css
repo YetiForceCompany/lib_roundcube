@@ -91,3 +91,6 @@ body{
 .actionBar{
 	background: #ecf6ff;
 }
+table.messagelist.fixedcopy{
+	position: absolute !important;
+}
