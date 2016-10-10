@@ -12,6 +12,7 @@ class yetiforce extends rcube_plugin
 	private $rc;
 	private $autologin;
 	private $currentUser;
+	private $viewData = [];
 
 	public function init()
 	{
@@ -23,14 +24,28 @@ class yetiforce extends rcube_plugin
 		if ($this->rc->task == 'mail') {
 			$this->register_action('plugin.yetiforce.addFilesToMail', [$this, 'addFilesToMail']);
 			$this->rc->output->set_env('site_URL', $this->rc->config->get('site_URL'));
+			$this->include_stylesheet($this->rc->config->get('site_URL') . 'layouts/basic/skins/icons/userIcons.css');
+
+			$currentPath = getcwd();
+			chdir($this->rc->config->get('root_directory'));
+			$this->loadCurrentUser();
 
 			if ($this->rc->action == 'compose') {
+				$composeAddressModules = [];
+				foreach (AppConfig::module('Email', 'RC_COMPOSE_ADDRESS_MODULES') as $moduleName) {
+					if (\App\Privilege::isPermitted($moduleName)) {
+						$composeAddressModules[$moduleName] = \includes\Language::translate($moduleName, $moduleName);
+					}
+				}
+				$this->viewData['compose']['composeAddressModules'] = $composeAddressModules;
+
 				$this->add_texts('localization/', false);
 				$this->include_script('compose.js');
 
 				$this->add_hook('message_compose_body', [$this, 'messageComposeBody']);
 				$this->add_hook('message_compose', [$this, 'messageComposeHead']);
 				$this->add_hook('render_page', [$this, 'loadSignature']);
+				$this->add_hook('template_object_yt_adress_button', [$this, 'ytAdressButton']);
 
 				$id = rcube_utils::get_input_value('_id', rcube_utils::INPUT_GPC);
 				if ($id && isset($_SESSION['compose_data_' . $id]['param']['crmmodule'])) {
@@ -46,10 +61,17 @@ class yetiforce extends rcube_plugin
 			if ($this->rc->action == 'preview' || $this->rc->action == 'show') {
 				$this->include_script('preview.js');
 				$this->include_stylesheet($this->rc->config->get('site_URL') . 'libraries/bootstrap3/css/glyphicon.css');
-				$this->include_stylesheet($this->rc->config->get('site_URL') . 'layouts/basic/skins/icons/userIcons.css');
 				$this->include_stylesheet('preview.css');
 				$this->add_hook('message_load', [$this, 'messageLoad']);
 			}
+			if(empty($this->rc->action)){
+				$this->rc->output->set_env('orientationPanelView', AppConfig::module('Email', 'ORIENTATION_PANEL_VIEW'));
+				$this->include_script('colResizable.js');
+				$this->include_script('list.js');
+			}
+			
+			
+			chdir($currentPath);
 		}
 	}
 
@@ -117,6 +139,20 @@ class yetiforce extends rcube_plugin
 		}
 		if ($row = $this->getAutoLogin()) {
 			$_SESSION['crm']['id'] = $row['cuid'];
+			if (isset($row['params']['language'])) {
+ 				$languages = $this->rc->list_languages();
+ 				$lang = explode('_', $row['params']['language']);
+ 				$lang[1] = strtoupper($lang[1]);
+ 				$lang = implode('_', $lang);
+ 				if (!isset($languages[$lang])) {
+ 					$lang = substr($lang, 0, 2);
+ 				}
+ 				if (isset($languages[$lang])) {
+ 					$this->rc->config->set('language', $lang);
+ 					$this->rc->load_language($lang);
+ 					$this->rc->user->save_prefs(['language' => $lang]);
+ 				}
+ 			}
 		}
 		return $args;
 	}
@@ -146,7 +182,6 @@ class yetiforce extends rcube_plugin
 		$db = $this->rc->get_dbh();
 		global $COMPOSE_ID;
 
-		$compose = &$_SESSION['compose_data_' . $COMPOSE_ID];
 		$composeKey = rcube_utils::get_input_value('_composeKey', rcube_utils::INPUT_GET);
 		$result = $db->query('SELECT * FROM `u_yf_mail_compose_data` WHERE `key` = ?', $composeKey);
 		$params = $db->fetch_assoc($result);
@@ -155,7 +190,7 @@ class yetiforce extends rcube_plugin
 			$params = json_decode($params['data'], true);
 
 			foreach ($params as $key => &$value) {
-				$compose['param'][$key] = $value;
+				$args['param'][$key] = $value;
 			}
 			if ((isset($params['crmmodule']) && $params['crmmodule'] == 'Documents') || (isset($params['filePath']) && $params['filePath'])) {
 				$userid = $this->rc->user->ID;
@@ -173,8 +208,8 @@ class yetiforce extends rcube_plugin
 			$mailId = $params['mailId'];
 			$result = $db->query('SELECT content,reply_to_email,date,from_email,to_email,cc_email,subject FROM vtiger_ossmailview WHERE ossmailviewid = ?;', $mailId);
 			$row = $db->fetch_assoc($result);
-			$compose['param']['type'] = $params['type'];
-			$compose['param']['mailData'] = $row;
+			$args['param']['type'] = $params['type'];
+			$args['param']['mailData'] = $row;
 			switch ($params['type']) {
 				case 'replyAll':
 					$cc = $row['to_email'];
@@ -196,8 +231,18 @@ class yetiforce extends rcube_plugin
 						$subject = 'Fwd: ' . $row['subject'];
 					break;
 			}
-			if (!empty($params['subject'])) {
-				$subject .= ' [' . $params['subject'] . ']';
+			if (!empty($params['recordNumber']) && !empty($params['crmmodule'])) {
+				$currentPath = getcwd();
+				chdir($this->rc->config->get('root_directory'));
+				$this->loadCurrentUser();
+
+				$subjectNumber = \includes\fields\Email::findRecordNumber($subject, $params['crmmodule']);
+				$recordNumber = \includes\fields\Email::findRecordNumber('[' . $params['recordNumber'] . ']', $params['crmmodule']);
+				if ($subject === false || ($subject !== false && $subjectNumber != $recordNumber)) {
+					$subject .= ' [' . $params['recordNumber'] . ']';
+				}
+
+				chdir($currentPath);
 			}
 			$args['param']['to'] = $to;
 			$args['param']['cc'] = $cc;
@@ -289,7 +334,7 @@ class yetiforce extends rcube_plugin
 	public function loadSignature($response)
 	{
 		global $OUTPUT, $MESSAGE;
-		if ($this->rc->config->get('enable_variables_in_signature')) {
+		if ($this->rc->config->get('enable_variables_in_signature') && !empty($OUTPUT->get_env('signatures'))) {
 			$signatures = [];
 			foreach ($OUTPUT->get_env('signatures') as $identityId => $signature) {
 				$signatures[$identityId]['text'] = $this->parseVariables($signature['text']);
@@ -520,6 +565,7 @@ if (window && window.rcmail) {
 		$autologin = false;
 		if ($row = $db->fetch_assoc($sqlResult)) {
 			$autologin = $row;
+			$autologin['params'] = json_decode($autologin['params'], true);
 		}
 		$this->autologin = $autologin;
 		return $autologin;
@@ -550,5 +596,19 @@ if (window && window.rcmail) {
 		$this->currentUser = $ownerObject;
 		vglobal('current_user', $ownerObject);
 		return true;
+	}
+
+	public function ytAdressButton($p)
+	{
+		if (empty($this->viewData['compose']['composeAddressModules'])) {
+			return $p;
+		}
+		$content = '';
+		foreach ($this->viewData['compose']['composeAddressModules'] as $moduleName => $value) {
+			$text = html::span(['class' => "userIcon-$moduleName"], '') . ' ' . $value;
+			$content .= html::a(['class' => 'button', 'data-input' => $p['part'], 'data-module' => $moduleName], $text);
+		}
+		$p['content'] = $content;
+		return $p;
 	}
 }

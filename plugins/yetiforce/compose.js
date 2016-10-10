@@ -50,7 +50,7 @@ window.rcmail && rcmail.addEventListener('init', function (evt) {
 	}, true);
 
 	// Selection of email with popup
-	$('#composeheaders #oss_btn_bar .oss_btn').click(function () {
+	$('#composeheaders #yt_adress_buttons .button').click(function () {
 		var mailField = $(this).attr('data-input');
 		var module = $(this).attr('data-module');
 		var params = {

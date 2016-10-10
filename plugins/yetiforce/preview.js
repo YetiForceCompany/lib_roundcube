@@ -45,7 +45,7 @@ function registerEvents(content) {
 	registerRemoveRecord(content);
 	registerImportMail(content);
 
-	var block = content.find('.ytHeader > .data');
+	var block = content.find('.ytHeader .data');
 	content.find('.hideBtn').click(function () {
 		var button = $(this);
 		var icon = button.find('.glyphicon');
@@ -224,18 +224,13 @@ function showQuickCreateForm(moduleName, record, params) {
 		$('<input type="hidden" name="sourceRecord" value="' + record + '" />').appendTo(data);
 		$('<input type="hidden" name="relationOperation" value="true" />').appendTo(data);
 	}
-	var links = JSON.parse(content.find('#modulesLevel0').val());
-	var process = JSON.parse(content.find('#modulesLevel1').val());
-	var subprocess = JSON.parse(content.find('#modulesLevel2').val());
-
-	if ($.inArray(sourceModule, links) >= 0) {
-		relatedParams['link'] = record;
-	}
-	if ($.inArray(sourceModule, process) >= 0) {
-		relatedParams['process'] = record;
-	}
-	if ($.inArray(sourceModule, subprocess) >= 0) {
-		relatedParams['subprocess'] = record;
+	var ids = {link: 'modulesLevel0', process: 'modulesLevel1', subprocess: 'modulesLevel2'};
+	for (var i in ids) {
+		var element = content.find('#' + ids[i]);
+		var value = element.length ? JSON.parse(element.val()) : [];
+		if ($.inArray(sourceModule, value) >= 0) {
+			relatedParams[i] = record;
+		}
 	}
 	if (moduleName == 'Leads') {
 		relatedParams['company'] = rcmail.env.fromName;
