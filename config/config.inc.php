@@ -5,8 +5,6 @@
  */
 $currentPath = getcwd();
 chdir(dirname(__FILE__) . '/../../../../');
-if (!$no_include_config) {
-	include_once('include/ConfigUtils.php');
-}
+include_once('include/ConfigUtils.php');
 include_once('config/modules/OSSMail.php');
 chdir($currentPath);
