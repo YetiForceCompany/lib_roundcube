@@ -65,14 +65,11 @@ class yetiforce extends rcube_plugin
 				$this->add_hook('message_load', [$this, 'messageLoad']);
 			}
 			if (empty($this->rc->action)) {
-				$this->add_hook('preferences_save', array($this, 'prefsSave'));
+				//$this->add_hook('preferences_save', array($this, 'prefsSave'));
 
-				$this->rc->output->set_env('orientationPanelView', AppConfig::module('Email', 'ORIENTATION_PANEL_VIEW'));
 				$this->include_script('colResizable.js');
 				$this->include_script('list.js');
 			}
-
-			//var_dump($this->rc->config->get('preview_pane'));
 			chdir($currentPath);
 		}
 	}
@@ -612,38 +609,5 @@ if (window && window.rcmail) {
 		}
 		$p['content'] = $content;
 		return $p;
-	}
-
-	// save prefs after modified in UI  
-	public function prefsSave($args)
-	{
-		if ($args['section'] != 'thunderbird_labels')
-			return $args;
-
-
-		$this->load_config();
-		$dont_override = (array) $this->rc->config->get('dont_override', array());
-
-		if (!in_array('tb_label_enable', $dont_override))
-			$args['prefs']['tb_label_enable'] = get_input_value('tb_label_enable', RCUBE_INPUT_POST) ? true : false;
-
-		if (!in_array('tb_label_enable_shortcuts', $dont_override))
-			$args['prefs']['tb_label_enable_shortcuts'] = get_input_value('tb_label_enable_shortcuts', RCUBE_INPUT_POST) ? true : false;
-
-		if (!in_array('tb_label_style', $dont_override))
-			$args['prefs']['tb_label_style'] = get_input_value('tb_label_style', RCUBE_INPUT_POST);
-
-		if (!in_array('tb_label_custom_labels', $dont_override) && $this->rc->config->get('tb_label_modify_labels')) {
-			$args['prefs']['tb_label_custom_labels'] = array(
-				0 => $this->gettext('label0'),
-				1 => get_input_value('tb_label_custom_labels1', RCUBE_INPUT_POST),
-				2 => get_input_value('tb_label_custom_labels2', RCUBE_INPUT_POST),
-				3 => get_input_value('tb_label_custom_labels3', RCUBE_INPUT_POST),
-				4 => get_input_value('tb_label_custom_labels4', RCUBE_INPUT_POST),
-				5 => get_input_value('tb_label_custom_labels5', RCUBE_INPUT_POST)
-			);
-		}
-
-		return $args;
 	}
 }
