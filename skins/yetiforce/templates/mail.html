@@ -4,15 +4,19 @@
 		<title><roundcube:object name="pagetitle" /></title>
 	<roundcube:include file="/includes/links.html" />
 	<style type="text/css">
-		<roundcube:if condition="config:preview_pane == 'v'" />
+		<roundcube:if condition="config:preview_pane != '0'" />
 		#mailview-top { height: 276px; }
-		#mailview-bottom { top: 330px; height: auto; display: block; }
+		#mailview-bottom { top: 330px; width: auto; height: auto; display: block; }
 		#mailpreviewframe { display: block; }
 		<roundcube:endif />
-		<roundcube:if condition="config:preview_pane == 'h'" />
-		#mailview-top { height: 276px; }
-		#mailview-bottom { top: 330px; height: auto; display: block; }
-		#mailpreviewframe { display: block; }
+		<roundcube:if condition="config:preview_pane == 'v'" />
+		.mailpreviewtoggle.horizontalBtn{
+			display: none;
+		}
+		<roundcube:elseif condition="config:preview_pane == 'h'" />
+		.mailpreviewtoggle.verticalBtn{
+			display: none;
+		}
 		<roundcube:endif />
 	</style>
 </head>
@@ -86,7 +90,7 @@
 			</div>
 		</div>
 		<roundcube:if condition="config:preview_pane == 'v'" />
-		<div id="mailview-right " class="verticalPanel" role="main">
+		<div id="mailview-right" class="verticalPanel" role="main">
 			<roundcube:else />
 			<div id="mailview-right" role="main">
 				<roundcube:endif />
@@ -143,7 +147,7 @@
 								<a href="#preview" class="mailpreviewtoggle horizontalBtn" title="<roundcube:label name='previewpane' />" data-type="h" role="button" tabindex="0">
 									<span class="inner"></span>
 								</a>&nbsp;
-								<a href="#preview" class="mailpreviewtoggle verticalBtn " title="<roundcube:label name='previewpane' />" data-type="v" role="button" tabindex="0">
+								<a href="#preview" class="mailpreviewtoggle verticalBtn" title="<roundcube:label name='previewpane' />" data-type="v" role="button" tabindex="0">
 									<span class="inner"></span>
 								</a>
 							</div>
@@ -152,7 +156,7 @@
 
 					<div id="mailview-bottom" class="uibox">
 
-						<div id="mailpreviewframe" class="iframebox" role="complementary" aria-labelledby="aria-label-mailpreviewframe">
+						<div id="mailpreviewframe" class="iframebox" data-type="<roundcube:var name='config:preview_pane' />" role="complementary" aria-labelledby="aria-label-mailpreviewframe">
 							<h2 id="aria-label-mailpreviewframe" class="voice"><roundcube:label name="arialabelmailpreviewframe" /></h2>
 							<roundcube:object name="messagecontentframe" id="messagecontframe" style="width:100%; height:100%" frameborder="0" src="/watermark.html" title="arialabelmailpreviewframe" />
 						</div>

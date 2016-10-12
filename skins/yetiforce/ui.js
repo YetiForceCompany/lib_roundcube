@@ -218,12 +218,20 @@ function rcube_mail_ui()
 				new rcube_splitter({id: 'composesplitterv', p1: '#composeview-left', p2: '#composeview-right',
 					orientation: 'v', relative: true, start: 206, min: 170, size: 12, render: layout_composeview}).init();
 			} else if (rcmail.env.action == 'list' || !rcmail.env.action) {
-				var previewframe = $('#mailpreviewframe').is(':visible');
-				$('#mailpreviewtogglebtn .mailpreviewtoggle').addClass(previewframe ? 'enabled' : 'closed').attr('aria-expanded', previewframe ? 'true' : 'false')
-						.click(function (e) {
-							toggle_preview_pane(e);
-							return false;
-						});
+				var previewFrame = $('#mailpreviewframe');
+				var previewFrameType = previewFrame.data('type');
+				var isPreview = previewFrame.is(':visible');
+				$('#mailpreviewtogglebtn .mailpreviewtoggle').each(function (n, e) {
+					var btn = $(e);
+					if (isPreview && btn.data('type') == previewFrameType) {
+						btn.addClass('enabled').attr('aria-expanded', 'true');
+					} else {
+						btn.addClass('closed').attr('aria-expanded', 'false');
+					}
+				}).click(function (e) {
+					toggle_preview_pane(e);
+					return false;
+				});
 				$('#maillistmode').addClass(rcmail.env.threading ? '' : 'selected').click(function (e) {
 					switch_view_mode('list');
 					return false;
@@ -238,10 +246,8 @@ function rcube_mail_ui()
 					h: new rcube_splitter({id: 'mailviewsplitter_h', p1: '#mailview-top', p2: '#mailview-bottom',
 						orientation: 'h', relative: true, start: 310, min: 150, size: 12, offset: 4})
 				};
-				console.log(previewframe);
-				if (previewframe) {
-					mailviewsplit.v.init();
-					//mailviewsplit.h.init();
+				if (isPreview && mailviewsplit[previewFrameType] != undefined) {
+					mailviewsplit[previewFrameType].init();
 				}
 				rcmail.addEventListener('setquota', update_quota)
 						.addEventListener('enable-command', enable_command)
