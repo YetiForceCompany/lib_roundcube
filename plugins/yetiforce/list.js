@@ -1,28 +1,31 @@
 /* {[The file is published on the basis of YetiForce Public License that can be found in the following directory: licenses/License.html]} */
 window.rcmail && rcmail.addEventListener('listupdate', function (evt) {
-	window.crm = getCrmWindow();
+	//window.crm = getCrmWindow();
 	rcmail.register_command('yetiforce.importICS', function (ics, element, e) {
 
 	}, true);
 	var container = $('#messagelistcontainer');
 	var headerFixed = container.find('.records-table.messagelist.sortheader.fixedheader.fixedcopy');
 	var messageList = container.find('#messagelist');
-	var columnsWidth = window.crm.app.moduleCacheGet('widthColumns');
-	if (columnsWidth != null) {
-		messageList.find('th,td').each(function (index) {
-			$(this).width(columnsWidth[index]);
-		});
-		headerFixed.find('th,td').each(function (index) {
-			$(this).width(columnsWidth[index]);
-		});
-	}
-
-	headerFixed.colResizable({
-		onResize: function (e) {
-			resizeContentTable(headerFixed, messageList, e);
-		},
-		resizeMode:'fit'
-	});
+	/*
+	 var columnsWidth = window.crm.app.moduleCacheGet('widthColumns');
+	 if (columnsWidth != null) {
+	 messageList.find('th,td').each(function (index) {
+	 $(this).width(columnsWidth[index]);
+	 });
+	 headerFixed.find('th,td').each(function (index) {
+	 $(this).width(columnsWidth[index]);
+	 });
+	 }
+	 */
+	/*
+	 headerFixed.colResizable({
+	 onResize: function (e) {
+	 resizeContentTable(headerFixed, messageList, e);
+	 },
+	 resizeMode:'fit'
+	 });
+	 */
 });
 
 function resizeContentTable(headerFixed, messageList, e)
@@ -36,17 +39,4 @@ function resizeContentTable(headerFixed, messageList, e)
 	});
 	window.crm.app.moduleCacheSet('widthColumns', column_widths);
 	$(window).scroll();
-	
-	
-}
-
-function getCrmWindow() {
-	if (opener !== null) {
-		return opener.parent;
-	} else if (typeof parent.app == "object") {
-		return parent;
-	} else if (typeof parent.parent.app == "object") {
-		return parent.parent;
-	}
-	return false;
 }

@@ -69,12 +69,6 @@ body{
 	height: 100% !important;
 	top: 0px !important;
 }
-.verticalPanel #mailpreviewtoggle.iconbutton.enabled{
-    background-position: -26px -224px !important;
-}
-.verticalPanel #mailpreviewtoggle.iconbutton.closed{
-	background-position: -5px -224px !important;
-}
 @media only screen and (max-width:1040px){
 	.col-4{
 		float: left;
@@ -101,4 +95,50 @@ table.messagelist.fixedcopy{
 .chevronBtnCube .hideBtn{
 	padding-left: 2px;
 	padding-right: 2px;
+}
+
+#mailpreviewtogglebtn{
+    position: absolute;
+    top: 6px;
+    right: 10px;
+}
+.mailpreviewtoggle{
+	display: inline-block;
+	text-decoration: none;
+    padding: 1px 3px;
+	width: 16px;
+    height: 14px;
+    vertical-align: middle;
+    font-weight: bold;
+    background: #d8d8d8;
+    background: -moz-linear-gradient(top,#d8d8d8 0,#bababa 100%);
+    background: -webkit-gradient(linear,left top,left bottom,color-stop(0%,#d8d8d8),color-stop(100%,#bababa));
+    background: -o-linear-gradient(top,#d8d8d8 0,#bababa 100%);
+    background: -ms-linear-gradient(top,#d8d8d8 0,#bababa 100%);
+    background: linear-gradient(to bottom,#d8d8d8 0,#bababa 100%);
+    box-shadow: 0 1px 1px 0 #999;
+    -webkit-box-shadow: 0 1px 1px 0 #999;
+    margin: 0 2px;
+    color: #525252;
+    text-shadow: 0 1px 1px #fff;
+    border: 1px solid #e6e6e6;
+    border-radius: 4px;
+}
+.mailpreviewtoggle .inner{
+	width: 16px;
+    height: 13px;
+	display: inline-block;
+    background: url(images/buttons.png?v=51d4.15699) no-repeat;
+}
+.mailpreviewtoggle.verticalBtn .inner{
+	background-position: -6px -226px;
+}
+.mailpreviewtoggle.verticalBtn.enabled .inner{
+	background-position: -28px -226px;
+}
+.mailpreviewtoggle.horizontalBtn .inner{
+	background-position: -7px -241px;
+}
+.mailpreviewtoggle.horizontalBtn.enabled .inner{
+	background-position: -28px -242px;
 }
