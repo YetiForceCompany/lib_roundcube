@@ -235,8 +235,8 @@ class yetiforce extends rcube_plugin
 				chdir($this->rc->config->get('root_directory'));
 				$this->loadCurrentUser();
 
-				$subjectNumber = \includes\fields\Email::findRecordNumber($subject, $params['crmmodule']);
-				$recordNumber = \includes\fields\Email::findRecordNumber('[' . $params['recordNumber'] . ']', $params['crmmodule']);
+				$subjectNumber = \App\Fields\Email::findRecordNumber($subject, $params['crmmodule']);
+				$recordNumber = \App\Fields\Email::findRecordNumber('[' . $params['recordNumber'] . ']', $params['crmmodule']);
 				if ($subject === false || ($subject !== false && $subjectNumber != $recordNumber)) {
 					$subject .= ' [' . $params['recordNumber'] . ']';
 				}
