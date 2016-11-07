@@ -68,7 +68,7 @@ function registerImportMail(content) {
 			type: 'info'
 		});
 		var params = {
-			module: 'OSSMailScanner',
+			module: 'OSSMail',
 			action: 'ImportMail',
 			params: {
 				uid: rcmail.env.uid,
