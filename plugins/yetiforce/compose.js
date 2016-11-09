@@ -68,30 +68,31 @@ window.rcmail && rcmail.addEventListener('init', function (evt) {
 		});
 	});
 	//Loading list of modules with templates mail
-	jQuery.ajax({
-		type: 'Get',
-		url: crmPath + 'module=OSSMailTemplates&action=GetTemplates',
-		async: false,
-		success: function (data) {
-			var modules = [];
-			var tmp = [];
-			$.each(data.result, function (index, value) {
-				jQuery('#vtmodulemenulink').removeClass('disabled');
-				jQuery('#tplmenulink').removeClass('disabled');
-				tmp.push({name: value.module, label: value.moduleName});
-				jQuery('#tplmenu #texttplsmenu').append('<li class="' + value.module + '"><a href="#" data-module="' + value.module + '" data-tplid="' + value.id + '" class="active">' + value.name + '</a></li>');
-			});
+	if(rcmail.env.isPermittedOSSMailTemplates){
+		jQuery.ajax({
+			type: 'Get',
+			url: crmPath + 'module=OSSMailTemplates&action=GetTemplates',
+			async: false,
+			success: function (data) {
+				var modules = [];
+				var tmp = [];
+				$.each(data.result, function (index, value) {
+					jQuery('#vtmodulemenulink').removeClass('disabled');
+					jQuery('#tplmenulink').removeClass('disabled');
+					tmp.push({name: value.module, label: value.moduleName});
+					jQuery('#tplmenu #texttplsmenu').append('<li class="' + value.module + '"><a href="#" data-module="' + value.module + '" data-tplid="' + value.id + '" class="active">' + value.name + '</a></li>');
+				});
 
-			$.each(tmp, function (index, value) {
-				if (jQuery.inArray(value.name, modules) == -1) {
-					jQuery('#vtmodulemenu .toolbarmenu').append('<li class="' + value.name + '"><a href="#" data-module="' + value.name + '" class="active">' + value.label + '</a></li>');
-					modules.push(value.name);
-				}
-			});
+				$.each(tmp, function (index, value) {
+					if (jQuery.inArray(value.name, modules) == -1) {
+						jQuery('#vtmodulemenu .toolbarmenu').append('<li class="' + value.name + '"><a href="#" data-module="' + value.name + '" class="active">' + value.label + '</a></li>');
+						modules.push(value.name);
+					}
+				});
 
-		}
-	});
-
+			}
+		});
+	}
 	// Limit the list of templates
 	jQuery('#vtmodulemenu li a').on('click', function () {
 		var selectModule = jQuery(this).data('module');
