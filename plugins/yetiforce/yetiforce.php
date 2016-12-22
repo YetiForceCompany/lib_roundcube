@@ -398,6 +398,7 @@ class yetiforce extends rcube_plugin
 	{
 		$COMPOSE_ID = rcube_utils::get_input_value('_id', rcube_utils::INPUT_GPC);
 		$uploadid = rcube_utils::get_input_value('_uploadid', rcube_utils::INPUT_GPC);
+		$ids = rcube_utils::get_input_value('ids', rcube_utils::INPUT_GPC);
 		$COMPOSE = null;
 
 		if ($COMPOSE_ID && $_SESSION['compose_data_' . $COMPOSE_ID]) {
@@ -405,12 +406,12 @@ class yetiforce extends rcube_plugin
 			$COMPOSE = & $_SESSION[$SESSION_KEY];
 		}
 		if (!$COMPOSE) {
-			die("Invalid session var!");
+			die('Invalid session var!');
 		}
 		$this->rc = rcmail::get_instance();
 		$index = 0;
 
-		$attachments = self::getFiles();
+		$attachments = $this->getAttachment($ids, false);
 		foreach ($attachments as $attachment) {
 			$index++;
 			$attachment['group'] = $COMPOSE_ID;
@@ -462,13 +463,6 @@ if (window && window.rcmail) {
 		exit;
 	}
 
-	public function getFiles()
-	{
-		$files = [];
-		$files = array_merge($files, self::getAttachment());
-		return $files;
-	}
-
 	public function getAttachment($ids, $files)
 	{
 
@@ -488,7 +482,7 @@ if (window && window.rcmail) {
 			while ($row = $db->fetch_assoc($sql_result)) {
 				$orgFile = $this->rc->config->get('root_directory') . $row['path'] . $row['attachmentsid'] . '_' . $row['name'];
 				list($usec, $sec) = explode(' ', microtime());
-				$filepath = $this->rc->config->get('root_directory') . 'modules/OSSMail/roundcube/temp/' . $sec . $userid . $row['attachmentsid'] . $index . '.tmp';
+				$filepath = $this->rc->config->get('root_directory') . 'cache/mail/' . $sec . $userid . $row['attachmentsid'] . $index . '.tmp';
 				if (file_exists($orgFile)) {
 					copy($orgFile, $filepath);
 					$attachment = [
@@ -505,7 +499,7 @@ if (window && window.rcmail) {
 		if ($files) {
 			$orgFile = $this->rc->config->get('root_directory') . $files;
 			list($usec, $sec) = explode(' ', microtime());
-			$filepath = $this->rc->config->get('root_directory') . 'modules/OSSMail/roundcube/temp/' . $sec . $userid . $index . '.tmp';
+			$filepath = $this->rc->config->get('root_directory') . 'cache/mail/' . $sec . $userid . $index . '.tmp';
 			if (file_exists($orgFile)) {
 				copy($orgFile, $filepath);
 				$attachment = [
