@@ -18,7 +18,7 @@
 <roundcube:if condition="!env:extwin" />
 	<roundcube:button command="list" type="link" class="button back disabled" classAct="button back" classSel="button back pressed" label="back" />
 <roundcube:endif />
-	<roundcube:include file="/includes/mailtoolbar.html" />
+	<roundcube:include file="/includes/mailtoolbar.html" skinPath="skins/larry" />
 </div>
 
 <roundcube:if condition="!env:extwin" />
@@ -75,7 +75,7 @@
 
 <h2 class="subject"><span class="voice"><roundcube:label name="subject" />: </span><roundcube:object name="messageHeaders" valueOf="subject" /></h2>
 <div class="message-headers">
-<roundcube:object name="messageHeaders" class="headers-table" addicon="/images/addcontact.png" exclude="subject" max="20" />
+<roundcube:object name="messageHeaders" class="headers-table"  exclude="subject" max="20" />
 </div>
 <roundcube:object name="messageFullHeaders" id="full-headers" />
 

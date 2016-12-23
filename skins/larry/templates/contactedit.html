@@ -1,16 +1,16 @@
 <roundcube:object name="doctype" value="html5" />
 <html>
-<head>
-<title><roundcube:object name="pagetitle" /></title>
-<roundcube:include file="/includes/links.html" />
+	<head>
+		<title><roundcube:object name="pagetitle" /></title>
+	<roundcube:include file="/includes/links.html" />
 </head>
 <body class="iframe">
 
-<h1 class="boxtitle"><roundcube:object name="steptitle" /></h1>
+	<h1 class="boxtitle"><roundcube:object name="steptitle" /></h1>
 
 <roundcube:form name="editform" method="post" id="contact-details" class="boxcontent">
 	<roundcube:if condition="strlen(env:sourcename)" />
-		<div id="sourcename"><roundcube:label name="addressbook" />: <roundcube:var name="env:sourcename" condition="env:action!='add'" /><roundcube:object name="sourceselector" id="sourceselect" condition="env:action=='add'" /></div>
+	<div id="sourcename"><roundcube:label name="addressbook" />: <roundcube:var name="env:sourcename" condition="env:action!='add'" /><roundcube:object name="sourceselector" id="sourceselect" condition="env:action=='add'" /></div>
 	<roundcube:endif />
 
 	<fieldset id="contactphoto">

@@ -142,3 +142,6 @@ table.messagelist.fixedcopy{
 .mailpreviewtoggle.horizontalBtn.enabled .inner{
 	background-position: -28px -242px;
 }
+#composeview-right {
+	left: 0;
+}
