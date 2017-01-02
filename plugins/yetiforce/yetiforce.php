@@ -565,15 +565,21 @@ if (window && window.rcmail) {
 		return $autologin;
 	}
 
+	/**
+	 * Parse variables
+	 * @param string $text
+	 * @return string
+	 */
 	protected function parseVariables($text)
 	{
 		$currentPath = getcwd();
 		chdir($this->rc->config->get('root_directory'));
 		$this->loadCurrentUser();
 
-		$textParser = Vtiger_TextParser_Helper::getCleanInstance();
-		$textParser->setContent($text);
-		$text = $textParser->parse();
+		$text = \App\TextParser::getInstance()
+			->setContent($text)
+			->parse()
+			->getContent();
 
 		chdir($currentPath);
 		return $text;
