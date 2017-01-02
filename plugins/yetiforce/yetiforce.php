@@ -32,7 +32,7 @@ class yetiforce extends rcube_plugin
 
 			if ($this->rc->action == 'compose') {
 				$composeAddressModules = [];
-				foreach (AppConfig::module('Email', 'RC_COMPOSE_ADDRESS_MODULES') as $moduleName) {
+				foreach (AppConfig::module('Mail', 'RC_COMPOSE_ADDRESS_MODULES') as $moduleName) {
 					if (\App\Privilege::isPermitted($moduleName)) {
 						$composeAddressModules[$moduleName] = \App\Language::translate($moduleName, $moduleName);
 					}
