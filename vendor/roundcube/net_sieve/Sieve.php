@@ -699,8 +699,7 @@ class Net_Sieve
             return $challenge;
         }
 
-        $auth_sasl = new Auth_SASL;
-        $cram      = $auth_sasl->factory('crammd5');
+        $cram      = Auth_SASL::factory('crammd5');
         $challenge = base64_decode(trim($challenge));
         $response  = $cram->getResponse($user, $pass, $challenge);
 
@@ -727,8 +726,7 @@ class Net_Sieve
             return $challenge;
         }
 
-        $auth_sasl = new Auth_SASL;
-        $digest    = $auth_sasl->factory('digestmd5');
+        $digest    = Auth_SASL::factory('digestmd5');
         $challenge = base64_decode(trim($challenge));
 
         // @todo Really 'localhost'?
