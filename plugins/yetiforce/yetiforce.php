@@ -23,6 +23,8 @@ class yetiforce extends rcube_plugin
 
 		if ($this->rc->task == 'mail') {
 			$this->register_action('plugin.yetiforce.addFilesToMail', [$this, 'addFilesToMail']);
+			$this->register_action('plugin.yetiforce.GetEmailTemplates', [$this, 'getEmailTemplates']);
+			$this->register_action('plugin.yetiforce.GetConntentEmailTemplate', [$this, 'getConntentEmailTemplate']);
 			$this->rc->output->set_env('site_URL', $this->rc->config->get('site_URL'));
 			$this->include_stylesheet($this->rc->config->get('site_URL') . 'layouts/basic/skins/icons/userIcons.css');
 
@@ -326,6 +328,7 @@ class yetiforce extends rcube_plugin
 				$body = $prefix . '<blockquote>' . $body . '</blockquote>' . $suffix;
 			}
 		}
+		$this->rc->output->set_env('compose_mode', $type);
 		$args['body'] = $body;
 		return $args;
 	}
@@ -610,5 +613,30 @@ if (window && window.rcmail) {
 		}
 		$p['content'] = $content;
 		return $p;
+	}
+
+	public function getEmailTemplates()
+	{
+		$currentPath = getcwd();
+		chdir($this->rc->config->get('root_directory'));
+		$this->loadCurrentUser();
+		$emailTemplates = App\Mail::getTempleteList(false, 'PLL_MAIL');
+		echo App\Json::encode($emailTemplates);
+		chdir($currentPath);
+		exit;
+	}
+
+	public function getConntentEmailTemplate()
+	{
+		$recordId = rcube_utils::get_input_value('id', rcube_utils::INPUT_GPC);
+		$currentPath = getcwd();
+		chdir($this->rc->config->get('root_directory'));
+		$this->loadCurrentUser();
+		$mail = App\Mail::getTempleteDetail($recordId);
+		$emailTemplates ['subject'] = $mail['subject'];
+		$emailTemplates ['content'] = $mail['content'];
+		echo App\Json::encode($emailTemplates);
+		chdir($currentPath);
+		exit;
 	}
 }

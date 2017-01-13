@@ -1,6 +1,8 @@
 /* {[The file is published on the basis of YetiForce Public License that can be found in the following directory: licenses/License.html]} */
 
+
 window.rcmail && rcmail.addEventListener('init', function (evt) {
+
 	var crm = window.crm = getCrmWindow();
 	var crmPath = rcmail.env.site_URL + 'index.php?';
 
@@ -68,19 +70,20 @@ window.rcmail && rcmail.addEventListener('init', function (evt) {
 		});
 	});
 	//Loading list of modules with templates mail
-	if(rcmail.env.isPermittedOSSMailTemplates){
+	if (rcmail.env.isPermittedOSSMailTemplates) {
 		jQuery.ajax({
 			type: 'Get',
-			url: crmPath + 'module=OSSMailTemplates&action=GetTemplates',
+			url: "?_task=mail&_action=plugin.yetiforce.GetEmailTemplates&_id=" + rcmail.env.compose_id,
 			async: false,
 			success: function (data) {
 				var modules = [];
 				var tmp = [];
-				$.each(data.result, function (index, value) {
+				data = JSON.parse(data);
+				$.each(data, function (index, value) {
 					jQuery('#vtmodulemenulink').removeClass('disabled');
 					jQuery('#tplmenulink').removeClass('disabled');
-					tmp.push({name: value.module, label: value.moduleName});
-					jQuery('#tplmenu #texttplsmenu').append('<li class="' + value.module + '"><a href="#" data-module="' + value.module + '" data-tplid="' + value.id + '" class="active">' + value.name + '</a></li>');
+					tmp.push({name: value.moduleName, label: value.moduleName});
+					jQuery('#tplmenu #texttplsmenu').append('<li class="' + value.moduleName + '"><a href="#" data-module="' + value.module + '" data-tplid="' + value.id + '" class="active">' + value.name + '</a></li>');
 				});
 
 				$.each(tmp, function (index, value) {
@@ -120,16 +123,17 @@ window.rcmail && rcmail.addEventListener('init', function (evt) {
 		}
 		jQuery.ajax({
 			type: 'Get',
-			url: crmPath + 'module=OSSMailTemplates&action=GetTpl',
+			url: "?_task=mail&_action=plugin.yetiforce.GetConntentEmailTemplate&_id=" + rcmail.env.compose_id,
 			data: {
 				id: id,
 				record_id: recordId,
 				select_module: module
 			},
 			success: function (data) {
+				data = JSON.parse(data);
 				var oldSubject = jQuery('[name="_subject"]').val();
-				var html = jQuery("<div/>").html(data.result['content']).html();
-				jQuery('[name="_subject"]').val(oldSubject + ' ' + data.result['subject']);
+				var html = jQuery("<div/>").html(data.content).html();
+				jQuery('[name="_subject"]').val(oldSubject + ' ' + data.subject);
 				if (window.tinyMCE && (ed = tinyMCE.get(rcmail.env.composebody))) {
 					var oldBody = tinyMCE.activeEditor.getContent();
 					tinymce.activeEditor.setContent(html + oldBody);
@@ -138,7 +142,7 @@ window.rcmail && rcmail.addEventListener('init', function (evt) {
 					jQuery('#composebody').val(html + oldBody);
 				}
 				if (data.result.hasOwnProperty("attachments")) {
-					rcmail.command('yetiforce.addFilesToMail', data.result.attachments);
+					rcmail.command('yetiforce.addFilesToMail', data.attachments);
 				}
 			}
 		});
