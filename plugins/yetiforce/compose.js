@@ -73,7 +73,7 @@ window.rcmail && rcmail.addEventListener('init', function (evt) {
 	if (rcmail.env.isPermittedOSSMailTemplates) {
 		jQuery.ajax({
 			type: 'Get',
-			url: "?_task=mail&_action=plugin.yetiforce.GetEmailTemplates&_id=" + rcmail.env.compose_id,
+			url: "?_task=mail&_action=plugin.yetiforce.getEmailTemplates&_id=" + rcmail.env.compose_id,
 			async: false,
 			success: function (data) {
 				var modules = [];
@@ -123,7 +123,7 @@ window.rcmail && rcmail.addEventListener('init', function (evt) {
 		}
 		jQuery.ajax({
 			type: 'Get',
-			url: "?_task=mail&_action=plugin.yetiforce.GetConntentEmailTemplate&_id=" + rcmail.env.compose_id,
+			url: "?_task=mail&_action=plugin.yetiforce.getConntentEmailTemplate&_id=" + rcmail.env.compose_id,
 			data: {
 				id: id,
 				record_id: recordId,
@@ -141,7 +141,7 @@ window.rcmail && rcmail.addEventListener('init', function (evt) {
 					var oldBody = jQuery('#composebody').val();
 					jQuery('#composebody').val(html + oldBody);
 				}
-				if (data.result.hasOwnProperty("attachments")) {
+				if (typeof data.attachments !== 'undefined') {
 					rcmail.command('yetiforce.addFilesToMail', data.attachments);
 				}
 			}
