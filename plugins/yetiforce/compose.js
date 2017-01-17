@@ -70,7 +70,7 @@ window.rcmail && rcmail.addEventListener('init', function (evt) {
 		});
 	});
 	//Loading list of modules with templates mail
-	if (rcmail.env.isPermittedOSSMailTemplates) {
+	if (rcmail.env.isPermittedMailTemplates) {
 		jQuery.ajax({
 			type: 'Get',
 			url: "?_task=mail&_action=plugin.yetiforce.getEmailTemplates&_id=" + rcmail.env.compose_id,

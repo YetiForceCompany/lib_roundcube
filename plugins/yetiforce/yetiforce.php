@@ -40,7 +40,7 @@ class yetiforce extends rcube_plugin
 					}
 				}
 				$this->viewData['compose']['composeAddressModules'] = $composeAddressModules;
-				$this->rc->output->set_env('isPermittedOSSMailTemplates', \App\Privilege::isPermitted('EmailTemplates'));
+				$this->rc->output->set_env('isPermittedMailTemplates', \App\Privilege::isPermitted('EmailTemplates'));
 
 				$this->add_texts('localization/', false);
 				$this->include_script('compose.js');
