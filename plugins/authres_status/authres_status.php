@@ -359,7 +359,7 @@ class authres_status extends rcube_plugin
 				$status = 0;
 				if ($uid) {
 					$rcmail = rcmail::get_instance();
-					if ($headers->others['dkim-signature']) {
+					if ($headers->others['dkim-signature'] && $rcmail->config->get('use_fallback_verifier')) {
 						if (!class_exists('DKIM_Verify')) {
 							require __DIR__ . "/DKIM/Verify.php";
 						}
