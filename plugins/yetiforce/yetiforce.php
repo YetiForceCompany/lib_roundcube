@@ -24,6 +24,7 @@ class yetiforce extends rcube_plugin
 		if ($this->rc->task == 'mail') {
 			$this->register_action('plugin.yetiforce.addFilesToMail', [$this, 'addFilesToMail']);
 			$this->register_action('plugin.yetiforce.getEmailTemplates', [$this, 'getEmailTemplates']);
+			$this->register_action('plugin.yetiforce.getEmailFromCRM', [$this, 'getEmailFromCRM']);
 			$this->register_action('plugin.yetiforce.getConntentEmailTemplate', [$this, 'getConntentEmailTemplate']);
 			$this->rc->output->set_env('site_URL', $this->rc->config->get('site_URL'));
 			$this->include_stylesheet($this->rc->config->get('site_URL') . 'layouts/basic/skins/icons/userIcons.css');
@@ -613,6 +614,32 @@ if (window && window.rcmail) {
 		}
 		$p['content'] = $content;
 		return $p;
+	}
+
+	/**
+	 * Get address email from CRM
+	 */
+	public function getEmailFromCRM()
+	{
+		$currentPath = getcwd();
+		chdir($this->rc->config->get('root_directory'));
+		$this->loadCurrentUser();
+		$ids = rcube_utils::get_input_value('recordsId', rcube_utils::INPUT_GPC);
+		$sourceModule = rcube_utils::get_input_value('moduleName', rcube_utils::INPUT_GPC);
+		$emailFields = OSSMailScanner_Record_Model::getEmailSearch($sourceModule);
+		$addresEmails = [];
+		foreach ($ids as $id) {
+			$recordModel = Vtiger_Record_Model::getInstanceById($id, $sourceModule);
+			foreach ($emailFields as &$emailField) {
+				$email = $recordModel->get($emailField['fieldname']);
+				if (!empty($email)) {
+					$addresEmails[] = $email;
+				}
+			}
+		}
+		echo App\Json::encode($addresEmails);
+		chdir($currentPath);
+		exit;
 	}
 
 	/**

@@ -63,10 +63,11 @@ window.rcmail && rcmail.addEventListener('init', function (evt) {
 		};
 		show(params, function (data) {
 			var responseData = JSON.parse(data);
-			var length = Object.keys(responseData).length;
+			var ids = [];
 			for (var id in responseData) {
-				getMailFromCRM(mailField, module, id, length);
+				ids.push(id);
 			}
+			getMailFromCRM(mailField, module, ids);
 		});
 	});
 	//Loading list of modules with templates mail
@@ -158,25 +159,31 @@ function getCrmWindow() {
 	return false;
 }
 
-function getMailFromCRM(mailField, module, record, length) {
-	if (length > 1) {
-		length = 1;
-	} else {
-		length = 0;
-	}
-	window.crm.Vtiger_Index_Js.getEmailFromRecord(record, module, length).then(function (data) {
-		if (data == '') {
-			var notifyParams = {
-				text: window.crm.app.vtranslate('NoFindEmailInRecord'),
-				animation: 'show'
-			};
-			window.crm.Vtiger_Helper_Js.showPnotify(notifyParams);
-		} else {
-			var emails = $('#' + mailField).val();
-			if (emails != '' && emails.charAt(emails.length - 1) != ',') {
-				emails = emails + ',';
+function getMailFromCRM(mailField, moduleName, records) {
+	jQuery.ajax({
+		type: "POST",
+		url: "?_task=mail&_action=plugin.yetiforce.getEmailFromCRM&_id=" + rcmail.env.compose_id,
+		async: false,
+		data: {
+			recordsId: records,
+			moduleName: moduleName,
+		},
+		success: function (data) {
+			data = JSON.parse(data);
+			if (data.length == 0 ) {
+				var notifyParams = {
+					text: window.crm.app.vtranslate('NoFindEmailInRecord'),
+					animation: 'show'
+				};
+				window.crm.Vtiger_Helper_Js.showPnotify(notifyParams);
+			} else {
+				console.log(data);
+				var emails = $('#' + mailField).val();
+				if (emails != '' && emails.charAt(emails.length - 1) != ',') {
+					emails = emails + ',';
+				}
+				$('#' + mailField).val(emails + data);
 			}
-			$('#' + mailField).val(emails + data);
 		}
 	});
 }
