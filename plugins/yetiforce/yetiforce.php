@@ -599,6 +599,7 @@ if (window && window.rcmail) {
 		$ownerObject->retrieveCurrentUserInfoFromFile($_SESSION['crm']['id']);
 		$this->currentUser = $ownerObject;
 		vglobal('current_user', $ownerObject);
+		App\User::setCurrentUserId($_SESSION['crm']['id']);
 		return true;
 	}
 
@@ -661,15 +662,23 @@ if (window && window.rcmail) {
 	 */
 	public function getConntentEmailTemplate()
 	{
-		$recordId = rcube_utils::get_input_value('id', rcube_utils::INPUT_GPC);
+		$templeteId = rcube_utils::get_input_value('id', rcube_utils::INPUT_GPC);
+		$recordId = rcube_utils::get_input_value('record_id', rcube_utils::INPUT_GPC);
+		$moduleName = rcube_utils::get_input_value('select_module', rcube_utils::INPUT_GPC);
 		$currentPath = getcwd();
 		chdir($this->rc->config->get('root_directory'));
 		$this->loadCurrentUser();
-		$mail = App\Mail::getTemplete($recordId);
-		$emailTemplates ['subject'] = $mail['subject'];
-		$emailTemplates ['content'] = $mail['content'];
-		$emailTemplates ['attachments'] = $mail['attachments'];
-		echo App\Json::encode($emailTemplates);
+		$mail = App\Mail::getTemplete($templeteId);
+		if ($recordId) {
+			$textParser = \App\TextParser::getInstanceById($recordId, $moduleName);
+			$mail['subject'] = $textParser->setContent($mail['subject'])->parse()->getContent();
+			$mail['content'] = $textParser->setContent($mail['content'])->parse()->getContent();
+		}
+		echo App\Json::encode([
+			'subject' => $mail['subject'],
+			'content' => $mail['content'],
+			'attachments' => $mail['attachments'],
+		]);
 		chdir($currentPath);
 		exit;
 	}

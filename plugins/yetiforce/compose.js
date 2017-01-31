@@ -15,6 +15,7 @@ window.rcmail && rcmail.addEventListener('init', function (evt) {
 				frame_name = 'rcmupload' + ts,
 				frame = rcmail.async_upload_form_frame(frame_name);
 		data._uploadid = ts;
+		console.log(data);
 		jQuery.ajax({
 			url: "?_task=mail&_action=plugin.yetiforce.addFilesToMail&_id=" + rcmail.env.compose_id,
 			type: "POST",
@@ -142,7 +143,7 @@ window.rcmail && rcmail.addEventListener('init', function (evt) {
 					var oldBody = jQuery('#composebody').val();
 					jQuery('#composebody').val(html + oldBody);
 				}
-				if (typeof data.attachments !== 'undefined') {
+				if (typeof data.attachments !== 'undefined' && data.attachments !== null) {
 					rcmail.command('yetiforce.addFilesToMail', data.attachments);
 				}
 			}
@@ -170,14 +171,13 @@ function getMailFromCRM(mailField, moduleName, records) {
 		},
 		success: function (data) {
 			data = JSON.parse(data);
-			if (data.length == 0 ) {
+			if (data.length == 0) {
 				var notifyParams = {
 					text: window.crm.app.vtranslate('NoFindEmailInRecord'),
 					animation: 'show'
 				};
 				window.crm.Vtiger_Helper_Js.showPnotify(notifyParams);
 			} else {
-				console.log(data);
 				var emails = $('#' + mailField).val();
 				if (emails != '' && emails.charAt(emails.length - 1) != ',') {
 					emails = emails + ',';
