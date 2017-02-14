@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Render SVG gradients for IE 9
  *
@@ -10,11 +9,10 @@
  * by keeping credits to the original autors in the README file.
  * See http://creativecommons.org/licenses/by-sa/3.0/ for details.
  */
-
-ini_set('error_reporting', E_ALL &~ (E_NOTICE | E_STRICT));
+ini_set('error_reporting', E_ALL & ~ (E_NOTICE | E_STRICT));
 
 header('Content-Type: image/svg+xml');
-header("Expires: ".gmdate("D, d M Y H:i:s", time()+864000)." GMT");
+header("Expires: " . gmdate("D, d M Y H:i:s", time() + 864000) . " GMT");
 header("Cache-Control: max-age=864000");
 header("Pragma: ");
 
@@ -34,10 +32,10 @@ foreach ($color_stops as $i => $stop) {
 
 ?>
 <svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" version="1.0" width="100%" height="100%">
-<defs>
-  <linearGradient id="LG1" <?php echo $gradient_coords; ?> spreadMethod="pad">
-    <?php echo $svg_stops; ?>
-  </linearGradient>
-</defs>
-<rect width="100%" height="100%" style="fill:url(#LG1);"/>
+	<defs>
+		<linearGradient id="LG1" <?php echo $gradient_coords; ?> spreadMethod="pad">
+			<?php echo $svg_stops; ?>
+		</linearGradient>
+	</defs>
+	<rect width="100%" height="100%" style="fill:url(#LG1);"/>
 </svg>

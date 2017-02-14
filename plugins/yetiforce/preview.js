@@ -67,16 +67,15 @@ function registerImportMail(content) {
 			text: window.crm.app.vtranslate('StartedDownloadingEmail'),
 			type: 'info'
 		});
-		var params = {
-			module: 'OSSMailScanner',
+		window.crm.AppConnector.request({
+			module: 'OSSMail',
 			action: 'ImportMail',
 			params: {
 				uid: rcmail.env.uid,
 				folder: rcmail.env.mailbox,
 				rcId: rcmail.env.user_id
 			}
-		};
-		window.crm.AppConnector.request(params).then(function (data) {
+		}).then(function (data) {
 			loadActionBar();
 			window.crm.Vtiger_Helper_Js.showPnotify({
 				text: window.crm.app.vtranslate('AddFindEmailInRecord'),

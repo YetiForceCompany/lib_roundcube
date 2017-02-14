@@ -4,11 +4,20 @@
 <title><roundcube:object name="pagetitle" /></title>
 <roundcube:include file="/includes/links.html" />
 <style type="text/css">
-<roundcube:if condition="config:preview_pane == true" />
-	#mailview-top { height: 276px; }
-	#mailview-bottom { top: 330px; height: auto; display: block; }
+	<roundcube:if condition="config:preview_pane != '0'" />
+	#mailview-top { height: 270px; }
+	#mailview-bottom { top: 284px; width: auto; height: auto; display: block; }
 	#mailpreviewframe { display: block; }
-<roundcube:endif />
+	<roundcube:endif />
+	<roundcube:if condition="config:preview_pane == 'v'" />
+	.mailpreviewtoggle.horizontalBtn{
+		display: none;
+	}
+	<roundcube:elseif condition="config:preview_pane == 'h'" />
+	.mailpreviewtoggle.verticalBtn{
+		display: none;
+	}
+	<roundcube:endif />
 </style>
 </head>
 <body class="minwidth">
@@ -23,7 +32,7 @@
 <h2 id="aria-label-toolbar" class="voice"><roundcube:label name="arialabeltoolbar" /></h2>
 <div id="messagetoolbar" class="toolbar" role="toolbar" aria-labelledby="aria-label-toolbar">
 	<roundcube:button command="checkmail" type="link" class="button checkmail disabled" classAct="button checkmail" classSel="button checkmail pressed" label="refresh" title="checkmail" />
-	<roundcube:include file="/includes/mailtoolbar.html" />
+	<roundcube:include file="/includes/mailtoolbar.html" skinPath="skins/larry" />
 </div>
 
 <div id="messagesearchtools">
@@ -52,6 +61,8 @@
 		<li role="menuitem"><label><input type="checkbox" name="s_mods[]" value="bcc" id="s_mod_bcc" onclick="UI.set_searchmod(this)" /> <span><roundcube:label name="bcc" /></span></label></li>
 		<li role="menuitem"><label><input type="checkbox" name="s_mods[]" value="body" id="s_mod_body" onclick="UI.set_searchmod(this)" /> <span><roundcube:label name="body" /></span></label></li>
 		<li role="menuitem"><label><input type="checkbox" name="s_mods[]" value="text" id="s_mod_text" onclick="UI.set_searchmod(this)" /> <span><roundcube:label name="msgtext" /></span></label></li>
+		<li role="separator" class="separator"><label><roundcube:label name="date" /></label></li>
+		<li role="menuitem"><roundcube:object name="searchinterval" id="s_interval" onchange="rcmail.set_searchinterval($(this).val())" /></li>
 		<li role="separator" class="separator"><label><roundcube:label name="searchscope" /></label></li>
 		<li role="menuitem"><label><input type="radio" name="s_scope" value="base" id="s_scope_base" onclick="UI.set_searchscope(this)" /> <span><roundcube:label name="currentfolder" /></span></label></li>
 		<li role="menuitem"><label><input type="radio" name="s_scope" value="sub" id="s_scope_sub" onclick="UI.set_searchscope(this)" /> <span><roundcube:label name="subfolders" /></span></label></li>
@@ -83,13 +94,13 @@
 
 </div>
 
-<roundcube:if condition="env:orientationPanelView == h" />
-<div id="mailview-right " role="main">
-<roundcube:else />
+<roundcube:if condition="config:preview_pane == 'v'" />
 <div id="mailview-right" class="verticalPanel" role="main">
+<roundcube:else />
+<div id="mailview-right" role="main">
 <roundcube:endif />
+<roundcube:if condition="config:preview_pane != '0'" />
 
-<roundcube:if condition="config:preview_pane == true" />
 <div id="mailview-top" class="uibox">
 <roundcube:else />
 <div id="mailview-top" class="uibox fullheight">
@@ -132,6 +143,7 @@
 		<span class="pagenavbuttons">
 		<roundcube:button command="firstpage" type="link" class="button firstpage disabled" classAct="button firstpage" classSel="button firstpage pressed" innerClass="inner" title="firstpage" label="first" />
 		<roundcube:button command="previouspage" type="link" class="button prevpage disabled" classAct="button prevpage" classSel="button prevpage pressed" innerClass="inner" title="previouspage" label="previous" />
+		<input id="pagejumper" class="pagejumper" type="text" size="3" disabled="disabled" title="<roundcube:label name="currpage" />" />
 		<roundcube:button command="nextpage" type="link" class="button nextpage disabled" classAct="button nextpage" classSel="button nextpage pressed" innerClass="inner" title="nextpage" label="next" />
 		<roundcube:button command="lastpage" type="link" class="button lastpage disabled" classAct="button lastpage" classSel="button lastpage pressed" innerClass="inner" title="lastpage" label="last" />
 		</span>
@@ -139,14 +151,21 @@
 
 	<roundcube:container name="listcontrols" id="listcontrols" />
 
-	<a href="#preview" id="mailpreviewtoggle" class="iconbutton" title="<roundcube:label name='previewpane' />" role="button" tabindex="0"><roundcube:label name="previewpane" /></a>
+	<div id="mailpreviewtogglebtn">
+		<a href="#preview" class="mailpreviewtoggle horizontalBtn" title="<roundcube:label name='previewpane' />" data-type="h" role="button" tabindex="0">
+			<span class="inner"></span>
+		</a>&nbsp;
+		<a href="#preview" class="mailpreviewtoggle verticalBtn" title="<roundcube:label name='previewpane' />" data-type="v" role="button" tabindex="0">
+			<span class="inner"></span>
+		</a>
+	</div>
 </div>
 
 </div><!-- end mailview-top -->
 
 <div id="mailview-bottom" class="uibox">
 
-<div id="mailpreviewframe" class="iframebox" role="complementary" aria-labelledby="aria-label-mailpreviewframe">
+<div id="mailpreviewframe" class="iframebox" data-type="<roundcube:var name='config:preview_pane' />" role="complementary" aria-labelledby="aria-label-mailpreviewframe">
 <h2 id="aria-label-mailpreviewframe" class="voice"><roundcube:label name="arialabelmailpreviewframe" /></h2>
 <roundcube:object name="messagecontentframe" id="messagecontframe" style="width:100%; height:100%" frameborder="0" src="/watermark.html" title="arialabelmailpreviewframe" />
 </div>

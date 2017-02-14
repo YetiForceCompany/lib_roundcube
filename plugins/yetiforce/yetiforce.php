@@ -23,6 +23,9 @@ class yetiforce extends rcube_plugin
 
 		if ($this->rc->task == 'mail') {
 			$this->register_action('plugin.yetiforce.addFilesToMail', [$this, 'addFilesToMail']);
+			$this->register_action('plugin.yetiforce.getEmailTemplates', [$this, 'getEmailTemplates']);
+			$this->register_action('plugin.yetiforce.getEmailFromCRM', [$this, 'getEmailFromCRM']);
+			$this->register_action('plugin.yetiforce.getConntentEmailTemplate', [$this, 'getConntentEmailTemplate']);
 			$this->rc->output->set_env('site_URL', $this->rc->config->get('site_URL'));
 			$this->include_stylesheet($this->rc->config->get('site_URL') . 'layouts/basic/skins/icons/userIcons.css');
 
@@ -32,12 +35,13 @@ class yetiforce extends rcube_plugin
 
 			if ($this->rc->action == 'compose') {
 				$composeAddressModules = [];
-				foreach (AppConfig::module('Email', 'RC_COMPOSE_ADDRESS_MODULES') as $moduleName) {
+				foreach (AppConfig::module('Mail', 'RC_COMPOSE_ADDRESS_MODULES') as $moduleName) {
 					if (\App\Privilege::isPermitted($moduleName)) {
-						$composeAddressModules[$moduleName] = \includes\Language::translate($moduleName, $moduleName);
+						$composeAddressModules[$moduleName] = \App\Language::translate($moduleName, $moduleName);
 					}
 				}
 				$this->viewData['compose']['composeAddressModules'] = $composeAddressModules;
+				$this->rc->output->set_env('isPermittedMailTemplates', \App\Privilege::isPermitted('EmailTemplates'));
 
 				$this->add_texts('localization/', false);
 				$this->include_script('compose.js');
@@ -64,13 +68,12 @@ class yetiforce extends rcube_plugin
 				$this->include_stylesheet('preview.css');
 				$this->add_hook('message_load', [$this, 'messageLoad']);
 			}
-			if(empty($this->rc->action)){
-				$this->rc->output->set_env('orientationPanelView', AppConfig::module('Email', 'ORIENTATION_PANEL_VIEW'));
+			if (empty($this->rc->action)) {
+				//$this->add_hook('preferences_save', array($this, 'prefsSave'));
+
 				$this->include_script('colResizable.js');
 				$this->include_script('list.js');
 			}
-			
-			
 			chdir($currentPath);
 		}
 	}
@@ -140,19 +143,19 @@ class yetiforce extends rcube_plugin
 		if ($row = $this->getAutoLogin()) {
 			$_SESSION['crm']['id'] = $row['cuid'];
 			if (isset($row['params']['language'])) {
- 				$languages = $this->rc->list_languages();
- 				$lang = explode('_', $row['params']['language']);
- 				$lang[1] = strtoupper($lang[1]);
- 				$lang = implode('_', $lang);
- 				if (!isset($languages[$lang])) {
- 					$lang = substr($lang, 0, 2);
- 				}
- 				if (isset($languages[$lang])) {
- 					$this->rc->config->set('language', $lang);
- 					$this->rc->load_language($lang);
- 					$this->rc->user->save_prefs(['language' => $lang]);
- 				}
- 			}
+				$languages = $this->rc->list_languages();
+				$lang = explode('_', $row['params']['language']);
+				$lang[1] = strtoupper($lang[1]);
+				$lang = implode('_', $lang);
+				if (!isset($languages[$lang])) {
+					$lang = substr($lang, 0, 2);
+				}
+				if (isset($languages[$lang])) {
+					$this->rc->config->set('language', $lang);
+					$this->rc->load_language($lang);
+					$this->rc->user->save_prefs(['language' => $lang]);
+				}
+			}
 		}
 		return $args;
 	}
@@ -236,8 +239,8 @@ class yetiforce extends rcube_plugin
 				chdir($this->rc->config->get('root_directory'));
 				$this->loadCurrentUser();
 
-				$subjectNumber = \includes\fields\Email::findRecordNumber($subject, $params['crmmodule']);
-				$recordNumber = \includes\fields\Email::findRecordNumber('[' . $params['recordNumber'] . ']', $params['crmmodule']);
+				$subjectNumber = \App\Fields\Email::findRecordNumber($subject, $params['crmmodule']);
+				$recordNumber = \App\Fields\Email::findRecordNumber('[' . $params['recordNumber'] . ']', $params['crmmodule']);
 				if ($subject === false || ($subject !== false && $subjectNumber != $recordNumber)) {
 					$subject .= ' [' . $params['recordNumber'] . ']';
 				}
@@ -326,6 +329,7 @@ class yetiforce extends rcube_plugin
 				$body = $prefix . '<blockquote>' . $body . '</blockquote>' . $suffix;
 			}
 		}
+		$this->rc->output->set_env('compose_mode', $type);
 		$args['body'] = $body;
 		return $args;
 	}
@@ -398,6 +402,7 @@ class yetiforce extends rcube_plugin
 	{
 		$COMPOSE_ID = rcube_utils::get_input_value('_id', rcube_utils::INPUT_GPC);
 		$uploadid = rcube_utils::get_input_value('_uploadid', rcube_utils::INPUT_GPC);
+		$ids = rcube_utils::get_input_value('ids', rcube_utils::INPUT_GPC);
 		$COMPOSE = null;
 
 		if ($COMPOSE_ID && $_SESSION['compose_data_' . $COMPOSE_ID]) {
@@ -405,12 +410,12 @@ class yetiforce extends rcube_plugin
 			$COMPOSE = & $_SESSION[$SESSION_KEY];
 		}
 		if (!$COMPOSE) {
-			die("Invalid session var!");
+			die('Invalid session var!');
 		}
 		$this->rc = rcmail::get_instance();
 		$index = 0;
 
-		$attachments = self::getFiles();
+		$attachments = $this->getAttachment($ids, false);
 		foreach ($attachments as $attachment) {
 			$index++;
 			$attachment['group'] = $COMPOSE_ID;
@@ -462,13 +467,6 @@ if (window && window.rcmail) {
 		exit;
 	}
 
-	public function getFiles()
-	{
-		$files = [];
-		$files = array_merge($files, self::getAttachment());
-		return $files;
-	}
-
 	public function getAttachment($ids, $files)
 	{
 
@@ -488,7 +486,7 @@ if (window && window.rcmail) {
 			while ($row = $db->fetch_assoc($sql_result)) {
 				$orgFile = $this->rc->config->get('root_directory') . $row['path'] . $row['attachmentsid'] . '_' . $row['name'];
 				list($usec, $sec) = explode(' ', microtime());
-				$filepath = $this->rc->config->get('root_directory') . 'modules/OSSMail/roundcube/temp/' . $sec . $userid . $row['attachmentsid'] . $index . '.tmp';
+				$filepath = $this->rc->config->get('root_directory') . 'cache/mail/' . $sec . $userid . $row['attachmentsid'] . $index . '.tmp';
 				if (file_exists($orgFile)) {
 					copy($orgFile, $filepath);
 					$attachment = [
@@ -505,7 +503,7 @@ if (window && window.rcmail) {
 		if ($files) {
 			$orgFile = $this->rc->config->get('root_directory') . $files;
 			list($usec, $sec) = explode(' ', microtime());
-			$filepath = $this->rc->config->get('root_directory') . 'modules/OSSMail/roundcube/temp/' . $sec . $userid . $index . '.tmp';
+			$filepath = $this->rc->config->get('root_directory') . 'cache/mail/' . $sec . $userid . $index . '.tmp';
 			if (file_exists($orgFile)) {
 				copy($orgFile, $filepath);
 				$attachment = [
@@ -571,15 +569,21 @@ if (window && window.rcmail) {
 		return $autologin;
 	}
 
+	/**
+	 * Parse variables
+	 * @param string $text
+	 * @return string
+	 */
 	protected function parseVariables($text)
 	{
 		$currentPath = getcwd();
 		chdir($this->rc->config->get('root_directory'));
 		$this->loadCurrentUser();
 
-		$textParser = Vtiger_TextParser_Helper::getCleanInstance();
-		$textParser->setContent($text);
-		$text = $textParser->parse();
+		$text = \App\TextParser::getInstance()
+			->setContent($text)
+			->parse()
+			->getContent();
 
 		chdir($currentPath);
 		return $text;
@@ -595,6 +599,7 @@ if (window && window.rcmail) {
 		$ownerObject->retrieveCurrentUserInfoFromFile($_SESSION['crm']['id']);
 		$this->currentUser = $ownerObject;
 		vglobal('current_user', $ownerObject);
+		App\User::setCurrentUserId($_SESSION['crm']['id']);
 		return true;
 	}
 
@@ -610,5 +615,71 @@ if (window && window.rcmail) {
 		}
 		$p['content'] = $content;
 		return $p;
+	}
+
+	/**
+	 * Get address email from CRM
+	 */
+	public function getEmailFromCRM()
+	{
+		$currentPath = getcwd();
+		chdir($this->rc->config->get('root_directory'));
+		$this->loadCurrentUser();
+		$ids = rcube_utils::get_input_value('recordsId', rcube_utils::INPUT_GPC);
+		$sourceModule = rcube_utils::get_input_value('moduleName', rcube_utils::INPUT_GPC);
+		$emailFields = OSSMailScanner_Record_Model::getEmailSearch($sourceModule);
+		$addresEmails = [];
+		foreach ($ids as $id) {
+			$recordModel = Vtiger_Record_Model::getInstanceById($id, $sourceModule);
+			foreach ($emailFields as &$emailField) {
+				$email = $recordModel->get($emailField['fieldname']);
+				if (!empty($email)) {
+					$addresEmails[] = $email;
+				}
+			}
+		}
+		echo App\Json::encode($addresEmails);
+		chdir($currentPath);
+		exit;
+	}
+
+	/**
+	 * Function to get templates
+	 */
+	public function getEmailTemplates()
+	{
+		$currentPath = getcwd();
+		chdir($this->rc->config->get('root_directory'));
+		$this->loadCurrentUser();
+		$emailTemplates = App\Mail::getTempleteList(false, 'PLL_MAIL');
+		echo App\Json::encode($emailTemplates);
+		chdir($currentPath);
+		exit;
+	}
+
+	/**
+	 * Function to get info about email template
+	 */
+	public function getConntentEmailTemplate()
+	{
+		$templeteId = rcube_utils::get_input_value('id', rcube_utils::INPUT_GPC);
+		$recordId = rcube_utils::get_input_value('record_id', rcube_utils::INPUT_GPC);
+		$moduleName = rcube_utils::get_input_value('select_module', rcube_utils::INPUT_GPC);
+		$currentPath = getcwd();
+		chdir($this->rc->config->get('root_directory'));
+		$this->loadCurrentUser();
+		$mail = App\Mail::getTemplete($templeteId);
+		if ($recordId) {
+			$textParser = \App\TextParser::getInstanceById($recordId, $moduleName);
+			$mail['subject'] = $textParser->setContent($mail['subject'])->parse()->getContent();
+			$mail['content'] = $textParser->setContent($mail['content'])->parse()->getContent();
+		}
+		echo App\Json::encode([
+			'subject' => $mail['subject'],
+			'content' => $mail['content'],
+			'attachments' => $mail['attachments'],
+		]);
+		chdir($currentPath);
+		exit;
 	}
 }

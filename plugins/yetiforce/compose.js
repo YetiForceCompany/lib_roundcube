@@ -1,6 +1,8 @@
 /* {[The file is published on the basis of YetiForce Public License that can be found in the following directory: licenses/License.html]} */
 
+
 window.rcmail && rcmail.addEventListener('init', function (evt) {
+
 	var crm = window.crm = getCrmWindow();
 	var crmPath = rcmail.env.site_URL + 'index.php?';
 
@@ -13,6 +15,7 @@ window.rcmail && rcmail.addEventListener('init', function (evt) {
 				frame_name = 'rcmupload' + ts,
 				frame = rcmail.async_upload_form_frame(frame_name);
 		data._uploadid = ts;
+		console.log(data);
 		jQuery.ajax({
 			url: "?_task=mail&_action=plugin.yetiforce.addFilesToMail&_id=" + rcmail.env.compose_id,
 			type: "POST",
@@ -61,37 +64,40 @@ window.rcmail && rcmail.addEventListener('init', function (evt) {
 		};
 		show(params, function (data) {
 			var responseData = JSON.parse(data);
-			var length = Object.keys(responseData).length;
+			var ids = [];
 			for (var id in responseData) {
-				getMailFromCRM(mailField, module, id, length);
+				ids.push(id);
 			}
+			getMailFromCRM(mailField, module, ids);
 		});
 	});
 	//Loading list of modules with templates mail
-	jQuery.ajax({
-		type: 'Get',
-		url: crmPath + 'module=OSSMailTemplates&action=GetTemplates',
-		async: false,
-		success: function (data) {
-			var modules = [];
-			var tmp = [];
-			$.each(data.result, function (index, value) {
-				jQuery('#vtmodulemenulink').removeClass('disabled');
-				jQuery('#tplmenulink').removeClass('disabled');
-				tmp.push({name: value.module, label: value.moduleName});
-				jQuery('#tplmenu #texttplsmenu').append('<li class="' + value.module + '"><a href="#" data-module="' + value.module + '" data-tplid="' + value.id + '" class="active">' + value.name + '</a></li>');
-			});
+	if (rcmail.env.isPermittedMailTemplates) {
+		jQuery.ajax({
+			type: 'Get',
+			url: "?_task=mail&_action=plugin.yetiforce.getEmailTemplates&_id=" + rcmail.env.compose_id,
+			async: false,
+			success: function (data) {
+				var modules = [];
+				var tmp = [];
+				data = JSON.parse(data);
+				$.each(data, function (index, value) {
+					jQuery('#vtmodulemenulink').removeClass('disabled');
+					jQuery('#tplmenulink').removeClass('disabled');
+					tmp.push({name: value.moduleName, label: value.moduleName});
+					jQuery('#tplmenu #texttplsmenu').append('<li class="' + value.moduleName + '"><a href="#" data-module="' + value.module + '" data-tplid="' + value.id + '" class="active">' + value.name + '</a></li>');
+				});
 
-			$.each(tmp, function (index, value) {
-				if (jQuery.inArray(value.name, modules) == -1) {
-					jQuery('#vtmodulemenu .toolbarmenu').append('<li class="' + value.name + '"><a href="#" data-module="' + value.name + '" class="active">' + value.label + '</a></li>');
-					modules.push(value.name);
-				}
-			});
+				$.each(tmp, function (index, value) {
+					if (jQuery.inArray(value.name, modules) == -1) {
+						jQuery('#vtmodulemenu .toolbarmenu').append('<li class="' + value.name + '"><a href="#" data-module="' + value.name + '" class="active">' + value.label + '</a></li>');
+						modules.push(value.name);
+					}
+				});
 
-		}
-	});
-
+			}
+		});
+	}
 	// Limit the list of templates
 	jQuery('#vtmodulemenu li a').on('click', function () {
 		var selectModule = jQuery(this).data('module');
@@ -119,16 +125,17 @@ window.rcmail && rcmail.addEventListener('init', function (evt) {
 		}
 		jQuery.ajax({
 			type: 'Get',
-			url: crmPath + 'module=OSSMailTemplates&action=GetTpl',
+			url: "?_task=mail&_action=plugin.yetiforce.getConntentEmailTemplate&_id=" + rcmail.env.compose_id,
 			data: {
 				id: id,
 				record_id: recordId,
 				select_module: module
 			},
 			success: function (data) {
+				data = JSON.parse(data);
 				var oldSubject = jQuery('[name="_subject"]').val();
-				var html = jQuery("<div/>").html(data.result['content']).html();
-				jQuery('[name="_subject"]').val(oldSubject + ' ' + data.result['subject']);
+				var html = jQuery("<div/>").html(data.content).html();
+				jQuery('[name="_subject"]').val(oldSubject + ' ' + data.subject);
 				if (window.tinyMCE && (ed = tinyMCE.get(rcmail.env.composebody))) {
 					var oldBody = tinyMCE.activeEditor.getContent();
 					tinymce.activeEditor.setContent(html + oldBody);
@@ -136,8 +143,8 @@ window.rcmail && rcmail.addEventListener('init', function (evt) {
 					var oldBody = jQuery('#composebody').val();
 					jQuery('#composebody').val(html + oldBody);
 				}
-				if (data.result.hasOwnProperty("attachments")) {
-					rcmail.command('yetiforce.addFilesToMail', data.result.attachments);
+				if (typeof data.attachments !== 'undefined' && data.attachments !== null) {
+					rcmail.command('yetiforce.addFilesToMail', data.attachments);
 				}
 			}
 		});
@@ -153,25 +160,30 @@ function getCrmWindow() {
 	return false;
 }
 
-function getMailFromCRM(mailField, module, record, length) {
-	if (length > 1) {
-		length = 1;
-	} else {
-		length = 0;
-	}
-	window.crm.Vtiger_Index_Js.getEmailFromRecord(record, module, length).then(function (data) {
-		if (data == '') {
-			var notifyParams = {
-				text: window.crm.app.vtranslate('NoFindEmailInRecord'),
-				animation: 'show'
-			};
-			window.crm.Vtiger_Helper_Js.showPnotify(notifyParams);
-		} else {
-			var emails = $('#' + mailField).val();
-			if (emails != '' && emails.charAt(emails.length - 1) != ',') {
-				emails = emails + ',';
+function getMailFromCRM(mailField, moduleName, records) {
+	jQuery.ajax({
+		type: "POST",
+		url: "?_task=mail&_action=plugin.yetiforce.getEmailFromCRM&_id=" + rcmail.env.compose_id,
+		async: false,
+		data: {
+			recordsId: records,
+			moduleName: moduleName,
+		},
+		success: function (data) {
+			data = JSON.parse(data);
+			if (data.length == 0) {
+				var notifyParams = {
+					text: window.crm.app.vtranslate('NoFindEmailInRecord'),
+					animation: 'show'
+				};
+				window.crm.Vtiger_Helper_Js.showPnotify(notifyParams);
+			} else {
+				var emails = $('#' + mailField).val();
+				if (emails != '' && emails.charAt(emails.length - 1) != ',') {
+					emails = emails + ',';
+				}
+				$('#' + mailField).val(emails + data);
 			}
-			$('#' + mailField).val(emails + data);
 		}
 	});
 }
