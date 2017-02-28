@@ -1,22 +1,22 @@
 {
-    "name": "weird-birds/thunderbird_labels",
-    "type": "roundcube-plugin",
-    "keywords": ["mail","labels","tags"],
-    "license": "BSD-2-Clause",
-    "authors": [
-        {
-            "name": "Michael Kefeder",
-            "homepage": "https://github.com/mike-kfed/rcmail-thunderbird-labels",
-            "role": "Developer"
-        }
-    ],
-    "repositories": [
-        {
-            "type": "composer",
-            "url": "http://plugins.roundcube.net"
-        }
-    ],
-    "require": {
-        "roundcube/plugin-installer": ">=0.1.3"
-    }
+	"name": "weird-birds/thunderbird_labels",
+	"type": "roundcube-plugin",
+	"keywords": ["mail", "labels", "tags"],
+	"license": "BSD-2-Clause",
+	"authors": [
+		{
+			"name": "Michael Kefeder",
+			"homepage": "https://github.com/mike-kfed/rcmail-thunderbird-labels",
+			"role": "Developer"
+		}
+	],
+	"repositories": [
+		{
+			"type": "composer",
+			"url": "http://plugins.roundcube.net"
+		}
+	],
+	"require": {
+		"roundcube/plugin-installer": ">=0.1.3"
+	}
 }

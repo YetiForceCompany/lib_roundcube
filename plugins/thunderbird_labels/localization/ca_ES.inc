@@ -1,10 +1,9 @@
 <?php
 /**
-* Author:
-* Lluís Forns Puigmartí
-* http://code.google.com/p/rcmail-thunderbird-labels/
-*/
-
+ * Author:
+ * Lluís Forns Puigmartí
+ * http://code.google.com/p/rcmail-thunderbird-labels/
+ */
 $labels = array();
 $labels['label'] = 'Etiquetes';
 $labels['label0'] = 'Cap etiqueta';

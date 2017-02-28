@@ -1,10 +1,9 @@
 <?php
 /**
-* Author:
-* Artem Ushakov
-* http://code.google.com/p/rcmail-thunderbird-labels/
-*/
-
+ * Author:
+ * Artem Ushakov
+ * http://code.google.com/p/rcmail-thunderbird-labels/
+ */
 $labels = array();
 $labels['label'] = 'Vēstules atzīme';
 $labels['label0'] = 'Izdzēst visas atzīmes';

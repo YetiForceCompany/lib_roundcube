@@ -1,10 +1,9 @@
 <?php
 /**
-* Author:
-* Daniel P. 
-* http://code.google.com/p/rcmail-thunderbird-labels/
-*/
-
+ * Author:
+ * Daniel P. 
+ * http://code.google.com/p/rcmail-thunderbird-labels/
+ */
 $labels = array();
 $labels['label'] = 'Thunderbird Cimkék';
 $labels['label0'] = 'Minden cimke törlése';
