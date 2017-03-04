@@ -380,11 +380,13 @@ $config['user_aliases'] = false;
 // use this folder to store log files
 // must be writeable for the user who runs PHP process (Apache user if mod_php is being used)
 // This is used by the 'file' log driver.
-$config['log_dir'] = RCUBE_INSTALL_PATH . 'logs/';
+// $config['log_dir'] = RCUBE_INSTALL_PATH . 'logs/';
+$config['log_dir'] = ROOT_DIRECTORY.DIRECTORY_SEPARATOR.'cache/logs/';
 
 // use this folder to store temp files
 // must be writeable for the user who runs PHP process (Apache user if mod_php is being used)
-$config['temp_dir'] = RCUBE_INSTALL_PATH . 'temp/';
+//$config['temp_dir'] = RCUBE_INSTALL_PATH . 'temp/';
+$config['temp_dir'] = ROOT_DIRECTORY.DIRECTORY_SEPARATOR.'cache/mail/';
 
 // expire files in temp_dir after 48 hours
 // possible units: s, m, h, d, w
@@ -526,7 +528,8 @@ $config['max_group_members'] = 0;
 $config['product_name'] = 'Roundcube Webmail';
 
 // Add this user-agent to message headers when sending
-$config['useragent'] = 'Roundcube Webmail/'.RCMAIL_VERSION;
+$version = defined('RCMAIL_VERSION') ? RCMAIL_VERSION : '';
+$config['useragent'] = 'Roundcube Webmail/'.$version;
 
 // try to load host-specific configuration
 // see http://trac.roundcube.net/wiki/Howto_Config for more details
