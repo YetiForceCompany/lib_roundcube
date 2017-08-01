@@ -7,51 +7,51 @@
 */
 
 #tb_label_popuplink {
-  background-image: url(thunderbird_32.png);
-  /*background-repeat: repeat;*/
-  background-position: 50% 0px;
-  width: 32px;
-  height: 13px;
-  padding: 28px 2px 0px 2px;
-  margin: 0px 5px 0px 5px;
+	background-image: url(thunderbird_32.png);
+	/*background-repeat: repeat;*/
+	background-position: 50% 0px;
+	width: 32px;
+	height: 13px;
+	padding: 28px 2px 0px 2px;
+	margin: 0px 5px 0px 5px;
 }
 
 #tb_label_popup
 {
-  width: auto;
-  position: absolute;
+	width: auto;
+	position: absolute;
 }
 
 #tb_label_popup a.active
 {
-  color: inherit; /* fix for firefox */
+	color: inherit; /* fix for firefox */
 }
 
 .toolbarmenu li.label0,
 .toolbarmenu li.label0 a.active
 {
-  color: #EEE;
+	color: #EEE;
 }
 /* Colors for single/preview message window headers display */
 table.label1
 {
-  background-color: #FCC;
+	background-color: #FCC;
 }
 table.label2
 {
-  background-color: #FC3;
+	background-color: #FC3;
 }
 table.label3
 {
-  background-color: #3C3;
+	background-color: #3C3;
 }
 table.label4
 {
-  background-color: #99F;
+	background-color: #99F;
 }
 table.label5
 {
-  background-color: #C9C;
+	background-color: #C9C;
 }
 
 /* Support for Thunderbird label: definition of the 5 label color */
@@ -63,7 +63,7 @@ table.label5
 span.label1,
 .records-table tr.selected td span.label1
 {
-  color: #FF0000 !important;
+	color: #FF0000 !important;
 }
 
 #messagelist tr.label2 td,
@@ -73,7 +73,7 @@ span.label1,
 span.label2,
 .records-table tr.selected td span.label2
 {
-  color: #FF9900 !important;
+	color: #FF9900 !important;
 }
 
 
@@ -84,7 +84,7 @@ span.label2,
 span.label3,
 .records-table tr.selected td span.label3
 {
-  color: #009900 !important;
+	color: #009900 !important;
 }
 
 #messagelist tr.label4 td,
@@ -92,14 +92,14 @@ span.label3,
 span.label4,
 .records-table tr.selected td span.label4
 {
-  color: #3333FF !important;
+	color: #3333FF !important;
 }
 
 /* lighter blue for dark-grey popup... */
 .toolbarmenu li.label4,
 .toolbarmenu li.label4 a.active
 {
-  color: #0CF;
+	color: #0CF;
 }
 
 #messagelist tr.label5 td,
@@ -107,79 +107,79 @@ span.label4,
 span.label5,
 .records-table tr.selected td span.label5
 {
-  color: #993399 !important;
+	color: #993399 !important;
 }
 
 /* lighter purple for dark-grey popup... */
 .toolbarmenu li.label5,
 .toolbarmenu li.label5 a.active
 {
-  color: #B6F;
+	color: #B6F;
 }
 
 /* Selected messages */
 #messagelist tr.selected.label1 td,
 #messagelist tr.selected.label1 td a
 {
-  color: #FFFFFF;
-  background-color: #FF0000;
+	color: #FFFFFF;
+	background-color: #FF0000;
 }
 
 #messagelist tr.selected.label2 td,
 #messagelist tr.selected.label2 td a
 {
-  color: #FFFFFF;
-  background-color: #FF9900;
+	color: #FFFFFF;
+	background-color: #FF9900;
 }
 
 #messagelist tr.selected.label3 td,
 #messagelist tr.selected.label3 td a
 {
-  color: #FFFFFF;
-  background-color: #009900;
+	color: #FFFFFF;
+	background-color: #009900;
 }
 
 #messagelist tr.selected.label4 td,
 #messagelist tr.selected.label4 td a
 {
-  color: #FFFFFF;
-  background-color: #3333FF;
+	color: #FFFFFF;
+	background-color: #3333FF;
 }
 
 #messagelist tr.selected.label5 td,
 #messagelist tr.selected.label5 td a
 {
-  color: #FFFFFF;
-  background-color: #993399;
+	color: #FFFFFF;
+	background-color: #993399;
 }
 
 span.tb_label_dots {
-float: right;
-height: 0px;
-display: block;
-position:relative;
+	float: right;
+	height: 0px;
+	display: block;
+	position:relative;
 }
 
 /* hack for firefox : doesnt display the bullets at the correct height */
 @-moz-document url-prefix() {
-  span.tb_label_dots {
-    top: -19px;
-  }
+	span.tb_label_dots {
+		top: -19px;
+	}
 }
 
 span.tb_label_dots span {
-  font-size: 32px;
-  vertical-align: middle;
-  line-height: 0px;
+	font-size: 32px;
+	vertical-align: middle;
+	line-height: 0px;
 }
 
 
 
 div#labelbox {
-  white-space: nowrap;
-  position: absolute;
-  right: 67px;
-  top: 40px;
+	white-space: nowrap;
+	position: absolute;
+	right: 67px;
+	top: 40px;
 }
 
 div#labelbox span {
@@ -190,25 +190,25 @@ div#labelbox span {
     color: #black;
     font-weight: bold;
 }
-  
+
 div#labelbox span.tb_label_span1 {
-  background-color: #FF2200;
+	background-color: #FF2200;
 }
 
 div#labelbox span.tb_label_span2 {
-  background-color: #FF9900;
+	background-color: #FF9900;
 }
 
 div#labelbox span.tb_label_span3 {
-  background-color: #00CC00;
+	background-color: #00CC00;
 }
 
 div#labelbox span.tb_label_span4 {
-  background-color: #0CF;
+	background-color: #0CF;
 }
 
 div#labelbox span.tb_label_span5 {
-  background-color: #FF33FF;
+	background-color: #FF33FF;
 }  
 
 /* icon for settings-section */

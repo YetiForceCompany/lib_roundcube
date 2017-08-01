@@ -1,10 +1,9 @@
 <?php
 /**
-* Author:
-* Michael Kefeder
-* http://code.google.com/p/rcmail-thunderbird-labels/
-*/
-
+ * Author:
+ * Michael Kefeder
+ * http://code.google.com/p/rcmail-thunderbird-labels/
+ */
 $labels = array();
 $labels['label'] = 'Tags Thunderbird ';
 $labels['label0'] = 'Aucun tag';

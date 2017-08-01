@@ -1,5 +1,4 @@
 <?php
-
 $labels = array();
 $labels['label'] = 'Štítky';
 $labels['label0'] = 'Žádný štítek';

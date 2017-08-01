@@ -86,7 +86,7 @@ function registerImportMail(content) {
 }
 function registerRemoveRecord(content) {
 	content.find('button.removeRecord').click(function (e) {
-		var row = $(e.currentTarget).closest('.rowReletedRecord');
+		var row = $(e.currentTarget).closest('.rowRelatedRecord');
 		removeRecord(row.data('id'));
 	});
 }
@@ -101,8 +101,8 @@ function registerSelectRecord(content) {
 			var module = $(this).closest('.col').find('.module').val();
 		} else {
 			var module = $(this).data('module');
-			relParams.crmid = $(this).closest('.rowReletedRecord').data('id');
-			relParams.mod = $(this).closest('.rowReletedRecord').data('module');
+			relParams.crmid = $(this).closest('.rowRelatedRecord').data('id');
+			relParams.mod = $(this).closest('.rowRelatedRecord').data('module');
 			relParams.newModule = module;
 		}
 		var PopupParams = {
@@ -117,9 +117,9 @@ function registerSelectRecord(content) {
 }
 function registerAddReletedRecord(content) {
 	var id = content.find('#mailActionBarID').val();
-	content.find('button.addReletedRecord').click(function (e) {
+	content.find('button.addRelatedRecord').click(function (e) {
 		var targetElement = $(e.currentTarget);
-		var row = targetElement.closest('.rowReletedRecord');
+		var row = targetElement.closest('.rowRelatedRecord');
 		var params = {sourceModule: row.data('module')};
 		showQuickCreateForm(targetElement.data('module'), row.data('id'), params);
 	});

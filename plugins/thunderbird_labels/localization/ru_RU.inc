@@ -1,10 +1,9 @@
 <?php
 /**
-* Author:
-* Николай Николай
-* http://code.google.com/p/rcmail-thunderbird-labels/
-*/
-
+ * Author:
+ * Николай Николай
+ * http://code.google.com/p/rcmail-thunderbird-labels/
+ */
 $labels = array();
 $labels['label'] = 'Метка Thunderbird';
 $labels['label0'] = 'Удалить все метки';

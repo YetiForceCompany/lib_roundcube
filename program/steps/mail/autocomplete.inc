@@ -17,7 +17,7 @@ if (strlen($search)) {
 		if (is_file($addressBookFile)) {
 			include $addressBookFile;
 			foreach ($bookMails as $row) {
-				if (strpos($row, $search) !== false) {
+				if (stripos($row, $search) !== false) {
 					$contacts[] = $row;
 				}
 			}

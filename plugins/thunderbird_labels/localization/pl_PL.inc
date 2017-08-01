@@ -1,10 +1,9 @@
 ﻿<?php
 /**
-* Author:
-* master771
-* http://code.google.com/p/rcmail-thunderbird-labels/
-*/
-
+ * Author:
+ * master771
+ * http://code.google.com/p/rcmail-thunderbird-labels/
+ */
 $labels = array();
 $labels['label'] = 'Etykiety';
 $labels['label0'] = 'Brak';
