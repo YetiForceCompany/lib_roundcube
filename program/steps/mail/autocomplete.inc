@@ -13,7 +13,7 @@ if (strlen($search)) {
 		$crmUserId = $RCMAIL->user->data['crm_user_id'];
 	}
 	if ($crmUserId) {
-		$addressBookFile = '../../../cache/addressBook/mails_' . $crmUserId . '.php';
+		$addressBookFile = $RCMAIL->config->get('root_directory').'cache/addressBook/mails_' . $crmUserId . '.php';
 		if (is_file($addressBookFile)) {
 			include $addressBookFile;
 			foreach ($bookMails as $row) {
