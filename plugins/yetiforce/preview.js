@@ -136,7 +136,7 @@ function removeRecord(crmid) {
 	var params = {}
 	params.data = {
 		module: 'OSSMail',
-		action: 'executeActions',
+		action: 'ExecuteActions',
 		mode: 'removeRelated',
 		params: {
 			mailId: id,
@@ -181,7 +181,7 @@ function showPopup(params, sourceFieldElement, actionsParams) {
 		var params = {}
 		params.data = {
 			module: 'OSSMail',
-			action: 'executeActions',
+			action: 'ExecuteActions',
 			mode: 'addRelated',
 			params: actionsParams
 		}
