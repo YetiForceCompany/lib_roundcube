@@ -3,7 +3,7 @@
 /**
  * Integration Plugin yetiforce and roundcube
  * @package YetiForce.rcubePlugin
- * @license licenses/License.html
+ * @license MIT
  * @author Mariusz Krzaczkowski <m.krzaczkowski@yetiforce.com>
  */
 class yetiforce extends rcube_plugin
