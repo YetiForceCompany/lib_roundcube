@@ -7,8 +7,8 @@
 #ytActionBarContent .col{
 	padding-left: 4px;
 }
-#ytActionBarContent .col-4{
-    width: 33.33333333%;
+#ytActionBarContent .col-3{
+    width: 25%;
 	min-height: 1px;
 	float: left;
 	position: relative;
@@ -63,7 +63,7 @@
 	line-height: 11px;
 	margin-left: 3px;
 	padding: 0px 6px;
-	height: 18px;
+	height: 14px;
 }
 #ytActionBarContent .pull-right button .glyphicon{
 	top: 0;

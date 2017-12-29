@@ -1,4 +1,4 @@
-/* {[The file is published on the basis of YetiForce Public License that can be found in the following directory: licenses/License.html]} */
+/* {[The file is published on the basis of MIT License]} */
 window.rcmail && rcmail.addEventListener('init', function (evt) {
 	window.crm = getCrmWindow();
 	loadActionBar();
@@ -223,7 +223,7 @@ function showQuickCreateForm(moduleName, record, params) {
 		$('<input type="hidden" name="sourceRecord" value="' + record + '" />').appendTo(data);
 		$('<input type="hidden" name="relationOperation" value="true" />').appendTo(data);
 	}
-	var ids = {link: 'modulesLevel0', process: 'modulesLevel1', subprocess: 'modulesLevel2'};
+	var ids = {link: 'modulesLevel0', process: 'modulesLevel1', subprocess: 'modulesLevel2', linkextend: 'modulesLevel3'};
 	for (var i in ids) {
 		var element = content.find('#' + ids[i]);
 		var value = element.length ? JSON.parse(element.val()) : [];
@@ -256,7 +256,6 @@ function showQuickCreateForm(moduleName, record, params) {
 	var postQuickCreate = function (data) {
 		loadActionBar();
 	}
-
 	relatedParams['sourceModule'] = sourceModule;
 	relatedParams['sourceRecord'] = record;
 	relatedParams['relationOperation'] = true;
