@@ -598,7 +598,7 @@ if (window && window.rcmail) {
 		$ownerObject = CRMEntity::getInstance('Users');
 		$ownerObject->retrieveCurrentUserInfoFromFile($_SESSION['crm']['id']);
 		$this->currentUser = $ownerObject;
-		vglobal('current_user', $ownerObject);
+		App\User::getCurrentUserId($ownerObject);
 		App\User::setCurrentUserId($_SESSION['crm']['id']);
 		return true;
 	}
