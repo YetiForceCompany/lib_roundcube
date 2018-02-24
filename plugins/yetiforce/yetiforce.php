@@ -111,11 +111,15 @@ class yetiforce extends rcube_plugin
 				}
 			}
 			if ($host) {
+				$currentPath = getcwd();
+				chdir($this->rc->config->get('root_directory'));
+				require_once 'include/main/WebUI.php';
 				$args['user'] = $row['username'];
-				$args['pass'] = $row['password'];
+				$args['pass'] = \App\Encryption::getInstance()->decrypt($row['password']);
 				$args['host'] = $host;
 				$args['cookiecheck'] = false;
 				$args['valid'] = true;
+				chdir($currentPath);
 			}
 			$db = $this->rc->get_dbh();
 			$db->query('DELETE FROM `u_yf_mail_autologin` WHERE `cuid` = ?;', $row['cuid']);
@@ -130,6 +134,11 @@ class yetiforce extends rcube_plugin
 		$pass = rcube_utils::get_input_value('_pass', rcube_utils::INPUT_POST);
 		if (!empty($pass)) {
 			$sql = 'UPDATE ' . $this->rc->db->table_name('users') . ' SET password = ? WHERE user_id = ?';
+			$currentPath = getcwd();
+			chdir($this->rc->config->get('root_directory'));
+			require_once 'include/main/WebUI.php';
+			$pass = \App\Encryption::getInstance()->encrypt($pass);
+			chdir($currentPath);
 			call_user_func_array([$this->rc->db, 'query'], array_merge([$sql], [$pass, $this->rc->get_user_id()]));
 			$this->rc->db->affected_rows();
 		}
@@ -217,7 +226,7 @@ class yetiforce extends rcube_plugin
 					$cc .= ',' . $row['cc_email'];
 					$cc = str_replace($row['from_email'] . ',', '', $cc);
 					$cc = trim($cc, ',');
-					// no break
+				// no break
 				case 'reply':
 					$to = $row['reply_to_email'];
 					if (preg_match('/^re:/i', $row['subject'])) {
