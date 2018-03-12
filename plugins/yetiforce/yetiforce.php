@@ -26,7 +26,7 @@ class yetiforce extends rcube_plugin
 			$this->register_action('plugin.yetiforce.getEmailFromCRM', [$this, 'getEmailFromCRM']);
 			$this->register_action('plugin.yetiforce.getConntentEmailTemplate', [$this, 'getConntentEmailTemplate']);
 			$this->rc->output->set_env('site_URL', $this->rc->config->get('site_URL'));
-			$this->include_stylesheet($this->rc->config->get('public_URL') . 'layouts/basic/skins/icons/userIcons.css');
+			$this->include_stylesheet($this->rc->config->get('public_URL') . 'layouts/resources/icons/userIcons.css');
 
 			$currentPath = getcwd();
 			chdir($this->rc->config->get('root_directory'));
@@ -63,7 +63,7 @@ class yetiforce extends rcube_plugin
 			}
 			if ($this->rc->action === 'preview' || $this->rc->action === 'show') {
 				$this->include_script('preview.js');
-				$this->include_stylesheet($this->rc->config->get('public_URL') . 'libraries/bootstrap3/css/glyphicon.css');
+				$this->include_stylesheet($this->rc->config->get('public_URL') . 'libraries/font-awesome/web-fonts-with-css/css/fontawesome-all.css');
 				$this->include_stylesheet('preview.css');
 				$this->add_hook('message_load', [$this, 'messageLoad']);
 			}
