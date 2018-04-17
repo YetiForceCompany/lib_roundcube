@@ -30,17 +30,13 @@ window.rcmail && rcmail.addEventListener('init', function (evt) {
 	// Add a document to an email crm
 	rcmail.register_command('yetiforce.addFilesFromCRM', function (data) {
 		if (crm != false) {
-			var params = {
+			var data = {};
+			show({
 				module: 'Documents',
 				src_module: 'Documents',
 				multi_select: true,
 				url: crmPath
-			};
-			var sourceFieldElement = $(this);
-			var prePopupOpenEvent = jQuery.Event(crm.Vtiger_Edit_Js.preReferencePopUpOpenEvent);
-			sourceFieldElement.trigger(prePopupOpenEvent);
-			var data = {};
-			show(params, function (data) {
+			}, function (data) {
 				var responseData = JSON.parse(data);
 				var ids = [];
 				for (var id in responseData) {

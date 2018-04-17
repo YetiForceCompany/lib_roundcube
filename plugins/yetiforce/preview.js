@@ -165,8 +165,6 @@ function removeRecord(crmid) {
 }
 function showPopup(params, sourceFieldElement, actionsParams) {
 	actionsParams['newModule'] = params['module'];
-	var prePopupOpenEvent = jQuery.Event(window.crm.Vtiger_Edit_Js.preReferencePopUpOpenEvent);
-	sourceFieldElement.trigger(prePopupOpenEvent);
 	var data = {};
 	show(params, function (data) {
 		var responseData = JSON.parse(data);
