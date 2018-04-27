@@ -4,7 +4,7 @@
  * Integration Plugin yetiforce and roundcube.
  *
  * @license MIT
- * @author Mariusz Krzaczkowski <m.krzaczkowski@yetiforce.com>
+ * @author  Mariusz Krzaczkowski <m.krzaczkowski@yetiforce.com>
  */
 class yetiforce extends rcube_plugin
 {
@@ -19,11 +19,9 @@ class yetiforce extends rcube_plugin
 		$this->add_hook('login_after', [$this, 'loginAfter']);
 		$this->add_hook('startup', [$this, 'startup']);
 		$this->add_hook('authenticate', [$this, 'authenticate']);
-
 		if ($this->rc->task == 'mail') {
 			$this->register_action('plugin.yetiforce.addFilesToMail', [$this, 'addFilesToMail']);
 			$this->register_action('plugin.yetiforce.getEmailTemplates', [$this, 'getEmailTemplates']);
-			$this->register_action('plugin.yetiforce.getEmailFromCRM', [$this, 'getEmailFromCRM']);
 			$this->register_action('plugin.yetiforce.getConntentEmailTemplate', [$this, 'getConntentEmailTemplate']);
 			$this->rc->output->set_env('site_URL', $this->rc->config->get('site_URL'));
 			$this->include_stylesheet($this->rc->config->get('public_URL') . 'layouts/resources/icons/userIcons.css');
@@ -436,8 +434,8 @@ class yetiforce extends rcube_plugin
 			$this->rc->session->append($SESSION_KEY . '.attachments', $id, $attachment);
 			if (($icon = $COMPOSE['deleteicon']) && is_file($icon)) {
 				$button = html::img([
-						'src' => $icon,
-						'alt' => $this->rc->gettext('delete')
+					'src' => $icon,
+					'alt' => $this->rc->gettext('delete')
 				]);
 			} elseif ($COMPOSE['textbuttons']) {
 				$button = rcube::Q($this->rc->gettext('delete'));
@@ -446,12 +444,12 @@ class yetiforce extends rcube_plugin
 			}
 
 			$content = html::a([
-					'href' => '#delete',
-					'onclick' => sprintf("return %s.command('remove-attachment','rcmfile%s', this)", rcmail_output::JS_OBJECT_NAME, $id),
-					'title' => $this->rc->gettext('delete'),
-					'class' => 'delete',
-					'aria-label' => $this->rc->gettext('delete') . ' ' . $attachment['name'],
-					], $button
+				'href' => '#delete',
+				'onclick' => sprintf("return %s.command('remove-attachment','rcmfile%s', this)", rcmail_output::JS_OBJECT_NAME, $id),
+				'title' => $this->rc->gettext('delete'),
+				'class' => 'delete',
+				'aria-label' => $this->rc->gettext('delete') . ' ' . $attachment['name'],
+			], $button
 			);
 
 			$content .= rcube::Q($attachment['name']);
@@ -617,32 +615,6 @@ if (window && window.rcmail) {
 		}
 		$p['content'] = $content;
 		return $p;
-	}
-
-	/**
-	 * Get address email from CRM.
-	 */
-	public function getEmailFromCRM()
-	{
-		$currentPath = getcwd();
-		chdir($this->rc->config->get('root_directory'));
-		$this->loadCurrentUser();
-		$ids = rcube_utils::get_input_value('recordsId', rcube_utils::INPUT_GPC);
-		$sourceModule = rcube_utils::get_input_value('moduleName', rcube_utils::INPUT_GPC);
-		$emailFields = OSSMailScanner_Record_Model::getEmailSearch($sourceModule);
-		$addresEmails = [];
-		foreach ($ids as $id) {
-			$recordModel = Vtiger_Record_Model::getInstanceById($id, $sourceModule);
-			foreach ($emailFields as &$emailField) {
-				$email = $recordModel->get($emailField['fieldname']);
-				if (!empty($email)) {
-					$addresEmails[] = $email;
-				}
-			}
-		}
-		echo App\Json::encode($addresEmails);
-		chdir($currentPath);
-		exit;
 	}
 
 	/**
