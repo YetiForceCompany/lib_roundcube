@@ -489,7 +489,7 @@ if (window && window.rcmail) {
 		if ($ids) {
 			$sql_result = $db->query("SELECT vtiger_attachments.* FROM vtiger_attachments INNER JOIN vtiger_seattachmentsrel ON vtiger_seattachmentsrel.attachmentsid=vtiger_attachments.attachmentsid WHERE vtiger_seattachmentsrel.crmid IN ($ids);");
 			while ($row = $db->fetch_assoc($sql_result)) {
-				$orgFile = $this->rc->config->get('root_directory') . $row['path'] . $row['attachmentsid'] . '_' . $row['name'];
+				$orgFile = $this->rc->config->get('root_directory') . $row['path'] . $row['attachmentsid'];
 				list($usec, $sec) = explode(' ', microtime());
 				$filepath = $this->rc->config->get('root_directory') . 'cache/mail/' . $sec . $userid . $row['attachmentsid'] . $index . '.tmp';
 				if (file_exists($orgFile)) {
