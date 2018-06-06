@@ -61,7 +61,7 @@ class yetiforce extends rcube_plugin
 			}
 			if ($this->rc->action === 'preview' || $this->rc->action === 'show') {
 				$this->include_script('preview.js');
-				$this->include_stylesheet($this->rc->config->get('public_URL') . 'libraries/font-awesome/web-fonts-with-css/css/fontawesome-all.css');
+				$this->include_stylesheet($this->rc->config->get('public_URL') . 'libraries/fontawesome-web/css/fontawesome-all.css');
 				$this->include_stylesheet('preview.css');
 				$this->add_hook('message_load', [$this, 'messageLoad']);
 			}
