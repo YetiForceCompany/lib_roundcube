@@ -1,28 +1,29 @@
 /* {[The file is published on the basis of MIT License]} */
 window.rcmail && rcmail.addEventListener('init', function (evt) {
-	window.crm = getCrmWindow();
-	loadActionBar();
-	rcmail.env.message_commands.push('yetiforce.importICS');
-	rcmail.register_command('yetiforce.importICS', function (ics, element, e) {
-		window.crm.AppConnector.request({
-			async: true,
-			dataType: 'json',
-			data: {
-				module: 'Calendar',
-				action: 'ImportICS',
-				ics: ics
-			}
-		}).then(function (response) {
-			window.crm.Vtiger_Helper_Js.showPnotify({
-				text: response['result'],
-				type: 'info',
-				animation: 'show'
-			});
-			$(element).closest('.icalattachments').remove();
-		})
-	}, true);
-}
+		window.crm = getCrmWindow();
+		loadActionBar();
+		rcmail.env.message_commands.push('yetiforce.importICS');
+		rcmail.register_command('yetiforce.importICS', function (ics, element, e) {
+			window.crm.AppConnector.request({
+				async: true,
+				dataType: 'json',
+				data: {
+					module: 'Calendar',
+					action: 'ImportICS',
+					ics: ics
+				}
+			}).done(function (response) {
+				window.crm.Vtiger_Helper_Js.showPnotify({
+					text: response['result'],
+					type: 'info',
+					animation: 'show'
+				});
+				$(element).closest('.icalattachments').remove();
+			})
+		}, true);
+	}
 );
+
 function loadActionBar() {
 	var content = $('#ytActionBarContent');
 	var params = {
@@ -32,12 +33,13 @@ function loadActionBar() {
 		folder: rcmail.env.mailbox,
 		rcId: rcmail.env.user_id
 	};
-	window.crm.AppConnector.request(params).then(function (response) {
+	window.crm.AppConnector.request(params).done(function (response) {
 		content.find('.ytHeader').html(response);
 		$('#messagecontent').css('top', (content.outerHeight() + $('#messageheader').outerHeight()) + 'px');
 		registerEvents(content);
 	});
 }
+
 function registerEvents(content) {
 	registerAddRecord(content);
 	registerAddReletedRecord(content);
@@ -61,6 +63,7 @@ function registerEvents(content) {
 		$(window).trigger("resize");
 	});
 }
+
 function registerImportMail(content) {
 	content.find('.importMail').click(function (e) {
 		window.crm.Vtiger_Helper_Js.showPnotify({
@@ -75,7 +78,7 @@ function registerImportMail(content) {
 				folder: rcmail.env.mailbox,
 				rcId: rcmail.env.user_id
 			}
-		}).then(function (data) {
+		}).done(function (data) {
 			loadActionBar();
 			window.crm.Vtiger_Helper_Js.showPnotify({
 				text: window.crm.app.vtranslate('AddFindEmailInRecord'),
@@ -84,17 +87,18 @@ function registerImportMail(content) {
 		})
 	});
 }
+
 function registerRemoveRecord(content) {
 	content.find('button.removeRecord').click(function (e) {
 		var row = $(e.currentTarget).closest('.rowRelatedRecord');
 		removeRecord(row.data('id'));
 	});
 }
+
 function registerSelectRecord(content) {
-	var id = content.find('#mailActionBarID').val();
+	let id = content.find('#mailActionBarID').val();
 	content.find('button.selectRecord').click(function (e) {
-		var sourceFieldElement = jQuery('input[name="tempField"]');
-		var relParams = {
+		let relParams = {
 			mailId: id
 		};
 		if ($(this).data('type') == 0) {
@@ -105,16 +109,14 @@ function registerSelectRecord(content) {
 			relParams.mod = $(this).closest('.rowRelatedRecord').data('module');
 			relParams.newModule = module;
 		}
-		var PopupParams = {
+		showPopup({
 			module: module,
-			src_module: module,
-			src_field: 'tempField',
-			src_record: '',
-			url: rcmail.env.site_URL + 'index.php?'
-		};
-		showPopup(PopupParams, sourceFieldElement, relParams);
+			src_module: 'OSSMailView',
+			src_record: id,
+		}, relParams);
 	});
 }
+
 function registerAddReletedRecord(content) {
 	var id = content.find('#mailActionBarID').val();
 	content.find('button.addRelatedRecord').click(function (e) {
@@ -124,6 +126,7 @@ function registerAddReletedRecord(content) {
 		showQuickCreateForm(targetElement.data('module'), row.data('id'), params);
 	});
 }
+
 function registerAddRecord(content) {
 	var id = content.find('#mailActionBarID').val();
 	content.find('button.addRecord').click(function (e) {
@@ -131,6 +134,7 @@ function registerAddRecord(content) {
 		showQuickCreateForm(col.find('.module').val(), id);
 	});
 }
+
 function removeRecord(crmid) {
 	var id = $('#mailActionBarID').val();
 	var params = {}
@@ -145,7 +149,7 @@ function removeRecord(crmid) {
 	}
 	params.async = false;
 	params.dataType = 'json';
-	window.crm.AppConnector.request(params).then(function (data) {
+	window.crm.AppConnector.request(params).done(function (data) {
 		var response = data['result'];
 		if (response['success']) {
 			var notifyParams = {
@@ -163,49 +167,42 @@ function removeRecord(crmid) {
 		loadActionBar();
 	});
 }
-function showPopup(params, sourceFieldElement, actionsParams) {
+
+function showPopup(params, actionsParams) {
 	actionsParams['newModule'] = params['module'];
-	var prePopupOpenEvent = jQuery.Event(window.crm.Vtiger_Edit_Js.preReferencePopUpOpenEvent);
-	sourceFieldElement.trigger(prePopupOpenEvent);
-	var data = {};
-	show(params, function (data) {
-		var responseData = JSON.parse(data);
-		for (var id in responseData) {
-			var data = {
-				name: responseData[id].name,
-				id: id
-			}
-			sourceFieldElement.val(data.id);
-		}
-		actionsParams['newCrmId'] = data.id;
-		var params = {}
-		params.data = {
-			module: 'OSSMail',
-			action: 'ExecuteActions',
-			mode: 'addRelated',
-			params: actionsParams
-		}
-		params.async = false;
-		params.dataType = 'json';
-		window.crm.AppConnector.request(params).then(function (data) {
-			var response = data['result'];
-			if (response['success']) {
-				var notifyParams = {
-					text: response['data'],
-					type: 'info',
-					animation: 'show'
-				};
-			} else {
-				var notifyParams = {
-					text: response['data'],
-					animation: 'show'
-				};
-			}
-			window.crm.Vtiger_Helper_Js.showPnotify(notifyParams);
-			loadActionBar();
+	window.crm.app.showRecordsList(params, (modal, instance) => {
+		instance.setSelectEvent((responseData, e) => {
+			actionsParams['newCrmId'] = responseData.id;
+			window.crm.AppConnector.request({
+				async: false,
+				dataType: 'json',
+				data: {
+					module: 'OSSMail',
+					action: 'ExecuteActions',
+					mode: 'addRelated',
+					params: actionsParams
+				}
+			}).done(function (data) {
+				let response = data['result'];
+				if (response['success']) {
+					var notifyParams = {
+						text: response['data'],
+						type: 'info',
+						animation: 'show'
+					};
+				} else {
+					var notifyParams = {
+						text: response['data'],
+						animation: 'show'
+					};
+				}
+				window.crm.Vtiger_Helper_Js.showPnotify(notifyParams);
+				loadActionBar();
+			});
 		});
 	});
 }
+
 function showQuickCreateForm(moduleName, record, params) {
 	var content = $('#ytActionBarContent');
 	if (params == undefined) {
@@ -223,7 +220,12 @@ function showQuickCreateForm(moduleName, record, params) {
 		$('<input type="hidden" name="sourceRecord" value="' + record + '" />').appendTo(data);
 		$('<input type="hidden" name="relationOperation" value="true" />').appendTo(data);
 	}
-	var ids = {link: 'modulesLevel0', process: 'modulesLevel1', subprocess: 'modulesLevel2', linkextend: 'modulesLevel3'};
+	var ids = {
+		link: 'modulesLevel0',
+		process: 'modulesLevel1',
+		subprocess: 'modulesLevel2',
+		linkextend: 'modulesLevel3'
+	};
 	for (var i in ids) {
 		var element = content.find('#' + ids[i]);
 		var value = element.length ? JSON.parse(element.val()) : [];
@@ -268,42 +270,7 @@ function showQuickCreateForm(moduleName, record, params) {
 	var headerInstance = new window.crm.Vtiger_Header_Js();
 	headerInstance.quickCreateModule(moduleName, quickCreateParams);
 }
-function show(urlOrParams, cb, windowName, eventName, onLoadCb) {
-	var thisInstance = window.crm.Vtiger_Popup_Js.getInstance();
-	if (typeof urlOrParams == 'undefined') {
-		urlOrParams = {};
-	}
-	if (typeof urlOrParams == 'object' && (typeof urlOrParams['view'] == "undefined")) {
-		urlOrParams['view'] = 'Popup';
-	}
-	if (typeof eventName == 'undefined') {
-		eventName = 'postSelection' + Math.floor(Math.random() * 10000);
-	}
-	if (typeof windowName == 'undefined') {
-		windowName = 'test';
-	}
-	if (typeof urlOrParams == 'object') {
-		urlOrParams['triggerEventName'] = eventName;
-	} else {
-		urlOrParams += '&triggerEventName=' + eventName;
-	}
-	var urlString = (typeof urlOrParams == 'string') ? urlOrParams : window.crm.jQuery.param(urlOrParams);
-	var url = urlOrParams['url'] + urlString;
-	var popupWinRef = window.crm.window.open(url, windowName, 'width=800,height=650,resizable=0,scrollbars=1');
-	if (typeof thisInstance.destroy == 'function') {
-		thisInstance.destroy();
-	}
-	window.crm.jQuery.initWindowMsg();
-	if (typeof cb != 'undefined') {
-		thisInstance.retrieveSelectedRecords(cb, eventName);
-	}
-	if (typeof onLoadCb == 'function') {
-		window.crm.jQuery.windowMsg('Vtiger.OnPopupWindowLoad.Event', function (data) {
-			onLoadCb(data);
-		})
-	}
-	return popupWinRef;
-}
+
 function getCrmWindow() {
 	if (opener !== null) {
 		return opener.parent;
