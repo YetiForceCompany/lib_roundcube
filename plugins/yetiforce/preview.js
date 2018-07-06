@@ -12,7 +12,7 @@ window.rcmail && rcmail.addEventListener('init', function (evt) {
 					action: 'ImportICS',
 					ics: ics
 				}
-			}).then(function (response) {
+			}).done(function (response) {
 				window.crm.Vtiger_Helper_Js.showPnotify({
 					text: response['result'],
 					type: 'info',
@@ -33,7 +33,7 @@ function loadActionBar() {
 		folder: rcmail.env.mailbox,
 		rcId: rcmail.env.user_id
 	};
-	window.crm.AppConnector.request(params).then(function (response) {
+	window.crm.AppConnector.request(params).done(function (response) {
 		content.find('.ytHeader').html(response);
 		$('#messagecontent').css('top', (content.outerHeight() + $('#messageheader').outerHeight()) + 'px');
 		registerEvents(content);
@@ -78,7 +78,7 @@ function registerImportMail(content) {
 				folder: rcmail.env.mailbox,
 				rcId: rcmail.env.user_id
 			}
-		}).then(function (data) {
+		}).done(function (data) {
 			loadActionBar();
 			window.crm.Vtiger_Helper_Js.showPnotify({
 				text: window.crm.app.vtranslate('AddFindEmailInRecord'),
@@ -149,7 +149,7 @@ function removeRecord(crmid) {
 	}
 	params.async = false;
 	params.dataType = 'json';
-	window.crm.AppConnector.request(params).then(function (data) {
+	window.crm.AppConnector.request(params).done(function (data) {
 		var response = data['result'];
 		if (response['success']) {
 			var notifyParams = {
@@ -182,7 +182,7 @@ function showPopup(params, actionsParams) {
 					mode: 'addRelated',
 					params: actionsParams
 				}
-			}).then(function (data) {
+			}).done(function (data) {
 				let response = data['result'];
 				if (response['success']) {
 					var notifyParams = {
