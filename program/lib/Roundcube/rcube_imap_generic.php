@@ -114,8 +114,7 @@ class rcube_imap_generic
         $res = fwrite($this->fp, $string);
 
         if ($res === false) {
-            @fclose($this->fp);
-            $this->fp = null;
+            $this->closeSocket();
         }
 
         return $res;
@@ -542,6 +541,14 @@ class rcube_imap_generic
                 // RFC2195: CRAM-MD5
                 $ipad = '';
                 $opad = '';
+                $xor  = function($str1, $str2) {
+                    $result = '';
+                    $size   = strlen($str1);
+                    for ($i=0; $i<$size; $i++) {
+                        $result .= chr(ord($str1[$i]) ^ ord($str2[$i]));
+                    }
+                    return $result;
+                };
 
                 // initialize ipad, opad
                 for ($i=0; $i<64; $i++) {
@@ -550,14 +557,11 @@ class rcube_imap_generic
                 }
 
                 // pad $pass so it's 64 bytes
-                $padLen = 64 - strlen($pass);
-                for ($i=0; $i<$padLen; $i++) {
-                    $pass .= chr(0);
-                }
+                $pass = str_pad($pass, 64, chr(0));
 
                 // generate hash
-                $hash  = md5($this->_xor($pass, $opad) . pack("H*",
-                    md5($this->_xor($pass, $ipad) . base64_decode($challenge))));
+                $hash  = md5($xor($pass, $opad) . pack("H*",
+                    md5($xor($pass, $ipad) . base64_decode($challenge))));
                 $reply = base64_encode($user . ' ' . $hash);
 
                 // send result
@@ -575,7 +579,8 @@ class rcube_imap_generic
                     $user  = '';
                 }
 
-                $auth_sasl = Auth_SASL::factory('digestmd5');
+                $auth_sasl = new Auth_SASL;
+                $auth_sasl = $auth_sasl->factory('digestmd5');
                 $reply     = base64_encode($auth_sasl->getResponse($authc, $pass,
                     base64_decode($challenge), $this->host, 'imap', $user));
 
@@ -849,6 +854,7 @@ class rcube_imap_generic
             if ($auth_caps = $this->getCapability('AUTH')) {
                 $auth_methods = $auth_caps;
             }
+
             // RFC 2595 (LOGINDISABLED) LOGIN disabled when connection is not secure
             $login_disabled = $this->getCapability('LOGINDISABLED');
             if (($key = array_search('LOGIN', $auth_methods)) !== false) {
@@ -861,7 +867,12 @@ class rcube_imap_generic
             }
 
             // Use best (for security) supported authentication method
-            $all_methods = array('GSSAPI', 'DIGEST-MD5', 'CRAM-MD5', 'CRAM_MD5', 'PLAIN', 'LOGIN');
+            $all_methods = array('DIGEST-MD5', 'CRAM-MD5', 'CRAM_MD5', 'PLAIN', 'LOGIN');
+
+            if (!empty($this->prefs['gssapi_cn'])) {
+                array_unshift($all_methods, 'GSSAPI');
+            }
+
             foreach ($all_methods as $auth_method) {
                 if (in_array($auth_method, $auth_methods)) {
                     break;
@@ -1128,35 +1139,61 @@ class rcube_imap_generic
 
             $response = explode("\r\n", $response);
             foreach ($response as $line) {
-                if (preg_match('/^\* ([0-9]+) (EXISTS|RECENT)$/i', $line, $m)) {
-                    $this->data[strtoupper($m[2])] = (int) $m[1];
-                }
-                else if (preg_match('/^\* OK \[/i', $line, $match)) {
-                    $line = substr($line, 6);
-                    if (preg_match('/^(UIDNEXT|UIDVALIDITY|UNSEEN) ([0-9]+)/i', $line, $match)) {
-                        $this->data[strtoupper($match[1])] = (int) $match[2];
-                    }
-                    else if (preg_match('/^(HIGHESTMODSEQ) ([0-9]+)/i', $line, $match)) {
-                        $this->data[strtoupper($match[1])] = (string) $match[2];
-                    }
-                    else if (preg_match('/^(NOMODSEQ)/i', $line, $match)) {
-                        $this->data[strtoupper($match[1])] = true;
-                    }
-                    else if (preg_match('/^PERMANENTFLAGS \(([^\)]+)\)/iU', $line, $match)) {
-                        $this->data['PERMANENTFLAGS'] = explode(' ', $match[1]);
-                    }
-                }
-                // QRESYNC FETCH response (RFC5162)
-                else if (preg_match('/^\* ([0-9+]) FETCH/i', $line, $match)) {
-                    $line       = substr($line, strlen($match[0]));
-                    $fetch_data = $this->tokenizeResponse($line, 1);
-                    $data       = array('id' => $match[1]);
+                if (preg_match('/^\* OK \[/i', $line)) {
+                    $pos   = strcspn($line, ' ]', 6);
+                    $token = strtoupper(substr($line, 6, $pos));
+                    $pos   += 7;
 
-                    for ($i=0, $size=count($fetch_data); $i<$size; $i+=2) {
-                        $data[strtolower($fetch_data[$i])] = $fetch_data[$i+1];
-                    }
+                    switch ($token) {
+                    case 'UIDNEXT':
+                    case 'UIDVALIDITY':
+                    case 'UNSEEN':
+                        if ($len = strspn($line, '0123456789', $pos)) {
+                            $this->data[$token] = (int) substr($line, $pos, $len);
+                        }
+                        break;
 
-                    $this->data['QRESYNC'][$data['uid']] = $data;
+                    case 'HIGHESTMODSEQ':
+                        if ($len = strspn($line, '0123456789', $pos)) {
+                            $this->data[$token] = (string) substr($line, $pos, $len);
+                        }
+                        break;
+
+                    case 'NOMODSEQ':
+                        $this->data[$token] = true;
+                        break;
+
+                    case 'PERMANENTFLAGS':
+                        $start = strpos($line, '(', $pos);
+                        $end   = strrpos($line, ')');
+                        if ($start && $end) {
+                            $flags = substr($line, $start + 1, $end - $start - 1);
+                            $this->data[$token] = explode(' ', $flags);
+                        }
+                        break;
+                    }
+                }
+                else if (preg_match('/^\* ([0-9]+) (EXISTS|RECENT|FETCH)/i', $line, $match)) {
+                    $token = strtoupper($match[2]);
+                    switch ($token) {
+                    case 'EXISTS':
+                    case 'RECENT':
+                        $this->data[$token] = (int) $match[1];
+                        break;
+
+                    case 'FETCH':
+                        // QRESYNC FETCH response (RFC5162)
+                        $line       = substr($line, strlen($match[0]));
+                        $fetch_data = $this->tokenizeResponse($line, 1);
+                        $data       = array('id' => $match[1]);
+
+                        for ($i=0, $size=count($fetch_data); $i<$size; $i+=2) {
+                            $data[strtolower($fetch_data[$i])] = $fetch_data[$i+1];
+                        }
+
+                        $this->data['QRESYNC'][$data['uid']] = $data;
+                        break;
+                    }
                 }
                 // QRESYNC VANISHED response (RFC5162)
                 else if (preg_match('/^\* VANISHED [()EARLIER]*/i', $line, $match)) {
@@ -1201,7 +1238,7 @@ class rcube_imap_generic
         }
 
         list($code, $response) = $this->execute('STATUS', array($this->escape($mailbox),
-            '(' . implode(' ', (array) $items) . ')'));
+            '(' . implode(' ', $items) . ')'));
 
         if ($code == self::ERROR_OK && preg_match('/^\* STATUS /i', $response)) {
             $result   = array();
@@ -1214,10 +1251,10 @@ class rcube_imap_generic
             if (!is_array($items) && ($pos = strpos($response, '(')) !== false) {
                 $response = substr($response, $pos);
                 $items    = $this->tokenizeResponse($response, 1);
+            }
 
-                if (!is_array($items)) {
-                    return $result;
-                }
+            if (!is_array($items)) {
+                return $result;
             }
 
             for ($i=0, $len=count($items); $i<$len; $i += 2) {
@@ -2034,12 +2071,12 @@ class rcube_imap_generic
                     if (preg_match('/BODY\[HEADER\.FIELDS \("*DATE"*\)\] (.*)/', $line, $matches)) {
                         $value = preg_replace(array('/^"*[a-z]+:/i'), '', $matches[1]);
                         $value = trim($value);
-                        $result[$id] = $this->strToTime($value);
+                        $result[$id] = rcube_utils::strtotime($value);
                     }
                     // non-existent/empty Date: header, use INTERNALDATE
                     if (empty($result[$id])) {
                         if (preg_match('/INTERNALDATE "([^"]+)"/', $line, $matches)) {
-                            $result[$id] = $this->strToTime($matches[1]);
+                            $result[$id] = rcube_utils::strtotime($matches[1]);
                         }
                         else {
                             $result[$id] = 0;
@@ -2071,7 +2108,7 @@ class rcube_imap_generic
                 }
                 else if ($mode == 4) {
                     if (preg_match('/INTERNALDATE "([^"]+)"/', $line, $matches)) {
-                        $result[$id] = $this->strToTime($matches[1]);
+                        $result[$id] = rcube_utils::strtotime($matches[1]);
                     }
                     else {
                         $result[$id] = 0;
@@ -2400,7 +2437,7 @@ class rcube_imap_generic
                     else if ($name == 'INTERNALDATE') {
                         $result[$id]->internaldate = $value;
                         $result[$id]->date         = $value;
-                        $result[$id]->timestamp    = $this->StrToTime($value);
+                        $result[$id]->timestamp    = rcube_utils::strtotime($value);
                     }
                     else if ($name == 'FLAGS') {
                         if (!empty($value)) {
@@ -2465,7 +2502,7 @@ class rcube_imap_generic
                         switch ($field) {
                         case 'date';
                             $result[$id]->date = $string;
-                            $result[$id]->timestamp = $this->strToTime($string);
+                            $result[$id]->timestamp = rcube_utils::strtotime($string);
                             break;
                         case 'to':
                             $result[$id]->to = preg_replace('/undisclosed-recipients:[;,]*/', '', $string);
@@ -2605,7 +2642,7 @@ class rcube_imap_generic
 
         reset($messages);
 
-        while (list($key, $headers) = each($messages)) {
+        foreach ($messages as $key => $headers) {
             $value = null;
 
             switch ($field) {
@@ -2614,7 +2651,7 @@ class rcube_imap_generic
             case 'date':
             case 'internaldate':
             case 'timestamp':
-                $value = self::strToTime($headers->$field);
+                $value = rcube_utils::strtotime($headers->$field);
                 if (!$value && $field != 'timestamp') {
                     $value = $headers->timestamp;
                 }
@@ -2647,7 +2684,7 @@ class rcube_imap_generic
             }
 
             // form new array based on index
-            while (list($key, $val) = each($index)) {
+            foreach ($index as $key => $val) {
                 $result[$key] = $messages[$key];
             }
         }
@@ -3088,8 +3125,9 @@ class rcube_imap_generic
                 if (preg_match('/^\* QUOTA /', $line)) {
                     list(, , $quota_root) = $this->tokenizeResponse($line, 3);
 
-                    while ($line) {
-                        list($type, $used, $total) = $this->tokenizeResponse($line, 1);
+                    $quotas = $this->tokenizeResponse($line, 1);
+                    foreach (array_chunk($quotas, 3) as $quota) {
+                        list($type, $used, $total) = $quota;
                         $type = strtolower($type);
 
                         if ($type && $total) {
@@ -3592,14 +3630,12 @@ class rcube_imap_generic
             $data['type'] = 'multipart';
         }
         else {
-            $data['type'] = strtolower($part_a[0]);
-
-            // encoding
+            $data['type']     = strtolower($part_a[0]);
             $data['encoding'] = strtolower($part_a[5]);
 
             // charset
             if (is_array($part_a[2])) {
-               while (list($key, $val) = each($part_a[2])) {
+               foreach ($part_a[2] as $key => $val) {
                     if (strcasecmp($val, 'charset') == 0) {
                         $data['charset'] = $part_a[2][$key+1];
                         break;
@@ -3692,8 +3728,16 @@ class rcube_imap_generic
         // Parse response
         do {
             $line = $this->readLine(4096);
+
             if ($response !== null) {
                 $response .= $line;
+            }
+
+            // parse untagged response for [COPYUID 1204196876 3456:3457 123:124] (RFC6851)
+            if ($line && $command == 'UID MOVE') {
+                if (preg_match("/^\* OK \[COPYUID [0-9]+ ([0-9,:]+) ([0-9,:]+)\]/i", $line, $m)) {
+                    $this->data['COPYUID'] = array($m[1], $m[2]);
+                }
             }
         }
         while (!$this->startsWith($line, $tag . ' ', true, true));
@@ -3803,6 +3847,9 @@ class rcube_imap_generic
         return $num == 1 ? $result[0] : $result;
     }
 
+    /**
+     * Joins IMAP command line elements (recursively)
+     */
     protected static function r_implode($element)
     {
         $string = '';
@@ -3832,16 +3879,15 @@ class rcube_imap_generic
     {
         // given a comma delimited list of independent mid's,
         // compresses by grouping sequences together
-
         if (!is_array($messages)) {
             // if less than 255 bytes long, let's not bother
-            if (!$force && strlen($messages)<255) {
-                return $messages;
+            if (!$force && strlen($messages) < 255) {
+                return preg_match('/[^0-9:,*]/', $messages) ? 'INVALID' : $messages;
             }
 
             // see if it's already been compressed
             if (strpos($messages, ':') !== false) {
-                return $messages;
+                return preg_match('/[^0-9:,*]/', $messages) ? 'INVALID' : $messages;
             }
 
             // separate, then sort
@@ -3876,7 +3922,9 @@ class rcube_imap_generic
         }
 
         // return as comma separated string
-        return implode(',', $result);
+        $result = implode(',', $result);
+
+        return preg_match('/[^0-9:,*]/', $result) ? 'INVALID' : $result;
     }
 
     /**
@@ -3903,18 +3951,6 @@ class rcube_imap_generic
                 $result[] = (int)$x;
             }
             unset($messages[$idx]);
-        }
-
-        return $result;
-    }
-
-    protected function _xor($string, $string2)
-    {
-        $result = '';
-        $size   = strlen($string);
-
-        for ($i=0; $i<$size; $i++) {
-            $result .= chr(ord($string[$i]) ^ ord($string2[$i]));
         }
 
         return $result;
@@ -3965,44 +4001,6 @@ class rcube_imap_generic
         }
 
         return implode(' ', (array)$flags);
-    }
-
-    /**
-     * Converts datetime string into unix timestamp
-     *
-     * @param string $date Date string
-     *
-     * @return int Unix timestamp
-     */
-    protected static function strToTime($date)
-    {
-        // Clean malformed data
-        $date = preg_replace(
-            array(
-                '/GMT\s*([+-][0-9]+)/',                     // support non-standard "GMTXXXX" literal
-                '/[^a-z0-9\x20\x09:+-]/i',                  // remove any invalid characters
-                '/\s*(Mon|Tue|Wed|Thu|Fri|Sat|Sun)\s*/i',   // remove weekday names
-            ),
-            array(
-                '\\1',
-                '',
-                '',
-            ), $date);
-
-        $date = trim($date);
-
-        // if date parsing fails, we have a date in non-rfc format
-        // remove token from the end and try again
-        while (($ts = intval(@strtotime($date))) <= 0) {
-            $d = explode(' ', $date);
-            array_pop($d);
-            if (empty($d)) {
-                break;
-            }
-            $date = implode(' ', $d);
-        }
-
-        return $ts < 0 ? 0 : $ts;
     }
 
     /**
@@ -4077,7 +4075,7 @@ class rcube_imap_generic
     /**
      * Write the given debug text to the current debug output handler.
      *
-     * @param string $message Debug mesage text.
+     * @param string $message Debug message text.
      *
      * @since 0.5-stable
      */

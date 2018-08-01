@@ -6,7 +6,6 @@
  * Sample plugin that adds a new button to the mailbox toolbar
  * to mark the selected messages as Junk and move them to the Junk folder
  *
- * @version @package_version@
  * @license GNU GPLv3+
  * @author Thomas Bruederli
  */
@@ -63,7 +62,7 @@ class markasjunk extends rcube_plugin
         $rcmail  = rcmail::get_instance();
         $storage = $rcmail->get_storage();
 
-        foreach (rcmail::get_uids() as $mbox => $uids) {
+        foreach (rcmail::get_uids(null, null, $multifolder, rcube_utils::INPUT_POST) as $mbox => $uids) {
             $storage->unset_flag($uids, 'NONJUNK', $mbox);
             $storage->set_flag($uids, 'JUNK', $mbox);
         }

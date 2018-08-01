@@ -7,7 +7,6 @@
  * It's clickable interface which operates on text scripts and communicates
  * with server using managesieve protocol. Adds Filters tab in Settings.
  *
- * @version @package_version@
  * @author Aleksander Machniak <alec@alec.pl>
  *
  * Configuration (see config.inc.php.dist)
@@ -44,6 +43,7 @@ class managesieve extends rcube_plugin
         $this->register_action('plugin.managesieve-action', array($this, 'managesieve_actions'));
         $this->register_action('plugin.managesieve-vacation', array($this, 'managesieve_actions'));
         $this->register_action('plugin.managesieve-save', array($this, 'managesieve_save'));
+        $this->register_action('plugin.managesieve-saveraw', array($this, 'managesieve_saveraw'));
 
         if ($this->rc->task == 'settings') {
             $this->add_hook('settings_actions', array($this, 'settings_actions'));
@@ -189,9 +189,10 @@ class managesieve extends rcube_plugin
      */
     function managesieve_actions()
     {
+        $uids = rcmail::get_uids(null, null, $multifolder, rcube_utils::INPUT_POST);
+
         // handle fetching email headers for the new filter form
-        if ($uid = rcube_utils::get_input_value('_uid', rcube_utils::INPUT_POST)) {
-            $uids    = rcmail::get_uids();
+        if (!empty($uids)) {
             $mailbox = key($uids);
             $message = new rcube_message($uids[$mailbox][0], $mailbox);
             $headers = $this->parse_headers($message->headers);
@@ -224,6 +225,23 @@ class managesieve extends rcube_plugin
 
         $engine = $this->get_engine();
         $engine->save();
+    }
+
+    /**
+     * Raw form save action handler
+     */
+    function managesieve_saveraw()
+    {
+        $engine = $this->get_engine();
+
+        if (!$this->rc->config->get('managesieve_raw_editor', true)) {
+            return;
+        }
+
+        // load localization
+        $this->add_texts('localization/', array('filters','managefilters'));
+
+        $engine->saveraw();
     }
 
     /**

@@ -20,8 +20,8 @@ window.rcmail && rcmail.addEventListener('init', function (evt) {
 			type: "POST",
 			data: data,
 			success: function (data) {
-				var doc = frame[0].contentWindow.document;
-				var body = $('html', doc);
+				var doc = frame[0];
+				var body = $(doc);
 				body.html(data);
 			}
 		});
