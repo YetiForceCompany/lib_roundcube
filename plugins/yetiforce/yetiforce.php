@@ -429,9 +429,9 @@ class yetiforce extends rcube_plugin
 			list($usec, $sec) = explode(' ', microtime());
 			$id = preg_replace('/[^0-9]/', '', $userid . $sec . $usec) . $index;
 			$attachment['id'] = $id;
-
-			$_SESSION['plugins']['filesystem_attachments'][$COMPOSE_ID][$id] = $attachment['path'];
+			$_SESSION['plugins']['filesystem_attachments'][$COMPOSE_ID][$id] = realpath($attachment['path']);
 			$this->rc->session->append($SESSION_KEY . '.attachments', $id, $attachment);
+
 			if (($icon = $COMPOSE['deleteicon']) && is_file($icon)) {
 				$button = html::img([
 					'src' => $icon,
@@ -442,20 +442,25 @@ class yetiforce extends rcube_plugin
 			} else {
 				$button = '';
 			}
-
-			$content = html::a([
+			$link_content = sprintf('%s <span class="attachment-size"> (%s)</span>',
+				rcube::Q($attachment['name']), $this->rc->show_bytes($attachment['size']));
+			$content_link = html::a([
+				'href' => '#load',
+				'class' => 'filename',
+				'onclick' => sprintf("return %s.command('load-attachment','rcmfile%s', this, event)", rcmail_output::JS_OBJECT_NAME, $id),
+			], $link_content);
+			$delete_link = html::a([
 				'href' => '#delete',
-				'onclick' => sprintf("return %s.command('remove-attachment','rcmfile%s', this)", rcmail_output::JS_OBJECT_NAME, $id),
+				'onclick' => sprintf("return %s.command('remove-attachment','rcmfile%s', this, event)", rcmail_output::JS_OBJECT_NAME, $id),
 				'title' => $this->rc->gettext('delete'),
 				'class' => 'delete',
 				'aria-label' => $this->rc->gettext('delete') . ' ' . $attachment['name'],
-			], $button
-			);
+			], $button);
+			$content = $COMPOSE['icon_pos'] == 'left' ? $delete_link . $content_link : $content_link . $delete_link;
 
-			$content .= rcube::Q($attachment['name']);
-			$htmlAttachments .= 'window.rcmail.add2attachment_list("rcmfile' . $id . '",{html:"<a href=\"#delete\" onclick=\"return rcmail.command(\'remove-attachment\',\'rcmfile' . $id . '\', this)\" title=\"' . $this->rc->gettext('delete') . '\" class=\"delete\" aria-label=\"' . $this->rc->gettext('delete') . ' ' . $attachment['name'] . '\"><\/a>' . $attachment['name'] . '",name:"' . $attachment['name'] . '",mimetype:"' . $attachment['mimetype'] . '",classname:"' . rcube_utils::file2class($attachment['mimetype'], $attachment['name']) . '",complete:true},"' . $uploadid . '");' . PHP_EOL;
+			$htmlAttachments = 'window.rcmail.add2attachment_list("rcmfile' . $id . '",{html:"' . rcube::JQ($content) . '",name:"' . $attachment['name'] . '",mimetype:"' . $attachment['mimetype'] . '",classname:"' . rcube_utils::file2class($attachment['mimetype'], $attachment['name']) . '",complete:true},"' . $uploadid . '");' . PHP_EOL;
 		}
-		$response = '<!DOCTYPE html>
+		echo '<!DOCTYPE html>
 <html lang="en">
 <head><title></title><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
 <script type="text/javascript">
@@ -469,7 +474,6 @@ if (window && window.rcmail) {
 <body>
 </body>
 </html>';
-		echo $response;
 		exit;
 	}
 
@@ -491,13 +495,13 @@ if (window && window.rcmail) {
 			while ($row = $db->fetch_assoc($sql_result)) {
 				$orgFile = $this->rc->config->get('root_directory') . $row['path'] . $row['attachmentsid'];
 				list($usec, $sec) = explode(' ', microtime());
-				$filepath = $this->rc->config->get('root_directory') . 'cache/mail/' . $sec . $userid . $row['attachmentsid'] . $index . '.tmp';
+				$filepath = $this->rc->config->get('temp_dir') . DIRECTORY_SEPARATOR . "{$sec}_{$userid}_{$row['attachmentsid']}_$index.tmp";
 				if (file_exists($orgFile)) {
 					copy($orgFile, $filepath);
 					$attachment = [
 						'path' => $filepath,
-						'size' => filesize($filepath),
 						'name' => $row['name'],
+						'size' => filesize($filepath),
 						'mimetype' => rcube_mime::file_content_type($filepath, $row['name'], $row['type']),
 					];
 					$attachments[] = $attachment;
@@ -508,7 +512,7 @@ if (window && window.rcmail) {
 		if ($files) {
 			$orgFile = $this->rc->config->get('root_directory') . $files;
 			list($usec, $sec) = explode(' ', microtime());
-			$filepath = $this->rc->config->get('root_directory') . 'cache/mail/' . $sec . $userid . $index . '.tmp';
+			$filepath = $this->rc->config->get('root_directory') . "cache/mail/{$sec}_{$userid}_{$index}.tmp";
 			if (file_exists($orgFile)) {
 				copy($orgFile, $filepath);
 				$attachment = [
