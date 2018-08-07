@@ -14,7 +14,6 @@ window.rcmail && rcmail.addEventListener('init', function (evt) {
 			frame_name = 'rcmupload' + ts,
 			frame = rcmail.async_upload_form_frame(frame_name);
 		data._uploadid = ts;
-		console.log(data);
 		jQuery.ajax({
 			url: "?_task=mail&_action=plugin.yetiforce.addFilesToMail&_id=" + rcmail.env.compose_id,
 			type: "POST",
