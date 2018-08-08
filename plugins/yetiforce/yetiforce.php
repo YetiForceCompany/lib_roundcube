@@ -384,10 +384,15 @@ class yetiforce extends rcube_plugin
 		global $RCMAIL;
 		$db = $RCMAIL->get_dbh();
 		$result = [];
-		$sqlResult = $db->query("SELECT * FROM yetiforce_mail_config WHERE `type` = 'signature' AND `name` = 'signature';");
-		while ($sql_arr = $db->fetch_assoc($sqlResult)) {
-			$result['html'] = $sql_arr['value'];
-			$result['text'] = $sql_arr['value'];
+		$sqlResult = $db->query("SELECT `value` FROM yetiforce_mail_config WHERE `type` = 'signature' AND `name` = 'signature';");
+		while ($row = $db->fetch_assoc($sqlResult)) {
+			$currentPath = getcwd();
+			chdir($this->rc->config->get('root_directory'));
+			$parser = App\TextParser::getInstanceById($this->currentUser->getId(), 'Users');
+			$value = $parser->setContent($row['value'])->parse()->getContent();
+			chdir($currentPath);
+			$result['html'] = $value;
+			$result['text'] = $value;
 		}
 		return $result;
 	}
