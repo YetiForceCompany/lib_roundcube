@@ -30,12 +30,14 @@
 		<a href="#languages" class="dropbuttontip" id="spellmenulink" onclick="UI.toggle_popup('spellmenu',event);return false" aria-haspopup="true" aria-expanded="false" tabindex="2">Select Spell Language</a>
 	</span>
 	<roundcube:endif />
-	<roundcube:button name="addattachment" type="link" class="button attach" label="attach" title="addattachment" onclick="UI.show_uploadform(event);return false" aria-haspopup="true" aria-expanded="false"tabindex="2" />
+	<roundcube:button name="addattachment" type="link" class="button attach" label="attach" title="addattachment" onclick="rcmail.upload_input('uploadform')" aria-haspopup="true" aria-expanded="false" tabindex="2" />
 	<roundcube:button command="insert-sig" type="link" class="button insertsig disabled" classAct="button insertsig" label="signature" title="insertsignature" tabindex="2" />
 	<a href="#responses" class="button responses" label="responses" title="<roundcube:label name='insertresponse' />" id="responsesmenulink" unselectable="on" onmousedown="return false" onclick="UI.toggle_popup('responsesmenu',event);return false" tabindex="2" aria-haspopup="true" aria-expanded="false" aria-owns="textresponsesmenu"><roundcube:label name="responses" /></a>
 	<roundcube:button command="compose-encrypted" type="link" class="button encrypt disabled" classAct="button encrypt" classSel="button encrypt selected" label="encrypt" title="encryptmessagemailvelope" tabindex="2" style="display:none" />
+	<!-- Yetiforce -->
 	<a href="#vtmodule" class="button archive disabled" label="vtmodule" title="<roundcube:label name='selectmodule' />" id="vtmodulemenulink" unselectable="on" onmousedown="return false" onclick="UI.show_popup('vtmodulemenu');return false"><roundcube:label name="vtmodule" /></a>
 	<a href="#tpl" class="button download disabled" label="tpl" title="<roundcube:label name='selecttemplate' />" id="tplmenulink" unselectable="on" onmousedown="return false" onclick="UI.show_popup('tplmenu');return false"><roundcube:label name="tpl" /></a>
+	<!-- /Yetiforce -->
 	<roundcube:container name="toolbar" id="compose-toolbar" />
 </div>
 
@@ -125,7 +127,7 @@
 	<roundcube:button command="extwin" type="link" class="button extwin" classSel="button extwin pressed" innerClass="icon" title="openinextwin" label="openinextwin" condition="!env:extwin" />
 </div>
 
-<!-- (collapsable) message options -->
+<!-- (collapsible) message options -->
 <div id="composeoptions" role="region" aria-labelledby="aria-label-composeoptions">
 	<h2 id="aria-label-composeoptions" class="voice"><roundcube:label name="arialabelcomposeoptions" /></h2>
 	<roundcube:if condition="!in_array('htmleditor', (array)config:dont_override)" />
@@ -143,7 +145,7 @@
 		<label><roundcube:object name="mdnCheckBox" form="form" id="rcmcomposereceipt" tabindex="4" /> <roundcube:label name="returnreceipt" /></label>
 	</span>
 	<roundcube:endif />
-	<roundcube:if condition="config:smtp_server != '' and !in_array('dsn_default', (array)config:dont_override)" />
+	<roundcube:if condition="!in_array('dsn_default', (array)config:dont_override)" />
 	<span class="composeoption">
 		<label><roundcube:object name="dsnCheckBox" form="form" id="rcmcomposedsn" tabindex="4" /> <roundcube:label name="dsn" /></label>
 	</span>
@@ -166,8 +168,9 @@
 	</div>
 	<div id="compose-attachments" class="rightcol" role="region" aria-labelledby="aria-label-composeattachments">
 		<h2 id="aria-label-composeattachments" class="voice"><roundcube:label name="attachments" /></h2>
-		<div style="text-align:center; margin-bottom:20px">
-			<roundcube:button name="addattachment" type="input" class="button" classSel="button pressed" label="addattachment" onclick="UI.show_uploadform(event);return false" tabindex="1" />
+		<div style="text-align:center; margin-bottom:10px">
+            <roundcube:object name="composeAttachmentForm" mode="hint" />
+			<roundcube:button name="addattachment" type="input" class="button" classSel="button pressed" label="addattachment" onclick="rcmail.upload_input('uploadform')" tabindex="1" />
 			<roundcube:button type="input" class="button" classSel="button pressed" label="FileFromCRM" domain="yetiforce" command="yetiforce.addFilesFromCRM" tabindex="1" />
 		</div>
 		<roundcube:object name="composeAttachmentList" id="attachment-list" class="attachmentslist" tabindex="1" />
@@ -190,14 +193,7 @@
 
 </div><!-- end mainscreen -->
 
-<div id="upload-dialog" class="propform popupdialog" title="<roundcube:label name='addattachment' />" aria-hidden="true">
-	<h2 id="aria-label-uploaddialog" class="voice"><roundcube:label name="arialabelattachmentuploadform" /></h2>
-	<roundcube:object name="composeAttachmentForm" id="uploadform" buttons="no" />
-	<div class="formbuttons">
-		<roundcube:button command="send-attachment" type="input" class="button mainaction" label="upload" />
-		<roundcube:button name="close" type="input" class="button" label="cancel" onclick="UI.show_uploadform()" />
-	</div>
-</div>
+<roundcube:object name="composeAttachmentForm" id="uploadform" mode="smart" />
 
 <div id="spellmenu" class="popupmenu" aria-hidden="true"></div>
 
@@ -214,7 +210,15 @@
 
 <div id="tplmenu" class="popupmenu">
     <ul class="toolbarmenu" id="texttplsmenu">
-    </ul>
+	</ul>
+</div>
+<div id="attachmentmenu" class="popupmenu" aria-hidden="true">
+	<ul class="toolbarmenu" id="attachmentoptionsmenu" role="menu">
+		<roundcube:button command="open-attachment" id="attachmenuopen" type="link-menuitem" label="open" class="icon" classAct="icon active" innerclass="icon extwin" />
+		<roundcube:button command="download-attachment" id="attachmenudownload" type="link-menuitem" label="download" class="icon" classAct="icon active" innerclass="icon download" />
+		<roundcube:button command="rename-attachment" id="attachmenurename" type="link-menuitem" label="rename" class="icon" classAct="icon active" innerclass="icon rename" />
+		<roundcube:container name="attachmentmenu" id="attachmentoptionsmenu" />
+	</ul>
 </div>
 <div id="vtmodulemenu" class="popupmenu">
     <ul class="toolbarmenu" id="texttplsmenu">
