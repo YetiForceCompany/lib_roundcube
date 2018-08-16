@@ -1,14 +1,13 @@
 <?php
 
 /**
- * Integration Plugin yetiforce and roundcube
- * @package YetiForce.rcubePlugin
+ * Integration Plugin yetiforce and roundcube.
+ *
  * @license MIT
- * @author Mariusz Krzaczkowski <m.krzaczkowski@yetiforce.com>
+ * @author  Mariusz Krzaczkowski <m.krzaczkowski@yetiforce.com>
  */
 class yetiforce extends rcube_plugin
 {
-
 	private $rc;
 	private $autologin;
 	private $currentUser;
@@ -20,20 +19,18 @@ class yetiforce extends rcube_plugin
 		$this->add_hook('login_after', [$this, 'loginAfter']);
 		$this->add_hook('startup', [$this, 'startup']);
 		$this->add_hook('authenticate', [$this, 'authenticate']);
-
 		if ($this->rc->task == 'mail') {
 			$this->register_action('plugin.yetiforce.addFilesToMail', [$this, 'addFilesToMail']);
 			$this->register_action('plugin.yetiforce.getEmailTemplates', [$this, 'getEmailTemplates']);
-			$this->register_action('plugin.yetiforce.getEmailFromCRM', [$this, 'getEmailFromCRM']);
 			$this->register_action('plugin.yetiforce.getConntentEmailTemplate', [$this, 'getConntentEmailTemplate']);
 			$this->rc->output->set_env('site_URL', $this->rc->config->get('site_URL'));
-			$this->include_stylesheet($this->rc->config->get('public_URL') . 'layouts/basic/skins/icons/userIcons.css');
+			$this->include_stylesheet($this->rc->config->get('public_URL') . 'layouts/resources/icons/userIcons.css');
 
 			$currentPath = getcwd();
 			chdir($this->rc->config->get('root_directory'));
 			$this->loadCurrentUser();
 
-			if ($this->rc->action == 'compose') {
+			if ($this->rc->action === 'compose') {
 				$composeAddressModules = [];
 				foreach (AppConfig::module('Mail', 'RC_COMPOSE_ADDRESS_MODULES') as $moduleName) {
 					if (\App\Privilege::isPermitted($moduleName)) {
@@ -62,9 +59,9 @@ class yetiforce extends rcube_plugin
 					$this->rc->output->set_env('crmView', $_SESSION['compose_data_' . $id]['param']['crmview']);
 				}
 			}
-			if ($this->rc->action == 'preview' || $this->rc->action == 'show') {
+			if ($this->rc->action === 'preview' || $this->rc->action === 'show') {
 				$this->include_script('preview.js');
-				$this->include_stylesheet($this->rc->config->get('public_URL') . 'libraries/bootstrap3/css/glyphicon.css');
+				$this->include_stylesheet($this->rc->config->get('public_URL') . 'libraries/fontawesome-web/css/fontawesome-all.css');
 				$this->include_stylesheet('preview.css');
 				$this->add_hook('message_load', [$this, 'messageLoad']);
 			}
@@ -104,8 +101,7 @@ class yetiforce extends rcube_plugin
 		if (empty($_GET['_autologin'])) {
 			return $args;
 		}
-		$row = $this->getAutoLogin();
-		if ($row) {
+		if ($row = $this->getAutoLogin()) {
 			$host = false;
 			foreach ($this->rc->config->get('default_host') as $key => $value) {
 				if (strpos($key, $row['mail_host']) !== false) {
@@ -113,11 +109,15 @@ class yetiforce extends rcube_plugin
 				}
 			}
 			if ($host) {
+				$currentPath = getcwd();
+				chdir($this->rc->config->get('root_directory'));
+				require_once 'include/main/WebUI.php';
 				$args['user'] = $row['username'];
-				$args['pass'] = $row['password'];
+				$args['pass'] = \App\Encryption::getInstance()->decrypt($row['password']);
 				$args['host'] = $host;
 				$args['cookiecheck'] = false;
 				$args['valid'] = true;
+				chdir($currentPath);
 			}
 			$db = $this->rc->get_dbh();
 			$db->query('DELETE FROM `u_yf_mail_autologin` WHERE `cuid` = ?;', $row['cuid']);
@@ -131,8 +131,13 @@ class yetiforce extends rcube_plugin
 		$this->rc = rcmail::get_instance();
 		$pass = rcube_utils::get_input_value('_pass', rcube_utils::INPUT_POST);
 		if (!empty($pass)) {
-			$sql = "UPDATE " . $this->rc->db->table_name('users') . " SET password = ? WHERE user_id = ?";
-			call_user_func_array(array($this->rc->db, 'query'), array_merge(array($sql), array($pass, $this->rc->get_user_id())));
+			$sql = 'UPDATE ' . $this->rc->db->table_name('users') . ' SET password = ? WHERE user_id = ?';
+			$currentPath = getcwd();
+			chdir($this->rc->config->get('root_directory'));
+			require_once 'include/main/WebUI.php';
+			$pass = \App\Encryption::getInstance()->encrypt($pass);
+			chdir($currentPath);
+			call_user_func_array([$this->rc->db, 'query'], array_merge([$sql], [$pass, $this->rc->get_user_id()]));
 			$this->rc->db->affected_rows();
 		}
 		if ($_GET['_autologin'] && !empty($_REQUEST['_composeKey'])) {
@@ -219,19 +224,22 @@ class yetiforce extends rcube_plugin
 					$cc .= ',' . $row['cc_email'];
 					$cc = str_replace($row['from_email'] . ',', '', $cc);
 					$cc = trim($cc, ',');
+				// no break
 				case 'reply':
 					$to = $row['reply_to_email'];
-					if (preg_match('/^re:/i', $row['subject']))
+					if (preg_match('/^re:/i', $row['subject'])) {
 						$subject = $row['subject'];
-					else
+					} else {
 						$subject = 'Re: ' . $row['subject'];
+					}
 					$subject = preg_replace('/\s*\([wW]as:[^\)]+\)\s*$/', '', $subject);
 					break;
 				case 'forward':
-					if (preg_match('/^fwd:/i', $row['subject']))
+					if (preg_match('/^fwd:/i', $row['subject'])) {
 						$subject = $row['subject'];
-					else
+					} else {
 						$subject = 'Fwd: ' . $row['subject'];
+					}
 					break;
 			}
 			if (!empty($params['recordNumber']) && !empty($params['crmmodule'])) {
@@ -244,7 +252,6 @@ class yetiforce extends rcube_plugin
 				if ($subject === false || ($subject !== false && $subjectNumber !== $recordNumber)) {
 					$subject = "[{$params['recordNumber']}] $subject";
 				}
-
 				chdir($currentPath);
 			}
 			$args['param']['to'] = $to;
@@ -273,7 +280,7 @@ class yetiforce extends rcube_plugin
 		$replyto = $row['reply_to_email'];
 
 		$prefix = $suffix = '';
-		if ($type == 'forward') {
+		if ($type === 'forward') {
 			if (!$bodyIsHtml) {
 				$prefix = "\n\n\n-------- " . $this->rc->gettext('originalmessage') . " --------\n";
 				$prefix .= $this->rc->gettext('subject') . ': ' . $subject . "\n";
@@ -294,27 +301,29 @@ class yetiforce extends rcube_plugin
 				$body = trim($body, "\n");
 			} else {
 				$prefix = sprintf(
-					"<p>-------- " . $this->rc->gettext('originalmessage') . " --------</p>" .
-					"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><tbody>" .
-					"<tr><th align=\"right\" nowrap=\"nowrap\" valign=\"baseline\">%s: </th><td>%s</td></tr>" .
-					"<tr><th align=\"right\" nowrap=\"nowrap\" valign=\"baseline\">%s: </th><td>%s</td></tr>" .
-					"<tr><th align=\"right\" nowrap=\"nowrap\" valign=\"baseline\">%s: </th><td>%s</td></tr>" .
-					"<tr><th align=\"right\" nowrap=\"nowrap\" valign=\"baseline\">%s: </th><td>%s</td></tr>", $this->rc->gettext('subject'), rcube::Q($subject), $this->rc->gettext('date'), rcube::Q($date), $this->rc->gettext('from'), rcube::Q($from, 'replace'), $this->rc->gettext('to'), rcube::Q($to, 'replace'));
-				if ($cc = $row['cc_email'])
-					$prefix .= sprintf("<tr><th align=\"right\" nowrap=\"nowrap\" valign=\"baseline\">%s: </th><td>%s</td></tr>", $this->rc->gettext('cc'), rcube::Q($cc, 'replace'));
-				if ($replyto != $from)
-					$prefix .= sprintf("<tr><th align=\"right\" nowrap=\"nowrap\" valign=\"baseline\">%s: </th><td>%s</td></tr>", $this->rc->gettext('replyto'), rcube::Q($replyto, 'replace'));
-				$prefix .= "</tbody></table><br>";
+					'<p>-------- ' . $this->rc->gettext('originalmessage') . ' --------</p>' .
+					'<table border="0" cellpadding="0" cellspacing="0"><tbody>' .
+					'<tr><th align="right" nowrap="nowrap" valign="baseline">%s: </th><td>%s</td></tr>' .
+					'<tr><th align="right" nowrap="nowrap" valign="baseline">%s: </th><td>%s</td></tr>' .
+					'<tr><th align="right" nowrap="nowrap" valign="baseline">%s: </th><td>%s</td></tr>' .
+					'<tr><th align="right" nowrap="nowrap" valign="baseline">%s: </th><td>%s</td></tr>', $this->rc->gettext('subject'), rcube::Q($subject), $this->rc->gettext('date'), rcube::Q($date), $this->rc->gettext('from'), rcube::Q($from, 'replace'), $this->rc->gettext('to'), rcube::Q($to, 'replace'));
+				if ($cc = $row['cc_email']) {
+					$prefix .= sprintf('<tr><th align="right" nowrap="nowrap" valign="baseline">%s: </th><td>%s</td></tr>', $this->rc->gettext('cc'), rcube::Q($cc, 'replace'));
+				}
+				if ($replyto != $from) {
+					$prefix .= sprintf('<tr><th align="right" nowrap="nowrap" valign="baseline">%s: </th><td>%s</td></tr>', $this->rc->gettext('replyto'), rcube::Q($replyto, 'replace'));
+				}
+				$prefix .= '</tbody></table><br>';
 			}
 			$body = $prefix . $body;
-		}else {
-			$prefix = $this->rc->gettext(array(
+		} else {
+			$prefix = $this->rc->gettext([
 				'name' => 'mailreplyintro',
-				'vars' => array(
+				'vars' => [
 					'date' => $this->rc->format_date($date, $this->rc->config->get('date_long')),
 					'sender' => $from,
-				)
-			));
+				]
+			]);
 			if (!$bodyIsHtml) {
 				global $LINE_LENGTH;
 				$txt = new rcube_html2text($body, false, true, $LINE_LENGTH);
@@ -375,11 +384,15 @@ class yetiforce extends rcube_plugin
 		global $RCMAIL;
 		$db = $RCMAIL->get_dbh();
 		$result = [];
-		$sql_result = $db->query("SELECT * FROM yetiforce_mail_config WHERE `type` = 'signature' AND `name` = 'signature';");
-
-		while ($sql_arr = $db->fetch_assoc($sql_result)) {
-			$result['html'] = $sql_arr['value'];
-			$result['text'] = $sql_arr['value'];
+		$sqlResult = $db->query("SELECT `value` FROM yetiforce_mail_config WHERE `type` = 'signature' AND `name` = 'signature';");
+		while ($row = $db->fetch_assoc($sqlResult)) {
+			$currentPath = getcwd();
+			chdir($this->rc->config->get('root_directory'));
+			$parser = App\TextParser::getInstanceById($this->currentUser->getId(), 'Users');
+			$value = $parser->setContent($row['value'])->parse()->getContent();
+			chdir($currentPath);
+			$result['html'] = $value;
+			$result['text'] = $value;
 		}
 		return $result;
 	}
@@ -388,10 +401,8 @@ class yetiforce extends rcube_plugin
 	{
 		global $RCMAIL;
 		$db = $RCMAIL->get_dbh();
-		$result = [];
-		$sql_result = $db->query("SELECT * FROM yetiforce_mail_config WHERE `type` = 'signature' AND `name` = 'addSignature';");
-
-		while ($sql_arr = $db->fetch_assoc($sql_result)) {
+		$sqlResult = $db->query("SELECT * FROM yetiforce_mail_config WHERE `type` = 'signature' AND `name` = 'addSignature';");
+		while ($sql_arr = $db->fetch_assoc($sqlResult)) {
 			return $sql_arr['value'] == 'false' ? true : false;
 		}
 		return true;
@@ -407,7 +418,7 @@ class yetiforce extends rcube_plugin
 
 		if ($COMPOSE_ID && $_SESSION['compose_data_' . $COMPOSE_ID]) {
 			$SESSION_KEY = 'compose_data_' . $COMPOSE_ID;
-			$COMPOSE = & $_SESSION[$SESSION_KEY];
+			$COMPOSE = &$_SESSION[$SESSION_KEY];
 		}
 		if (!$COMPOSE) {
 			die('Invalid session var!');
@@ -423,33 +434,38 @@ class yetiforce extends rcube_plugin
 			list($usec, $sec) = explode(' ', microtime());
 			$id = preg_replace('/[^0-9]/', '', $userid . $sec . $usec) . $index;
 			$attachment['id'] = $id;
-
-			$_SESSION['plugins']['filesystem_attachments'][$COMPOSE_ID][$id] = $attachment['path'];
+			$_SESSION['plugins']['filesystem_attachments'][$COMPOSE_ID][$id] = realpath($attachment['path']);
 			$this->rc->session->append($SESSION_KEY . '.attachments', $id, $attachment);
+
 			if (($icon = $COMPOSE['deleteicon']) && is_file($icon)) {
-				$button = html::img(array(
-						'src' => $icon,
-						'alt' => $this->rc->gettext('delete')
-				));
-			} else if ($COMPOSE['textbuttons']) {
+				$button = html::img([
+					'src' => $icon,
+					'alt' => $this->rc->gettext('delete')
+				]);
+			} elseif ($COMPOSE['textbuttons']) {
 				$button = rcube::Q($this->rc->gettext('delete'));
 			} else {
 				$button = '';
 			}
+			$link_content = sprintf('%s <span class="attachment-size"> (%s)</span>',
+				rcube::Q($attachment['name']), $this->rc->show_bytes($attachment['size']));
+			$content_link = html::a([
+				'href' => '#load',
+				'class' => 'filename',
+				'onclick' => sprintf("return %s.command('load-attachment','rcmfile%s', this, event)", rcmail_output::JS_OBJECT_NAME, $id),
+			], $link_content);
+			$delete_link = html::a([
+				'href' => '#delete',
+				'onclick' => sprintf("return %s.command('remove-attachment','rcmfile%s', this, event)", rcmail_output::JS_OBJECT_NAME, $id),
+				'title' => $this->rc->gettext('delete'),
+				'class' => 'delete',
+				'aria-label' => $this->rc->gettext('delete') . ' ' . $attachment['name'],
+			], $button);
+			$content = $COMPOSE['icon_pos'] == 'left' ? $delete_link . $content_link : $content_link . $delete_link;
 
-			$content = html::a(array(
-					'href' => "#delete",
-					'onclick' => sprintf("return %s.command('remove-attachment','rcmfile%s', this)", rcmail_output::JS_OBJECT_NAME, $id),
-					'title' => $this->rc->gettext('delete'),
-					'class' => 'delete',
-					'aria-label' => $this->rc->gettext('delete') . ' ' . $attachment['name'],
-					), $button
-			);
-
-			$content .= rcube::Q($attachment['name']);
-			$htmlAttachments .= 'window.rcmail.add2attachment_list("rcmfile' . $id . '",{html:"<a href=\"#delete\" onclick=\"return rcmail.command(\'remove-attachment\',\'rcmfile' . $id . '\', this)\" title=\"' . $this->rc->gettext('delete') . '\" class=\"delete\" aria-label=\"' . $this->rc->gettext('delete') . ' ' . $attachment['name'] . '\"><\/a>' . $attachment['name'] . '",name:"' . $attachment['name'] . '",mimetype:"' . $attachment['mimetype'] . '",classname:"' . rcube_utils::file2class($attachment['mimetype'], $attachment['name']) . '",complete:true},"' . $uploadid . '");' . PHP_EOL;
+			$htmlAttachments = 'window.rcmail.add2attachment_list("rcmfile' . $id . '",{html:"' . rcube::JQ($content) . '",name:"' . $attachment['name'] . '",mimetype:"' . $attachment['mimetype'] . '",classname:"' . rcube_utils::file2class($attachment['mimetype'], $attachment['name']) . '",complete:true},"' . $uploadid . '");' . PHP_EOL;
 		}
-		$response = '<!DOCTYPE html>
+		echo '<!DOCTYPE html>
 <html lang="en">
 <head><title></title><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
 <script type="text/javascript">
@@ -463,13 +479,11 @@ if (window && window.rcmail) {
 <body>
 </body>
 </html>';
-		echo $response;
 		exit;
 	}
 
 	public function getAttachment($ids, $files)
 	{
-
 		$attachments = [];
 		if (empty($ids) && empty($files)) {
 			return $attachments;
@@ -484,15 +498,15 @@ if (window && window.rcmail) {
 		if ($ids) {
 			$sql_result = $db->query("SELECT vtiger_attachments.* FROM vtiger_attachments INNER JOIN vtiger_seattachmentsrel ON vtiger_seattachmentsrel.attachmentsid=vtiger_attachments.attachmentsid WHERE vtiger_seattachmentsrel.crmid IN ($ids);");
 			while ($row = $db->fetch_assoc($sql_result)) {
-				$orgFile = $this->rc->config->get('root_directory') . $row['path'] . $row['attachmentsid'] . '_' . $row['name'];
+				$orgFile = $this->rc->config->get('root_directory') . $row['path'] . $row['attachmentsid'];
 				list($usec, $sec) = explode(' ', microtime());
-				$filepath = $this->rc->config->get('root_directory') . 'cache/mail/' . $sec . $userid . $row['attachmentsid'] . $index . '.tmp';
+				$filepath = $this->rc->config->get('temp_dir') . DIRECTORY_SEPARATOR . "{$sec}_{$userid}_{$row['attachmentsid']}_$index.tmp";
 				if (file_exists($orgFile)) {
 					copy($orgFile, $filepath);
 					$attachment = [
 						'path' => $filepath,
-						'size' => filesize($filepath),
 						'name' => $row['name'],
+						'size' => filesize($filepath),
 						'mimetype' => rcube_mime::file_content_type($filepath, $row['name'], $row['type']),
 					];
 					$attachments[] = $attachment;
@@ -503,7 +517,7 @@ if (window && window.rcmail) {
 		if ($files) {
 			$orgFile = $this->rc->config->get('root_directory') . $files;
 			list($usec, $sec) = explode(' ', microtime());
-			$filepath = $this->rc->config->get('root_directory') . 'cache/mail/' . $sec . $userid . $index . '.tmp';
+			$filepath = $this->rc->config->get('root_directory') . "cache/mail/{$sec}_{$userid}_{$index}.tmp";
 			if (file_exists($orgFile)) {
 				copy($orgFile, $filepath);
 				$attachment = [
@@ -529,14 +543,15 @@ if (window && window.rcmail) {
 			// don't wrap already quoted lines
 			if ($line[0] == '>') {
 				$line = '>' . rtrim($line);
-			} else if (mb_strlen($line) > $max) {
+			} elseif (mb_strlen($line) > $max) {
 				$newline = '';
 
 				foreach (explode("\n", rcube_mime::wordwrap($line, $length - 2)) as $l) {
-					if (strlen($l))
+					if (strlen($l)) {
 						$newline .= '> ' . $l . "\n";
-					else
+					} else {
 						$newline .= ">\n";
+					}
 				}
 
 				$line = rtrim($newline);
@@ -570,8 +585,10 @@ if (window && window.rcmail) {
 	}
 
 	/**
-	 * Parse variables
+	 * Parse variables.
+	 *
 	 * @param string $text
+	 *
 	 * @return string
 	 */
 	protected function parseVariables($text)
@@ -579,12 +596,7 @@ if (window && window.rcmail) {
 		$currentPath = getcwd();
 		chdir($this->rc->config->get('root_directory'));
 		$this->loadCurrentUser();
-
-		$text = \App\TextParser::getInstance()
-			->setContent($text)
-			->parse()
-			->getContent();
-
+		$text = \App\TextParser::getInstance()->setContent($text)->parse()->getContent();
 		chdir($currentPath);
 		return $text;
 	}
@@ -595,10 +607,7 @@ if (window && window.rcmail) {
 			return true;
 		}
 		require 'include/main/WebUI.php';
-		$ownerObject = CRMEntity::getInstance('Users');
-		$ownerObject->retrieveCurrentUserInfoFromFile($_SESSION['crm']['id']);
-		$this->currentUser = $ownerObject;
-		vglobal('current_user', $ownerObject);
+		$this->currentUser = \App\User::getUserModel($_SESSION['crm']['id']);
 		App\User::setCurrentUserId($_SESSION['crm']['id']);
 		return true;
 	}
@@ -618,33 +627,7 @@ if (window && window.rcmail) {
 	}
 
 	/**
-	 * Get address email from CRM
-	 */
-	public function getEmailFromCRM()
-	{
-		$currentPath = getcwd();
-		chdir($this->rc->config->get('root_directory'));
-		$this->loadCurrentUser();
-		$ids = rcube_utils::get_input_value('recordsId', rcube_utils::INPUT_GPC);
-		$sourceModule = rcube_utils::get_input_value('moduleName', rcube_utils::INPUT_GPC);
-		$emailFields = OSSMailScanner_Record_Model::getEmailSearch($sourceModule);
-		$addresEmails = [];
-		foreach ($ids as $id) {
-			$recordModel = Vtiger_Record_Model::getInstanceById($id, $sourceModule);
-			foreach ($emailFields as &$emailField) {
-				$email = $recordModel->get($emailField['fieldname']);
-				if (!empty($email)) {
-					$addresEmails[] = $email;
-				}
-			}
-		}
-		echo App\Json::encode($addresEmails);
-		chdir($currentPath);
-		exit;
-	}
-
-	/**
-	 * Function to get templates
+	 * Function to get templates.
 	 */
 	public function getEmailTemplates()
 	{
@@ -658,7 +641,7 @@ if (window && window.rcmail) {
 	}
 
 	/**
-	 * Function to get info about email template
+	 * Function to get info about email template.
 	 */
 	public function getConntentEmailTemplate()
 	{

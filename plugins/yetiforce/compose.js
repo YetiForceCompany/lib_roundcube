@@ -11,17 +11,16 @@ window.rcmail && rcmail.addEventListener('init', function (evt) {
 	// Document selection
 	rcmail.register_command('yetiforce.addFilesToMail', function (data) {
 		var ts = new Date().getTime(),
-				frame_name = 'rcmupload' + ts,
-				frame = rcmail.async_upload_form_frame(frame_name);
+			frame_name = 'rcmupload' + ts,
+			frame = rcmail.async_upload_form_frame(frame_name);
 		data._uploadid = ts;
-		console.log(data);
 		jQuery.ajax({
 			url: "?_task=mail&_action=plugin.yetiforce.addFilesToMail&_id=" + rcmail.env.compose_id,
 			type: "POST",
 			data: data,
 			success: function (data) {
-				var doc = frame[0].contentWindow.document;
-				var body = $('html', doc);
+				var doc = frame[0];
+				var body = $(doc);
 				body.html(data);
 			}
 		});
@@ -30,44 +29,58 @@ window.rcmail && rcmail.addEventListener('init', function (evt) {
 	// Add a document to an email crm
 	rcmail.register_command('yetiforce.addFilesFromCRM', function (data) {
 		if (crm != false) {
-			var params = {
+			window.crm.app.showRecordsList({
 				module: 'Documents',
 				src_module: 'Documents',
 				multi_select: true,
-				url: crmPath
-			};
-			var sourceFieldElement = $(this);
-			var prePopupOpenEvent = jQuery.Event(crm.Vtiger_Edit_Js.preReferencePopUpOpenEvent);
-			sourceFieldElement.trigger(prePopupOpenEvent);
-			var data = {};
-			show(params, function (data) {
-				var responseData = JSON.parse(data);
-				var ids = [];
-				for (var id in responseData) {
-					ids.push(id);
-				}
-				rcmail.command('yetiforce.addFilesToMail', {ids: ids, _uploadid: new Date().getTime()});
+				additionalInformations: true
+			}, (modal, instance) => {
+				instance.setSelectEvent((responseData) => {
+					rcmail.command('yetiforce.addFilesToMail', {
+						ids: Object.keys(responseData),
+						_uploadid: new Date().getTime()
+					});
+				});
 			});
 		}
 	}, true);
-
 	// Selection of email with popup
 	$('#composeheaders #yt_adress_buttons .button').click(function () {
 		var mailField = $(this).attr('data-input');
 		var module = $(this).attr('data-module');
-		var params = {
+		window.crm.app.showRecordsList({
 			module: module,
 			src_module: 'OSSMail',
 			multi_select: true,
-			url: crmPath
-		};
-		show(params, function (data) {
-			var responseData = JSON.parse(data);
-			var ids = [];
-			for (var id in responseData) {
-				ids.push(id);
-			}
-			getMailFromCRM(mailField, module, ids);
+			additionalInformations: true
+		}, (modal, instance) => {
+			instance.setSelectEvent((responseData, e) => {
+				let emails = [];
+				if (typeof e.target !== 'undefined' && $(e.target).data('type') === 'email') {
+					emails.push($(e.target).text());
+				} else {
+					$.each(responseData, function (id, fields) {
+						$.each(fields, function (key, row) {
+							if (row.type === 'email') {
+								emails.push(row.value);
+								return false;
+							}
+						});
+					});
+				}
+				if (emails.length === 0) {
+					window.crm.Vtiger_Helper_Js.showPnotify({
+						text: window.crm.app.vtranslate('NoFindEmailInRecord'),
+						animation: 'show'
+					});
+				} else {
+					let value = $('#' + mailField).val();
+					if (value != '' && value.charAt(value.length - 1) != ',') {
+						value = value + ',';
+					}
+					$('#' + mailField).val(value + emails.join(','));
+				}
+			});
 		});
 	});
 	//Loading list of modules with templates mail
@@ -116,8 +129,8 @@ window.rcmail && rcmail.addEventListener('init', function (evt) {
 	jQuery('#tplmenu  li a').on('click', function () {
 		var id = jQuery(this).data('tplid');
 		var recordId = rcmail.env.crmRecord,
-				module = rcmail.env.crmModule,
-				view = rcmail.env.crmView;
+			module = rcmail.env.crmModule,
+			view = rcmail.env.crmView;
 		if (view == 'List') {
 			var chElement = jQuery(crm.document).find('.listViewEntriesCheckBox')[0];
 			recordId = jQuery(chElement).val();
@@ -157,68 +170,4 @@ function getCrmWindow() {
 		return parent;
 	}
 	return false;
-}
-
-function getMailFromCRM(mailField, moduleName, records) {
-	jQuery.ajax({
-		type: "POST",
-		url: "?_task=mail&_action=plugin.yetiforce.getEmailFromCRM&_id=" + rcmail.env.compose_id,
-		async: false,
-		data: {
-			recordsId: records,
-			moduleName: moduleName,
-		},
-		success: function (data) {
-			data = JSON.parse(data);
-			if (data.length == 0) {
-				var notifyParams = {
-					text: window.crm.app.vtranslate('NoFindEmailInRecord'),
-					animation: 'show'
-				};
-				window.crm.Vtiger_Helper_Js.showPnotify(notifyParams);
-			} else {
-				var emails = $('#' + mailField).val();
-				if (emails != '' && emails.charAt(emails.length - 1) != ',') {
-					emails = emails + ',';
-				}
-				$('#' + mailField).val(emails + data);
-			}
-		}
-	});
-}
-function show(urlOrParams, cb, windowName, eventName, onLoadCb) {
-	var thisInstance = window.crm.Vtiger_Popup_Js.getInstance();
-	if (typeof urlOrParams == 'undefined') {
-		urlOrParams = {};
-	}
-	if (typeof urlOrParams == 'object' && (typeof urlOrParams['view'] == "undefined")) {
-		urlOrParams['view'] = 'Popup';
-	}
-	if (typeof eventName == 'undefined') {
-		eventName = 'postSelection' + Math.floor(Math.random() * 10000);
-	}
-	if (typeof windowName == 'undefined') {
-		windowName = 'test';
-	}
-	if (typeof urlOrParams == 'object') {
-		urlOrParams['triggerEventName'] = eventName;
-	} else {
-		urlOrParams += '&triggerEventName=' + eventName;
-	}
-	var urlString = (typeof urlOrParams == 'string') ? urlOrParams : window.crm.jQuery.param(urlOrParams);
-	var url = urlOrParams['url'] + urlString;
-	var popupWinRef = window.crm.window.open(url, windowName, 'width=800,height=650,resizable=0,scrollbars=1');
-	if (typeof thisInstance.destroy == 'function') {
-		thisInstance.destroy();
-	}
-	window.crm.jQuery.initWindowMsg();
-	if (typeof cb != 'undefined') {
-		thisInstance.retrieveSelectedRecords(cb, eventName);
-	}
-	if (typeof onLoadCb == 'function') {
-		window.crm.jQuery.windowMsg('Vtiger.OnPopupWindowLoad.Event', function (data) {
-			onLoadCb(data);
-		})
-	}
-	return popupWinRef;
 }
