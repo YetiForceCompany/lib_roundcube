@@ -4,20 +4,11 @@
 <title><roundcube:object name="pagetitle" /></title>
 <roundcube:include file="/includes/links.html" />
 <style type="text/css">
-	<roundcube:if condition="config:preview_pane != '0' && config:preview_pane != '1'" />
+<roundcube:if condition="env:layout != 'list'" />
 	#mailview-top { height: 270px; }
-	#mailview-bottom { top: 284px; width: auto; height: auto; display: block; }
+	#mailview-bottom { top: 284px; height: auto; display: block; }
 	#mailpreviewframe { display: block; }
 <roundcube:endif />
-	<roundcube:if condition="config:preview_pane == 'v'"/>
-	.mailpreviewtoggle.horizontalBtn{
-		display: none;
-	}
-	<roundcube:elseif condition="config:preview_pane == 'h'" />
-	.mailpreviewtoggle.verticalBtn{
-		display: none;
-	}
-	<roundcube:endif />
 </style>
 </head>
 <body class="minwidth">
@@ -34,6 +25,7 @@
 	<roundcube:button command="checkmail" type="link" class="button checkmail disabled" classAct="button checkmail" classSel="button checkmail pressed" label="refresh" title="checkmail" />
 	<!-- YetiForce  -->
 	<roundcube:include file="/includes/mailtoolbar.html" skinPath="skins/larry" />
+	<!-- YetiForce  -->
 </div>
 
 <div id="messagesearchtools">
@@ -95,14 +87,9 @@
 </div>
 
 </div>
-<!-- Yetiforce -->
-<roundcube:if condition="config:preview_pane == 'v'" />
-<div id="mailview-right" class="verticalPanel" role="main">
-<roundcube:else />
+
 <div id="mailview-right" role="main">
-<roundcube:endif />
-<roundcube:if condition="config:preview_pane != '0'" />
-<!-- /Yetiforce -->
+
 <roundcube:if condition="env:layout == 'desktop'" />
 <div id="mailview-top" class="uibox">
 <roundcube:else />
@@ -154,24 +141,13 @@
 	</div>
 
 	<roundcube:container name="listcontrols" id="listcontrols" />
-	<!-- Yetiforce -->
-	<div id="mailpreviewtogglebtn">
-		<a href="#preview" class="mailpreviewtoggle horizontalBtn" title="<roundcube:label name='previewpane' />" data-type="h" role="button" tabindex="0">
-			<span class="inner"></span>
-		</a>&nbsp;
-		<a href="#preview" class="mailpreviewtoggle verticalBtn" title="<roundcube:label name='previewpane' />" data-type="v" role="button" tabindex="0">
-			<span class="inner"></span>
-		</a>
-	</div>
-	<!-- /Yetiforce -->
 </div>
 
 </div><!-- end mailview-top -->
 
 <div id="mailview-bottom" class="uibox">
-<!-- Yetiforce -->
-<div id="mailpreviewframe" class="iframebox" data-type="<roundcube:var name='config:preview_pane' />" role="complementary" aria-labelledby="aria-label-mailpreviewframe">
-<!-- /Yetiforce -->
+
+<div id="mailpreviewframe" class="iframebox" role="complementary" aria-labelledby="aria-label-mailpreviewframe">
 <h2 id="aria-label-mailpreviewframe" class="voice"><roundcube:label name="arialabelmailpreviewframe" /></h2>
 <roundcube:object name="messagecontentframe" id="messagecontframe" style="width:100%; height:100%" frameborder="0" src="/watermark.html" title="arialabelmailpreviewframe" />
 </div>

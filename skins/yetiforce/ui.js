@@ -231,37 +231,10 @@ function rcube_mail_ui()
       }
       else if (rcmail.env.action == 'list' || !rcmail.env.action) {
 		mail_layout();
-		/** Yetiforce **/
-		var previewFrame = $('#mailpreviewframe');
-		var previewFrameType = previewFrame.data('type');
-		var isPreview = previewFrame.is(':visible');
-		$('#mailpreviewtogglebtn .mailpreviewtoggle').each(function (n, e) {
-			var btn = $(e);
-			if (isPreview && btn.data('type') == previewFrameType) {
-				btn.addClass('enabled').attr('aria-expanded', 'true');
-			} else {
-				btn.addClass('closed').attr('aria-expanded', 'false');
-			}
-		}).click(function (e) {
-			toggle_preview_pane(e);
-			return false;
-		});
-		/** Yetiforce **/
+
         $('#maillistmode').addClass(rcmail.env.threading ? '' : 'selected').click(function(e) { switch_view_mode('list'); return false; });
         $('#mailthreadmode').addClass(rcmail.env.threading ? 'selected' : '').click(function(e) { switch_view_mode('thread'); return false; });
 
-		/** Yetiforce **/
-		mailviewsplit = {
-			v: new rcube_splitter({id: 'mailviewsplitter_v', p1: '#mailview-top', p2: '#mailview-bottom',
-				orientation: 'v', relative: true, start: 276, min: 560, size: 12, offset: 4}),
-			h: new rcube_splitter({id: 'mailviewsplitter_h', p1: '#mailview-top', p2: '#mailview-bottom',
-				orientation: 'h', relative: true, start: 276, min: 150, size: 12, offset: 4})
-		};
-		if (isPreview && mailviewsplit[previewFrameType] != undefined) {
-			mailviewsplit[previewFrameType].init();
-		}
-		/** Yetiforce **/
-		
         rcmail.init_pagejumper('#pagejumper');
 
         rcmail.addEventListener('setquota', update_quota)
@@ -730,76 +703,6 @@ function rcube_mail_ui()
       ref.get(0),
       $.Event('click', { target:ref.get(0), pageX:pos.left, pageY:pos.top, clientX:pos.left, clientY:pos.top }));
   }
-
-	/**
-	 * Show/hide the preview pane
-	 * Yetiforce
-	 */
-	function toggle_preview_pane(e)
-	{
-		var button = $(e.currentTarget),
-				type = button.data('type'),
-				frame = $('#mailpreviewframe'),
-				visible = !frame.is(':visible'),
-				splitter = mailviewsplit[type],
-				//splitter = mailviewsplit.pos || parseInt(get_pref('mailviewsplitter') || 320),
-				topstyles, bottomstyles, uid, css;
-		frame.toggle();
-		button.toggleClass('enabled closed').attr('aria-expanded', visible ? 'true' : 'false');
-		if (type == 'v') {
-			css = {height: 'auto', width: 'auto'};
-			if (mailviewsplit.h.handle)
-				mailviewsplit.h.handle.hide();
-			if (!$('#mailview-right').hasClass('verticalPanel')) {
-				$('#mailview-right').addClass('verticalPanel');
-			}
-		} else {
-			css = {width: 'auto', height: 'auto', left: '0'};
-			if (mailviewsplit.v.handle)
-				mailviewsplit.v.handle.hide();
-			if ($('#mailview-right').hasClass('verticalPanel')) {
-				$('#mailview-right').removeClass('verticalPanel');
-			}
-		}
-		if (visible) {
-			$('#mailview-top').removeClass('fullheight').css({bottom: 'auto'});
-			$('#mailview-bottom').css(css).show();
-			rcmail.env.contentframe = 'messagecontframe';
-			if (uid = rcmail.message_list.get_single_selection())
-				rcmail.show_message(uid, false, true);
-			// let the splitter set the correct size and position
-			if (splitter.handle) {
-				splitter.handle.show();
-				splitter.resize();
-			} else
-				splitter.init();
-			if (type == 'v') {
-				$('#mailpreviewtogglebtn .mailpreviewtoggle[data-type="h"]').hide();
-			} else {
-				$('#mailpreviewtogglebtn .mailpreviewtoggle[data-type="v"]').hide();
-			}
-		} else {
-			rcmail.env.contentframe = null;
-			rcmail.show_contentframe(false);
-			$('#mailview-top').addClass('fullheight').css($.extend({bottom: '0px'}, css));
-			css[Object.keys(css)[0]] = '0px';
-			$('#mailview-bottom').css($.extend({top: 'auto'}, css)).hide();
-			if (splitter.handle)
-				splitter.handle.hide();
-			if (type == 'v') {
-				$('#mailpreviewtogglebtn .mailpreviewtoggle[data-type="h"]').show();
-			} else {
-				$('#mailpreviewtogglebtn .mailpreviewtoggle[data-type="v"]').show();
-			}
-		}
-		if (rcmail.message_list) {
-			if (visible && uid)
-				rcmail.message_list.scrollto(uid);
-			rcmail.message_list.resize();
-		}
-		rcmail.command('save-pref', {name: 'preview_pane', value: (visible ? type : 0)});
-	}
-
 
   /**
    * Switch between short and full headers display in message preview

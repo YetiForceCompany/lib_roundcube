@@ -272,12 +272,14 @@ function showQuickCreateForm(moduleName, record, params) {
 }
 
 function getCrmWindow() {
-	if (opener !== null) {
+	if (opener !== null && opener.parent.CONFIG == "object") {
 		return opener.parent;
-	} else if (typeof parent.app == "object") {
+	} else if (typeof parent.CONFIG == "object") {
 		return parent;
-	} else if (typeof parent.parent.app == "object") {
+	} else if (typeof parent.parent.CONFIG == "object") {
 		return parent.parent;
+	} else if (typeof opener.crm.CONFIG == "object") {
+		return opener.crm;
 	}
 	return false;
 }
