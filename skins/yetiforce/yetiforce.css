@@ -1,147 +1,220 @@
 /** The file is published on the basis of YetiForce Public License that can be found in the following directory: licenses/License.html */
-#footer{
+#footer {
 	position: absolute;
-    left: 10px;
-    right: 10px;
-    bottom: 0px;
+	left: 10px;
+	right: 10px;
+	bottom: 0px;
 	text-align: center;
 	color: #000;
 }
-#footer a{
+
+#footer a {
 	color: #000;
 	text-decoration: none;
 }
+
 #footer a:hover {
 	text-decoration: underline;
 }
-#footer #taskbar a{
+
+#footer #taskbar a {
 	padding: 0;
 	height: 20px;
 	background: none;
 }
-#footer #taskbar a span.button-inner{
-    zoom: 0.8;
+
+#footer #taskbar a span.button-inner {
+	zoom: 0.8;
 }
-#footer #taskbar .tooltip{
+
+#footer #taskbar .tooltip {
 	top: -16px;
 	display: none;
 }
-#footer #taskbar a:hover .tooltip{
+
+#footer #taskbar a:hover .tooltip {
 	right: -10px;
 	display: block;
 }
-#footer #taskbar .tooltip:after{
+
+#footer #taskbar .tooltip:after {
 	top: 18px;
 	right: 15px;
-    -ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=2)";
-    -webkit-transform: rotate(180deg);
-    -ms-transform: rotate(180deg);
-    transform: rotate(180deg);
+	-ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=2)";
+	-webkit-transform: rotate(180deg);
+	-ms-transform: rotate(180deg);
+	transform: rotate(180deg);
 }
-#taskbar .button-inner{
+
+#taskbar .button-inner {
 	top: 0px;
 }
+
 #footer #taskbar {
-    padding-right:0;
+	padding-right: 0;
 }
-#footer .topleft,#footer .username {
+
+#footer .topleft, #footer .username {
 	padding-top: 3px;
 }
-#mainscreen{
+
+#mainscreen {
 	top: 10px !important;
 	left: 5px;
-    right: 5px;
+	right: 5px;
 }
-body{
+
+body {
 	background: #dadada;
 }
-#yt_adress_buttons{	
-	margin-top: 3px;		
+
+#yt_adress_buttons {
+	margin-top: 3px;
 	top: 0px !important;
-}		
-#yt_adress_buttons .button{		
-	cursor: pointer;		
-	color: #000;		
+}
+
+#yt_adress_buttons .button {
+	cursor: pointer;
+	color: #000;
 	font-weight: bold;
 }
-.verticalPanel #mailview-bottom, 
-.verticalPanel #mailview-top{
+
+.verticalPanel #mailview-bottom,
+.verticalPanel #mailview-top {
 	height: 100% !important;
 	top: 0px !important;
 }
-@media only screen and (max-width:1040px){
-	.col-4{
+
+@media only screen and (max-width: 1040px) {
+	.col-4 {
 		float: left;
 		width: 100% !important;
 	}
-	.head{
+
+	.head {
 		height: auto !important;
-		padding-bottom: 2px; 
+		padding-bottom: 2px;
 	}
-	.relatedName{
+
+	.relatedName {
 		font-size: 12px;
 	}
 }
-.action-bar{
-	background: #ecf6ff;
-}
-table.messagelist.fixedcopy{
+
+table.messagelist.fixedcopy {
 	position: absolute !important;
 }
-.chevronBtnCube{
+
+.chevronBtnCube {
 	position: absolute;
 	z-index: 1;
 }
-.chevronBtnCube .hideBtn{
+
+.chevronBtnCube .hideBtn {
 	padding-left: 2px;
 	padding-right: 2px;
 }
 
-#mailpreviewtogglebtn{
-    position: absolute;
-    top: 6px;
-    right: 10px;
+#mailpreviewtogglebtn {
+	position: absolute;
+	top: 6px;
+	right: 10px;
 }
-.mailpreviewtoggle{
+
+.mailpreviewtoggle {
 	display: inline-block;
 	text-decoration: none;
-    padding: 1px 3px;
+	padding: 1px 3px;
 	width: 16px;
-    height: 14px;
-    vertical-align: middle;
-    font-weight: bold;
-    background: #d8d8d8;
-    background: -moz-linear-gradient(top,#d8d8d8 0,#bababa 100%);
-    background: -webkit-gradient(linear,left top,left bottom,color-stop(0%,#d8d8d8),color-stop(100%,#bababa));
-    background: -o-linear-gradient(top,#d8d8d8 0,#bababa 100%);
-    background: -ms-linear-gradient(top,#d8d8d8 0,#bababa 100%);
-    background: linear-gradient(to bottom,#d8d8d8 0,#bababa 100%);
-    box-shadow: 0 1px 1px 0 #999;
-    -webkit-box-shadow: 0 1px 1px 0 #999;
-    margin: 0 2px;
-    color: #525252;
-    text-shadow: 0 1px 1px #fff;
-    border: 1px solid #e6e6e6;
-    border-radius: 4px;
+	height: 14px;
+	vertical-align: middle;
+	font-weight: bold;
+	background: #d8d8d8;
+	background: -moz-linear-gradient(top, #d8d8d8 0, #bababa 100%);
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #d8d8d8), color-stop(100%, #bababa));
+	background: -o-linear-gradient(top, #d8d8d8 0, #bababa 100%);
+	background: -ms-linear-gradient(top, #d8d8d8 0, #bababa 100%);
+	background: linear-gradient(to bottom, #d8d8d8 0, #bababa 100%);
+	box-shadow: 0 1px 1px 0 #999;
+	-webkit-box-shadow: 0 1px 1px 0 #999;
+	margin: 0 2px;
+	color: #525252;
+	text-shadow: 0 1px 1px #fff;
+	border: 1px solid #e6e6e6;
+	border-radius: 4px;
 }
-.mailpreviewtoggle .inner{
+
+.mailpreviewtoggle .inner {
 	width: 16px;
-    height: 13px;
+	height: 13px;
 	display: inline-block;
-    background: url(images/buttons.png?v=51d4.15699) no-repeat;
+	background: url(images/buttons.png?v=51d4.15699) no-repeat;
 }
-.mailpreviewtoggle.verticalBtn .inner{
+
+.mailpreviewtoggle.verticalBtn .inner {
 	background-position: -6px -226px;
 }
-.mailpreviewtoggle.verticalBtn.enabled .inner{
+
+.mailpreviewtoggle.verticalBtn.enabled .inner {
 	background-position: -28px -226px;
 }
-.mailpreviewtoggle.horizontalBtn .inner{
+
+.mailpreviewtoggle.horizontalBtn .inner {
 	background-position: -7px -241px;
 }
-.mailpreviewtoggle.horizontalBtn.enabled .inner{
+
+.mailpreviewtoggle.horizontalBtn.enabled .inner {
 	background-position: -28px -242px;
 }
+
 #composeview-right {
 	left: 0;
+}
+
+.action-bar {
+	background: #ecf6ff;
+}
+
+.mr-5px {
+	margin-right: 5px;
+}
+
+.ml-5px {
+	margin-left: 5px;
+}
+
+.w-100 {
+	width: 100%;
+}
+
+.flex-wrap {
+	display: flex;
+	flex-wrap: wrap;
+}
+
+.rowRelatedRecord {
+	padding: 2px;
+}
+
+.action-bar__head__container {
+	column-width: 310px;
+}
+
+.action-bar__data a {
+	text-decoration: none;
+	color: #000;
+	font-size: 14px;
+	line-height: 14px
+}
+
+.action-bar__header {
+	font-size: 14px;
+	min-width: 90px;
+}
+
+.action-bar__head {
+	background-color: #4a5364;
+	height: 20px;
+	color: #fff;
+	padding: 2px;
 }
