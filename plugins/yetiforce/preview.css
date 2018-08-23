@@ -6,22 +6,6 @@
 	padding: 0
 }
 
-#ytActionBarContent .col {
-	padding: 1px 3px 1px 5px;
-}
-
-#ytActionBarContent .col .col-text {
-	float: left !important;
-	font-size: 14px;
-}
-
-#ytActionBarContent .col-3 {
-	width: 25%;
-	min-height: 1px;
-	float: left;
-	position: relative
-}
-
 #ytActionBarContent .row:before {
 	display: table;
 	content: " "
@@ -36,16 +20,6 @@
 #ytActionBarContent .ytHeader {
 	position: relative;
 	border-bottom: 1px solid #dfdfdf;
-}
-
-#ytActionBarContent .head {
-	background-color: #4a5364;
-	height: 20px;
-	color: #fff;
-}
-
-#ytActionBarContent .data {
-	margin: 1px 0;
 }
 
 #ytActionBarContent .rowReletedRecord .rowActions {
@@ -84,21 +58,6 @@
 	height: 14px
 }
 
-#ytActionBarContent .head .pull-right button {
-	height: 18px
-}
-
-#ytActionBarContent .pull-right button .glyphicon {
-	top: 0
-}
-
-#ytActionBarContent .data a {
-	text-decoration: none;
-	color: #000;
-	font-size: 14px;
-	line-height: 14px
-}
-
 #ytActionBarContent .relatedModuleIcon {
 	margin-right: 5px
 }
@@ -109,4 +68,65 @@
 
 .rcmaddcontact {
 	display: none;
+}
+
+.mr-5px {
+	margin-right: 5px;
+}
+
+.ml-5px {
+	margin-left: 5px;
+}
+
+.w-100 {
+	width: 100%;
+}
+
+.flex-wrap {
+	display: flex;
+	flex-wrap: wrap;
+}
+
+.rowRelatedRecord {
+	padding: 2px;
+}
+
+.action-bar__head__container {
+	display: flex;
+	flex-wrap: nowrap;
+}
+
+.action-bar__data a {
+	text-decoration: none;
+	color: #000;
+	font-size: 14px;
+	line-height: 14px
+}
+
+.action-bar__header {
+	font-size: 14px;
+	min-width: 90px;
+}
+
+.action-bar__head {
+	background-color: #4a5364;
+	height: 20px;
+	color: #fff;
+	padding: 2px;
+}
+
+.action-bar__col {
+	width: 100%;
+}
+
+@media only screen and (min-width: 600px) {
+	#ytActionBarContent .action-bar__col {
+		width: 50%;
+	}
+}
+
+@media only screen and (min-width: 1200px) {
+	#ytActionBarContent .action-bar__col {
+		width: 25%;
+	}
 }

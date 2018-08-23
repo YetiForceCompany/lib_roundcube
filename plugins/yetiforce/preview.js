@@ -47,7 +47,7 @@ function registerEvents(content) {
 	registerRemoveRecord(content);
 	registerImportMail(content);
 
-	var block = content.find('.ytHeader .data');
+	var block = content.find('.ytHeader .js-data');
 	content.find('.hideBtn').click(function () {
 		var button = $(this);
 		var icon = button.find('.glyphicon');
@@ -102,7 +102,7 @@ function registerSelectRecord(content) {
 			mailId: id
 		};
 		if ($(this).data('type') == 0) {
-			var module = $(this).closest('.col').find('.module').val();
+			var module = $(this).closest('.js-head-container').find('.module').val();
 		} else {
 			var module = $(this).data('module');
 			relParams.crmid = $(this).closest('.rowRelatedRecord').data('id');
@@ -130,7 +130,7 @@ function registerAddReletedRecord(content) {
 function registerAddRecord(content) {
 	var id = content.find('#mailActionBarID').val();
 	content.find('button.addRecord').click(function (e) {
-		var col = $(e.currentTarget).closest('.col');
+		var col = $(e.currentTarget).closest('.js-head-container');
 		showQuickCreateForm(col.find('.module').val(), id);
 	});
 }
