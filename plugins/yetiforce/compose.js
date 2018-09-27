@@ -61,7 +61,7 @@ window.rcmail && rcmail.addEventListener('init', function (evt) {
 				} else {
 					$.each(responseData, function (id, fields) {
 						$.each(fields, function (key, row) {
-							if (row.type === 'email') {
+							if ((row.type === 'email' || row.type === 'multiEmail') && row.value) {
 								emails.push(row.value);
 								return false;
 							}
@@ -96,7 +96,10 @@ window.rcmail && rcmail.addEventListener('init', function (evt) {
 				$.each(data, function (index, value) {
 					jQuery('#vtmodulemenulink').removeClass('disabled');
 					jQuery('#tplmenulink').removeClass('disabled');
-					tmp.push({name: value.moduleName, label: value.moduleName});
+					tmp.push({
+						name: value.moduleName,
+						label: value.moduleName
+					});
 					jQuery('#tplmenu #texttplsmenu').append('<li class="' + value.moduleName + '"><a href="#" data-module="' + value.module + '" data-tplid="' + value.id + '" class="active">' + value.name + '</a></li>');
 				});
 
