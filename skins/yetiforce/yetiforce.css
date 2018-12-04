@@ -208,8 +208,9 @@ table.messagelist.fixedcopy {
 }
 
 .action-bar__header {
-	font-size: 14px;
-	min-width: 90px;
+	font-size: 13px;
+	align-self: center;
+	margin-right: 2px;
 }
 
 .action-bar__head {

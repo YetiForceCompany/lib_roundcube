@@ -88,7 +88,11 @@
 }
 
 .rowRelatedRecord {
-	padding: 2px;
+	background: white;
+	margin: 2px;
+	border: 1px #c1c1c1 solid;
+	border-radius: 6px;
+	padding: 1px 5px;
 }
 
 .action-bar__head__container {
@@ -96,37 +100,29 @@
 	flex-wrap: nowrap;
 }
 
+.action-bar__data {
+	padding: 0 2px 2px;
+	align-items: center;
+}
+
 .action-bar__data a {
 	text-decoration: none;
 	color: #000;
-	font-size: 14px;
 	line-height: 14px
 }
 
 .action-bar__header {
-	font-size: 14px;
-	min-width: 90px;
+	font-size: 13px;
+	margin-right: 7px
 }
 
 .action-bar__head {
-	background-color: #4a5364;
 	height: 20px;
 	color: #fff;
-	padding: 2px;
+	padding: 5px 2px 4px;
 }
 
 .action-bar__col {
+	background-color: #4a5364;
 	width: 100%;
-}
-
-@media only screen and (min-width: 600px) {
-	#ytActionBarContent .action-bar__col {
-		width: 50%;
-	}
-}
-
-@media only screen and (min-width: 1200px) {
-	#ytActionBarContent .action-bar__col {
-		width: 25%;
-	}
 }
