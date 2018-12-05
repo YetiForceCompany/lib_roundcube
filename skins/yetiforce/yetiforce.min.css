@@ -192,10 +192,6 @@ table.messagelist.fixedcopy {
 	flex-wrap: wrap;
 }
 
-.rowRelatedRecord {
-	padding: 2px;
-}
-
 .action-bar__head__container {
 	column-width: 310px;
 }
@@ -212,7 +208,6 @@ table.messagelist.fixedcopy {
 
 .action-bar__head {
 	background-color: #4a5364;
-	height: 20px;
 	color: #fff;
 	padding: 2px;
 }
