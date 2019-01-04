@@ -80,8 +80,26 @@ window.rcmail && rcmail.addEventListener('init', function (evt) {
 							fieldType: ['email', 'multiEmail']
 						}).done((data) => {
 							i++;
-							emails.push(data.result.data.email);
-							if (i === Object.keys(responseData).length) {
+							let mailObj = data.result.data;
+							if (mailObj.email) {
+								emails.push(mailObj.email);
+							} else if (mailObj.secondary_email) {
+								emails.push(mailObj.secondary_email);
+							} else {
+								for (let key in mailObj) {
+									if (key !== 'secondary_email' && key !== 'email' && mailObj[key]) {
+										let multiEmail = JSON.parse(mailObj[key]);
+										if (typeof multiEmail === 'object') {
+											for (let i in multiEmail) {
+												emails.push(multiEmail[i].e);
+											}
+										} else {
+											emails.push(multiEmail);
+										}
+									}
+								}
+							}
+							if (i === Object.keys(responseData).length) { //last iteration
 								aDeferred.resolve(emails);
 							}
 						});
