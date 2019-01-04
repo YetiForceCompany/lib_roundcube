@@ -103,6 +103,9 @@ function registerSelectRecord(content) {
 		};
 		if ($(this).data('type') == 0) {
 			var module = $(this).closest('.js-head-container').find('.module').val();
+			if (module === null) {
+				return;
+			}
 		} else {
 			var module = $(this).data('module');
 			relParams.crmid = $(this).closest('.rowRelatedRecord').data('id');
@@ -131,7 +134,10 @@ function registerAddRecord(content) {
 	var id = content.find('#mailActionBarID').val();
 	content.find('button.addRecord').click(function (e) {
 		var col = $(e.currentTarget).closest('.js-head-container');
-		showQuickCreateForm(col.find('.module').val(), id);
+		let selectValue = col.find('.module').val();
+		if (selectValue !== null) {
+			showQuickCreateForm(selectValue, id);
+		}
 	});
 }
 
