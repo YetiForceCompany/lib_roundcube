@@ -46,7 +46,6 @@ window.rcmail && rcmail.addEventListener('init', function (evt) {
 	}, true);
 	// Selection of email with popup
 	$('#composeheaders #yt_adress_buttons .button').click(function () {
-		console.log('como');
 		var mailField = $(this).attr('data-input');
 		var module = $(this).attr('data-module');
 		window.crm.app.showRecordsList({
@@ -56,46 +55,12 @@ window.rcmail && rcmail.addEventListener('init', function (evt) {
 			additionalInformations: true
 		}, (modal, instance) => {
 			instance.setSelectEvent((responseData, e) => {
-				let emails = [];
-				let aDeferred = $.Deferred();
-				let emailData = {
-					setValue(emails) {
-						let value = $('#' + mailField).val();
-						if (value != '' && value.charAt(value.length - 1) != ',') {
-							value = value + ',';
-						}
-						$('#' + mailField).val(value + emails.join(','));
+				getEmailAddresses(responseData, e, module).done((emails) => {
+					let value = $('#' + mailField).val();
+					if (value != '' && value.charAt(value.length - 1) != ',') {
+						value = value + ',';
 					}
-				};
-				aDeferred.promise(emailData);
-				if (typeof e.target !== 'undefined' && ($(e.target).data('type') === 'email' || $(e.target).data('type') === 'multiEmail')) {
-					emails.push($(e.target).text());
-					aDeferred.resolve(emails);
-				} else {
-					let i = 0;
-					for (let id in responseData) {
-						window.crm.app.getRecordDetails({
-							record: id,
-							module: module,
-							fieldType: ['email', 'multiEmail']
-						}).done((data) => {
-							i++;
-							let mailObj = data.result.data;
-							if (mailObj.email) {
-								emails.push(mailObj.email);
-							} else if (mailObj.secondary_email) {
-								emails.push(mailObj.secondary_email);
-							} else {
-								emails.push(getOtherMailAddresses(mailObj));
-							}
-							if (i === Object.keys(responseData).length) { //last iteration
-								aDeferred.resolve(emails);
-							}
-						});
-					}
-				}
-				emailData.done((emails) => {
-					emailData.setValue(emails);
+					$('#' + mailField).val(value + emails.join(','));
 					if (emails.length === 0) {
 						window.crm.Vtiger_Helper_Js.showPnotify({
 							text: window.crm.app.vtranslate('NoFindEmailInRecord'),
@@ -107,17 +72,51 @@ window.rcmail && rcmail.addEventListener('init', function (evt) {
 		});
 	});
 
-	function getOtherMailAddresses(mailObj) {
+	function getEmailAddresses(responseData, e, module) {
+		let aDeferred = $.Deferred(),
+			emails = [];
+		if (typeof e.target !== 'undefined' && ($(e.target).data('type') === 'email' || $(e.target).data('type') === 'multiEmail')) {
+			emails.push($(e.target).text());
+			aDeferred.resolve(emails);
+		} else {
+			let i = 0;
+			for (let id in responseData) {
+				window.crm.app.getRecordDetails({
+					record: id,
+					module: module,
+					fieldType: ['email', 'multiEmail']
+				}).done((data) => {
+					i++;
+					let mailObj = data.result.data;
+					if (mailObj.email) {
+						emails.push(mailObj.email);
+					} else if (mailObj.secondary_email) {
+						emails.push(mailObj.secondary_email);
+					} else {
+						emails.push(getOtherEmailAddresses(mailObj));
+					}
+					if (i === Object.keys(responseData).length) { //last iteration
+						aDeferred.resolve(emails);
+					}
+				});
+			}
+		}
+		return aDeferred.promise();
+	}
+
+	function getOtherEmailAddresses(mailObj) {
 		let emails = [];
 		for (let key in mailObj) {
 			if (key !== 'secondary_email' && key !== 'email' && mailObj[key]) {
-				let multiEmail = JSON.parse(mailObj[key]);
-				if (typeof multiEmail === 'object') {
+				if (window.crm.app.isJsonString(mailObj[key])) {
+					let multiEmail = JSON.parse(mailObj[key]);
 					for (let i in multiEmail) {
 						emails.push(multiEmail[i].e);
 					}
+					break;
 				} else {
-					emails.push(multiEmail);
+					emails.push(mailObj[key]);
+					break;
 				}
 			}
 		}
