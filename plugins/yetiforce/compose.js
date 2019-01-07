@@ -56,12 +56,13 @@ window.rcmail && rcmail.addEventListener('init', function (evt) {
 		}, (modal, instance) => {
 			instance.setSelectEvent((responseData, e) => {
 				getEmailAddresses(responseData, e, module).done((emails) => {
-					let value = $('#' + mailField).val();
-					if (value != '' && value.charAt(value.length - 1) != ',') {
-						value = value + ',';
-					}
-					$('#' + mailField).val(value + emails.join(','));
-					if (emails.length === 0) {
+					if (emails.length) {
+						let value = $('#' + mailField).val();
+						if (value != '' && value.charAt(value.length - 1) != ',') {
+							value = value + ',';
+						}
+						$('#' + mailField).val(value + emails.join(','));
+					} else {
 						window.crm.Vtiger_Helper_Js.showPnotify({
 							text: window.crm.app.vtranslate('NoFindEmailInRecord'),
 							animation: 'show'
