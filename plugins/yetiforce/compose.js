@@ -87,14 +87,7 @@ window.rcmail && rcmail.addEventListener('init', function (evt) {
 					fieldType: ['email', 'multiEmail']
 				}).done((data) => {
 					i++;
-					let mailObj = data.result.data;
-					if (mailObj.email) {
-						emails.push(mailObj.email);
-					} else if (mailObj.secondary_email) {
-						emails.push(mailObj.secondary_email);
-					} else {
-						emails.push(getOtherEmailAddresses(mailObj));
-					}
+					emails.push(getFirstEmailAddress(data.result.data));
 					if (i === Object.keys(responseData).length) { //last iteration
 						aDeferred.resolve(emails);
 					}
@@ -104,10 +97,10 @@ window.rcmail && rcmail.addEventListener('init', function (evt) {
 		return aDeferred.promise();
 	}
 
-	function getOtherEmailAddresses(mailObj) {
+	function getFirstEmailAddress(mailObj) {
 		let emails = [];
 		for (let key in mailObj) {
-			if (key !== 'secondary_email' && key !== 'email' && mailObj[key]) {
+			if (mailObj[key]) {
 				if (window.crm.app.isJsonString(mailObj[key])) {
 					let multiEmail = JSON.parse(mailObj[key]);
 					for (let i in multiEmail) {
