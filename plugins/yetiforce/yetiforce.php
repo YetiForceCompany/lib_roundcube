@@ -12,6 +12,10 @@ class yetiforce extends rcube_plugin
 	private $autologin;
 	private $currentUser;
 	private $viewData = [];
+	public $task = 'mail';
+	private $message;
+	private $ics_parts = [];
+	private $ics_bodies = [];
 
 	public function init()
 	{
@@ -64,6 +68,8 @@ class yetiforce extends rcube_plugin
 				$this->include_stylesheet($this->rc->config->get('public_URL') . 'libraries/@fortawesome/fontawesome-free/css/all.css');
 				$this->include_stylesheet('preview.css');
 				$this->add_hook('message_load', [$this, 'messageLoad']);
+				$this->add_hook('message_load', [$this, 'message_load']);
+				$this->add_hook('template_object_messageattachments', [$this, 'html_output']);
 			}
 			if (empty($this->rc->action)) {
 				//$this->add_hook('preferences_save', array($this, 'prefsSave'));
@@ -664,5 +670,67 @@ if (window && window.rcmail) {
 		]);
 		chdir($currentPath);
 		exit;
+	}
+
+
+	/**
+	 * Check message bodies and attachments for ical.
+	 */
+	public function message_load($p)
+	{
+		$this->message = $p['object'];
+
+		// handle attachments vcard attachments
+		foreach ((array)$this->message->attachments as $attachment) {
+			if ($this->is_ics($attachment)) {
+				$this->ics_parts[] = ['part' => $attachment->mime_id, 'uid' => $this->message->uid];
+			}
+		}
+		// the same with message bodies
+		foreach ((array)$this->message->parts as $part) {
+			if ($this->is_ics($part)) {
+				$this->ics_parts[] = ['part' => $attachment->mime_id, 'uid' => $this->message->uid];
+				$this->ics_bodies[] = $part->mime_id;
+			}
+		}
+		if ($this->ics_parts) {
+			$this->add_texts('localization');
+		}
+	}
+
+	/**
+	 * This callback function adds a box below the message content
+	 * if there is a vcard attachment available.
+	 */
+	public function html_output($p)
+	{
+		$attach_script = false;
+
+		foreach ($this->ics_parts as $part) {
+			$icscontent = $this->message->get_part_content($part['part'], null, true);
+			$file_name = $part['uid'];
+			$file = '../../../cache/import/' . $file_name . '.ics';
+			file_put_contents($file, $icscontent);
+
+			// add box below message body
+			$p['content'] .= html::p(['class' => 'icalattachments'], html::a([
+				'href' => 'javascript:void',
+				'onclick' => "return rcmail.command('yetiforce.importICS',$file_name,this,event)",
+				'title' => $this->gettext('addicalinvitemsg'),
+			], html::span(null, rcube::Q($this->gettext('addicalinvitemsg')))
+			)
+			);
+			$attach_script = true;
+		}
+		if ($attach_script) {
+			$this->include_stylesheet($this->local_skin_path() . '/style.css');
+		}
+		return $p;
+	}
+
+	public function is_ics($part)
+	{
+		//return ( $part->mimetype == 'application/ics' || $part->mimetype == 'text/calendar' );
+		return $part->mimetype == 'application/ics';
 	}
 }
