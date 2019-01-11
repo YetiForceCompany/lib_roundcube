@@ -672,7 +672,6 @@ if (window && window.rcmail) {
 		exit;
 	}
 
-
 	/**
 	 * Check message bodies and attachments for ical.
 	 */
@@ -704,33 +703,32 @@ if (window && window.rcmail) {
 	 */
 	public function html_output($p)
 	{
-		$attach_script = false;
-
 		foreach ($this->ics_parts as $part) {
 			$icscontent = $this->message->get_part_content($part['part'], null, true);
 			$file_name = $part['uid'];
 			$file = '../../../cache/import/' . $file_name . '.ics';
 			file_put_contents($file, $icscontent);
+			$currentPath = getcwd();
+			chdir($this->rc->config->get('root_directory'));
+			$this->loadCurrentUser();
+			$icsFields = \App\Utils\iCalendar::import($file_name);
+			chdir($currentPath);
 
 			// add box below message body
-			$p['content'] .= html::p(['class' => 'icalattachments'], html::a([
+			$p['content'] .= html::p(['class' => ''], html::a([
 				'href' => 'javascript:void',
 				'onclick' => "return rcmail.command('yetiforce.importICS',$file_name,this,event)",
 				'title' => $this->gettext('addicalinvitemsg'),
 			], html::span(null, rcube::Q($this->gettext('addicalinvitemsg')))
 			)
 			);
-			$attach_script = true;
-		}
-		if ($attach_script) {
-			$this->include_stylesheet($this->local_skin_path() . '/style.css');
+			$p['content'] .= html::p(null, $icsFields);
 		}
 		return $p;
 	}
 
 	public function is_ics($part)
 	{
-		//return ( $part->mimetype == 'application/ics' || $part->mimetype == 'text/calendar' );
-		return $part->mimetype == 'application/ics';
+		return $part->mimetype == 'application/ics' || $part->mimetype == 'text/calendar';
 	}
 }
