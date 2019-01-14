@@ -706,14 +706,18 @@ if (window && window.rcmail) {
 		foreach ($this->ics_parts as $part) {
 			$icscontent = $this->message->get_part_content($part['part'], null, true);
 			$file_name = $part['uid'];
-			$file = '../../../cache/import/' . $file_name . '.ics';
+			$file = $this->rc->config->get('root_directory') . 'cache/import/' . $file_name . '.ics';
 			file_put_contents($file, $icscontent);
 			$currentPath = getcwd();
 			chdir($this->rc->config->get('root_directory'));
 			$this->loadCurrentUser();
-			$icsFields = \App\Utils\iCalendar::import($file_name);
+			$icsFields = \App\Utils\iCalendar::import($file);
 			chdir($currentPath);
-
+			$eventTable = '<table>';
+			foreach ($icsFields as $key => $value) {
+				$eventTable .= "<tr><td>$key</td><td>$value</td></tr>";
+			}
+			$eventTable .= '</table>';
 			// add box below message body
 			$p['content'] .= html::p(['class' => ''], html::a([
 				'href' => 'javascript:void',
@@ -722,7 +726,7 @@ if (window && window.rcmail) {
 			], html::span(null, rcube::Q($this->gettext('addicalinvitemsg')))
 			)
 			);
-			$p['content'] .= html::p(null, $icsFields);
+			$p['content'] .= html::div(null, $eventTable);
 		}
 		return $p;
 	}
