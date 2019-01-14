@@ -703,9 +703,15 @@ if (window && window.rcmail) {
 	 */
 	public function html_output($p)
 	{
+		$partsIds = [];
 		foreach ($this->ics_parts as $part) {
 			$icscontent = $this->message->get_part_content($part['part'], null, true);
 			$file_name = $part['uid'];
+			if (in_array($file_name, $partsIds)) {
+				continue;
+			} else {
+				array_push($partsIds, $file_name);
+			}
 			$file = $this->rc->config->get('root_directory') . 'cache/import/' . $file_name . '.ics';
 			file_put_contents($file, $icscontent);
 			$currentPath = getcwd();
