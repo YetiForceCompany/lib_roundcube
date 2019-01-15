@@ -177,3 +177,27 @@ button:hover {
 	background-color: #e2e6ea;
 	border-color: #dae0e5;
 }
+
+.c-ical {
+	margin: 2px;
+	border-radius: 6px;
+	background: #dedcdc;
+}
+
+.c-ical__card {
+	width: fit-content;
+	height: fit-content;
+	background: white;
+	border: 1px solid #d0d0d0;
+	border-radius: 6px;
+	color: #c51818;
+	padding: 2px;
+	margin: 2px;
+}
+
+.c-ical__card__nb {
+	font-size: 17px;
+	margin: 0 auto;
+	width: fit-content;
+	color: black;
+}

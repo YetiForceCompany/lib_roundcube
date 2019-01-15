@@ -711,15 +711,30 @@ if (window && window.rcmail) {
 			$currentPath = getcwd();
 			chdir($this->rc->config->get('root_directory'));
 			$this->loadCurrentUser();
-			$icsEvents = \App\Utils\iCalendar::import($filePath);
+			$icsRecords = \App\Utils\iCalendar::import($filePath);
 			chdir($currentPath);
-			$eventTable = '<table>';
-			foreach ($icsEvents as $event) {
-				foreach ($event as $key => $value) {
-					$eventTable .= "<tr><td>$key</td><td>$value</td></tr>";
+			$eventTable = '<div class="c-ical">';
+			foreach ($icsRecords as $record) {
+				if ($record->getValueByField('time_start') || $record->getValueByField('time_end')) {
+					$dateStart = strtotime($record->getDisplayValue('date_start'));
+					$monthName = date('M', $dateStart);
+					$dayName = date('w', $dateStart);
+					if (date('Y-m-d', $dateStart) !== ($dateEnd = date('Y-m-d', strtotime($record->getDisplayValue('due_date'))))) {
+						if ($monthName !== date('M', $dateEnd)) {
+							$monthName .= ' - ' . date('M', $dateEnd);
+						}
+						$dayName .= ' - ' . date('w', $dateEnd);
+					}
+					$eventTable .= "<div class='w-100 flex-wrap'>
+										<div class='c-ical__card'>
+											$monthName
+											<div class='c-ical__card__nb'>$dayName</div>
+										</div>
+										{$record->getDisplayValue('subject')}
+									</div>";
 				}
 			}
-			$eventTable .= '</table>';
+			$eventTable .= '</div>';
 			$args['content'] .=
 				html::p(['class' => ''],
 					html::a([
