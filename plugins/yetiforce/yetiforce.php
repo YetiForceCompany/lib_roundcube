@@ -12,6 +12,8 @@ class yetiforce extends rcube_plugin
 	private $autologin;
 	private $currentUser;
 	private $viewData = [];
+	private $message;
+	private $icsParts = [];
 
 	public function init()
 	{
@@ -64,6 +66,7 @@ class yetiforce extends rcube_plugin
 				$this->include_stylesheet($this->rc->config->get('public_URL') . 'libraries/@fortawesome/fontawesome-free/css/all.css');
 				$this->include_stylesheet('preview.css');
 				$this->add_hook('message_load', [$this, 'messageLoad']);
+				$this->add_hook('template_object_messageattachments', [$this, 'appendIcsPreview']);
 			}
 			if (empty($this->rc->action)) {
 				//$this->add_hook('preferences_save', array($this, 'prefsSave'));
@@ -182,6 +185,7 @@ class yetiforce extends rcube_plugin
 		}
 		$this->rc->output->set_env('fromName', $fromName);
 		$this->rc->output->set_env('fromMail', $fromMail);
+		$this->setIcsData($args);
 	}
 
 	public function messageComposeHead($args)
@@ -664,5 +668,77 @@ if (window && window.rcmail) {
 		]);
 		chdir($currentPath);
 		exit;
+	}
+
+	public function setIcsData($args)
+	{
+		$this->message = $args['object'];
+		foreach ((array)$this->message->attachments as $attachment) {
+			if ($this->isIcs($attachment)) {
+				$this->icsParts[] = ['part' => $attachment->mime_id, 'uid' => $this->message->uid];
+			}
+		}
+		foreach ((array)$this->message->parts as $part) {
+			if ($this->isIcs($part)) {
+				$this->icsParts[] = ['part' => $attachment->mime_id, 'uid' => $this->message->uid];
+			}
+		}
+		if ($this->icsParts) {
+			$this->add_texts('localization');
+		}
+	}
+
+	/**
+	 * Append ical preview in attachments' area
+	 * @param $args
+	 * @return mixed
+	 */
+	public function appendIcsPreview($args)
+	{
+		$icsPartsIds = [];
+		foreach ($this->icsParts as $icsPart) {
+			$icsContent = $this->message->get_part_content($icsPart['part'], null, true);
+			$file_name = $icsPart['uid'];
+			if (in_array($file_name, $icsPartsIds)) {
+				continue;
+			} else {
+				array_push($icsPartsIds, $file_name);
+			}
+			$filePath = $this->rc->config->get('root_directory') . 'cache/import/' . $file_name . '.ics';
+			file_put_contents($filePath, $icsContent);
+			$currentPath = getcwd();
+			chdir($this->rc->config->get('root_directory'));
+			$this->loadCurrentUser();
+			$icsFields = \App\Utils\iCalendar::import($filePath);
+			chdir($currentPath);
+			$eventTable = '<table>';
+			foreach ($icsFields as $key => $value) {
+				$eventTable .= "<tr><td>$key</td><td>$value</td></tr>";
+			}
+			$eventTable .= '</table>';
+			$args['content'] .=
+				html::p(['class' => ''],
+					html::a([
+						'href' => 'javascript:void',
+						'onclick' => "return rcmail.command('yetiforce.importICS',$file_name,this,event)",
+						'title' => $this->gettext('addicalinvitemsg'),
+					],
+						html::span(null, rcube::Q($this->gettext('addicalinvitemsg'))
+						)
+					)
+				);
+			$args['content'] .= html::div(null, $eventTable);
+		}
+		return $args;
+	}
+
+	/**
+	 * Check if $part is ics
+	 * @param $part
+	 * @return bool
+	 */
+	public function isIcs($part)
+	{
+		return $part->mimetype == 'application/ics' || $part->mimetype == 'text/calendar';
 	}
 }
