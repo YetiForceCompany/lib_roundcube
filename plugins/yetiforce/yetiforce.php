@@ -689,8 +689,10 @@ if (window && window.rcmail) {
 	}
 
 	/**
-	 * Append ical preview in attachments' area
+	 * Append ical preview in attachments' area.
+	 *
 	 * @param $args
+	 *
 	 * @return mixed
 	 */
 	public function appendIcsPreview($args)
@@ -709,11 +711,13 @@ if (window && window.rcmail) {
 			$currentPath = getcwd();
 			chdir($this->rc->config->get('root_directory'));
 			$this->loadCurrentUser();
-			$icsFields = \App\Utils\iCalendar::import($filePath);
+			$icsEvents = \App\Utils\iCalendar::import($filePath);
 			chdir($currentPath);
 			$eventTable = '<table>';
-			foreach ($icsFields as $key => $value) {
-				$eventTable .= "<tr><td>$key</td><td>$value</td></tr>";
+			foreach ($icsEvents as $event) {
+				foreach ($event as $key => $value) {
+					$eventTable .= "<tr><td>$key</td><td>$value</td></tr>";
+				}
 			}
 			$eventTable .= '</table>';
 			$args['content'] .=
@@ -733,8 +737,10 @@ if (window && window.rcmail) {
 	}
 
 	/**
-	 * Check if $part is ics
+	 * Check if $part is ics.
+	 *
 	 * @param $part
+	 *
 	 * @return bool
 	 */
 	public function isIcs($part)
