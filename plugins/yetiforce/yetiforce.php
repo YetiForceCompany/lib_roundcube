@@ -713,28 +713,26 @@ if (window && window.rcmail) {
 			$this->loadCurrentUser();
 			$icsRecords = \App\Utils\iCalendar::import($filePath);
 			chdir($currentPath);
-			$eventTable = '<div class="c-ical">';
+			$evTemplate = '<div class="c-ical">';
 			foreach ($icsRecords as $record) {
 				if ($record->getValueByField('time_start') || $record->getValueByField('time_end')) {
 					$dateStart = strtotime($record->getDisplayValue('date_start'));
-					$monthName = date('M', $dateStart);
-					$dayName = date('w', $dateStart);
-					if (date('Y-m-d', $dateStart) !== ($dateEnd = date('Y-m-d', strtotime($record->getDisplayValue('due_date'))))) {
-						if ($monthName !== date('M', $dateEnd)) {
-							$monthName .= ' - ' . date('M', $dateEnd);
-						}
-						$dayName .= ' - ' . date('w', $dateEnd);
+					$dateStartCard = $this->cardTemplate($dateStart);
+					$dueDate = strtotime($record->getDisplayValue('due_date'));
+					$dueDateCard = '';
+					if (date('Y-m-d', $dateStart) !== date('Y-m-d', $dueDate)) {
+						$dueDateCard = '<span class="c-ical__card__arrow fas fa-arrow-circle-right"></span>' . $this->cardTemplate($dueDate);
 					}
-					$eventTable .= "<div class='w-100 flex-wrap'>
-										<div class='c-ical__card'>
-											$monthName
-											<div class='c-ical__card__nb'>$dayName</div>
+					$evTemplate .= "<div class='w-100 flex-nowrap'>
+										$dateStartCard
+										$dueDateCard
+										<div class='c-ical__wrapper'>
+											<h4 class='c-ical__subject'>{$record->getDisplayValue('subject')}</h4>
 										</div>
-										{$record->getDisplayValue('subject')}
 									</div>";
 				}
 			}
-			$eventTable .= '</div>';
+			$evTemplate .= '</div>';
 			$args['content'] .=
 				html::p(['class' => ''],
 					html::a([
@@ -746,9 +744,22 @@ if (window && window.rcmail) {
 						)
 					)
 				);
-			$args['content'] .= html::div(null, $eventTable);
+			$args['content'] .= html::div(null, $evTemplate);
 		}
 		return $args;
+	}
+
+	public function cardTemplate($date)
+	{
+		$monthName = \App\Language::translate(date('M', $date));
+		$yearName = date('Y', $date);
+		$dayName = date('w', $date);
+		return "<div class='c-ical__card'>
+					<span class='c-ical__card__year'>$yearName</span>
+					<br>
+					$monthName
+					<div class='c-ical__card__day'>$dayName</div>
+				</div>";
 	}
 
 	/**
