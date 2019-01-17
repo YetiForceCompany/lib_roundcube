@@ -715,19 +715,29 @@ if (window && window.rcmail) {
 			chdir($currentPath);
 			$evTemplate = '<div class="c-ical">';
 			foreach ($icsRecords as $record) {
+				var_dump($record);
 				if ($record->getValueByField('time_start') || $record->getValueByField('time_end')) {
 					$dateStart = strtotime($record->getDisplayValue('date_start'));
 					$dateStartCard = $this->cardTemplate($dateStart);
 					$dueDate = strtotime($record->getDisplayValue('due_date'));
 					$dueDateCard = '';
 					if (date('Y-m-d', $dateStart) !== date('Y-m-d', $dueDate)) {
-						$dueDateCard = '<span class="c-ical__card__arrow fas fa-arrow-circle-right"></span>' . $this->cardTemplate($dueDate);
+						$dueDateCard = "<span class=\"c-ical__card__arrow fas fa-arrow-right\"></span>{$this->cardTemplate($dueDate)}";
 					}
-					$evTemplate .= "<div class='w-100 flex-nowrap'>
-										$dateStartCard
-										$dueDateCard
-										<div class='c-ical__wrapper'>
-											<h4 class='c-ical__subject'>{$record->getDisplayValue('subject')}</h4>
+					$fields = '';
+					$evTemplate .= "<div class=\"w-100 c-ical__event\">
+										<h3 class='c-ical__subject'>{$record->getDisplayValue('subject')}</h3>
+										<div class=\" flex-nowrap justify-content-center\">
+											$dateStartCard
+											$dueDateCard
+											<div class=\"c-ical__card__time\">
+												{$record->getDisplayValue('time_start')}
+												<span class=\"fas fa-arrow-right fa-xs\"></span>
+												{$record->getDisplayValue('time_end')}
+											</div>
+										</div>
+										<div class=\"c-ical__wrapper\">
+										$fields
 										</div>
 									</div>";
 				}

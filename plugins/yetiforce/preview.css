@@ -138,14 +138,21 @@
 
 .c-ical {
 	margin: 2px;
+}
+
+.c-ical__event {
+	background: #fffdfd;
+	margin: 2px 0;
+	border: 1px solid #dedede;
+	margin: 3px auto;
 	border-radius: 6px;
-	background: #dedcdc;
 }
 
 .c-ical__wrapper {
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
+	margin: 3px;
 }
 
 .c-ical__card {
@@ -172,10 +179,26 @@
 	color: #888888
 }
 
+.c-ical__card__time {
+	font-size: 18px;
+	margin: auto;
+}
+
 .c-ical__card__arrow {
 	margin: auto 0;
 }
 
 .c-ical__subject {
 	margin: 0 auto;
+	text-align: center;
+}
+
+/*.justify-content-around {*/
+/*-ms-flex-pack: distribute !important;*/
+/*justify-content: space-around !important;*/
+/*}*/
+
+.justify-content-center {
+	-ms-flex-pack: center !important;
+	justify-content: center !important;
 }
