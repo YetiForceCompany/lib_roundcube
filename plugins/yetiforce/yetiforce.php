@@ -12,7 +12,13 @@ class yetiforce extends rcube_plugin
 	private $autologin;
 	private $currentUser;
 	private $viewData = [];
-	private $message;
+	/**
+	 * @var array
+	 */
+	private $message = [];
+	/**
+	 * @var array
+	 */
 	private $icsParts = [];
 
 	public function init()
@@ -670,7 +676,11 @@ if (window && window.rcmail) {
 		exit;
 	}
 
-	public function setIcsData($args)
+	/**
+	 * Set ics data
+	 * @param array $args
+	 */
+	public function setIcsData(array $args)
 	{
 		$this->message = $args['object'];
 		foreach ((array)$this->message->attachments as $attachment) {
@@ -712,6 +722,7 @@ if (window && window.rcmail) {
 			chdir($this->rc->config->get('root_directory'));
 			$this->loadCurrentUser();
 			$icsRecords = \App\Utils\iCalendar::import($filePath);
+			unlink($filePath);
 			chdir($currentPath);
 			$evTemplate = '<div class="c-ical">';
 			$translationMod = 'Calendar';
