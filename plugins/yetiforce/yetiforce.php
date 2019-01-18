@@ -716,60 +716,52 @@ if (window && window.rcmail) {
 			$evTemplate = '<div class="c-ical">';
 			$translationMod = 'Calendar';
 			foreach ($icsRecords as $record) {
-				if ($record->getValueByField('time_start') || $record->getValueByField('time_end')) {
-					$dateStart = strtotime($record->getDisplayValue('date_start'));
-					$dateStartCard = $this->cardTemplate($dateStart);
-					$dueDate = strtotime($record->getDisplayValue('due_date'));
-					$dueDateCard = '';
-					if (date('Y-m-d', $dateStart) !== date('Y-m-d', $dueDate)) {
-						$dueDateCard = $this->cardTemplate($dueDate);
-					}
-					$fields = '';
-					if ($location = $record->getDisplayValue('location')) {
-						$locationLabel = \App\Language::translate('Location', $translationMod);
-						$fields .= "<div><span class=\"fas fa-map mr-1\"></span>$locationLabel: $location</div>";
-					}
-					if ($status = $record->getDisplayValue('activitystatus')) {
-						$statusLabel = \App\Language::translate('LBL_STATUS', $translationMod);
-						$fields .= "<div><span class=\"fas fa-question-circle mr-1\"></span>$statusLabel: $status</div>";
-					}
-					if ($type = $record->getDisplayValue('activitytype')) {
-						$typeLabel = \App\Language::translate('Activity Type', $translationMod);
-						$fields .= "<div><span class=\"fas fa-edit mr-1\"></span>$typeLabel: $type</div>";
-					}
-					if ($allday = $record->getDisplayValue('allday')) {
-						$alldayLabel = \App\Language::translate('All day', $translationMod);
-						$fields .= "<div><span class=\"fas fa-edit mr-1\"></span>$alldayLabel: $allday</div>";
-					}
-					if ($visibility = $record->getDisplayValue('visibility')) {
-						$visibilityLabel = \App\Language::translate('Visibility', $translationMod);
-						$fields .= "<div><span class=\"fas fa-eye mr-1\"></span>$visibilityLabel: $visibility</div>";
-					}
-					if ($description = $record->getValueByField('description')) {
-						$descriptionLabel = \App\Language::translate('Description', $translationMod);
-						$description = \App\TextParser::textTruncate($description, 100);
-						$fields .= "<div><span class=\"fas fa-edit mr-1\"></span>$descriptionLabel: $description</div>";
-					}
-					$evTemplate .= "<div class=\"w-100 c-ical__event\">
+				$fields = '';
+				if ($dateStart = strtotime($record->getDisplayValue('date_start'))) {
+					$dateStart = date('Y-m-d H:i:s', $dateStart);
+					$dateStartLabel = \App\Language::translate('LBL_START');
+					$fields .= "<div><span class=\"fas fa-clock mr-1\"></span><strong>$dateStartLabel</strong>: $dateStart</div>";
+				}
+				if ($dueDate = strtotime($record->getDisplayValue('due_date'))) {
+					$dueDate = date('Y-m-d H:i:s', $dueDate);
+					$dueDateLabel = \App\Language::translate('LBL_END');
+					$fields .= "<div><span class=\"fas fa-clock mr-1\"></span><strong>$dueDateLabel</strong>: $dueDate</div>";
+				}
+				if ($location = $record->getDisplayValue('location')) {
+					$locationLabel = \App\Language::translate('Location', $translationMod);
+					$fields .= "<div><span class=\"fas fa-map mr-1\"></span><strong>$locationLabel</strong>: $location</div>";
+				}
+				if ($status = $record->getDisplayValue('activitystatus')) {
+					$statusLabel = \App\Language::translate('LBL_STATUS', $translationMod);
+					$fields .= "<div><span class=\"fas fa-question-circle mr-1\"></span><strong>$statusLabel</strong>: $status</div>";
+				}
+				if ($type = $record->getDisplayValue('activitytype')) {
+					$typeLabel = \App\Language::translate('Activity Type', $translationMod);
+					$type = \App\Language::translate('LBL_' . strtoupper($type), $translationMod);
+					$fields .= "<div><span class=\"fas fa-calendar mr-1\"></span><strong>$typeLabel</strong>: $type</div>";
+				}
+				if ($allday = $record->getDisplayValue('allday')) {
+					$alldayLabel = \App\Language::translate('All day', $translationMod);
+					$fields .= "<div><span class=\"fas fa-edit mr-1\"></span><strong>$alldayLabel</strong>: $allday</div>";
+				}
+				if ($visibility = $record->getDisplayValue('visibility')) {
+					$visibilityLabel = \App\Language::translate('Visibility', $translationMod);
+					$fields .= "<div><span class=\"fas fa-eye mr-1\"></span><strong>$visibilityLabel</strong>: $visibility</div>";
+				}
+				if ($description = $record->getValueByField('description')) {
+					$descriptionLabel = \App\Language::translate('Description', $translationMod);
+					$description = \App\TextParser::textTruncate($description, 100);
+					$fields .= "<div><span class=\"fas fa-edit mr-1\"></span><strong>$descriptionLabel</strong>: $description</div>";
+				}
+				$evTemplate .= "<div class=\"w-100 c-ical__event\">
 										<h3 class='c-ical__subject'>{$record->getDisplayValue('subject')}</h3>
-										<div class=\"flex-nowrap\">
-											$dateStartCard
-											<div class=\"c-ical__card__time\">
-												{$record->getDisplayValue('time_start')}
-											</div>											
-											<span class=\"c-ical__card__arrow fas fa-arrow-right\"></span>											
-											<div class=\"c-ical__card__time\">
-												{$record->getDisplayValue('time_end')}
-											</div>
-											$dueDateCard
-										</div>
 										<div class=\"c-ical__wrapper\">
 										$fields
 										</div>
 									</div>";
-				}
 			}
 			$evTemplate .= '</div>';
+
 			$args['content'] .=
 				html::p(['class' => ''],
 					html::a([
@@ -784,19 +776,6 @@ if (window && window.rcmail) {
 			$args['content'] .= html::div(null, $evTemplate);
 		}
 		return $args;
-	}
-
-	public function cardTemplate($date)
-	{
-		$monthName = \App\Language::translate(date('M', $date));
-		$yearName = date('Y', $date);
-		$dayName = date('w', $date);
-		return "<div class='c-ical__card'>
-					<span class='c-ical__card__year'>$yearName</span>
-					<br>
-					$monthName
-					<div class='c-ical__card__day'>$dayName</div>
-				</div>";
 	}
 
 	/**

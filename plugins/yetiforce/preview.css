@@ -149,9 +149,6 @@
 }
 
 .c-ical__wrapper {
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
 	margin: 3px;
 }
 
@@ -191,6 +188,11 @@
 .c-ical__subject {
 	margin: 0 auto;
 	text-align: center;
+	background: #4a5364;
+	color: white;
+	border-top-left-radius: 6px;
+	border-top-right-radius: 6px;
+	padding-bottom: 2px;
 }
 
 .mr-1 {
