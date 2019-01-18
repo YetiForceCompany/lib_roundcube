@@ -181,11 +181,11 @@
 
 .c-ical__card__time {
 	font-size: 18px;
-	margin: auto;
+	margin: auto 5px;
 }
 
 .c-ical__card__arrow {
-	margin: auto 0;
+	margin: auto 5px;
 }
 
 .c-ical__subject {
@@ -193,12 +193,6 @@
 	text-align: center;
 }
 
-/*.justify-content-around {*/
-/*-ms-flex-pack: distribute !important;*/
-/*justify-content: space-around !important;*/
-/*}*/
-
-.justify-content-center {
-	-ms-flex-pack: center !important;
-	justify-content: center !important;
+.mr-1 {
+	margin-right: 0.25rem;
 }
