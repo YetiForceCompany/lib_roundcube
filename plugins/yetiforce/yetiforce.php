@@ -12,6 +12,14 @@ class yetiforce extends rcube_plugin
 	private $autologin;
 	private $currentUser;
 	private $viewData = [];
+	/**
+	 * @var array
+	 */
+	private $message = [];
+	/**
+	 * @var array
+	 */
+	private $icsParts = [];
 
 	public function init()
 	{
@@ -25,6 +33,7 @@ class yetiforce extends rcube_plugin
 			$this->register_action('plugin.yetiforce.getConntentEmailTemplate', [$this, 'getConntentEmailTemplate']);
 			$this->rc->output->set_env('site_URL', $this->rc->config->get('site_URL'));
 			$this->include_stylesheet($this->rc->config->get('public_URL') . 'layouts/resources/icons/userIcons.css');
+			$this->add_texts('localization/', false);
 
 			$currentPath = getcwd();
 			chdir($this->rc->config->get('root_directory'));
@@ -40,7 +49,6 @@ class yetiforce extends rcube_plugin
 				$this->viewData['compose']['composeAddressModules'] = $composeAddressModules;
 				$this->rc->output->set_env('isPermittedMailTemplates', \App\Privilege::isPermitted('EmailTemplates'));
 
-				$this->add_texts('localization/', false);
 				$this->include_script('compose.js');
 
 				$this->add_hook('message_compose_body', [$this, 'messageComposeBody']);
@@ -64,6 +72,7 @@ class yetiforce extends rcube_plugin
 				$this->include_stylesheet($this->rc->config->get('public_URL') . 'libraries/@fortawesome/fontawesome-free/css/all.css');
 				$this->include_stylesheet('preview.css');
 				$this->add_hook('message_load', [$this, 'messageLoad']);
+				$this->add_hook('template_object_messageattachments', [$this, 'appendIcsPreview']);
 			}
 			if (empty($this->rc->action)) {
 				//$this->add_hook('preferences_save', array($this, 'prefsSave'));
@@ -182,6 +191,7 @@ class yetiforce extends rcube_plugin
 		}
 		$this->rc->output->set_env('fromName', $fromName);
 		$this->rc->output->set_env('fromMail', $fromMail);
+		$this->setIcsData($args);
 	}
 
 	public function messageComposeHead($args)
@@ -664,5 +674,127 @@ if (window && window.rcmail) {
 		]);
 		chdir($currentPath);
 		exit;
+	}
+
+	/**
+	 * Set ics data
+	 * @param array $args
+	 */
+	public function setIcsData(array $args)
+	{
+		$this->message = $args['object'];
+		foreach ((array)$this->message->attachments as $attachment) {
+			if ($this->isIcs($attachment)) {
+				$this->icsParts[] = ['part' => $attachment->mime_id, 'uid' => $this->message->uid];
+			}
+		}
+		foreach ((array)$this->message->parts as $part) {
+			if ($this->isIcs($part)) {
+				$this->icsParts[] = ['part' => $attachment->mime_id, 'uid' => $this->message->uid];
+			}
+		}
+	}
+
+	/**
+	 * Append ical preview in attachments' area.
+	 *
+	 * @param array $args
+	 *
+	 * @return mixed
+	 */
+	public function appendIcsPreview($args)
+	{
+		$icsPartsIds = [];
+		foreach ($this->icsParts as $icsPart) {
+			$icsContent = $this->message->get_part_content($icsPart['part'], null, true);
+			$file_name = $icsPart['uid'];
+			if (in_array($file_name, $icsPartsIds)) {
+				continue;
+			} else {
+				array_push($icsPartsIds, $file_name);
+			}
+			$filePath = $this->rc->config->get('root_directory') . 'cache/import/' . $file_name . '.ics';
+			file_put_contents($filePath, $icsContent);
+			$currentPath = getcwd();
+			chdir($this->rc->config->get('root_directory'));
+			$this->loadCurrentUser();
+			$icsRecords = \App\Utils\iCalendar::import($filePath);
+			unlink($filePath);
+			chdir($currentPath);
+			$evTemplate = '<div class="c-ical">';
+			$translationMod = 'Calendar';
+			foreach ($icsRecords as $record) {
+				$fields = '';
+				if ($dateStart = strtotime($record->get('date_start'))) {
+					$dateStart = date('Y-m-d H:i:s', $dateStart);
+					$dateStartLabel = \App\Language::translate('LBL_START');
+					$fields .= "<div><span class=\"fas fa-clock mr-1\"></span><strong>$dateStartLabel</strong>: $dateStart</div>";
+				}
+				if ($dueDate = strtotime($record->get('due_date'))) {
+					$dueDate = date('Y-m-d H:i:s', $dueDate);
+					$dueDateLabel = \App\Language::translate('LBL_END');
+					$fields .= "<div><span class=\"fas fa-clock mr-1\"></span><strong>$dueDateLabel</strong>: $dueDate</div>";
+				}
+				if ($location = $record->getDisplayValue('location')) {
+					$locationLabel = \App\Language::translate('Location', $translationMod);
+					$fields .= "<div><span class=\"fas fa-map mr-1\"></span><strong>$locationLabel</strong>: $location</div>";
+				}
+				if ($status = $record->getDisplayValue('activitystatus')) {
+					$statusLabel = \App\Language::translate('LBL_STATUS', $translationMod);
+					$fields .= "<div><span class=\"fas fa-question-circle mr-1\"></span><strong>$statusLabel</strong>: $status</div>";
+				}
+				if ($type = $record->getDisplayValue('activitytype')) {
+					$typeLabel = \App\Language::translate('Activity Type', $translationMod);
+					$type = \App\Language::translate('LBL_' . strtoupper($type), $translationMod);
+					$fields .= "<div><span class=\"fas fa-calendar mr-1\"></span><strong>$typeLabel</strong>: $type</div>";
+				}
+				if ($allday = $record->getDisplayValue('allday')) {
+					$alldayLabel = \App\Language::translate('All day', $translationMod);
+					$fields .= "<div><span class=\"fas fa-edit mr-1\"></span><strong>$alldayLabel</strong>: $allday</div>";
+				}
+				if ($visibility = $record->getDisplayValue('visibility')) {
+					$visibilityLabel = \App\Language::translate('Visibility', $translationMod);
+					$fields .= "<div><span class=\"fas fa-eye mr-1\"></span><strong>$visibilityLabel</strong>: $visibility</div>";
+				}
+				if ($description = $record->getValueByField('description')) {
+					$descriptionLabel = \App\Language::translate('Description', $translationMod);
+					$description = \App\TextParser::textTruncate($description, 100);
+					$fields .= "<div><span class=\"fas fa-edit mr-1\"></span><strong>$descriptionLabel</strong>: $description</div>";
+				}
+				$evTemplate .= "<div class=\"w-100 c-ical__event\">
+										<h3 class='c-ical__subject'>{$record->getDisplayValue('subject')}</h3>
+										<div class=\"c-ical__wrapper\">
+										$fields
+										</div>
+									</div>";
+			}
+			$evTemplate .= '</div>';
+
+			$args['content'] .=
+				html::p(['class' => ''],
+					html::a([
+						'href' => 'javascript:void',
+						'onclick' => "return rcmail.command('yetiforce.importICS',$file_name,this,event)",
+						'title' => $this->gettext('addicalinvitemsg'),
+					],
+						html::span(null, rcube::Q($this->gettext('addicalinvitemsg'))
+						)
+					)
+				);
+			$args['content'] .= html::div(null, $evTemplate);
+		}
+		return $args;
+	}
+
+	/**
+	 * Check if $part is ics.
+	 *
+	 * @param $part
+	 *
+	 * @return bool
+	 */
+	public function isIcs($part)
+	{
+		return $part->mimetype == 'application/ics' || $part->mimetype == 'text/calendar';
 	}
 }
