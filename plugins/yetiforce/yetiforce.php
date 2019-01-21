@@ -698,7 +698,7 @@ if (window && window.rcmail) {
 	/**
 	 * Append ical preview in attachments' area.
 	 *
-	 * @param $args
+	 * @param array $args
 	 *
 	 * @return mixed
 	 */
@@ -725,12 +725,12 @@ if (window && window.rcmail) {
 			$translationMod = 'Calendar';
 			foreach ($icsRecords as $record) {
 				$fields = '';
-				if ($dateStart = strtotime($record->getDisplayValue('date_start'))) {
+				if ($dateStart = strtotime($record->get('date_start'))) {
 					$dateStart = date('Y-m-d H:i:s', $dateStart);
 					$dateStartLabel = \App\Language::translate('LBL_START');
 					$fields .= "<div><span class=\"fas fa-clock mr-1\"></span><strong>$dateStartLabel</strong>: $dateStart</div>";
 				}
-				if ($dueDate = strtotime($record->getDisplayValue('due_date'))) {
+				if ($dueDate = strtotime($record->get('due_date'))) {
 					$dueDate = date('Y-m-d H:i:s', $dueDate);
 					$dueDateLabel = \App\Language::translate('LBL_END');
 					$fields .= "<div><span class=\"fas fa-clock mr-1\"></span><strong>$dueDateLabel</strong>: $dueDate</div>";
