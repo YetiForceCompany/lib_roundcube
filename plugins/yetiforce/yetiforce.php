@@ -33,6 +33,7 @@ class yetiforce extends rcube_plugin
 			$this->register_action('plugin.yetiforce.getConntentEmailTemplate', [$this, 'getConntentEmailTemplate']);
 			$this->rc->output->set_env('site_URL', $this->rc->config->get('site_URL'));
 			$this->include_stylesheet($this->rc->config->get('public_URL') . 'layouts/resources/icons/userIcons.css');
+			$this->add_texts('localization/', false);
 
 			$currentPath = getcwd();
 			chdir($this->rc->config->get('root_directory'));
@@ -48,7 +49,6 @@ class yetiforce extends rcube_plugin
 				$this->viewData['compose']['composeAddressModules'] = $composeAddressModules;
 				$this->rc->output->set_env('isPermittedMailTemplates', \App\Privilege::isPermitted('EmailTemplates'));
 
-				$this->add_texts('localization/', false);
 				$this->include_script('compose.js');
 
 				$this->add_hook('message_compose_body', [$this, 'messageComposeBody']);
@@ -692,9 +692,6 @@ if (window && window.rcmail) {
 			if ($this->isIcs($part)) {
 				$this->icsParts[] = ['part' => $attachment->mime_id, 'uid' => $this->message->uid];
 			}
-		}
-		if ($this->icsParts) {
-			$this->add_texts('localization');
 		}
 	}
 
