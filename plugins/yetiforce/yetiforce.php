@@ -619,6 +619,7 @@ if (window && window.rcmail) {
 		require 'include/main/WebUI.php';
 		$this->currentUser = \App\User::getUserModel($_SESSION['crm']['id']);
 		App\User::setCurrentUserId($_SESSION['crm']['id']);
+		\App\Language::setTemporaryLanguage($this->currentUser->getDetail('language'));
 		return true;
 	}
 
@@ -677,18 +678,19 @@ if (window && window.rcmail) {
 	}
 
 	/**
-	 * Set ics data
+	 * Set ics data.
+	 *
 	 * @param array $args
 	 */
 	public function setIcsData(array $args)
 	{
 		$this->message = $args['object'];
-		foreach ((array)$this->message->attachments as $attachment) {
+		foreach ((array) $this->message->attachments as $attachment) {
 			if ($this->isIcs($attachment)) {
 				$this->icsParts[] = ['part' => $attachment->mime_id, 'uid' => $this->message->uid];
 			}
 		}
-		foreach ((array)$this->message->parts as $part) {
+		foreach ((array) $this->message->parts as $part) {
 			if ($this->isIcs($part)) {
 				$this->icsParts[] = ['part' => $attachment->mime_id, 'uid' => $this->message->uid];
 			}
