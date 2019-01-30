@@ -3,23 +3,20 @@ window.rcmail && rcmail.addEventListener('init', function (evt) {
 		window.crm = getCrmWindow();
 		loadActionBar();
 		rcmail.env.message_commands.push('yetiforce.importICS');
-		rcmail.register_command('yetiforce.importICS', function (ics, element, e) {
-			window.crm.AppConnector.request({
-				async: true,
-				dataType: 'json',
-				data: {
-					module: 'Calendar',
-					action: 'ImportICS',
-					ics: ics
+		rcmail.register_command('yetiforce.importICS', function (part, type) {
+			jQuery.ajax({
+				type: 'POST',
+				url: "./?_task=mail&_action=plugin.yetiforce.importIcs&_mbox=" + urlencode(rcmail.env.mailbox) + '&_uid=' + urlencode(rcmail.env.uid) + '&_part=' + part + '&_type=' + type,
+				async: false,
+				success: function (data) {
+					data = JSON.parse(data);
+					window.crm.Vtiger_Helper_Js.showPnotify({
+						text: data['message'],
+						type: 'info',
+						animation: 'show'
+					});
 				}
-			}).done(function (response) {
-				window.crm.Vtiger_Helper_Js.showPnotify({
-					text: response['result'],
-					type: 'info',
-					animation: 'show'
-				});
-				$(element).closest('.icalattachments').remove();
-			})
+			});
 		}, true);
 	}
 );
