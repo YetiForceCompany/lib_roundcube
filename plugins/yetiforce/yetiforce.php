@@ -33,7 +33,7 @@ class yetiforce extends rcube_plugin
 			$this->register_action('plugin.yetiforce.getConntentEmailTemplate', [$this, 'getConntentEmailTemplate']);
 			$this->register_action('plugin.yetiforce.importIcs', [$this, 'importIcs']);
 			$this->rc->output->set_env('site_URL', $this->rc->config->get('site_URL'));
-			$this->include_stylesheet($this->rc->config->get('public_URL') . 'layouts/resources/icons/userIcons.css');
+			$this->include_stylesheet('../../../../../layouts/resources/icons/userIcons.css');
 			$this->add_texts('localization/', false);
 
 			$currentPath = getcwd();
@@ -70,7 +70,7 @@ class yetiforce extends rcube_plugin
 			}
 			if ($this->rc->action === 'preview' || $this->rc->action === 'show') {
 				$this->include_script('preview.js');
-				$this->include_stylesheet($this->rc->config->get('public_URL') . 'libraries/@fortawesome/fontawesome-free/css/all.css');
+				$this->include_stylesheet('../../../../../libraries/@fortawesome/fontawesome-free/css/all.css');
 				$this->include_stylesheet('preview.css');
 				$this->add_hook('message_load', [$this, 'messageLoad']);
 				$this->add_hook('template_object_messageattachments', [$this, 'appendIcsPreview']);
