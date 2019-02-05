@@ -780,7 +780,7 @@ if (window && window.rcmail) {
 										</div>
 									</div>";
 			$evTemplate .= '</div>';
-			if (!isset($showPart[$icsPart['part']])) {
+			if (!isset($showPart[$icsPart['part']]) && \App\Privilege::isPermitted('Calendar', 'CreateView')) {
 				$showPart[$icsPart['part']] = $icsPart['part'];
 				$title = \App\Language::translate('LBL_ADD_TO_MY_CALENDAR', 'OSSMail');
 				$counterText = empty($counterBtn[$icsPart['part']]) ? '' : ($counterBtn[$icsPart['part']] > 1 ? " ({$counterBtn[$icsPart['part']]})" : '');
@@ -813,28 +813,32 @@ if (window && window.rcmail) {
 
 	public function importIcs()
 	{
-		$uid = rcube_utils::get_input_value('_uid', rcube_utils::INPUT_GPC);
-		$mbox = rcube_utils::get_input_value('_mbox', rcube_utils::INPUT_GPC);
-		$mime_id = rcube_utils::get_input_value('_part', rcube_utils::INPUT_GPC);
-		$status = 0;
-		if ($uid && $mbox && $mime_id) {
-			$currentPath = getcwd();
-			chdir($this->rc->config->get('root_directory'));
-			$this->loadCurrentUser();
-			$message = new rcube_message($uid, $mbox);
-			$calendar = \App\Integrations\Dav\Calendar::loadFromContent($message->get_part_body($mime_id));
-			foreach ($calendar->getRecordInstance() as $key => $recordModel) {
-				$recordModel->set('assigned_user_id', $this->currentUser->getId());
-				$recordModel->save();
-				if ($recordModel->getId()) {
-					$status++;
+		if (\App\Privilege::isPermitted('Calendar', 'CreateView')) {
+			$uid = rcube_utils::get_input_value('_uid', rcube_utils::INPUT_GPC);
+			$mbox = rcube_utils::get_input_value('_mbox', rcube_utils::INPUT_GPC);
+			$mime_id = rcube_utils::get_input_value('_part', rcube_utils::INPUT_GPC);
+			$status = 0;
+			if ($uid && $mbox && $mime_id) {
+				$currentPath = getcwd();
+				chdir($this->rc->config->get('root_directory'));
+				$this->loadCurrentUser();
+				$message = new rcube_message($uid, $mbox);
+				$calendar = \App\Integrations\Dav\Calendar::loadFromContent($message->get_part_body($mime_id));
+				foreach ($calendar->getRecordInstance() as $key => $recordModel) {
+					$recordModel->set('assigned_user_id', $this->currentUser->getId());
+					$recordModel->save();
+					if ($recordModel->getId()) {
+						$status++;
+					}
 				}
+				chdir($currentPath);
 			}
-			chdir($currentPath);
+			$message = ['message' => $status ? \App\Language::translateArgs('LBL_FILE_HAS_BEEN_IMPORTED', 'OSSMail', $status) : \App\Language::translate('LBL_ERROR_OCCURRED_DURING_IMPORT', 'OSSMail'),
+			];
+		} else {
+			$message = ['message' => \App\Language::translate('LBL_PERMISSION_DENIED')];
 		}
-		echo App\Json::encode([
-			'message' => $status ? \App\Language::translateArgs('LBL_FILE_HAS_BEEN_IMPORTED', 'OSSMail', $status) : \App\Language::translate('LBL_ERROR_OCCURRED_DURING_IMPORT', 'OSSMail'),
-		]);
+		echo App\Json::encode($message);
 		exit;
 	}
 }
