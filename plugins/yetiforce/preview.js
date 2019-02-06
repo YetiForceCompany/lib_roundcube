@@ -70,11 +70,9 @@ function registerImportMail(content) {
 		window.crm.AppConnector.request({
 			module: 'OSSMail',
 			action: 'ImportMail',
-			params: {
-				uid: rcmail.env.uid,
-				folder: rcmail.env.mailbox,
-				rcId: rcmail.env.user_id
-			}
+			uid: rcmail.env.uid,
+			folder: rcmail.env.mailbox,
+			rcId: rcmail.env.user_id
 		}).done(function (data) {
 			loadActionBar();
 			window.crm.Vtiger_Helper_Js.showPnotify({
