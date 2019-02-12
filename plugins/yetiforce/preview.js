@@ -3,23 +3,20 @@ window.rcmail && rcmail.addEventListener('init', function (evt) {
 		window.crm = getCrmWindow();
 		loadActionBar();
 		rcmail.env.message_commands.push('yetiforce.importICS');
-		rcmail.register_command('yetiforce.importICS', function (ics, element, e) {
-			window.crm.AppConnector.request({
-				async: true,
-				dataType: 'json',
-				data: {
-					module: 'Calendar',
-					action: 'ImportICS',
-					ics: ics
+		rcmail.register_command('yetiforce.importICS', function (part, type) {
+			jQuery.ajax({
+				type: 'POST',
+				url: "./?_task=mail&_action=plugin.yetiforce.importIcs&_mbox=" + urlencode(rcmail.env.mailbox) + '&_uid=' + urlencode(rcmail.env.uid) + '&_part=' + part + '&_type=' + type,
+				async: false,
+				success: function (data) {
+					data = JSON.parse(data);
+					window.crm.Vtiger_Helper_Js.showPnotify({
+						text: data['message'],
+						type: 'info',
+						animation: 'show'
+					});
 				}
-			}).done(function (response) {
-				window.crm.Vtiger_Helper_Js.showPnotify({
-					text: response['result'],
-					type: 'info',
-					animation: 'show'
-				});
-				$(element).closest('.icalattachments').remove();
-			})
+			});
 		}, true);
 	}
 );
@@ -73,11 +70,9 @@ function registerImportMail(content) {
 		window.crm.AppConnector.request({
 			module: 'OSSMail',
 			action: 'ImportMail',
-			params: {
-				uid: rcmail.env.uid,
-				folder: rcmail.env.mailbox,
-				rcId: rcmail.env.user_id
-			}
+			uid: rcmail.env.uid,
+			folder: rcmail.env.mailbox,
+			rcId: rcmail.env.user_id
 		}).done(function (data) {
 			loadActionBar();
 			window.crm.Vtiger_Helper_Js.showPnotify({
@@ -103,6 +98,9 @@ function registerSelectRecord(content) {
 		};
 		if ($(this).data('type') == 0) {
 			var module = $(this).closest('.js-head-container').find('.module').val();
+			if (module === null) {
+				return;
+			}
 		} else {
 			var module = $(this).data('module');
 			relParams.crmid = $(this).closest('.rowRelatedRecord').data('id');
@@ -131,7 +129,10 @@ function registerAddRecord(content) {
 	var id = content.find('#mailActionBarID').val();
 	content.find('button.addRecord').click(function (e) {
 		var col = $(e.currentTarget).closest('.js-head-container');
-		showQuickCreateForm(col.find('.module').val(), id);
+		let selectValue = col.find('.module').val();
+		if (selectValue !== null) {
+			showQuickCreateForm(selectValue, id);
+		}
 	});
 }
 

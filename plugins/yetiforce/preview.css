@@ -70,8 +70,16 @@
 	display: none;
 }
 
+.d-none {
+	display: none;
+}
+
 .mr-5px {
 	margin-right: 5px;
+}
+
+.mr-3px {
+	margin-right: 3px;
 }
 
 .ml-5px {
@@ -87,46 +95,156 @@
 	flex-wrap: wrap;
 }
 
+.flex-nowrap {
+	display: flex;
+	flex-wrap: nowrap;
+}
+
 .rowRelatedRecord {
-	padding: 2px;
+	background: #bbdde8;
+	margin-left: 3px;
+	border: 1px #c1c1c1 solid;
 }
 
 .action-bar__head__container {
 	display: flex;
 	flex-wrap: nowrap;
+	width: fit-content;
+	margin-right: 5px;
 }
 
-.action-bar__data a {
+.action-bar__head a {
 	text-decoration: none;
 	color: #000;
-	font-size: 14px;
-	line-height: 14px
-}
-
-.action-bar__header {
-	font-size: 14px;
-	min-width: 90px;
 }
 
 .action-bar__head {
-	background-color: #4a5364;
-	height: 20px;
 	color: #fff;
-	padding: 2px;
+	padding: 0 2px 4px;
+	display: flex;
+	flex-wrap: wrap;
+}
+
+.action-bar__head > * {
+	margin-top: 4px;
 }
 
 .action-bar__col {
+	background-color: #4a5364;
 	width: 100%;
 }
 
-@media only screen and (min-width: 600px) {
-	#ytActionBarContent .action-bar__col {
-		width: 50%;
-	}
+.action-bar__select {
+	margin-left: 3px;
 }
 
-@media only screen and (min-width: 1200px) {
-	#ytActionBarContent .action-bar__col {
-		width: 25%;
-	}
+.action-bar__select:required:invalid {
+	color: gray;
+}
+
+.action-bar__select optgroup {
+	color: black;
+}
+
+button, select, .rowRelatedRecord {
+	border-radius: .25rem;
+	padding: 0.1rem 0.2rem;
+}
+
+button, select {
+	cursor: pointer;
+}
+
+.rowActions {
+	display: inline-flex;
+	align-items: center;
+}
+
+.rowActions button {
+	padding: 0.005rem 0.2rem;
+	margin-left: 5px;
+}
+
+button {
+	display: inline-block;
+	background-color: #f8f9fa;
+	border-color: #f8f9fa;
+	font-weight: 400;
+	text-align: center;
+	white-space: nowrap;
+	vertical-align: middle;
+	user-select: none;
+	border: 1px solid transparent;
+	padding: 0.2rem 0.3rem;
+	border-radius: 0.25rem;
+	transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+button:hover {
+	color: #212529;
+	background-color: #e2e6ea;
+	border-color: #dae0e5;
+}
+
+.c-ical {
+	margin: 2px;
+}
+
+.c-ical__event {
+	background: #fffdfd;
+	margin: 2px 0;
+	border: 1px solid #dedede;
+	margin: 3px auto;
+	border-radius: 6px;
+}
+
+.c-ical__wrapper {
+	margin: 3px;
+}
+
+.c-ical__card {
+	width: fit-content;
+	height: fit-content;
+	background: white;
+	border: 1px solid #d0d0d0;
+	border-radius: 6px;
+	color: #c51818;
+	padding: 0 2px 2px;
+	margin: 2px;
+	text-align: center;
+}
+
+.c-ical__card__day {
+	font-size: 15px;
+	margin: 0 auto;
+	width: fit-content;
+	color: black;
+}
+
+.c-ical__card__year {
+	font-size: 9px;
+	color: #888888
+}
+
+.c-ical__card__time {
+	font-size: 18px;
+	margin: auto 5px;
+}
+
+.c-ical__card__arrow {
+	margin: auto 5px;
+}
+
+.c-ical__subject {
+	margin: 0 auto;
+	text-align: center;
+	background: #4a5364;
+	color: white;
+	border-top-left-radius: 6px;
+	border-top-right-radius: 6px;
+	padding-bottom: 2px;
+}
+
+.mr-1 {
+	margin-right: 0.25rem;
 }

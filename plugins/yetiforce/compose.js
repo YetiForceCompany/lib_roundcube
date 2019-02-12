@@ -55,34 +55,68 @@ window.rcmail && rcmail.addEventListener('init', function (evt) {
 			additionalInformations: true
 		}, (modal, instance) => {
 			instance.setSelectEvent((responseData, e) => {
-				let emails = [];
-				if (typeof e.target !== 'undefined' && $(e.target).data('type') === 'email') {
-					emails.push($(e.target).text());
-				} else {
-					$.each(responseData, function (id, fields) {
-						$.each(fields, function (key, row) {
-							if (row.type === 'email') {
-								emails.push(row.value);
-								return false;
-							}
+				getEmailAddresses(responseData, e, module).done((emails) => {
+					if (emails.length) {
+						let value = $('#' + mailField).val();
+						if (value != '' && value.charAt(value.length - 1) != ',') {
+							value = value + ',';
+						}
+						$('#' + mailField).val(value + emails.join(','));
+					} else {
+						window.crm.Vtiger_Helper_Js.showPnotify({
+							text: window.crm.app.vtranslate('NoFindEmailInRecord'),
+							animation: 'show'
 						});
-					});
-				}
-				if (emails.length === 0) {
-					window.crm.Vtiger_Helper_Js.showPnotify({
-						text: window.crm.app.vtranslate('NoFindEmailInRecord'),
-						animation: 'show'
-					});
-				} else {
-					let value = $('#' + mailField).val();
-					if (value != '' && value.charAt(value.length - 1) != ',') {
-						value = value + ',';
 					}
-					$('#' + mailField).val(value + emails.join(','));
-				}
+				});
 			});
 		});
 	});
+
+	function getEmailAddresses(responseData, e, module) {
+		let aDeferred = $.Deferred(),
+			emails = [];
+		if (typeof e.target !== 'undefined' && ($(e.target).data('type') === 'email' || $(e.target).data('type') === 'multiEmail')) {
+			emails.push($(e.target).text());
+			aDeferred.resolve(emails);
+		} else {
+			let i = 0;
+			for (let id in responseData) {
+				window.crm.app.getRecordDetails({
+					record: id,
+					module: module,
+					fieldType: ['email', 'multiEmail']
+				}).done((data) => {
+					i++;
+					emails.push(getFirstEmailAddress(data.result.data));
+					if (i === Object.keys(responseData).length) { //last iteration
+						aDeferred.resolve(emails);
+					}
+				});
+			}
+		}
+		return aDeferred.promise();
+	}
+
+	function getFirstEmailAddress(mailObj) {
+		let emails = [];
+		for (let key in mailObj) {
+			if (mailObj[key]) {
+				if (window.crm.app.isJsonString(mailObj[key])) {
+					let multiEmail = JSON.parse(mailObj[key]);
+					for (let i in multiEmail) {
+						emails.push(multiEmail[i].e);
+					}
+					break;
+				} else {
+					emails.push(mailObj[key]);
+					break;
+				}
+			}
+		}
+		return emails;
+	}
+
 	//Loading list of modules with templates mail
 	if (rcmail.env.isPermittedMailTemplates) {
 		jQuery.ajax({
@@ -96,7 +130,10 @@ window.rcmail && rcmail.addEventListener('init', function (evt) {
 				$.each(data, function (index, value) {
 					jQuery('#vtmodulemenulink').removeClass('disabled');
 					jQuery('#tplmenulink').removeClass('disabled');
-					tmp.push({name: value.moduleName, label: value.moduleName});
+					tmp.push({
+						name: value.moduleName,
+						label: value.moduleName
+					});
 					jQuery('#tplmenu #texttplsmenu').append('<li class="' + value.moduleName + '"><a href="#" data-module="' + value.module + '" data-tplid="' + value.id + '" class="active">' + value.name + '</a></li>');
 				});
 
