@@ -225,7 +225,8 @@ function showQuickCreateForm(moduleName, record, params) {
 		link: 'modulesLevel0',
 		process: 'modulesLevel1',
 		subprocess: 'modulesLevel2',
-		linkextend: 'modulesLevel3'
+		subprocess_sl: 'modulesLevel3',
+		linkextend: 'modulesLevel4'
 	};
 	for (var i in ids) {
 		var element = content.find('#' + ids[i]);
