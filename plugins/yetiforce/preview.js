@@ -39,6 +39,7 @@ function loadActionBar() {
 
 function registerEvents(content) {
 	registerAddRecord(content);
+	registerAddAttachments(content);
 	registerAddReletedRecord(content);
 	registerSelectRecord(content);
 	registerRemoveRecord(content);
@@ -123,8 +124,50 @@ function registerAddReletedRecord(content) {
 		var params = {sourceModule: row.data('module')};
 		showQuickCreateForm(targetElement.data('module'), row.data('id'), params);
 	});
-}
 
+}
+function registerAddAttachments(content) {
+	const id = content.find('#mailActionBarID').val();
+	content.find('button.addAttachments').click(function (e) {
+		let row = $(e.currentTarget).closest('.rowRelatedRecord');
+		let relatedModule = row.data('module');
+		let relatedRecordId = row.data('id');
+		window.crm.app.showRecordsList({
+				module: 'Documents',
+				related_parent_module: 'OSSMailView',
+				related_parent_id: id,
+				multi_select: true,
+				record_selected: true,
+			}, (modal, instance) => {
+			instance.setSelectEvent((responseData, e) => {
+				window.crm.AppConnector.request({
+					async: false,
+					dataType: 'json',
+					data: {
+						module: relatedModule,
+						action: 'RelationAjax',
+						mode: 'addRelation',
+						related_module: 'Documents',
+						src_record: relatedRecordId,
+						related_record_list: JSON.stringify(Object.keys(responseData))
+					}
+				}).done(function (data) {
+					let notifyParams = {
+						text: window.crm.app.vtranslate('JS_DOCUMENTS_ADDED'),
+						type: 'success',
+						animation: 'show'
+					};
+					if (!data['success']) {
+						notifyParams.type = 'error';
+						notifyParams.text = window.crm.app.vtranslate('JS_ERROR');
+					}
+					window.crm.Vtiger_Helper_Js.showPnotify(notifyParams);
+					loadActionBar();
+				});
+			});
+		});
+	});
+}
 function registerAddRecord(content) {
 	var id = content.find('#mailActionBarID').val();
 	content.find('button.addRecord').click(function (e) {
@@ -225,7 +268,8 @@ function showQuickCreateForm(moduleName, record, params) {
 		link: 'modulesLevel0',
 		process: 'modulesLevel1',
 		subprocess: 'modulesLevel2',
-		linkextend: 'modulesLevel3'
+		subprocess_sl: 'modulesLevel3',
+		linkextend: 'modulesLevel4'
 	};
 	for (var i in ids) {
 		var element = content.find('#' + ids[i]);
