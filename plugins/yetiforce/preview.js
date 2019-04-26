@@ -256,7 +256,9 @@ function showQuickCreateForm(moduleName, record, params = {}) {
 	}
 	relatedParams['email'] = rcmail.env.fromMail;
 	relatedParams['email1'] = rcmail.env.fromMail;
-	relatedParams['description'] = $('#messagebody').html();
+	let messageBody = $('#messagebody').clone()
+	messageBody.find('.image-attachment').remove()
+	relatedParams['description'] = messageBody.text()
 	//relatedParams['related_to'] = record;
 	var postQuickCreate = function (data) {
 		loadActionBar();
