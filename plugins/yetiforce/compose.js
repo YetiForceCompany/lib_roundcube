@@ -1,3 +1,4 @@
+'use strict';
 /* {[The file is published on the basis of MIT License]} */
 
 window.rcmail && rcmail.addEventListener('init', function (evt) {
@@ -182,14 +183,15 @@ window.rcmail && rcmail.addEventListener('init', function (evt) {
 			},
 			success: function (data) {
 				data = JSON.parse(data);
-				var oldSubject = jQuery('[name="_subject"]').val();
-				var html = jQuery("<div/>").html(data.content).html();
+				let oldSubject = jQuery('[name="_subject"]').val(),
+				html = jQuery("<div/>").html(data.content).html(),
+				ed = '';
 				jQuery('[name="_subject"]').val(oldSubject + ' ' + data.subject);
 				if (window.tinyMCE && (ed = tinyMCE.get(rcmail.env.composebody))) {
-					var oldBody = tinyMCE.activeEditor.getContent();
+					let oldBody = tinyMCE.activeEditor.getContent();
 					tinymce.activeEditor.setContent(html + oldBody);
 				} else {
-					var oldBody = jQuery('#composebody').val();
+					let oldBody = jQuery('#composebody').val();
 					jQuery('#composebody').val(html + oldBody);
 				}
 				if (typeof data.attachments !== 'undefined' && data.attachments !== null) {
