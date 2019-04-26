@@ -131,7 +131,12 @@ function registerAddRecord(content) {
 		var col = $(e.currentTarget).closest('.js-head-container');
 		let selectValue = col.find('.module').val();
 		if (selectValue !== null) {
-			showQuickCreateForm(selectValue, id);
+			let relatedRecords = []
+			content.find('.js-data').find('.rowRelatedRecord').each((i, record) => {
+				let data = $(record).data()
+				relatedRecords.push({module: data.module, id: data.id})
+			})
+			showQuickCreateForm(selectValue, id, {relatedRecords: relatedRecords});
 		}
 	});
 }
@@ -204,16 +209,12 @@ function showPopup(params, actionsParams) {
 	});
 }
 
-function showQuickCreateForm(moduleName, record, params) {
+function showQuickCreateForm(moduleName, record, params = {}) {
 	var content = $('#ytActionBarContent');
-	if (params == undefined) {
-		var params = {};
-	}
 	var relatedParams = {};
+	var sourceModule = 'OSSMailView';
 	if (params['sourceModule']) {
-		var sourceModule = params['sourceModule'];
-	} else {
-		var sourceModule = 'OSSMailView';
+		sourceModule = params['sourceModule'];
 	}
 	var postShown = function (data) {
 		var index, queryParam, queryParamComponents;
@@ -255,10 +256,13 @@ function showQuickCreateForm(moduleName, record, params) {
 	}
 	relatedParams['email'] = rcmail.env.fromMail;
 	relatedParams['email1'] = rcmail.env.fromMail;
-	relatedParams['description'] = $('#messagebody').text();
+	relatedParams['description'] = $('#messagebody').html();
 	//relatedParams['related_to'] = record;
 	var postQuickCreate = function (data) {
 		loadActionBar();
+	}
+	if (params.relatedRecords !== undefined) {
+		relatedParams['relatedRecords'] = params.relatedRecords;
 	}
 	relatedParams['sourceModule'] = sourceModule;
 	relatedParams['sourceRecord'] = record;
