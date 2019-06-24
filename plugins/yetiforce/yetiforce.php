@@ -435,7 +435,7 @@ class yetiforce extends rcube_plugin
 		}
 		$this->rc = rcmail::get_instance();
 		$index = 0;
-
+		$htmlAttachments = '';
 		$attachments = $this->getAttachment($ids, false);
 		foreach ($attachments as $attachment) {
 			++$index;
@@ -473,7 +473,7 @@ class yetiforce extends rcube_plugin
 			], $button);
 			$content = 'left' == $COMPOSE['icon_pos'] ? $delete_link . $content_link : $content_link . $delete_link;
 
-			$htmlAttachments = 'window.rcmail.add2attachment_list("rcmfile' . $id . '",{html:"' . rcube::JQ($content) . '",name:"' . $attachment['name'] . '",mimetype:"' . $attachment['mimetype'] . '",classname:"' . rcube_utils::file2class($attachment['mimetype'], $attachment['name']) . '",complete:true},"' . $uploadid . '");' . PHP_EOL;
+			$htmlAttachments .= 'window.rcmail.add2attachment_list("rcmfile' . $id . '",{html:"' . rcube::JQ($content) . '",name:"' . $attachment['name'] . '",mimetype:"' . $attachment['mimetype'] . '",classname:"' . rcube_utils::file2class($attachment['mimetype'], $attachment['name']) . '",complete:true},"' . $uploadid . '");' . PHP_EOL;
 		}
 		echo '<!DOCTYPE html>
 <html lang="en">
