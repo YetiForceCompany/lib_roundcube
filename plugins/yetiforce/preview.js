@@ -131,7 +131,12 @@ function registerAddRecord(content) {
 		var col = $(e.currentTarget).closest('.js-head-container');
 		let selectValue = col.find('.module').val();
 		if (selectValue !== null) {
-			showQuickCreateForm(selectValue, id);
+			let relatedRecords = []
+			content.find('.js-data').find('.rowRelatedRecord').each((i, record) => {
+				let data = $(record).data()
+				relatedRecords.push({module: data.module, id: data.id})
+			})
+			showQuickCreateForm(selectValue, id, {relatedRecords: relatedRecords});
 		}
 	});
 }
@@ -253,13 +258,20 @@ function showQuickCreateForm(moduleName, record, params = {}) {
 	}
 	relatedParams['email'] = rcmail.env.fromMail;
 	relatedParams['email1'] = rcmail.env.fromMail;
-	relatedParams['description'] = $('#messagebody').text();
+	let messageBody = $('#messagebody').clone()
+	messageBody.find('.image-attachment').remove()
+	relatedParams['description'] = messageBody.text()
 	//relatedParams['related_to'] = record;
+	if (params.relatedRecords !== undefined) {
+		relatedParams['relatedRecords'] = params.relatedRecords;
+	}
 	relatedParams['sourceModule'] = sourceModule;
 	relatedParams['sourceRecord'] = record;
 	relatedParams['relationOperation'] = true;
 	const quickCreateParams = {
-		callbackFunction: postQuickCreate,
+		callbackFunction: (data) => {
+			loadActionBar();
+		},
 		callbackPostShown: postShown,
 		data: relatedParams,
 		noCache: true
