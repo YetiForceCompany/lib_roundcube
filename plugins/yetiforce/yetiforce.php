@@ -31,7 +31,7 @@ class yetiforce extends rcube_plugin
 		if ('mail' == $this->rc->task) {
 			$this->register_action('plugin.yetiforce.addFilesToMail', [$this, 'addFilesToMail']);
 			$this->register_action('plugin.yetiforce.getEmailTemplates', [$this, 'getEmailTemplates']);
-			$this->register_action('plugin.yetiforce.getConntentEmailTemplate', [$this, 'getConntentEmailTemplate']);
+			$this->register_action('plugin.yetiforce.getContentEmailTemplate', [$this, 'getContentEmailTemplate']);
 			$this->register_action('plugin.yetiforce.importIcs', [$this, 'importIcs']);
 			$this->rc->output->set_env('site_URL', $this->rc->config->get('site_URL'));
 			$this->include_stylesheet('../../../../../layouts/resources/icons/userIcons.css');
@@ -146,7 +146,7 @@ class yetiforce extends rcube_plugin
 			require_once 'include/main/WebUI.php';
 			$pass = \App\Encryption::getInstance()->encrypt($pass);
 			chdir($currentPath);
-			call_user_func_array([$this->rc->db, 'query'], array_merge([$sql], [$pass, $this->rc->get_user_id()]));
+			\call_user_func_array([$this->rc->db, 'query'], array_merge([$sql], [$pass, $this->rc->get_user_id()]));
 			$this->rc->db->affected_rows();
 		}
 		if ($_GET['_autologin'] && !empty($_REQUEST['_composeKey'])) {
@@ -183,7 +183,7 @@ class yetiforce extends rcube_plugin
 		$from = $args['object']->headers->from;
 		$from = explode('<', rtrim($from, '>'), 2);
 		$fromName = '';
-		if (count($from) > 1) {
+		if (\count($from) > 1) {
 			$fromName = $from[0];
 			$fromMail = $from[1];
 		} else {
@@ -377,7 +377,7 @@ class yetiforce extends rcube_plugin
 			$signatures[$identityId]['text'] = $signature['text'] . PHP_EOL . $gS['text'];
 			$signatures[$identityId]['html'] = $signature['html'] . '<div class="pre global">' . $gS['html'] . '</div>';
 		}
-		if (count($MESSAGE->identities)) {
+		if (\count($MESSAGE->identities)) {
 			foreach ($MESSAGE->identities as &$identity) {
 				$identityId = $identity['identity_id'];
 				if (!isset($signatures[$identityId])) {
@@ -498,7 +498,7 @@ if (window && window.rcmail) {
 		if (empty($ids) && empty($files)) {
 			return $attachments;
 		}
-		if (is_array($ids)) {
+		if (\is_array($ids)) {
 			$ids = implode(',', $ids);
 		}
 		$this->rc = rcmail::get_instance();
@@ -525,7 +525,7 @@ if (window && window.rcmail) {
 			}
 		}
 		if ($files) {
-			if (!is_array($files)) {
+			if (!\is_array($files)) {
 				$files = [$files];
 			}
 			foreach ($files as $file) {
@@ -567,7 +567,7 @@ if (window && window.rcmail) {
 				$newline = '';
 
 				foreach (explode("\n", rcube_mime::wordwrap($line, $length - 2)) as $l) {
-					if (strlen($l)) {
+					if (\strlen($l)) {
 						$newline .= '> ' . $l . "\n";
 					} else {
 						$newline .= ">\n";
@@ -655,7 +655,11 @@ if (window && window.rcmail) {
 		$currentPath = getcwd();
 		chdir($this->rc->config->get('root_directory'));
 		$this->loadCurrentUser();
-		$emailTemplates = App\Mail::getTempleteList(false, 'PLL_MAIL');
+		$emailTemplates = App\Mail::getTemplateList('', 'PLL_MAIL');
+		foreach ($emailTemplates as &$template) {
+			$moduleLabel = $template['module_name'];
+			$template['moduleTranslate'] = $moduleLabel ? \App\Language::translate($moduleLabel, $moduleLabel) : '';
+		}
 		echo App\Json::encode($emailTemplates);
 		chdir($currentPath);
 		exit;
@@ -664,24 +668,27 @@ if (window && window.rcmail) {
 	/**
 	 * Function to get info about email template.
 	 */
-	public function getConntentEmailTemplate()
+	public function getContentEmailTemplate()
 	{
-		$templeteId = rcube_utils::get_input_value('id', rcube_utils::INPUT_GPC);
+		$templateId = rcube_utils::get_input_value('id', rcube_utils::INPUT_GPC);
 		$recordId = rcube_utils::get_input_value('record_id', rcube_utils::INPUT_GPC);
 		$moduleName = rcube_utils::get_input_value('select_module', rcube_utils::INPUT_GPC);
 		$currentPath = getcwd();
 		chdir($this->rc->config->get('root_directory'));
 		$this->loadCurrentUser();
-		$mail = App\Mail::getTemplete($templeteId);
-		if ($recordId) {
-			$textParser = \App\TextParser::getInstanceById($recordId, $moduleName);
-			$mail['subject'] = $textParser->setContent($mail['subject'])->parse()->getContent();
-			$mail['content'] = $textParser->setContent($mail['content'])->parse()->getContent();
+		$mail = [];
+		if (\App\Privilege::isPermitted('EmailTemplates', 'DetailView', $templateId)) {
+			$mail = \App\Mail::getTemplate($templateId);
+			if ($recordId) {
+				$textParser = \App\TextParser::getInstanceById($recordId, $moduleName);
+				$mail['subject'] = $textParser->setContent($mail['subject'])->parse()->getContent();
+				$mail['content'] = $textParser->setContent($mail['content'])->parse()->getContent();
+			}
 		}
 		echo App\Json::encode([
-			'subject' => $mail['subject'],
-			'content' => $mail['content'],
-			'attachments' => $mail['attachments'],
+			'subject' => $mail['subject'] ?? null,
+			'content' => $mail['content'] ?? null,
+			'attachments' => $mail['attachments'] ?? null
 		]);
 		chdir($currentPath);
 		exit;
