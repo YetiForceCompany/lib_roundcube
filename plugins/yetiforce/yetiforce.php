@@ -846,6 +846,7 @@ if (window && window.rcmail) {
 					$recordModel->set('assigned_user_id', $this->currentUser->getId());
 					$recordModel->save();
 					if ($recordModel->getId()) {
+						$calendar->recordSaveAttendee($recordModel);
 						++$status;
 					}
 				}
