@@ -1,20 +1,20 @@
 .pull-right {
-	float: right !important
+	float: right !important;
 }
 
 #ytActionBarContent select {
-	padding: 0
+	padding: 0;
 }
 
 #ytActionBarContent .row:before {
 	display: table;
-	content: " "
+	content: ' ';
 }
 
 #ytActionBarContent .row:after {
 	clear: both;
 	display: table;
-	content: " "
+	content: ' ';
 }
 
 #ytActionBarContent .ytHeader {
@@ -23,43 +23,43 @@
 }
 
 #ytActionBarContent .rowReletedRecord .rowActions {
-	display: none
+	display: none;
 }
 
 #ytActionBarContent .rowReletedRecord:hover .rowActions {
-	display: block
+	display: block;
 }
 
 #ytActionBarContent .noRecords {
 	background: #70a8cb;
 	text-align: center;
 	color: #fff;
-	padding: 2px 0
+	padding: 2px 0;
 }
 
 #ytActionBarContent .noRecords a.importMail {
 	color: #ecf6ff;
 	cursor: pointer;
-	font-weight: 800
+	font-weight: 800;
 }
 
 #ytActionBarContent .rowReletedRecord {
-	margin: 3px 0 6px 0
+	margin: 3px 0 6px 0;
 }
 
 #ytActionBarContent .rowReletedRecord {
-	margin: 3px 0 6px 0
+	margin: 3px 0 6px 0;
 }
 
 #ytActionBarContent .pull-right button {
 	line-height: 10px;
 	margin-left: 3px;
 	padding: 0 6px;
-	height: 14px
+	height: 14px;
 }
 
 #ytActionBarContent .relatedModuleIcon {
-	margin-right: 5px
+	margin-right: 5px;
 }
 
 #messageheader.previewheader {
@@ -146,12 +146,15 @@
 	color: black;
 }
 
-button, select, .rowRelatedRecord {
-	border-radius: .25rem;
+button,
+select,
+.rowRelatedRecord {
+	border-radius: 0.25rem;
 	padding: 0.1rem 0.2rem;
 }
 
-button, select {
+button,
+select {
 	cursor: pointer;
 }
 
@@ -177,7 +180,8 @@ button {
 	border: 1px solid transparent;
 	padding: 0.2rem 0.3rem;
 	border-radius: 0.25rem;
-	transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+	transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out,
+		box-shadow 0.15s ease-in-out;
 }
 
 button:hover {
@@ -223,7 +227,7 @@ button:hover {
 
 .c-ical__card__year {
 	font-size: 9px;
-	color: #888888
+	color: #888888;
 }
 
 .c-ical__card__time {
@@ -247,4 +251,9 @@ button:hover {
 
 .mr-1 {
 	margin-right: 0.25rem;
+}
+
+.action-bar__head__message {
+	text-align: center !important;
+	display: block;
 }
