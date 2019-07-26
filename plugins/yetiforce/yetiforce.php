@@ -33,7 +33,7 @@ class yetiforce extends rcube_plugin
 			$this->register_action('plugin.yetiforce.getConntentEmailTemplate', [$this, 'getConntentEmailTemplate']);
 			$this->register_action('plugin.yetiforce.importIcs', [$this, 'importIcs']);
 			$this->rc->output->set_env('site_URL', $this->rc->config->get('site_URL'));
-			$this->include_stylesheet('../../../../../layouts/resources/icons/userIcons.css');
+			$this->include_stylesheet('../../../../../layouts/resources/icons/userIcon.css');
 			$this->add_texts('localization/', false);
 
 			$currentPath = getcwd();
