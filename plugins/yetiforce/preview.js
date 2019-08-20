@@ -132,7 +132,7 @@ function registerAddReletedRecord(content) {
 
 function registerAddRecord(content) {
 	var id = content.find('#mailActionBarID').val();
-	var getCacheModule = window.crm.app.moduleCacheGet('selectedModuleName');
+	let getCacheModule = window.crm.app.moduleCacheGet('selectedModuleName');
 	if (getCacheModule) {
 		content.find('#addRelationSelect').val(getCacheModule);
 	}
