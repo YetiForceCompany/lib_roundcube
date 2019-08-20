@@ -93,6 +93,11 @@ function registerRemoveRecord(content) {
 function registerSelectRecord(content) {
 	let id = content.find('#mailActionBarID').val();
 	content.find('button.selectRecord').click(function (e) {
+		let relationSelect = content.find('#addRelationSelect').val();
+		let getCacheModule = window.crm.app.moduleCacheGet('selectedModuleName');
+		if (getCacheModule === 'undefined' || relationSelect !== getCacheModule) {
+			window.crm.app.moduleCacheSet('selectedModuleName', relationSelect);
+		}
 		let relParams = {
 			mailId: id
 		};
@@ -127,7 +132,15 @@ function registerAddReletedRecord(content) {
 
 function registerAddRecord(content) {
 	var id = content.find('#mailActionBarID').val();
-	content.find('button.addRecord').click(function (e) {
+	let getCacheModule = window.crm.app.moduleCacheGet('selectedModuleName');
+	if (getCacheModule) {
+		content.find('#addRelationSelect').val(getCacheModule);
+	}
+	content.find('button.addRecord').click(function(e) {
+		var relationSelect = content.find('#addRelationSelect').val();
+		if (getCacheModule === 'undefined' || relationSelect !== getCacheModule) {
+			window.crm.app.moduleCacheSet('selectedModuleName', relationSelect);
+		}
 		var col = $(e.currentTarget).closest('.js-head-container');
 		let selectValue = col.find('.module').val();
 		if (selectValue !== null) {
