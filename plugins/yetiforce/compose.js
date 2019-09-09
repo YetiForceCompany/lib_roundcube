@@ -1,3 +1,4 @@
+'use strict';
 /* {[The file is published on the basis of MIT License]} */
 
 window.rcmail && rcmail.addEventListener('init', function (evt) {
@@ -124,23 +125,18 @@ window.rcmail && rcmail.addEventListener('init', function (evt) {
 			url: "?_task=mail&_action=plugin.yetiforce.getEmailTemplates&_id=" + rcmail.env.compose_id,
 			async: false,
 			success: function (data) {
-				var modules = [];
-				var tmp = [];
+				let tmp = {};
 				data = JSON.parse(data);
 				$.each(data, function (index, value) {
 					jQuery('#vtmodulemenulink').removeClass('disabled');
 					jQuery('#tplmenulink').removeClass('disabled');
-					tmp.push({
-						name: value.moduleName,
-						label: value.moduleName
-					});
-					jQuery('#tplmenu #texttplsmenu').append('<li class="' + value.moduleName + '"><a href="#" data-module="' + value.module + '" data-tplid="' + value.id + '" class="active">' + value.name + '</a></li>');
+					tmp[value.module_name] = value.moduleTranslate;
+					jQuery('#tplmenu #texttplsmenu').append('<li class="' + value.module_name + '"><a href="#" data-module="' + value.module_name + '" data-tplid="' + value.id + '" class="active">' + value.name + '</a></li>');
 				});
 
-				$.each(tmp, function (index, value) {
-					if (jQuery.inArray(value.name, modules) == -1) {
-						jQuery('#vtmodulemenu .toolbarmenu').append('<li class="' + value.name + '"><a href="#" data-module="' + value.name + '" class="active">' + value.label + '</a></li>');
-						modules.push(value.name);
+				$.each(tmp, function (moduleName, moduleTranslate) {
+					if (moduleName) {
+						jQuery('#vtmodulemenu .toolbarmenu').append('<li class="' + moduleName + '"><a href="#" data-module="' + moduleName + '" class="active">' + moduleTranslate + '</a></li>');
 					}
 				});
 
@@ -174,7 +170,7 @@ window.rcmail && rcmail.addEventListener('init', function (evt) {
 		}
 		jQuery.ajax({
 			type: 'Get',
-			url: "?_task=mail&_action=plugin.yetiforce.getConntentEmailTemplate&_id=" + rcmail.env.compose_id,
+			url: "?_task=mail&_action=plugin.yetiforce.getContentEmailTemplate&_id=" + rcmail.env.compose_id,
 			data: {
 				id: id,
 				record_id: recordId,
@@ -182,14 +178,15 @@ window.rcmail && rcmail.addEventListener('init', function (evt) {
 			},
 			success: function (data) {
 				data = JSON.parse(data);
-				var oldSubject = jQuery('[name="_subject"]').val();
-				var html = jQuery("<div/>").html(data.content).html();
+				let oldSubject = jQuery('[name="_subject"]').val(),
+				html = jQuery("<div/>").html(data.content).html(),
+				ed = '';
 				jQuery('[name="_subject"]').val(oldSubject + ' ' + data.subject);
 				if (window.tinyMCE && (ed = tinyMCE.get(rcmail.env.composebody))) {
-					var oldBody = tinyMCE.activeEditor.getContent();
+					let oldBody = tinyMCE.activeEditor.getContent();
 					tinymce.activeEditor.setContent(html + oldBody);
 				} else {
-					var oldBody = jQuery('#composebody').val();
+					let oldBody = jQuery('#composebody').val();
 					jQuery('#composebody').val(html + oldBody);
 				}
 				if (typeof data.attachments !== 'undefined' && data.attachments !== null) {

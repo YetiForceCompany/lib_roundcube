@@ -94,6 +94,11 @@ function registerRemoveRecord(content) {
 function registerSelectRecord(content) {
 	let id = content.find('#mailActionBarID').val();
 	content.find('button.selectRecord').click(function (e) {
+		let relationSelect = content.find('#addRelationSelect').val();
+		let getCacheModule = window.crm.app.moduleCacheGet('selectedModuleName');
+		if (getCacheModule === 'undefined' || relationSelect !== getCacheModule) {
+			window.crm.app.moduleCacheSet('selectedModuleName', relationSelect);
+		}
 		let relParams = {
 			mailId: id
 		};
@@ -170,18 +175,31 @@ function registerAddAttachments(content) {
 }
 function registerAddRecord(content) {
 	var id = content.find('#mailActionBarID').val();
-	content.find('button.addRecord').click(function (e) {
+	let getCacheModule = window.crm.app.moduleCacheGet('selectedModuleName');
+	if (getCacheModule) {
+		content.find('#addRelationSelect').val(getCacheModule);
+	}
+	content.find('button.addRecord').click(function(e) {
+		var relationSelect = content.find('#addRelationSelect').val();
+		if (getCacheModule === 'undefined' || relationSelect !== getCacheModule) {
+			window.crm.app.moduleCacheSet('selectedModuleName', relationSelect);
+		}
 		var col = $(e.currentTarget).closest('.js-head-container');
 		let selectValue = col.find('.module').val();
 		if (selectValue !== null) {
-			showQuickCreateForm(selectValue, id);
+			let relatedRecords = []
+			content.find('.js-data').find('.rowRelatedRecord').each((i, record) => {
+				let data = $(record).data()
+				relatedRecords.push({module: data.module, id: data.id})
+			})
+			showQuickCreateForm(selectValue, id, {relatedRecords: relatedRecords});
 		}
 	});
 }
 
 function removeRecord(crmid) {
-	var id = $('#mailActionBarID').val();
-	var params = {}
+	const id = $('#mailActionBarID').val();
+	let params = {}
 	params.data = {
 		module: 'OSSMail',
 		action: 'ExecuteActions',
@@ -194,16 +212,15 @@ function removeRecord(crmid) {
 	params.async = false;
 	params.dataType = 'json';
 	window.crm.AppConnector.request(params).done(function (data) {
-		var response = data['result'];
+		const response = data['result'];
+		let notifyParams = {
+			text: response['data'],
+			animation: 'show'
+		};
 		if (response['success']) {
-			var notifyParams = {
+			notifyParams = {
 				text: response['data'],
 				type: 'info',
-				animation: 'show'
-			};
-		} else {
-			var notifyParams = {
-				text: response['data'],
 				animation: 'show'
 			};
 		}
@@ -247,24 +264,23 @@ function showPopup(params, actionsParams) {
 	});
 }
 
-function showQuickCreateForm(moduleName, record, params) {
-	var content = $('#ytActionBarContent');
-	if (params == undefined) {
-		var params = {};
-	}
-	var relatedParams = {};
+function showQuickCreateForm(moduleName, record, params = {}) {
+	const content = $('#ytActionBarContent');
+	let relatedParams = {},
+		sourceModule = 'OSSMailView';
 	if (params['sourceModule']) {
-		var sourceModule = params['sourceModule'];
-	} else {
-		var sourceModule = 'OSSMailView';
+		sourceModule = params['sourceModule'];
 	}
-	var postShown = function (data) {
+	const postShown = function (data) {
 		var index, queryParam, queryParamComponents;
 		$('<input type="hidden" name="sourceModule" value="' + sourceModule + '" />').appendTo(data);
 		$('<input type="hidden" name="sourceRecord" value="' + record + '" />').appendTo(data);
 		$('<input type="hidden" name="relationOperation" value="true" />').appendTo(data);
 	}
-	var ids = {
+	const postQuickCreate = function (data) {
+		loadActionBar();
+	}
+	const ids = {
 		link: 'modulesLevel0',
 		process: 'modulesLevel1',
 		subprocess: 'modulesLevel2',
@@ -298,21 +314,25 @@ function showQuickCreateForm(moduleName, record, params) {
 	}
 	relatedParams['email'] = rcmail.env.fromMail;
 	relatedParams['email1'] = rcmail.env.fromMail;
-	relatedParams['description'] = $('#messagebody').text();
+	let messageBody = $('#messagebody').clone()
+	messageBody.find('.image-attachment').remove()
+	relatedParams['description'] = messageBody.text()
 	//relatedParams['related_to'] = record;
-	var postQuickCreate = function (data) {
-		loadActionBar();
+	if (params.relatedRecords !== undefined) {
+		relatedParams['relatedRecords'] = params.relatedRecords;
 	}
 	relatedParams['sourceModule'] = sourceModule;
 	relatedParams['sourceRecord'] = record;
 	relatedParams['relationOperation'] = true;
-	var quickCreateParams = {
-		callbackFunction: postQuickCreate,
+	const quickCreateParams = {
+		callbackFunction: (data) => {
+			loadActionBar();
+		},
 		callbackPostShown: postShown,
 		data: relatedParams,
 		noCache: true
 	};
-	var headerInstance = new window.crm.Vtiger_Header_Js();
+	const headerInstance = new window.crm.Vtiger_Header_Js();
 	headerInstance.quickCreateModule(moduleName, quickCreateParams);
 }
 

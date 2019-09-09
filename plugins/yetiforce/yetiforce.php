@@ -5,6 +5,7 @@
  *
  * @license MIT
  * @author  Mariusz Krzaczkowski <m.krzaczkowski@yetiforce.com>
+ * @author  Radosław Skrzypczak <r.skrzypczak@yetiforce.com>
  */
 class yetiforce extends rcube_plugin
 {
@@ -27,10 +28,10 @@ class yetiforce extends rcube_plugin
 		$this->add_hook('login_after', [$this, 'loginAfter']);
 		$this->add_hook('startup', [$this, 'startup']);
 		$this->add_hook('authenticate', [$this, 'authenticate']);
-		if ($this->rc->task == 'mail') {
+		if ('mail' == $this->rc->task) {
 			$this->register_action('plugin.yetiforce.addFilesToMail', [$this, 'addFilesToMail']);
 			$this->register_action('plugin.yetiforce.getEmailTemplates', [$this, 'getEmailTemplates']);
-			$this->register_action('plugin.yetiforce.getConntentEmailTemplate', [$this, 'getConntentEmailTemplate']);
+			$this->register_action('plugin.yetiforce.getContentEmailTemplate', [$this, 'getContentEmailTemplate']);
 			$this->register_action('plugin.yetiforce.importIcs', [$this, 'importIcs']);
 			$this->rc->output->set_env('site_URL', $this->rc->config->get('site_URL'));
 			$this->include_stylesheet('../../../../../layouts/resources/icons/userIcon.css');
@@ -40,7 +41,7 @@ class yetiforce extends rcube_plugin
 			chdir($this->rc->config->get('root_directory'));
 			$this->loadCurrentUser();
 
-			if ($this->rc->action === 'compose') {
+			if ('compose' === $this->rc->action) {
 				$composeAddressModules = [];
 				foreach (\App\Config::component('Mail', 'RC_COMPOSE_ADDRESS_MODULES') as $moduleName) {
 					if (\App\Privilege::isPermitted($moduleName)) {
@@ -68,7 +69,7 @@ class yetiforce extends rcube_plugin
 					$this->rc->output->set_env('crmView', $_SESSION['compose_data_' . $id]['param']['crmview']);
 				}
 			}
-			if ($this->rc->action === 'preview' || $this->rc->action === 'show') {
+			if ('preview' === $this->rc->action || 'show' === $this->rc->action) {
 				$this->include_script('preview.js');
 				$this->include_stylesheet('../../../../../libraries/@fortawesome/fontawesome-free/css/all.css');
 				$this->include_stylesheet('preview.css');
@@ -112,7 +113,7 @@ class yetiforce extends rcube_plugin
 		if ($row = $this->getAutoLogin()) {
 			$host = false;
 			foreach ($this->rc->config->get('default_host') as $key => $value) {
-				if (strpos($key, $row['mail_host']) !== false) {
+				if (false !== strpos($key, $row['mail_host'])) {
 					$host = $key;
 				}
 			}
@@ -145,7 +146,7 @@ class yetiforce extends rcube_plugin
 			require_once 'include/main/WebUI.php';
 			$pass = \App\Encryption::getInstance()->encrypt($pass);
 			chdir($currentPath);
-			call_user_func_array([$this->rc->db, 'query'], array_merge([$sql], [$pass, $this->rc->get_user_id()]));
+			\call_user_func_array([$this->rc->db, 'query'], array_merge([$sql], [$pass, $this->rc->get_user_id()]));
 			$this->rc->db->affected_rows();
 		}
 		if ($_GET['_autologin'] && !empty($_REQUEST['_composeKey'])) {
@@ -182,7 +183,7 @@ class yetiforce extends rcube_plugin
 		$from = $args['object']->headers->from;
 		$from = explode('<', rtrim($from, '>'), 2);
 		$fromName = '';
-		if (count($from) > 1) {
+		if (\count($from) > 1) {
 			$fromName = $from[0];
 			$fromMail = $from[1];
 		} else {
@@ -209,9 +210,9 @@ class yetiforce extends rcube_plugin
 			foreach ($params as $key => &$value) {
 				$args['param'][$key] = $value;
 			}
-			if ((isset($params['crmmodule']) && $params['crmmodule'] == 'Documents') || (isset($params['filePath']) && $params['filePath'])) {
+			if ((isset($params['crmmodule']) && 'Documents' == $params['crmmodule']) || (isset($params['filePath']) && $params['filePath'])) {
 				$userid = $this->rc->user->ID;
-				list($usec, $sec) = explode(' ', microtime());
+				[$usec, $sec] = explode(' ', microtime());
 				$dId = preg_replace('/[^0-9]/', '', $userid . $sec . $usec);
 				foreach (self::getAttachment($params['crmrecord'], $params['filePath']) as $index => $attachment) {
 					$attachment['group'] = $COMPOSE_ID;
@@ -258,7 +259,7 @@ class yetiforce extends rcube_plugin
 
 				$subjectNumber = \App\Fields\Email::findRecordNumber($subject, $params['crmmodule']);
 				$recordNumber = \App\Fields\Email::findRecordNumber("[{$params['recordNumber']}]", $params['crmmodule']);
-				if ($subject === false || ($subject !== false && $subjectNumber !== $recordNumber)) {
+				if (false === $subject || (false !== $subject && $subjectNumber !== $recordNumber)) {
 					$subject = "[{$params['recordNumber']}] $subject";
 				}
 				chdir($currentPath);
@@ -289,7 +290,7 @@ class yetiforce extends rcube_plugin
 		$replyto = $row['reply_to_email'];
 
 		$prefix = $suffix = '';
-		if ($type === 'forward') {
+		if ('forward' === $type) {
 			if (!$bodyIsHtml) {
 				$prefix = "\n\n\n-------- " . $this->rc->gettext('originalmessage') . " --------\n";
 				$prefix .= $this->rc->gettext('subject') . ': ' . $subject . "\n";
@@ -376,7 +377,7 @@ class yetiforce extends rcube_plugin
 			$signatures[$identityId]['text'] = $signature['text'] . PHP_EOL . $gS['text'];
 			$signatures[$identityId]['html'] = $signature['html'] . '<div class="pre global">' . $gS['html'] . '</div>';
 		}
-		if (count($MESSAGE->identities)) {
+		if (\count($MESSAGE->identities)) {
 			foreach ($MESSAGE->identities as &$identity) {
 				$identityId = $identity['identity_id'];
 				if (!isset($signatures[$identityId])) {
@@ -412,7 +413,7 @@ class yetiforce extends rcube_plugin
 		$db = $RCMAIL->get_dbh();
 		$sqlResult = $db->query("SELECT * FROM yetiforce_mail_config WHERE `type` = 'signature' AND `name` = 'addSignature';");
 		while ($sql_arr = $db->fetch_assoc($sqlResult)) {
-			return $sql_arr['value'] == 'false' ? true : false;
+			return 'false' == $sql_arr['value'] ? true : false;
 		}
 		return true;
 	}
@@ -434,13 +435,13 @@ class yetiforce extends rcube_plugin
 		}
 		$this->rc = rcmail::get_instance();
 		$index = 0;
-
+		$htmlAttachments = '';
 		$attachments = $this->getAttachment($ids, false);
 		foreach ($attachments as $attachment) {
-			$index++;
+			++$index;
 			$attachment['group'] = $COMPOSE_ID;
 			$userid = rcmail::get_instance()->user->ID;
-			list($usec, $sec) = explode(' ', microtime());
+			[$usec, $sec] = explode(' ', microtime());
 			$id = preg_replace('/[^0-9]/', '', $userid . $sec . $usec) . $index;
 			$attachment['id'] = $id;
 			$_SESSION['plugins']['filesystem_attachments'][$COMPOSE_ID][$id] = realpath($attachment['path']);
@@ -470,9 +471,9 @@ class yetiforce extends rcube_plugin
 				'class' => 'delete',
 				'aria-label' => $this->rc->gettext('delete') . ' ' . $attachment['name'],
 			], $button);
-			$content = $COMPOSE['icon_pos'] == 'left' ? $delete_link . $content_link : $content_link . $delete_link;
+			$content = 'left' == $COMPOSE['icon_pos'] ? $delete_link . $content_link : $content_link . $delete_link;
 
-			$htmlAttachments = 'window.rcmail.add2attachment_list("rcmfile' . $id . '",{html:"' . rcube::JQ($content) . '",name:"' . $attachment['name'] . '",mimetype:"' . $attachment['mimetype'] . '",classname:"' . rcube_utils::file2class($attachment['mimetype'], $attachment['name']) . '",complete:true},"' . $uploadid . '");' . PHP_EOL;
+			$htmlAttachments .= 'window.rcmail.add2attachment_list("rcmfile' . $id . '",{html:"' . rcube::JQ($content) . '",name:"' . $attachment['name'] . '",mimetype:"' . $attachment['mimetype'] . '",classname:"' . rcube_utils::file2class($attachment['mimetype'], $attachment['name']) . '",complete:true},"' . $uploadid . '");' . PHP_EOL;
 		}
 		echo '<!DOCTYPE html>
 <html lang="en">
@@ -497,7 +498,7 @@ if (window && window.rcmail) {
 		if (empty($ids) && empty($files)) {
 			return $attachments;
 		}
-		if (is_array($ids)) {
+		if (\is_array($ids)) {
 			$ids = implode(',', $ids);
 		}
 		$this->rc = rcmail::get_instance();
@@ -508,7 +509,7 @@ if (window && window.rcmail) {
 			$sql_result = $db->query("SELECT vtiger_attachments.* FROM vtiger_attachments INNER JOIN vtiger_seattachmentsrel ON vtiger_seattachmentsrel.attachmentsid=vtiger_attachments.attachmentsid WHERE vtiger_seattachmentsrel.crmid IN ($ids);");
 			while ($row = $db->fetch_assoc($sql_result)) {
 				$orgFile = $this->rc->config->get('root_directory') . $row['path'] . $row['attachmentsid'];
-				list($usec, $sec) = explode(' ', microtime());
+				[$usec, $sec] = explode(' ', microtime());
 				$filepath = $this->rc->config->get('temp_dir') . DIRECTORY_SEPARATOR . "{$sec}_{$userid}_{$row['attachmentsid']}_$index.tmp";
 				if (file_exists($orgFile)) {
 					copy($orgFile, $filepath);
@@ -520,24 +521,34 @@ if (window && window.rcmail) {
 					];
 					$attachments[] = $attachment;
 				}
-				$index++;
+				++$index;
 			}
 		}
 		if ($files) {
-			$orgFile = $this->rc->config->get('root_directory') . $files;
-			list($usec, $sec) = explode(' ', microtime());
-			$filepath = $this->rc->config->get('root_directory') . "cache/mail/{$sec}_{$userid}_{$index}.tmp";
-			if (file_exists($orgFile)) {
-				copy($orgFile, $filepath);
-				$attachment = [
-					'path' => $filepath,
-					'size' => filesize($filepath),
-					'name' => basename($orgFile),
-					'mimetype' => rcube_mime::file_content_type($filepath, basename($orgFile)),
-				];
-				$attachments[] = $attachment;
+			if (!\is_array($files)) {
+				$files = [$files];
 			}
-			$index++;
+			foreach ($files as $file) {
+				$orgFileName = $file['name'] ?? basename($file);
+				$orgFilePath = $file['path'] ?? $file;
+				$orgFile = $this->rc->config->get('root_directory') . $orgFilePath;
+				[$usec, $sec] = explode(' ', microtime());
+				$filepath = $this->rc->config->get('temp_dir') . DIRECTORY_SEPARATOR . "{$sec}_{$userid}_{$index}.tmp";
+				if (file_exists($orgFile)) {
+					copy($orgFile, $filepath);
+					$attachment = [
+						'path' => $filepath,
+						'size' => filesize($filepath),
+						'name' => $orgFileName,
+						'mimetype' => rcube_mime::file_content_type($filepath, $orgFileName),
+					];
+					if (0 === strpos($orgFilePath, 'cache')) {
+						unlink($orgFile);
+					}
+					$attachments[] = $attachment;
+				}
+				++$index;
+			}
 		}
 		return $attachments;
 	}
@@ -550,13 +561,13 @@ if (window && window.rcmail) {
 		$out = '';
 		foreach ($lines as $line) {
 			// don't wrap already quoted lines
-			if ($line[0] == '>') {
+			if ('>' == $line[0]) {
 				$line = '>' . rtrim($line);
 			} elseif (mb_strlen($line) > $max) {
 				$newline = '';
 
 				foreach (explode("\n", rcube_mime::wordwrap($line, $length - 2)) as $l) {
-					if (strlen($l)) {
+					if (\strlen($l)) {
 						$newline .= '> ' . $l . "\n";
 					} else {
 						$newline .= ">\n";
@@ -644,7 +655,11 @@ if (window && window.rcmail) {
 		$currentPath = getcwd();
 		chdir($this->rc->config->get('root_directory'));
 		$this->loadCurrentUser();
-		$emailTemplates = App\Mail::getTempleteList(false, 'PLL_MAIL');
+		$emailTemplates = App\Mail::getTemplateList('', 'PLL_MAIL');
+		foreach ($emailTemplates as &$template) {
+			$moduleLabel = $template['module_name'];
+			$template['moduleTranslate'] = $moduleLabel ? \App\Language::translate($moduleLabel, $moduleLabel) : '';
+		}
 		echo App\Json::encode($emailTemplates);
 		chdir($currentPath);
 		exit;
@@ -653,24 +668,27 @@ if (window && window.rcmail) {
 	/**
 	 * Function to get info about email template.
 	 */
-	public function getConntentEmailTemplate()
+	public function getContentEmailTemplate()
 	{
-		$templeteId = rcube_utils::get_input_value('id', rcube_utils::INPUT_GPC);
+		$templateId = rcube_utils::get_input_value('id', rcube_utils::INPUT_GPC);
 		$recordId = rcube_utils::get_input_value('record_id', rcube_utils::INPUT_GPC);
 		$moduleName = rcube_utils::get_input_value('select_module', rcube_utils::INPUT_GPC);
 		$currentPath = getcwd();
 		chdir($this->rc->config->get('root_directory'));
 		$this->loadCurrentUser();
-		$mail = App\Mail::getTemplete($templeteId);
-		if ($recordId) {
-			$textParser = \App\TextParser::getInstanceById($recordId, $moduleName);
-			$mail['subject'] = $textParser->setContent($mail['subject'])->parse()->getContent();
-			$mail['content'] = $textParser->setContent($mail['content'])->parse()->getContent();
+		$mail = [];
+		if (\App\Privilege::isPermitted('EmailTemplates', 'DetailView', $templateId)) {
+			$mail = \App\Mail::getTemplate($templateId);
+			if ($recordId) {
+				$textParser = \App\TextParser::getInstanceById($recordId, $moduleName);
+				$mail['subject'] = $textParser->setContent($mail['subject'])->parse()->getContent();
+				$mail['content'] = $textParser->setContent($mail['content'])->parse()->getContent();
+			}
 		}
 		echo App\Json::encode([
-			'subject' => $mail['subject'],
-			'content' => $mail['content'],
-			'attachments' => $mail['attachments'],
+			'subject' => $mail['subject'] ?? null,
+			'content' => $mail['content'] ?? null,
+			'attachments' => $mail['attachments'] ?? null
 		]);
 		chdir($currentPath);
 		exit;
@@ -685,12 +703,12 @@ if (window && window.rcmail) {
 	{
 		$this->message = $args['object'];
 		foreach ((array) $this->message->attachments as $attachment) {
-			if ($attachment->mimetype === 'application/ics' || $attachment->mimetype === 'text/calendar') {
+			if ('application/ics' === $attachment->mimetype || 'text/calendar' === $attachment->mimetype) {
 				$this->icsParts[] = ['part' => $attachment->mime_id, 'uid' => $this->message->uid, 'type' => 'attachments'];
 			}
 		}
 		foreach ((array) $this->message->parts as $part) {
-			if ($part->mimetype === 'application/ics' || $part->mimetype === 'text/calendar') {
+			if ('application/ics' === $part->mimetype || 'text/calendar' === $part->mimetype) {
 				$this->icsParts[] = ['part' => $part->mime_id, 'uid' => $this->message->uid, 'type' => 'parts'];
 			}
 		}
@@ -717,7 +735,7 @@ if (window && window.rcmail) {
 				if (!isset($ics[$key])) {
 					$ics[$key] = [$recordModel, $icsPart];
 					if (isset($counterBtn[$icsPart['part']])) {
-						$counterBtn[$icsPart['part']]++;
+						++$counterBtn[$icsPart['part']];
 					} else {
 						$counterBtn[$icsPart['part']] = 1;
 					}
@@ -799,7 +817,7 @@ if (window && window.rcmail) {
 				$showMore = true;
 			}
 			if (isset($counterList[$icsPart['part']])) {
-				$counterList[$icsPart['part']]++;
+				++$counterList[$icsPart['part']];
 			} else {
 				$counterList[$icsPart['part']] = 1;
 			}
@@ -828,7 +846,8 @@ if (window && window.rcmail) {
 					$recordModel->set('assigned_user_id', $this->currentUser->getId());
 					$recordModel->save();
 					if ($recordModel->getId()) {
-						$status++;
+						$calendar->recordSaveAttendee($recordModel);
+						++$status;
 					}
 				}
 				chdir($currentPath);
