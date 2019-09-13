@@ -62,7 +62,10 @@ function registerEvents(content) {
 }
 
 function registerImportMail(content) {
-	content.find('.importMail').click(function (e) {
+	let clicked = false;
+	content.find('.importMail').click(function(e) {
+		if (clicked) return false;
+		clicked = true;
 		window.crm.Vtiger_Helper_Js.showPnotify({
 			text: window.crm.app.vtranslate('StartedDownloadingEmail'),
 			type: 'info'
@@ -73,13 +76,17 @@ function registerImportMail(content) {
 			uid: rcmail.env.uid,
 			folder: rcmail.env.mailbox,
 			rcId: rcmail.env.user_id
-		}).done(function (data) {
-			loadActionBar();
-			window.crm.Vtiger_Helper_Js.showPnotify({
-				text: window.crm.app.vtranslate('AddFindEmailInRecord'),
-				type: 'success'
-			});
 		})
+			.done(function(data) {
+				loadActionBar();
+				window.crm.Vtiger_Helper_Js.showPnotify({
+					text: window.crm.app.vtranslate('AddFindEmailInRecord'),
+					type: 'success'
+				});
+			})
+			.fail(function() {
+				clicked = false;
+			});
 	});
 }
 
