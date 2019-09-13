@@ -43,7 +43,7 @@ function registerEvents(content) {
 	registerSelectRecord(content);
 	registerRemoveRecord(content);
 	registerImportMail(content);
-	window.crm.app.registerPopover(content.closest('#mainscreen'));
+	window.crm.app.registerPopover(content.closest('body'));
 	var block = content.find('.ytHeader .js-data');
 	content.find('.hideBtn').click(function () {
 		var button = $(this);
