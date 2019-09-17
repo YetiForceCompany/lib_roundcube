@@ -276,79 +276,88 @@ class yetiforce extends rcube_plugin
 		$this->rc = rcmail::get_instance();
 
 		$id = rcube_utils::get_input_value('_id', rcube_utils::INPUT_GPC);
+		$params = $_SESSION['compose_data_' . $id]['param'];
+		$recordNumber = '[' . \App\Fields\Email::findRecordNumber("[{$params['recordNumber']}]", $params['crmmodule']) . ']';
 		$row = $_SESSION['compose_data_' . $id]['param']['mailData'];
 		$type = $_SESSION['compose_data_' . $id]['param']['type'];
-		if (!$row) {
-			return;
-		}
-		$bodyIsHtml = $args['html'];
-		$date = $row['date'];
-		$from = $row['from_email'];
-		$to = $row['to_email'];
-		$body = $row['content'];
-		$subject = $row['subject'];
-		$replyto = $row['reply_to_email'];
+		if ($row) {
+			$bodyIsHtml = $args['html'];
+			$date = $row['date'];
+			$from = $row['from_email'];
+			$to = $row['to_email'];
+			$body = $row['content'];
+			$subject = $row['subject'];
+			$replyto = $row['reply_to_email'];
 
-		$prefix = $suffix = '';
-		if ('forward' === $type) {
-			if (!$bodyIsHtml) {
-				$prefix = "\n\n\n-------- " . $this->rc->gettext('originalmessage') . " --------\n";
-				$prefix .= $this->rc->gettext('subject') . ': ' . $subject . "\n";
-				$prefix .= $this->rc->gettext('date') . ': ' . $date . "\n";
-				$prefix .= $this->rc->gettext('from') . ': ' . $from . "\n";
-				$prefix .= $this->rc->gettext('to') . ': ' . $to . "\n";
-				if ($cc = $row['cc_email']) {
-					$prefix .= $this->rc->gettext('cc') . ': ' . $cc . "\n";
+			$prefix = $suffix = '';
+			if ('forward' === $type) {
+				if (!$bodyIsHtml) {
+					$prefix = "\n\n\n-------- " . $this->rc->gettext('originalmessage') . " --------\n";
+					$prefix .= $this->rc->gettext('subject') . ': ' . $subject . "\n";
+					$prefix .= $this->rc->gettext('date') . ': ' . $date . "\n";
+					$prefix .= $this->rc->gettext('from') . ': ' . $from . "\n";
+					$prefix .= $this->rc->gettext('to') . ': ' . $to . "\n";
+					if ($cc = $row['cc_email']) {
+						$prefix .= $this->rc->gettext('cc') . ': ' . $cc . "\n";
+					}
+					if ($replyto != $from) {
+						$prefix .= $this->rc->gettext('replyto') . ': ' . $replyto . "\n";
+					}
+					$prefix .= "\n";
+					global $LINE_LENGTH;
+					$txt = new rcube_html2text($body, false, true, $LINE_LENGTH);
+					$body = $txt->get_text();
+					$body = preg_replace('/\r?\n/', "\n", $body);
+					$body = trim($body, "\n");
+				} else {
+					$prefix = sprintf(
+						'<p>-------- ' . $this->rc->gettext('originalmessage') . ' --------</p>' .
+						'<table border="0" cellpadding="0" cellspacing="0"><tbody>' .
+						'<tr><th align="right" nowrap="nowrap" valign="baseline">%s: </th><td>%s</td></tr>' .
+						'<tr><th align="right" nowrap="nowrap" valign="baseline">%s: </th><td>%s</td></tr>' .
+						'<tr><th align="right" nowrap="nowrap" valign="baseline">%s: </th><td>%s</td></tr>' .
+						'<tr><th align="right" nowrap="nowrap" valign="baseline">%s: </th><td>%s</td></tr>', $this->rc->gettext('subject'), rcube::Q($subject), $this->rc->gettext('date'), rcube::Q($date), $this->rc->gettext('from'), rcube::Q($from, 'replace'), $this->rc->gettext('to'), rcube::Q($to, 'replace'));
+					if ($cc = $row['cc_email']) {
+						$prefix .= sprintf('<tr><th align="right" nowrap="nowrap" valign="baseline">%s: </th><td>%s</td></tr>', $this->rc->gettext('cc'), rcube::Q($cc, 'replace'));
+					}
+					if ($replyto != $from) {
+						$prefix .= sprintf('<tr><th align="right" nowrap="nowrap" valign="baseline">%s: </th><td>%s</td></tr>', $this->rc->gettext('replyto'), rcube::Q($replyto, 'replace'));
+					}
+					$prefix .= '</tbody></table><br>';
 				}
-				if ($replyto != $from) {
-					$prefix .= $this->rc->gettext('replyto') . ': ' . $replyto . "\n";
-				}
-				$prefix .= "\n";
-				global $LINE_LENGTH;
-				$txt = new rcube_html2text($body, false, true, $LINE_LENGTH);
-				$body = $txt->get_text();
-				$body = preg_replace('/\r?\n/', "\n", $body);
-				$body = trim($body, "\n");
+				$body = $prefix . $body;
 			} else {
-				$prefix = sprintf(
-					'<p>-------- ' . $this->rc->gettext('originalmessage') . ' --------</p>' .
-					'<table border="0" cellpadding="0" cellspacing="0"><tbody>' .
-					'<tr><th align="right" nowrap="nowrap" valign="baseline">%s: </th><td>%s</td></tr>' .
-					'<tr><th align="right" nowrap="nowrap" valign="baseline">%s: </th><td>%s</td></tr>' .
-					'<tr><th align="right" nowrap="nowrap" valign="baseline">%s: </th><td>%s</td></tr>' .
-					'<tr><th align="right" nowrap="nowrap" valign="baseline">%s: </th><td>%s</td></tr>', $this->rc->gettext('subject'), rcube::Q($subject), $this->rc->gettext('date'), rcube::Q($date), $this->rc->gettext('from'), rcube::Q($from, 'replace'), $this->rc->gettext('to'), rcube::Q($to, 'replace'));
-				if ($cc = $row['cc_email']) {
-					$prefix .= sprintf('<tr><th align="right" nowrap="nowrap" valign="baseline">%s: </th><td>%s</td></tr>', $this->rc->gettext('cc'), rcube::Q($cc, 'replace'));
+				$prefix = $this->rc->gettext([
+					'name' => 'mailreplyintro',
+					'vars' => [
+						'date' => $this->rc->format_date($date, $this->rc->config->get('date_long')),
+						'sender' => $from,
+					]
+				]);
+				if (!$bodyIsHtml) {
+					global $LINE_LENGTH;
+					$txt = new rcube_html2text($body, false, true, $LINE_LENGTH);
+					$body = $txt->get_text();
+					$body = preg_replace('/\r?\n/', "\n", $body);
+					$body = trim($body, "\n");
+					$body = rcmailWrapAndQuote($body, $LINE_LENGTH);
+					$prefix .= "\n";
+					$body = $prefix . $body . $suffix;
+					$body .= "\n ------------------------- \n" . $recordNumber;
+				} else {
+					$prefix = '<p>' . rcube::Q($prefix) . "</p>\n";
+					$body = $prefix . '<blockquote>' . $body . '</blockquote>' . $suffix;
+					$body .= '<hr/>' . $recordNumber;
 				}
-				if ($replyto != $from) {
-					$prefix .= sprintf('<tr><th align="right" nowrap="nowrap" valign="baseline">%s: </th><td>%s</td></tr>', $this->rc->gettext('replyto'), rcube::Q($replyto, 'replace'));
-				}
-				$prefix .= '</tbody></table><br>';
 			}
-			$body = $prefix . $body;
+			$this->rc->output->set_env('compose_mode', $type);
 		} else {
-			$prefix = $this->rc->gettext([
-				'name' => 'mailreplyintro',
-				'vars' => [
-					'date' => $this->rc->format_date($date, $this->rc->config->get('date_long')),
-					'sender' => $from,
-				]
-			]);
 			if (!$bodyIsHtml) {
-				global $LINE_LENGTH;
-				$txt = new rcube_html2text($body, false, true, $LINE_LENGTH);
-				$body = $txt->get_text();
-				$body = preg_replace('/\r?\n/', "\n", $body);
-				$body = trim($body, "\n");
-				$body = rcmailWrapAndQuote($body, $LINE_LENGTH);
-				$prefix .= "\n";
-				$body = $prefix . $body . $suffix;
+				$body = "\n ------------------------- \n" . $recordNumber;
 			} else {
-				$prefix = '<p>' . rcube::Q($prefix) . "</p>\n";
-				$body = $prefix . '<blockquote>' . $body . '</blockquote>' . $suffix;
+				$body = '<br><br><hr/>' . $recordNumber;
 			}
 		}
-		$this->rc->output->set_env('compose_mode', $type);
 		$args['body'] = $body;
 		return $args;
 	}
