@@ -59,14 +59,17 @@ class yetiforce extends rcube_plugin
 				$this->add_hook('template_object_yt_adress_button', [$this, 'ytAdressButton']);
 
 				$id = rcube_utils::get_input_value('_id', rcube_utils::INPUT_GPC);
-				if ($id && isset($_SESSION['compose_data_' . $id]['param']['crmmodule'])) {
-					$this->rc->output->set_env('crmModule', $_SESSION['compose_data_' . $id]['param']['crmmodule']);
-				}
-				if ($id && isset($_SESSION['compose_data_' . $id]['param']['crmrecord'])) {
-					$this->rc->output->set_env('crmRecord', $_SESSION['compose_data_' . $id]['param']['crmrecord']);
-				}
-				if ($id && isset($_SESSION['compose_data_' . $id]['param']['crmview'])) {
-					$this->rc->output->set_env('crmView', $_SESSION['compose_data_' . $id]['param']['crmview']);
+				if ($id) {
+					$id = App\Purifier::purifyByType($id, 'Alnum');
+					if (isset($_SESSION['compose_data_' . $id]['param']['crmmodule'])) {
+						$this->rc->output->set_env('crmModule', $_SESSION['compose_data_' . $id]['param']['crmmodule']);
+					}
+					if (isset($_SESSION['compose_data_' . $id]['param']['crmrecord'])) {
+						$this->rc->output->set_env('crmRecord', $_SESSION['compose_data_' . $id]['param']['crmrecord']);
+					}
+					if (isset($_SESSION['compose_data_' . $id]['param']['crmview'])) {
+						$this->rc->output->set_env('crmView', $_SESSION['compose_data_' . $id]['param']['crmview']);
+					}
 				}
 			}
 			if ('preview' === $this->rc->action || 'show' === $this->rc->action) {
@@ -149,10 +152,10 @@ class yetiforce extends rcube_plugin
 			\call_user_func_array([$this->rc->db, 'query'], array_merge([$sql], [$pass, $this->rc->get_user_id()]));
 			$this->rc->db->affected_rows();
 		}
-		if ($_GET['_autologin'] && !empty($_REQUEST['_composeKey'])) {
+		if ($_GET['_autologin'] && !empty($_GET['_composeKey'])) {
 			$args['_action'] = 'compose';
 			$args['_task'] = 'mail';
-			$args['_composeKey'] = rcube_utils::get_input_value('_composeKey', rcube_utils::INPUT_GET);
+			$args['_composeKey'] = App\Purifier::purifyByType(rcube_utils::get_input_value('_composeKey', rcube_utils::INPUT_GET), 'Alnum');
 		}
 		if ($row = $this->getAutoLogin()) {
 			$_SESSION['crm']['id'] = $row['cuid'];
@@ -199,8 +202,10 @@ class yetiforce extends rcube_plugin
 		$this->rc = rcmail::get_instance();
 		$db = $this->rc->get_dbh();
 		global $COMPOSE_ID;
-
-		$composeKey = rcube_utils::get_input_value('_composeKey', rcube_utils::INPUT_GET);
+		if (empty($_GET['_composeKey'])) {
+			return $args;
+		}
+		$composeKey = App\Purifier::purifyByType(rcube_utils::get_input_value('_composeKey', rcube_utils::INPUT_GET), 'Alnum');
 		$result = $db->query('SELECT * FROM `u_yf_mail_compose_data` WHERE `key` = ?', $composeKey);
 		$params = $db->fetch_assoc($result);
 		$db->query('DELETE FROM `u_yf_mail_compose_data` WHERE `key` = ?;', $composeKey);
@@ -274,8 +279,7 @@ class yetiforce extends rcube_plugin
 	public function messageComposeBody($args)
 	{
 		$this->rc = rcmail::get_instance();
-
-		$id = rcube_utils::get_input_value('_id', rcube_utils::INPUT_GPC);
+		$id = App\Purifier::purifyByType(rcube_utils::get_input_value('_id', rcube_utils::INPUT_GPC), 'Alnum');
 		$row = $_SESSION['compose_data_' . $id]['param']['mailData'];
 		$type = $_SESSION['compose_data_' . $id]['param']['type'];
 		if (!$row) {
@@ -421,11 +425,10 @@ class yetiforce extends rcube_plugin
 	//	Adding attachments
 	public function addFilesToMail()
 	{
-		$COMPOSE_ID = rcube_utils::get_input_value('_id', rcube_utils::INPUT_GPC);
-		$uploadid = rcube_utils::get_input_value('_uploadid', rcube_utils::INPUT_GPC);
-		$ids = rcube_utils::get_input_value('ids', rcube_utils::INPUT_GPC);
+		$COMPOSE_ID = App\Purifier::purifyByType(rcube_utils::get_input_value('_id', rcube_utils::INPUT_GPC), 'Alnum');
+		$uploadid = App\Purifier::purifyByType(rcube_utils::get_input_value('_uploadid', rcube_utils::INPUT_GPC), 'Integer');
+		$ids = App\Purifier::purifyByType(rcube_utils::get_input_value('ids', rcube_utils::INPUT_GPC), 'Integer');
 		$COMPOSE = null;
-
 		if ($COMPOSE_ID && $_SESSION['compose_data_' . $COMPOSE_ID]) {
 			$SESSION_KEY = 'compose_data_' . $COMPOSE_ID;
 			$COMPOSE = &$_SESSION[$SESSION_KEY];
@@ -436,8 +439,7 @@ class yetiforce extends rcube_plugin
 		$this->rc = rcmail::get_instance();
 		$index = 0;
 		$htmlAttachments = '';
-		$attachments = $this->getAttachment($ids, false);
-		foreach ($attachments as $attachment) {
+		foreach ($this->getAttachment($ids, false) as $attachment) {
 			++$index;
 			$attachment['group'] = $COMPOSE_ID;
 			$userid = rcmail::get_instance()->user->ID;
@@ -502,24 +504,20 @@ if (window && window.rcmail) {
 			$ids = implode(',', $ids);
 		}
 		$this->rc = rcmail::get_instance();
-		$db = $this->rc->get_dbh();
 		$userid = $this->rc->user->ID;
 		$index = 0;
 		if ($ids) {
-			$sql_result = $db->query("SELECT vtiger_attachments.* FROM vtiger_attachments INNER JOIN vtiger_seattachmentsrel ON vtiger_seattachmentsrel.attachmentsid=vtiger_attachments.attachmentsid WHERE vtiger_seattachmentsrel.crmid IN ($ids);");
-			while ($row = $db->fetch_assoc($sql_result)) {
-				$orgFile = $this->rc->config->get('root_directory') . $row['path'] . $row['attachmentsid'];
-				[$usec, $sec] = explode(' ', microtime());
-				$filepath = $this->rc->config->get('temp_dir') . DIRECTORY_SEPARATOR . "{$sec}_{$userid}_{$row['attachmentsid']}_$index.tmp";
-				if (file_exists($orgFile)) {
-					copy($orgFile, $filepath);
-					$attachment = [
-						'path' => $filepath,
+			foreach (App\Mail::getAttachmentsFromDocument($ids, false) as $filePath => $row) {
+				[, $sec] = explode(' ', microtime());
+				$path = $this->rc->config->get('temp_dir') . DIRECTORY_SEPARATOR . "{$sec}_{$userid}_{$row['attachmentsid']}_$index.tmp";
+				if (file_exists($filePath)) {
+					copy($filePath, $path);
+					$attachments[] = [
+						'path' => $path,
 						'name' => $row['name'],
-						'size' => filesize($filepath),
-						'mimetype' => rcube_mime::file_content_type($filepath, $row['name'], $row['type']),
+						'size' => filesize($path),
+						'mimetype' => rcube_mime::file_content_type($path, $row['name'], $row['type']),
 					];
-					$attachments[] = $attachment;
 				}
 				++$index;
 			}
@@ -532,15 +530,15 @@ if (window && window.rcmail) {
 				$orgFileName = $file['name'] ?? basename($file);
 				$orgFilePath = $file['path'] ?? $file;
 				$orgFile = $this->rc->config->get('root_directory') . $orgFilePath;
-				[$usec, $sec] = explode(' ', microtime());
-				$filepath = $this->rc->config->get('temp_dir') . DIRECTORY_SEPARATOR . "{$sec}_{$userid}_{$index}.tmp";
+				[, $sec] = explode(' ', microtime());
+				$filePath = $this->rc->config->get('temp_dir') . DIRECTORY_SEPARATOR . "{$sec}_{$userid}_{$index}.tmp";
 				if (file_exists($orgFile)) {
-					copy($orgFile, $filepath);
+					copy($orgFile, $filePath);
 					$attachment = [
-						'path' => $filepath,
-						'size' => filesize($filepath),
+						'path' => $filePath,
+						'size' => filesize($filePath),
 						'name' => $orgFileName,
-						'mimetype' => rcube_mime::file_content_type($filepath, $orgFileName),
+						'mimetype' => rcube_mime::file_content_type($filePath, $orgFileName),
 					];
 					if (0 === strpos($orgFilePath, 'cache')) {
 						unlink($orgFile);
@@ -592,7 +590,7 @@ if (window && window.rcmail) {
 		if (isset($this->autologin)) {
 			return $this->autologin;
 		}
-		$key = rcube_utils::get_input_value('_autologinKey', rcube_utils::INPUT_GPC);
+		$key = App\Purifier::purifyByType(rcube_utils::get_input_value('_autologinKey', rcube_utils::INPUT_GPC), 'Alnum');
 		$db = $this->rc->get_dbh();
 		$sqlResult = $db->query('SELECT * FROM u_yf_mail_autologin INNER JOIN roundcube_users ON roundcube_users.user_id = u_yf_mail_autologin.ruid WHERE roundcube_users.password <> \'\' AND u_yf_mail_autologin.`key` = ?;', $key);
 		$autologin = false;
@@ -670,17 +668,18 @@ if (window && window.rcmail) {
 	 */
 	public function getContentEmailTemplate()
 	{
-		$templateId = rcube_utils::get_input_value('id', rcube_utils::INPUT_GPC);
-		$recordId = rcube_utils::get_input_value('record_id', rcube_utils::INPUT_GPC);
-		$moduleName = rcube_utils::get_input_value('select_module', rcube_utils::INPUT_GPC);
+		$templateId = App\Purifier::purifyByType(rcube_utils::get_input_value('id', rcube_utils::INPUT_GPC), 'Integer');
 		$currentPath = getcwd();
 		chdir($this->rc->config->get('root_directory'));
 		$this->loadCurrentUser();
 		$mail = [];
 		if (\App\Privilege::isPermitted('EmailTemplates', 'DetailView', $templateId)) {
 			$mail = \App\Mail::getTemplate($templateId);
-			if ($recordId) {
-				$textParser = \App\TextParser::getInstanceById($recordId, $moduleName);
+			if (isset($_POST['record_id'])) {
+				$textParser = \App\TextParser::getInstanceById(
+					App\Purifier::purifyByType(rcube_utils::get_input_value('record_id', rcube_utils::INPUT_GPC), 'Integer'),
+					App\Purifier::purifyByType(rcube_utils::get_input_value('select_module', rcube_utils::INPUT_GPC), 'Alnum')
+					);
 				$mail['subject'] = $textParser->setContent($mail['subject'])->parse()->getContent();
 				$mail['content'] = $textParser->setContent($mail['content'])->parse()->getContent();
 			}
@@ -832,9 +831,9 @@ if (window && window.rcmail) {
 	public function importIcs()
 	{
 		if (\App\Privilege::isPermitted('Calendar', 'CreateView')) {
-			$uid = rcube_utils::get_input_value('_uid', rcube_utils::INPUT_GPC);
-			$mbox = rcube_utils::get_input_value('_mbox', rcube_utils::INPUT_GPC);
-			$mime_id = rcube_utils::get_input_value('_part', rcube_utils::INPUT_GPC);
+			$uid = App\Purifier::purifyByType(rcube_utils::get_input_value('_uid', rcube_utils::INPUT_GPC), 'Alnum');
+			$mbox = App\Purifier::purifyByType(rcube_utils::get_input_value('_mbox', rcube_utils::INPUT_GPC), 'Alnum');
+			$mime_id = App\Purifier::purifyByType(rcube_utils::get_input_value('_part', rcube_utils::INPUT_GPC), 'Text');
 			$status = 0;
 			if ($uid && $mbox && $mime_id) {
 				$currentPath = getcwd();
