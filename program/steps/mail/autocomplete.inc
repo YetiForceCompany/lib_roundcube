@@ -16,11 +16,7 @@ if (strlen($search)) {
         $addressBookFile = $RCMAIL->config->get('root_directory') . 'cache/addressBook/mails_' . $crmUserId . '.php';
         if (is_file($addressBookFile)) {
             include $addressBookFile;
-            foreach ($bookMails as $row) {
-                if (stripos($row, $search) !== false) {
-                    $contacts[] = $row;
-                }
-            }
+						$contacts = preg_grep("/{$search}/i", $bookMails);
         }
     }
 }
