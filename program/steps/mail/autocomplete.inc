@@ -20,6 +20,6 @@ if (strlen($search)) {
         }
     }
 }
-$OUTPUT->command('ksearch_query_results', $contacts, $search, $sid);
+$OUTPUT->command('ksearch_query_results', array_values($contacts), $search, $sid);
 $OUTPUT->send();
 // <--------   YetiForce Sp. z o.o.   -------->

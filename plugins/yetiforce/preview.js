@@ -1,25 +1,37 @@
 /* {[The file is published on the basis of MIT License]} */
-window.rcmail && rcmail.addEventListener('init', function (evt) {
+window.rcmail &&
+	rcmail.addEventListener('init', function(evt) {
 		window.crm = getCrmWindow();
 		loadActionBar();
 		rcmail.env.message_commands.push('yetiforce.importICS');
-		rcmail.register_command('yetiforce.importICS', function (part, type) {
-			jQuery.ajax({
-				type: 'POST',
-				url: "./?_task=mail&_action=plugin.yetiforce.importIcs&_mbox=" + urlencode(rcmail.env.mailbox) + '&_uid=' + urlencode(rcmail.env.uid) + '&_part=' + part + '&_type=' + type,
-				async: false,
-				success: function (data) {
-					data = JSON.parse(data);
-					window.crm.Vtiger_Helper_Js.showPnotify({
-						text: data['message'],
-						type: 'info',
-						animation: 'show'
-					});
-				}
-			});
-		}, true);
-	}
-);
+		rcmail.register_command(
+			'yetiforce.importICS',
+			function(part, type) {
+				jQuery.ajax({
+					type: 'POST',
+					url:
+						'./?_task=mail&_action=plugin.yetiforce.importIcs&_mbox=' +
+						urlencode(rcmail.env.mailbox) +
+						'&_uid=' +
+						urlencode(rcmail.env.uid) +
+						'&_part=' +
+						part +
+						'&_type=' +
+						type,
+					async: false,
+					success: function(data) {
+						data = JSON.parse(data);
+						window.crm.Vtiger_Helper_Js.showPnotify({
+							text: data['message'],
+							type: 'info',
+							animation: 'show'
+						});
+					}
+				});
+			},
+			true
+		);
+	});
 
 function loadActionBar() {
 	var content = $('#ytActionBarContent');
@@ -30,9 +42,9 @@ function loadActionBar() {
 		folder: rcmail.env.mailbox,
 		rcId: rcmail.env.user_id
 	};
-	window.crm.AppConnector.request(params).done(function (response) {
+	window.crm.AppConnector.request(params).done(function(response) {
 		content.find('.ytHeader').html(response);
-		$('#messagecontent').css('top', (content.outerHeight() + $('#messageheader').outerHeight()) + 'px');
+		$('#messagecontent').css('top', content.outerHeight() + $('#messageheader').outerHeight() + 'px');
 		registerEvents(content);
 	});
 }
@@ -46,19 +58,19 @@ function registerEvents(content) {
 	registerImportMail(content);
 	window.crm.app.registerPopover(content.closest('body'));
 	var block = content.find('.ytHeader .js-data');
-	content.find('.hideBtn').click(function () {
+	content.find('.hideBtn').click(function() {
 		var button = $(this);
 		var icon = button.find('.glyphicon');
 
 		if (button.data('type') == '0') {
 			button.data('type', '1');
-			icon.removeClass("glyphicon-chevron-up").addClass("glyphicon-chevron-down");
+			icon.removeClass('glyphicon-chevron-up').addClass('glyphicon-chevron-down');
 		} else {
 			button.data('type', '0');
-			icon.removeClass("glyphicon-chevron-down").addClass("glyphicon-chevron-up");
+			icon.removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-up');
 		}
 		block.toggle();
-		$(window).trigger("resize");
+		$(window).trigger('resize');
 	});
 }
 
@@ -92,7 +104,7 @@ function registerImportMail(content) {
 }
 
 function registerRemoveRecord(content) {
-	content.find('button.removeRecord').click(function (e) {
+	content.find('button.removeRecord').click(function(e) {
 		var row = $(e.currentTarget).closest('.rowRelatedRecord');
 		removeRecord(row.data('id'));
 	});
@@ -100,7 +112,7 @@ function registerRemoveRecord(content) {
 
 function registerSelectRecord(content) {
 	let id = content.find('#mailActionBarID').val();
-	content.find('button.selectRecord').click(function (e) {
+	content.find('button.selectRecord').click(function(e) {
 		let relationSelect = content.find('#addRelationSelect').val();
 		let getCacheModule = window.crm.app.moduleCacheGet('selectedModuleName');
 		if (getCacheModule === 'undefined' || relationSelect !== getCacheModule) {
@@ -110,30 +122,40 @@ function registerSelectRecord(content) {
 			mailId: id
 		};
 		if ($(this).data('type') == 0) {
-			var module = $(this).closest('.js-head-container').find('.module').val();
+			var module = $(this)
+				.closest('.js-head-container')
+				.find('.module')
+				.val();
 			if (module === null) {
 				return;
 			}
 		} else {
 			var module = $(this).data('module');
-			relParams.crmid = $(this).closest('.rowRelatedRecord').data('id');
-			relParams.mod = $(this).closest('.rowRelatedRecord').data('module');
+			relParams.crmid = $(this)
+				.closest('.rowRelatedRecord')
+				.data('id');
+			relParams.mod = $(this)
+				.closest('.rowRelatedRecord')
+				.data('module');
 			relParams.newModule = module;
 		}
-		showPopup({
-			module: module,
-			src_module: 'OSSMailView',
-			src_record: id,
-		}, relParams);
+		showPopup(
+			{
+				module: module,
+				src_module: 'OSSMailView',
+				src_record: id
+			},
+			relParams
+		);
 	});
 }
 
 function registerAddReletedRecord(content) {
 	var id = content.find('#mailActionBarID').val();
-	content.find('button.addRelatedRecord').click(function (e) {
+	content.find('button.addRelatedRecord').click(function(e) {
 		var targetElement = $(e.currentTarget);
 		var row = targetElement.closest('.rowRelatedRecord');
-		var params = {sourceModule: row.data('module')};
+		var params = { sourceModule: row.data('module') };
 		showQuickCreateForm(targetElement.data('module'), row.data('id'), params);
 	});
 
@@ -194,19 +216,22 @@ function registerAddRecord(content) {
 		var col = $(e.currentTarget).closest('.js-head-container');
 		let selectValue = col.find('.module').val();
 		if (selectValue !== null) {
-			let relatedRecords = []
-			content.find('.js-data').find('.rowRelatedRecord').each((i, record) => {
-				let data = $(record).data()
-				relatedRecords.push({module: data.module, id: data.id})
-			})
-			showQuickCreateForm(selectValue, id, {relatedRecords: relatedRecords});
+			let relatedRecords = [];
+			content
+				.find('.js-data')
+				.find('.rowRelatedRecord')
+				.each((i, record) => {
+					let data = $(record).data();
+					relatedRecords.push({ module: data.module, id: data.id });
+				});
+			showQuickCreateForm(selectValue, id, { relatedRecords: relatedRecords });
 		}
 	});
 }
 
 function removeRecord(crmid) {
 	const id = $('#mailActionBarID').val();
-	let params = {}
+	let params = {};
 	params.data = {
 		module: 'OSSMail',
 		action: 'ExecuteActions',
@@ -215,10 +240,10 @@ function removeRecord(crmid) {
 			mailId: id,
 			crmid: crmid
 		}
-	}
+	};
 	params.async = false;
 	params.dataType = 'json';
-	window.crm.AppConnector.request(params).done(function (data) {
+	window.crm.AppConnector.request(params).done(function(data) {
 		const response = data['result'];
 		let notifyParams = {
 			text: response['data'],
@@ -250,7 +275,7 @@ function showPopup(params, actionsParams) {
 					mode: 'addRelated',
 					params: actionsParams
 				}
-			}).done(function (data) {
+			}).done(function(data) {
 				let response = data['result'];
 				if (response['success']) {
 					var notifyParams = {
@@ -278,15 +303,15 @@ function showQuickCreateForm(moduleName, record, params = {}) {
 	if (params['sourceModule']) {
 		sourceModule = params['sourceModule'];
 	}
-	const postShown = function (data) {
+	const postShown = function(data) {
 		var index, queryParam, queryParamComponents;
 		$('<input type="hidden" name="sourceModule" value="' + sourceModule + '" />').appendTo(data);
 		$('<input type="hidden" name="sourceRecord" value="' + record + '" />').appendTo(data);
 		$('<input type="hidden" name="relationOperation" value="true" />').appendTo(data);
-	}
-	const postQuickCreate = function (data) {
+	};
+	const postQuickCreate = function(data) {
 		loadActionBar();
-	}
+	};
 	const ids = {
 		link: 'modulesLevel0',
 		process: 'modulesLevel1',
@@ -301,29 +326,44 @@ function showQuickCreateForm(moduleName, record, params = {}) {
 			relatedParams[i] = record;
 		}
 	}
-	if (moduleName == 'Leads') {
-		relatedParams['company'] = rcmail.env.fromName;
+	const fillNameFields = first => {
+		const nameData = rcmail.env.fromName.split(' ');
+		const firstName = nameData.shift();
+		const lastName = nameData.join(' ');
+		return first ? firstName : lastName;
+	};
+	let autoCompleteMapRaw = content.find('.js-mailAutoCompleteFields').val();
+	let autoCompleteMap = autoCompleteMapRaw ? JSON.parse(autoCompleteMapRaw) : [];
+	if (autoCompleteMap && autoCompleteMap[moduleName]) {
+		let map = autoCompleteMap[moduleName];
+		for (let name in map) {
+			if (map.hasOwnProperty(name) && map[name]) {
+				switch (map[name]) {
+					case 'fromNameFirstPart':
+						relatedParams[name] = fillNameFields(true);
+						break;
+					case 'fromNameSecondPart':
+						relatedParams[name] = fillNameFields(false);
+						break;
+					case 'fromName':
+						relatedParams[name] = rcmail.env.fromName;
+						break;
+					case 'subject':
+						relatedParams[name] = rcmail.env.subject;
+						break;
+					case 'email':
+						relatedParams[name] = rcmail.env.fromMail;
+						break;
+				}
+			}
+		}
 	}
-	if (moduleName == 'Leads' || moduleName == 'Contacts') {
-		relatedParams['lastname'] = rcmail.env.fromName;
-	}
-	if (moduleName == 'Project') {
-		relatedParams['projectname'] = rcmail.env.subject;
-	}
-	if (moduleName == 'HelpDesk') {
-		relatedParams['ticket_title'] = rcmail.env.subject;
-	}
-	if (moduleName == 'Products') {
-		relatedParams['productname'] = rcmail.env.subject;
-	}
-	if (moduleName == 'Services') {
-		relatedParams['servicename'] = rcmail.env.subject;
-	}
+
 	relatedParams['email'] = rcmail.env.fromMail;
 	relatedParams['email1'] = rcmail.env.fromMail;
-	let messageBody = $('#messagebody').clone()
-	messageBody.find('.image-attachment').remove()
-	relatedParams['description'] = messageBody.text()
+	let messageBody = $('#messagebody').clone();
+	messageBody.find('.image-attachment').remove();
+	relatedParams['description'] = messageBody.text();
 	//relatedParams['related_to'] = record;
 	if (params.relatedRecords !== undefined) {
 		relatedParams['relatedRecords'] = params.relatedRecords;
@@ -332,7 +372,7 @@ function showQuickCreateForm(moduleName, record, params = {}) {
 	relatedParams['sourceRecord'] = record;
 	relatedParams['relationOperation'] = true;
 	const quickCreateParams = {
-		callbackFunction: (data) => {
+		callbackFunction: data => {
 			loadActionBar();
 		},
 		callbackPostShown: postShown,
@@ -344,13 +384,13 @@ function showQuickCreateForm(moduleName, record, params = {}) {
 }
 
 function getCrmWindow() {
-	if (opener !== null && opener.parent.CONFIG == "object") {
+	if (opener !== null && opener.parent.CONFIG == 'object') {
 		return opener.parent;
-	} else if (typeof parent.CONFIG == "object") {
+	} else if (typeof parent.CONFIG == 'object') {
 		return parent;
-	} else if (typeof parent.parent.CONFIG == "object") {
+	} else if (typeof parent.parent.CONFIG == 'object') {
 		return parent.parent;
-	} else if (typeof opener.crm.CONFIG == "object") {
+	} else if (typeof opener.crm.CONFIG == 'object') {
 		return opener.crm;
 	}
 	return false;
