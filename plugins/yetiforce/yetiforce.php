@@ -675,7 +675,7 @@ if (window && window.rcmail) {
 		$mail = [];
 		if (\App\Privilege::isPermitted('EmailTemplates', 'DetailView', $templateId)) {
 			$mail = \App\Mail::getTemplate($templateId);
-			if (isset($_POST['record_id'])) {
+			if ($recordId = rcube_utils::get_input_value('record_id', rcube_utils::INPUT_GPC)) {
 				$textParser = \App\TextParser::getInstanceById(
 					App\Purifier::purifyByType(rcube_utils::get_input_value('record_id', rcube_utils::INPUT_GPC), 'Integer'),
 					App\Purifier::purifyByType(rcube_utils::get_input_value('select_module', rcube_utils::INPUT_GPC), 'Alnum')
