@@ -677,7 +677,7 @@ if (window && window.rcmail) {
 			$mail = \App\Mail::getTemplate($templateId);
 			if ($recordId = rcube_utils::get_input_value('record_id', rcube_utils::INPUT_GPC)) {
 				$textParser = \App\TextParser::getInstanceById(
-					App\Purifier::purifyByType(rcube_utils::get_input_value('record_id', rcube_utils::INPUT_GPC), 'Integer'),
+					App\Purifier::purifyByType($recordId, 'Integer'),
 					App\Purifier::purifyByType(rcube_utils::get_input_value('select_module', rcube_utils::INPUT_GPC), 'Alnum')
 					);
 				$mail['subject'] = $textParser->setContent($mail['subject'])->parse()->getContent();
