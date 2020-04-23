@@ -625,6 +625,18 @@ if (window && window.rcmail) {
 			return true;
 		}
 		require 'include/main/WebUI.php';
+		if (!isset($_SESSION['crm']['id'])&&isset($_COOKIE['YTSID']))
+		{
+			$driver = \App\Config::performance('SESSION_DRIVER');
+			if ($driver)
+			{
+				$className = '\App\Session\\' . $driver;
+				$ySession=new $className();
+				$sessionFilePath=ROOT_DIRECTORY . \DIRECTORY_SEPARATOR . 'cache' . \DIRECTORY_SEPARATOR . 'session' . \DIRECTORY_SEPARATOR . 'sess_' . $_COOKIE['YTSID'];
+				$sessionData = $ySession->unserialize(file_get_contents($sessionFilePath));
+				$_SESSION['crm']['id']=$sessionData['authenticated_user_id'];
+			}
+		}
 		$this->currentUser = \App\User::getUserModel($_SESSION['crm']['id']);
 		App\User::setCurrentUserId($_SESSION['crm']['id']);
 		\App\Language::setTemporaryLanguage($this->currentUser->getDetail('language'));
