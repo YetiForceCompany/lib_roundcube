@@ -80,7 +80,6 @@ class yetiforce extends rcube_plugin
 				$this->add_hook('template_object_messageattachments', [$this, 'appendIcsPreview']);
 			}
 			if (empty($this->rc->action)) {
-				//$this->add_hook('preferences_save', array($this, 'prefsSave'));
 				$this->include_script('colResizable.js');
 			}
 			chdir($currentPath);
@@ -89,8 +88,7 @@ class yetiforce extends rcube_plugin
 
 	public function startup($args)
 	{
-		$row = $this->getAutoLogin();
-		if (!$row || empty($_GET['_autologin'])) {
+		if (empty($_GET['_autologin']) || !($row = $this->getAutoLogin())) {
 			return $args;
 		}
 		if (!empty($_SESSION['user_id']) && $_SESSION['user_id'] != $row['user_id']) {
@@ -110,10 +108,7 @@ class yetiforce extends rcube_plugin
 
 	public function authenticate($args)
 	{
-		if (empty($_GET['_autologin'])) {
-			return $args;
-		}
-		if ($row = $this->getAutoLogin()) {
+		if (!empty($_GET['_autologin']) && ($row = $this->getAutoLogin())) {
 			$host = false;
 			foreach ($this->rc->config->get('default_host') as $key => $value) {
 				if (false !== strpos($key, $row['mail_host'])) {
@@ -638,7 +633,7 @@ if (window && window.rcmail) {
 		}
 		$content = '';
 		foreach ($this->viewData['compose']['composeAddressModules'] as $moduleName => $value) {
-			$text = html::span(['class' => "userIcon-$moduleName"], '') . ' ' . $value;
+			$text = html::span(['class' => "yfm-{$moduleName}"], '') . ' ' . $value;
 			$content .= html::a(['class' => 'button', 'data-input' => $p['part'], 'data-module' => $moduleName], $text);
 		}
 		$p['content'] = $content;
