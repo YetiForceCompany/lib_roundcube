@@ -1,31 +1,34 @@
 <?php
 
 $labels = array();
-$labels['nosignature'] = 'No signature information';
-$labels['noauthresults'] = 'Signature found but no auth. results header. Server configuration problem?';
-$labels['signaturepass'] = 'Valid signature(s) from the sender\'s domain. verified by ';
-$labels['partialpass'] = 'Some signatures are invalid but at least one is valid for the sender\'s domain. verified by ';
-$labels['thirdparty'] = 'Signed by third party, signature is present but for different domain than from address. verified for ';
-$labels['temporaryinvalid'] = 'Signature is (temporarily) not valid! verified by ';
-$labels['invalidsignature'] = 'Signature is not valid! verified by ';
+$labels['nosignature'] = 'Ni podatkov za podpis';
+$labels['noauthresults'] = 'Podpis je bil najden, vendar nobenih rezultatov preverjanja pristonosti v glavi sporočila. Morda gre za težavo v konfiguraciji strežnika?';
+$labels['signaturepass'] = 'Veljavni podpis(i) iz naslova domene pošiljatelja. Preverjeno iz strani';
+$labels['partialpass'] = 'Nekateri podpisi niso veljavni, vsaj en podpis z domeno pošiljatelja je veljaven. Preverjeno iz strani ';
+$labels['thirdparty'] = 'Podpisano iz neodvisnega naslova. Podpis je dodan, vendar za drugo domeno, kot je navedena v elektronskem naslovu. Preverjeno za';
+$labels['temporaryinvalid'] = 'Podpis je (trenutno) neveljaven. Preverjeno iz strani';
+$labels['invalidsignature'] = 'Podpis ni veljaven. Preverjeno iz strani';
 
-$labels['for'] = 'for';
-$labels['by'] = 'by';
+$labels['for'] = 'za';
+$labels['by'] = 'od';
 
-$labels['section_title']  = 'Authenticaton Status';
-$labels['column_title']  = 'Auth. Result';
+$labels['section_title']  = 'Status avtentikacije';
+$labels['column_title']  = 'Rezultat avtentikacije';
 
-$labels['title_enable_column']  = 'Enable Column';
-$labels['label_enable_column']  = 'Enable authentication result column in message list';
-$labels['label_fallback_verifier'] = 'Use internal DKIM verifier (if signature found but no auth. results header)';
+$labels['title_enable_column']  = 'Omogoči stolpec';
+$labels['label_enable_column']  = 'Omogoči preverjanje pristnosti rezultatov v seznamu sporočil';
+$labels['label_fallback_verifier'] = 'Za preverjanje uporabite interni pregledovalnik DKIM (v primeru da bo podpis najden, v glavi sporočila pa ne bo nobenih rezultatov preverjanja pristnosti)';
 
-$labels['title_include_status'] = 'Only show the following statuses';
-$labels['label_include_status1']  = 'No signature found';
-$labels['label_include_status2']  = 'Signature found but no auth. results header';
-$labels['label_include_status4']  = 'All signatures passed validation';
-$labels['label_include_status8']  = 'At least one signature passed validation';
-$labels['label_include_status16']  = 'Third party signature';
-$labels['label_include_status32']  = 'Signature temporary failed';
-$labels['label_include_status64']  = 'Signature permanently failed';
+$labels['title_trusted_mtas'] = 'Zaupanja vredni MTA';
+$labels['label_trusted_mtas'] = 'Z vejico ločen seznam authserv-id od zaupanja vrednih MTA. Prikazani bodo samo rezultati iz naslova teh MTA.-jev';
+
+$labels['title_include_status'] = 'Prikaži samo naslednje statuse';
+$labels['label_include_status1']  = 'Podpisa ni bilo moogoče najti';
+$labels['label_include_status2']  = 'Podpis je bil najden, a v glavi sporočila ni nobenih rezultatov preverjanja pristnosti';
+$labels['label_include_status4']  = 'Vsi podpisi so bili preverjeni';
+$labels['label_include_status8']  = 'Vsaj en podpis je bil uspešno preverjen';
+$labels['label_include_status16']  = 'Podpisi neodvisnih naslovov';
+$labels['label_include_status32']  = 'Podpisovanje je začasno spodletelo';
+$labels['label_include_status64']  = 'Podpisovanje je spodletelo';
 
 ?>
