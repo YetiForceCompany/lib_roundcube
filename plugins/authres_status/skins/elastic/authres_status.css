@@ -1,3 +1,6 @@
+.listing.iconized tr.authres_status>td.section:before {
+  content: "\f3ed"
+}
 
 .webkit .messagelist tr > .authres_status
 {
@@ -18,13 +21,11 @@
 
 #sections-table tbody #rcmrowauthres_status td.section {
     background-image: url(badge.png);
+    background-repeat: no-repeat;
     background-position: 10px 5px;
 }
 
 .authres-status-img {
-    vertical-align: top;
-    height: 14px;
-    width: 14px;
 }
 
 .widescreen .authres-status-img {
