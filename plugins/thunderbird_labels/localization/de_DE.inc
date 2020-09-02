@@ -1,9 +1,9 @@
 <?php
 /**
- * Author:
- * Michael Kefeder
- * http://code.google.com/p/rcmail-thunderbird-labels/
- */
+* Author:
+* Michael Kefeder
+*/
+
 $labels = array();
 $labels['label'] = 'Thunderbird Schlagwörter';
 $labels['label0'] = 'Alle Entfernen';
