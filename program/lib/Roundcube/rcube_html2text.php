@@ -3,7 +3,8 @@
 /**
  +-----------------------------------------------------------------------+
  | This file is part of the Roundcube Webmail client                     |
- | Copyright (C) 2008-2012, The Roundcube Dev Team                       |
+ |                                                                       |
+ | Copyright (C) The Roundcube Dev Team                                  |
  | Copyright (c) 2005-2007, Jon Abernathy <jon@chuggnutt.com>            |
  |                                                                       |
  | Licensed under the GNU General Public License version 3 or            |
@@ -248,8 +249,6 @@ class rcube_html2text
     protected $callback_search = array(
         '/<(a) [^>]*href=("|\')([^"\']+)\2[^>]*>(.*?)<\/a>/i', // <a href="">
         '/<(h)[123456]( [^>]*)?>(.*?)<\/h[123456]>/i',         // h1 - h6
-        '/<(b)( [^>]*)?>(.*?)<\/b>/i',                         // <b>
-        '/<(strong)( [^>]*)?>(.*?)<\/strong>/i',               // <strong>
         '/<(th)( [^>]*)?>(.*?)<\/th>/i',                       // <th> and </th>
     );
 
@@ -517,7 +516,7 @@ class rcube_html2text
      */
     protected function _build_link_list($link, $display)
     {
-        if (!$this->_do_links || empty($link)) {
+        if (empty($link)) {
             return $display;
         }
 
@@ -540,6 +539,19 @@ class rcube_html2text
                 $url .= '/';
             }
             $url .= "$link";
+        }
+
+        if (!$this->_do_links) {
+            // When not using link list use URL if there's no content (#5795)
+            // The content here is HTML, convert it to text first
+            $h2t     = new rcube_html2text($display, false, false, 1024, $this->charset);
+            $display = $h2t->get_text();
+
+            if (empty($display) && preg_match('!^([a-z][a-z0-9.+-]+://)!i', $link)) {
+                return $link;
+            }
+
+            return $display;
         }
 
         if (($index = array_search($url, $this->_link_list)) === false) {
@@ -623,7 +635,7 @@ class rcube_html2text
 
                     // Add citation markers and create <pre> block
                     $body = preg_replace_callback('/((?:^|\n)>*)([^\n]*)/', array($this, 'blockquote_citation_callback'), trim($body));
-                    $body = '<pre>' . htmlspecialchars($body) . '</pre>';
+                    $body = '<pre>' . htmlspecialchars($body, ENT_COMPAT | ENT_HTML401 | ENT_SUBSTITUTE, $this->charset) . '</pre>';
 
                     $text = substr_replace($text, $body . "\n", $start, $end + 13 - $start);
                     $offset = 0;
@@ -654,14 +666,12 @@ class rcube_html2text
      * Callback function for preg_replace_callback use.
      *
      * @param array $matches PREG matches
-     * @return string
+     *
+     * @return string Element content
      */
     public function tags_preg_callback($matches)
     {
         switch (strtolower($matches[1])) {
-        case 'b':
-        case 'strong':
-            return $this->_toupper($matches[3]);
         case 'th':
             return $this->_toupper("\t\t". $matches[3] ."\n");
         case 'h':
@@ -677,7 +687,8 @@ class rcube_html2text
      * Callback function for preg_replace_callback use in PRE content handler.
      *
      * @param array $matches PREG matches
-     * @return string
+     *
+     * @return string PRE content
      */
     public function pre_preg_callback($matches)
     {
@@ -688,6 +699,7 @@ class rcube_html2text
      * Strtoupper function with HTML tags and entities handling.
      *
      * @param string $str Text to convert
+     *
      * @return string Converted text
      */
     private function _toupper($str)
@@ -709,6 +721,7 @@ class rcube_html2text
      * Strtoupper multibyte wrapper function with HTML entities handling.
      *
      * @param string $str Text to convert
+     *
      * @return string Converted text
      */
     private function _strtoupper($str)
