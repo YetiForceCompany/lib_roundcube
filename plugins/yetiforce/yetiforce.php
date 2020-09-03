@@ -24,11 +24,12 @@ class yetiforce extends rcube_plugin
 
 	public function init()
 	{
+		$this->include_stylesheet('elastic.css');
 		$this->rc = rcmail::get_instance();
 		$this->add_hook('login_after', [$this, 'loginAfter']);
 		$this->add_hook('startup', [$this, 'startup']);
 		$this->add_hook('authenticate', [$this, 'authenticate']);
-		if ('mail' == $this->rc->task) {
+		if (  'mail' == $this->rc->task) {
 			$this->register_action('plugin.yetiforce.addFilesToMail', [$this, 'addFilesToMail']);
 			$this->register_action('plugin.yetiforce.getEmailTemplates', [$this, 'getEmailTemplates']);
 			$this->register_action('plugin.yetiforce.getContentEmailTemplate', [$this, 'getContentEmailTemplate']);
@@ -264,9 +265,9 @@ class yetiforce extends rcube_plugin
 				}
 				chdir($currentPath);
 			}
-			$args['param']['to'] = $to;
-			$args['param']['cc'] = $cc;
-			$args['param']['subject'] = $subject;
+				$args['param']['to'] = $to;
+				$args['param']['cc'] = $cc;
+				$args['param']['subject'] = $subject;
 		}
 		return $args;
 	}

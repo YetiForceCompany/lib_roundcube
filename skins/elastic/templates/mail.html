@@ -7,9 +7,12 @@
 <div id="layout-sidebar" class="listbox" role="navigation" aria-labelledby="aria-label-folderlist">
 	<div class="header">
 		<a class="button icon back-list-button" href="#back"><span class="inner"><roundcube:label name="back" /></span></a>
+
+		<roundcube:button command="settings" label="settings" type="link" innerClass="inner" class="button icon settings" title="settings" style="margin-left: 0.2rem;"/>
+
 		<span class="header-title username"><roundcube:object name="username" /></span>
-		<roundcube:button name="folderactions" type="link" title="folderactions" label="actions"
-			class="button icon sidebar-menu" innerclass="inner" data-popup="mailboxoptions-menu" />
+
+		<roundcube:button name="folderactions" type="link" title="folderactions" label="actions" class="button icon sidebar-menu" innerclass="inner" data-popup="mailboxoptions-menu" />
 	</div>
 	<h2 id="aria-label-folderlist" class="voice"><roundcube:label name="arialabelfolderlist" /></h2>
 	<div id="folderlist-content" class="scroller">
@@ -30,6 +33,15 @@
 	<div id="messagelist-header" class="header">
 		<a class="button icon task-menu-button" href="#menu"><span class="inner"><roundcube:label name="menu" /></span></a>
 		<a class="button icon back-sidebar-button folders" href="#sidebar"><span class="inner"><roundcube:label name="mailboxlist" /></span></a>
+
+		<roundcube:button command="compose" type="link" class="button icon toolbar-button compose" label="compose" title="writenewmessage" innerclass="inner" />
+
+		<roundcube:if condition="env:action == 'compose' and env:task == 'mail'" />
+			<roundcube:button command="mail" label="mail" type="link" innerClass="inner" class="mail" />
+		<roundcube:else />
+
+		<roundcube:endif />
+
 		<span class="header-title"></span>
 		<div class="toolbar menu" role="toolbar">
 			<a href="#select" class="select disabled" data-popup="listselect-menu" data-toggle-button="list-toggle-button" title="<roundcube:label name="select" />"><span class="inner"><roundcube:label name="select" /></span></a>

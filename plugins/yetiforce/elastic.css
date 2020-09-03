@@ -1,0 +1,19 @@
+a.compose:before {
+	content: '\f044';
+}
+.header a.mail:before {
+	content: '\f0e0';
+}
+@media screen and (min-width: 481px) {
+	#layout-menu {
+		width: 0;
+	}
+	#taskmenu .special-buttons {
+		display: none;
+	}
+}
+@media screen and (min-width: 769px) {
+	.header .button.icon.mail {
+		display: none;
+	}
+}

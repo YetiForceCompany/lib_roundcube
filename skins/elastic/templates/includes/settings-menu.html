@@ -1,6 +1,9 @@
 <div id="layout-sidebar" class="listbox<roundcube:exp expression="!request:_action ? ' selected' : ''"/>" role="navigation" aria-labelledby="aria-label-settingstabs">
 	<div class="header">
 		<a class="button icon task-menu-button" href="#menu"><span class="inner"><roundcube:label name="menu" /></span></a>
+
+		<roundcube:button command="mail" label="mail" type="link" innerClass="inner" class="button icon mail" title="mail" tabindex="2" style="margin-left: 0.3rem;" />
+
 		<span id="aria-label-settingstabs" class="header-title"><roundcube:label name="settings" /></span>
 	</div>
 	<div class="scroller">
