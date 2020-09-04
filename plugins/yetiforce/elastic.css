@@ -13,7 +13,7 @@ a.compose:before {
 	}
 }
 @media screen and (min-width: 769px) {
-	.header .button.icon.mail {
+	.action-compose .header .button.icon.mail {
 		display: none;
 	}
 }
