@@ -1,9 +1,9 @@
 <?php
 /**
- * Author:
- * Deyan Stoykov
- * http://code.google.com/p/rcmail-thunderbird-labels/
- */
+* Author:
+* Deyan Stoykov
+*/
+
 $labels = array();
 $labels['label'] = 'Thunderbird етикети';
 $labels['label0'] = 'Без етикет';

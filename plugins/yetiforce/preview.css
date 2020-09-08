@@ -17,11 +17,6 @@
 	content: ' ';
 }
 
-#ytActionBarContent .ytHeader {
-	position: relative;
-	border-bottom: 1px solid #dfdfdf;
-}
-
 #ytActionBarContent .rowReletedRecord .rowActions {
 	display: none;
 }
@@ -101,9 +96,9 @@
 }
 
 .rowRelatedRecord {
-	background: #bbdde8;
-	margin-left: 3px;
-	border: 1px #c1c1c1 solid;
+	background-color: #eaeaea;
+	color: #fff;
+	margin-right: 5px;
 }
 
 .action-bar__head__container {
@@ -113,24 +108,22 @@
 	margin-right: 5px;
 }
 
+.ytHeader {
+	margin-bottom: 5px;
+}
 .action-bar__head a {
 	text-decoration: none;
 	color: #000;
 }
 
 .action-bar__head {
-	color: #fff;
-	padding: 0 2px 4px;
+	padding-bottom: 6px;
+	border-bottom: 1px solid #929292;
 	display: flex;
 	flex-wrap: wrap;
 }
 
-.action-bar__head > * {
-	margin-top: 4px;
-}
-
 .action-bar__col {
-	background-color: #4a5364;
 	width: 100%;
 }
 
@@ -150,7 +143,7 @@ button,
 select,
 .rowRelatedRecord {
 	border-radius: 0.25rem;
-	padding: 0.1rem 0.2rem;
+	padding: 0.2rem 0.2rem 0.1rem 0.4rem;
 }
 
 button,
@@ -180,8 +173,8 @@ button {
 	border: 1px solid transparent;
 	padding: 0.2rem 0.3rem;
 	border-radius: 0.25rem;
-	transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out,
-		box-shadow 0.15s ease-in-out;
+	transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+		border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
 button:hover {
@@ -190,15 +183,9 @@ button:hover {
 	border-color: #dae0e5;
 }
 
-.c-ical {
-	margin: 2px;
-}
-
 .c-ical__event {
 	background: #fffdfd;
-	margin: 2px 0;
 	border: 1px solid #dedede;
-	margin: 3px auto;
 	border-radius: 6px;
 }
 
@@ -242,7 +229,7 @@ button:hover {
 .c-ical__subject {
 	margin: 0 auto;
 	text-align: center;
-	background: #4a5364;
+	background: #406a95;
 	color: white;
 	border-top-left-radius: 6px;
 	border-top-right-radius: 6px;
@@ -256,4 +243,11 @@ button:hover {
 .action-bar__head__message {
 	text-align: center !important;
 	display: block;
+}
+.importBtn {
+	float: right;
+	margin-right: 10px;
+}
+.importBtn a {
+	color: #fff;
 }

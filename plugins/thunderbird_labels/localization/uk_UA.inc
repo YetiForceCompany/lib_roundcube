@@ -1,9 +1,9 @@
 <?php
 /**
- * Author:
- * Mykyta Solomko
- * http://code.google.com/p/rcmail-thunderbird-labels/
- */
+* Author:
+* Mykyta Solomko
+*/
+
 $labels = array();
 $labels['label'] = 'Мітки Thunderbird';
 $labels['label0'] = 'Без мітки';

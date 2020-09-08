@@ -1,9 +1,9 @@
 <?php
 /**
- * Author:
- * Samuele Tognini <samuele@samuele.netsons.org>
- * http://code.google.com/p/rcmail-thunderbird-labels/
- */
+* Author:
+* Samuele Tognini <samuele@samuele.netsons.org>
+*/
+
 $labels = array();
 $labels['label'] = 'Etichette Thunderbird';
 $labels['label0'] = 'Nessuna etichetta';

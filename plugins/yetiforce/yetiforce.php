@@ -16,32 +16,37 @@ class yetiforce extends rcube_plugin
 	/**
 	 * @var array
 	 */
-	private $message = [];
-	/**
-	 * @var array
-	 */
 	private $icsParts = [];
 
 	public function init()
 	{
 		$this->rc = rcmail::get_instance();
+		$this->include_stylesheet('elastic.css');
+
 		$this->add_hook('login_after', [$this, 'loginAfter']);
 		$this->add_hook('startup', [$this, 'startup']);
 		$this->add_hook('authenticate', [$this, 'authenticate']);
-		if ('mail' == $this->rc->task) {
-			$this->register_action('plugin.yetiforce.addFilesToMail', [$this, 'addFilesToMail']);
-			$this->register_action('plugin.yetiforce.getEmailTemplates', [$this, 'getEmailTemplates']);
-			$this->register_action('plugin.yetiforce.getContentEmailTemplate', [$this, 'getContentEmailTemplate']);
-			$this->register_action('plugin.yetiforce.importIcs', [$this, 'importIcs']);
-			$this->rc->output->set_env('site_URL', $this->rc->config->get('site_URL'));
-			$this->include_stylesheet('../../../../../layouts/resources/icons/yfm.css');
-			$this->add_texts('localization/', false);
 
+		$this->register_action('plugin.yetiforce-importIcs', [$this, 'importIcs']);
+		$this->register_action('plugin.yetiforce-addFilesToMail', [$this, 'addFilesToMail']);
+		$this->register_action('plugin.yetiforce-getContentEmailTemplate', [$this, 'getContentEmailTemplate']);
+
+		$this->rc->output->add_handler('yetiforce.translate', [$this, 'translate']);
+		if ('mail' == $this->rc->task) {
+			$this->include_stylesheet('../../../../../layouts/resources/icons/yfm.css');
+			$this->include_stylesheet('../../../../../libraries/@fortawesome/fontawesome-free/css/all.css');
 			$currentPath = getcwd();
 			chdir($this->rc->config->get('root_directory'));
 			$this->loadCurrentUser();
 
-			if ('compose' === $this->rc->action) {
+			if ('preview' === $this->rc->action || 'show' === $this->rc->action) {
+				$this->include_script('preview.js');
+				$this->include_stylesheet('preview.css');
+
+				$this->add_hook('template_object_messageattachments', [$this, 'appendIcsPreview']);
+				$this->add_hook('message_load', [$this, 'messageLoad']);
+			} elseif ('compose' === $this->rc->action) {
+				$this->include_script('compose.js');
 				$composeAddressModules = [];
 				foreach (\App\Config::component('Mail', 'RC_COMPOSE_ADDRESS_MODULES') as $moduleName) {
 					if (\App\Privilege::isPermitted($moduleName)) {
@@ -51,15 +56,13 @@ class yetiforce extends rcube_plugin
 				$this->viewData['compose']['composeAddressModules'] = $composeAddressModules;
 				$this->rc->output->set_env('isPermittedMailTemplates', \App\Privilege::isPermitted('EmailTemplates'));
 
-				$this->include_script('compose.js');
+				$this->rc->output->add_handler('yetiforce.adressbutton', [$this, 'adressButton']);
+				$this->add_hook('render_page', [$this, 'loadSignature']);
 
 				$this->add_hook('message_compose_body', [$this, 'messageComposeBody']);
 				$this->add_hook('message_compose', [$this, 'messageComposeHead']);
-				$this->add_hook('render_page', [$this, 'loadSignature']);
-				$this->add_hook('template_object_yt_adress_button', [$this, 'ytAdressButton']);
 
-				$id = rcube_utils::get_input_value('_id', rcube_utils::INPUT_GPC);
-				if ($id) {
+				if ($id = rcube_utils::get_input_value('_id', rcube_utils::INPUT_GPC)) {
 					$id = App\Purifier::purifyByType($id, 'Alnum');
 					if (isset($_SESSION['compose_data_' . $id]['param']['crmmodule'])) {
 						$this->rc->output->set_env('crmModule', $_SESSION['compose_data_' . $id]['param']['crmmodule']);
@@ -72,20 +75,15 @@ class yetiforce extends rcube_plugin
 					}
 				}
 			}
-			if ('preview' === $this->rc->action || 'show' === $this->rc->action) {
-				$this->include_script('preview.js');
-				$this->include_stylesheet('../../../../../libraries/@fortawesome/fontawesome-free/css/all.css');
-				$this->include_stylesheet('preview.css');
-				$this->add_hook('message_load', [$this, 'messageLoad']);
-				$this->add_hook('template_object_messageattachments', [$this, 'appendIcsPreview']);
-			}
-			if (empty($this->rc->action)) {
-				$this->include_script('colResizable.js');
-			}
 			chdir($currentPath);
 		}
 	}
 
+	/**
+	 * startup hook handler.
+	 *
+	 * @param array $args
+	 */
 	public function startup($args)
 	{
 		if (empty($_GET['_autologin']) || !($row = $this->getAutoLogin())) {
@@ -106,6 +104,11 @@ class yetiforce extends rcube_plugin
 		return $args;
 	}
 
+	/**
+	 * authenticate hook handler.
+	 *
+	 * @param array $args
+	 */
 	public function authenticate($args)
 	{
 		if (!empty($_GET['_autologin']) && ($row = $this->getAutoLogin())) {
@@ -132,10 +135,14 @@ class yetiforce extends rcube_plugin
 		return $args;
 	}
 
+	/**
+	 * login_after hook handler.
+	 * Password savin.
+	 *
+	 * @param array $args
+	 */
 	public function loginAfter($args)
 	{
-		//	Password saving
-		$this->rc = rcmail::get_instance();
 		$pass = rcube_utils::get_input_value('_pass', rcube_utils::INPUT_POST);
 		if (!empty($pass)) {
 			$sql = 'UPDATE ' . $this->rc->db->table_name('users') . ' SET password = ? WHERE user_id = ?';
@@ -154,32 +161,63 @@ class yetiforce extends rcube_plugin
 		}
 		if ($row = $this->getAutoLogin()) {
 			$_SESSION['crm']['id'] = $row['cuid'];
-			if (isset($row['params']['language'])) {
-				$languages = $this->rc->list_languages();
-				$lang = explode('_', $row['params']['language']);
-				$lang[1] = strtoupper($lang[1]);
-				$lang = implode('_', $lang);
-				if (!isset($languages[$lang])) {
-					$lang = substr($lang, 0, 2);
-				}
-				if (isset($languages[$lang])) {
-					$this->rc->config->set('language', $lang);
-					$this->rc->load_language($lang);
-					$this->rc->user->save_prefs(['language' => $lang]);
-				}
+			if (!empty($row['params']['language'])) {
+				$language = $row['params']['language'];
+			}
+		} else {
+			$_SESSION['crm']['id'] = $args['cuid'];
+			$language = \App\Language::getLanguageTag();
+		}
+		if (isset($language)) {
+			$languages = $this->rc->list_languages();
+			$lang = explode('_', $row['params']['language']);
+			$lang[1] = strtoupper($lang[1]);
+			$lang = implode('_', $lang);
+			if (!isset($languages[$lang])) {
+				$lang = substr($lang, 0, 2);
+			}
+			if (isset($languages[$lang])) {
+				$this->rc->config->set('language', $lang);
+				$this->rc->load_language($lang);
+				$this->rc->user->save_prefs(['language' => $lang]);
 			}
 		}
 		return $args;
 	}
 
-	public function messageLoad($args)
+	protected function getAutoLogin()
+	{
+		if (empty($_GET['_autologinKey'])) {
+			return false;
+		}
+		if (isset($this->autologin)) {
+			return $this->autologin;
+		}
+		$key = App\Purifier::purifyByType(rcube_utils::get_input_value('_autologinKey', rcube_utils::INPUT_GPC), 'Alnum');
+		$db = $this->rc->get_dbh();
+		$sqlResult = $db->query('SELECT * FROM u_yf_mail_autologin INNER JOIN roundcube_users ON roundcube_users.user_id = u_yf_mail_autologin.ruid WHERE roundcube_users.password <> \'\' AND u_yf_mail_autologin.`key` = ?;', $key);
+		$autologin = false;
+		if ($row = $db->fetch_assoc($sqlResult)) {
+			$autologin = $row;
+			$autologin['params'] = json_decode($autologin['params'], true);
+		}
+		$this->autologin = $autologin;
+		return $autologin;
+	}
+
+	/**
+	 * Set environment variables in JS, needed for QuickCreateForm
+	 * message_load hook handler.
+	 *
+	 * @param array $args
+	 */
+	public function messageLoad(array $args)
 	{
 		if (!isset($args['object'])) {
 			return;
 		}
-		$this->rc->output->set_env('subject', $args['object']->headers->subject);
-		$from = $args['object']->headers->from;
-		$from = explode('<', rtrim($from, '>'), 2);
+		$this->message = $args['object'];
+		$from = explode('<', rtrim($this->message->headers->from, '>'), 2);
 		$fromName = '';
 		if (\count($from) > 1) {
 			$fromName = $from[0];
@@ -189,10 +227,20 @@ class yetiforce extends rcube_plugin
 		}
 		$this->rc->output->set_env('fromName', $fromName);
 		$this->rc->output->set_env('fromMail', $fromMail);
-		$this->setIcsData($args);
+		$this->rc->output->set_env('subject', $this->message->headers->subject);
+		foreach ((array) $this->message->attachments as $attachment) {
+			if ('application/ics' === $attachment->mimetype || 'text/calendar' === $attachment->mimetype) {
+				$this->icsParts[] = ['part' => $attachment->mime_id, 'uid' => $this->message->uid, 'type' => 'attachments'];
+			}
+		}
+		foreach ((array) $this->message->parts as $part) {
+			if ('application/ics' === $part->mimetype || 'text/calendar' === $part->mimetype) {
+				$this->icsParts[] = ['part' => $part->mime_id, 'uid' => $this->message->uid, 'type' => 'parts'];
+			}
+		}
 	}
 
-	public function messageComposeHead($args)
+	public function messageComposeHead(array $args)
 	{
 		$this->rc = rcmail::get_instance();
 		$db = $this->rc->get_dbh();
@@ -206,7 +254,6 @@ class yetiforce extends rcube_plugin
 		$db->query('DELETE FROM `u_yf_mail_compose_data` WHERE `key` = ?;', $composeKey);
 		if (!empty($params)) {
 			$params = json_decode($params['data'], true);
-
 			foreach ($params as $key => &$value) {
 				$args['param'][$key] = $value;
 			}
@@ -223,8 +270,7 @@ class yetiforce extends rcube_plugin
 			if (!isset($params['mailId'])) {
 				return $args;
 			}
-			$mailId = $params['mailId'];
-			$result = $db->query('SELECT content,reply_to_email,date,from_email,to_email,cc_email,subject FROM vtiger_ossmailview WHERE ossmailviewid = ?;', $mailId);
+			$result = $db->query('SELECT content,reply_to_email,date,from_email,to_email,cc_email,subject FROM vtiger_ossmailview WHERE ossmailviewid = ?;', $params['mailId']);
 			$row = $db->fetch_assoc($result);
 			$args['param']['type'] = $params['type'];
 			$args['param']['mailData'] = $row;
@@ -237,6 +283,9 @@ class yetiforce extends rcube_plugin
 				// no break
 				case 'reply':
 					$to = $row['reply_to_email'];
+					if (empty($to)) {
+						$to = $row['from_email'];
+					}
 					if (preg_match('/^re:/i', $row['subject'])) {
 						$subject = $row['subject'];
 					} else {
@@ -264,14 +313,20 @@ class yetiforce extends rcube_plugin
 				}
 				chdir($currentPath);
 			}
-			$args['param']['to'] = $to;
-			$args['param']['cc'] = $cc;
-			$args['param']['subject'] = $subject;
+			if (!empty($to)) {
+				$args['param']['to'] = $to;
+			}
+			if (!empty($cc)) {
+				$args['param']['cc'] = $cc;
+			}
+			if (!empty($subject)) {
+				$args['param']['subject'] = $subject;
+			}
 		}
 		return $args;
 	}
 
-	public function messageComposeBody($args)
+	public function messageComposeBody(array $args)
 	{
 		$this->rc = rcmail::get_instance();
 		$id = App\Purifier::purifyByType(rcube_utils::get_input_value('_id', rcube_utils::INPUT_GPC), 'Alnum');
@@ -322,7 +377,7 @@ class yetiforce extends rcube_plugin
 				if ($replyto != $from) {
 					$prefix .= sprintf('<tr><th align="right" nowrap="nowrap" valign="baseline">%s: </th><td>%s</td></tr>', $this->rc->gettext('replyto'), rcube::Q($replyto, 'replace'));
 				}
-				$prefix .= '</tbody></table><br>';
+				$prefix .= '</tbody></table>';
 			}
 			$body = $prefix . $body;
 		} else {
@@ -353,7 +408,7 @@ class yetiforce extends rcube_plugin
 	}
 
 	//	Loading signature
-	public function loadSignature($response)
+	public function loadSignature(array $args)
 	{
 		global $OUTPUT, $MESSAGE;
 		if ($this->rc->config->get('enable_variables_in_signature') && !empty($OUTPUT->get_env('signatures'))) {
@@ -376,7 +431,7 @@ class yetiforce extends rcube_plugin
 			$signatures[$identityId]['text'] = $signature['text'] . PHP_EOL . $gS['text'];
 			$signatures[$identityId]['html'] = $signature['html'] . '<div class="pre global">' . $gS['html'] . '</div>';
 		}
-		if (\count($MESSAGE->identities)) {
+		if ($MESSAGE->identities) {
 			foreach ($MESSAGE->identities as &$identity) {
 				$identityId = $identity['identity_id'];
 				if (!isset($signatures[$identityId])) {
@@ -390,34 +445,23 @@ class yetiforce extends rcube_plugin
 
 	public function getGlobalSignature()
 	{
-		global $RCMAIL;
-		$db = $RCMAIL->get_dbh();
-		$result = [];
-		$sqlResult = $db->query("SELECT `value` FROM yetiforce_mail_config WHERE `type` = 'signature' AND `name` = 'signature';");
-		while ($row = $db->fetch_assoc($sqlResult)) {
-			$currentPath = getcwd();
-			chdir($this->rc->config->get('root_directory'));
-			$parser = App\TextParser::getInstanceById($this->currentUser->getId(), 'Users');
-			$value = $parser->setContent($row['value'])->parse()->getContent();
-			chdir($currentPath);
-			$result['html'] = $value;
-			$result['text'] = $value;
-		}
+		$config = Settings_Mail_Config_Model::getConfig('signature');
+		$parser = App\TextParser::getInstanceById($this->currentUser->getId(), 'Users');
+		$result['text'] = $result['html'] = $parser->setContent($config['signature'])->parse()->getContent();
 		return $result;
 	}
 
 	public function checkAddSignature()
 	{
-		global $RCMAIL;
-		$db = $RCMAIL->get_dbh();
-		$sqlResult = $db->query("SELECT * FROM yetiforce_mail_config WHERE `type` = 'signature' AND `name` = 'addSignature';");
-		while ($sql_arr = $db->fetch_assoc($sqlResult)) {
-			return 'false' == $sql_arr['value'] ? true : false;
-		}
-		return true;
+		$config = Settings_Mail_Config_Model::getConfig('signature');
+		return empty($config['addSignature']) || 'false' === $config['addSignature'] ? true : false;
 	}
 
-	//	Adding attachments
+	/**
+	 * Add files to mail.
+	 *
+	 * @return void
+	 */
 	public function addFilesToMail()
 	{
 		$COMPOSE_ID = App\Purifier::purifyByType(rcube_utils::get_input_value('_id', rcube_utils::INPUT_GPC), 'Alnum');
@@ -431,74 +475,40 @@ class yetiforce extends rcube_plugin
 		if (!$COMPOSE) {
 			die('Invalid session var!');
 		}
-		$this->rc = rcmail::get_instance();
 		$index = 0;
-		$htmlAttachments = '';
 		foreach ($this->getAttachment($ids, false) as $attachment) {
 			++$index;
-			$attachment['group'] = $COMPOSE_ID;
 			$userid = rcmail::get_instance()->user->ID;
 			[$usec, $sec] = explode(' ', microtime());
 			$id = preg_replace('/[^0-9]/', '', $userid . $sec . $usec) . $index;
 			$attachment['id'] = $id;
+			$attachment['group'] = $COMPOSE_ID;
+			@chmod($attachment['path'], 0600);  // set correct permissions (#1488996)
 			$_SESSION['plugins']['filesystem_attachments'][$COMPOSE_ID][$id] = realpath($attachment['path']);
 			$this->rc->session->append($SESSION_KEY . '.attachments', $id, $attachment);
-
-			if (($icon = $COMPOSE['deleteicon']) && is_file($icon)) {
-				$button = html::img([
-					'src' => $icon,
-					'alt' => $this->rc->gettext('delete')
-				]);
-			} elseif ($COMPOSE['textbuttons']) {
-				$button = rcube::Q($this->rc->gettext('delete'));
-			} else {
-				$button = '';
-			}
-			$link_content = sprintf('%s <span class="attachment-size"> (%s)</span>',
-				rcube::Q($attachment['name']), $this->rc->show_bytes($attachment['size']));
-			$content_link = html::a([
-				'href' => '#load',
-				'class' => 'filename',
-				'onclick' => sprintf("return %s.command('load-attachment','rcmfile%s', this, event)", rcmail_output::JS_OBJECT_NAME, $id),
-			], $link_content);
-			$delete_link = html::a([
-				'href' => '#delete',
-				'onclick' => sprintf("return %s.command('remove-attachment','rcmfile%s', this, event)", rcmail_output::JS_OBJECT_NAME, $id),
-				'title' => $this->rc->gettext('delete'),
-				'class' => 'delete',
-				'aria-label' => $this->rc->gettext('delete') . ' ' . $attachment['name'],
-			], $button);
-			$content = 'left' == $COMPOSE['icon_pos'] ? $delete_link . $content_link : $content_link . $delete_link;
-
-			$htmlAttachments .= 'window.rcmail.add2attachment_list("rcmfile' . $id . '",{html:"' . rcube::JQ($content) . '",name:"' . $attachment['name'] . '",mimetype:"' . $attachment['mimetype'] . '",classname:"' . rcube_utils::file2class($attachment['mimetype'], $attachment['name']) . '",complete:true},"' . $uploadid . '");' . PHP_EOL;
+			$this->rcmail_attachment_success($attachment, $uploadid);
 		}
-		echo '<!DOCTYPE html>
-<html lang="en">
-<head><title></title><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-<script type="text/javascript">
-if (window && window.rcmail) {
-	window.rcmail.iframe_loaded("");
-	' . $htmlAttachments . '
-	window.rcmail.auto_save_start(false);
-}
-</script>
-</head>
-<body>
-</body>
-</html>';
-		exit;
+		$this->rc->output->command('auto_save_start');
+		$this->rc->output->send('iframe');
 	}
 
+	/**
+	 * Adding attachments.
+	 *
+	 * @param mixed $ids
+	 * @param mixed $files
+	 *
+	 * @return void
+	 */
 	public function getAttachment($ids, $files)
 	{
 		$attachments = [];
 		if (empty($ids) && empty($files)) {
 			return $attachments;
 		}
-		if (\is_array($ids)) {
+		if (!\is_array($ids)) {
 			$ids = implode(',', $ids);
 		}
-		$this->rc = rcmail::get_instance();
 		$userid = $this->rc->user->ID;
 		$index = 0;
 		if ($ids) {
@@ -546,6 +556,58 @@ if (window && window.rcmail) {
 		return $attachments;
 	}
 
+	/**
+	 * Copy functions from a file public_html/modules/OSSMail/roundcube/program/steps/mail/attachments.inc.
+	 *
+	 * @param array  $attachment
+	 * @param string $uploadid
+	 *
+	 * @return void
+	 */
+	public function rcmail_attachment_success($attachment, $uploadid)
+	{
+		global $RCMAIL, $COMPOSE;
+
+		$id = $attachment['id'];
+
+		if (($icon = $COMPOSE['deleteicon']) && is_file($icon)) {
+			$button = html::img([
+				'src' => $icon,
+				'alt' => $RCMAIL->gettext('delete')
+			]);
+		} elseif ($COMPOSE['textbuttons']) {
+			$button = rcube::Q($RCMAIL->gettext('delete'));
+		} else {
+			$button = '';
+		}
+
+		$link_content = sprintf('<span class="attachment-name">%s</span><span class="attachment-size">(%s)</span>',
+		rcube::Q($attachment['name']), $RCMAIL->show_bytes($attachment['size']));
+
+		$content_link = html::a([
+			'href' => '#load',
+			'class' => 'filename',
+			'onclick' => sprintf("return %s.command('load-attachment','rcmfile%s', this, event)", rcmail_output::JS_OBJECT_NAME, $id),
+		], $link_content);
+
+		$delete_link = html::a([
+			'href' => '#delete',
+			'onclick' => sprintf("return %s.command('remove-attachment','rcmfile%s', this, event)", rcmail_output::JS_OBJECT_NAME, $id),
+			'title' => $RCMAIL->gettext('delete'),
+			'class' => 'delete',
+			'aria-label' => $RCMAIL->gettext('delete') . ' ' . $attachment['name'],
+		], $button);
+
+		$content = 'left' == $COMPOSE['icon_pos'] ? $delete_link . $content_link : $content_link . $delete_link;
+
+		$RCMAIL->output->command('add2attachment_list', "rcmfile$id", [
+			'html' => $content,
+			'name' => $attachment['name'],
+			'mimetype' => $attachment['mimetype'],
+			'classname' => rcube_utils::file2class($attachment['mimetype'], $attachment['name']),
+			'complete' => true], $uploadid);
+	}
+
 	public function rcmailWrapAndQuote($text, $length = 72)
 	{
 		// Rebuild the message body with a maximum of $max chars, while keeping quoted message.
@@ -577,26 +639,6 @@ if (window && window.rcmail) {
 		return rtrim($out, "\n");
 	}
 
-	protected function getAutoLogin()
-	{
-		if (empty($_GET['_autologinKey'])) {
-			return false;
-		}
-		if (isset($this->autologin)) {
-			return $this->autologin;
-		}
-		$key = App\Purifier::purifyByType(rcube_utils::get_input_value('_autologinKey', rcube_utils::INPUT_GPC), 'Alnum');
-		$db = $this->rc->get_dbh();
-		$sqlResult = $db->query('SELECT * FROM u_yf_mail_autologin INNER JOIN roundcube_users ON roundcube_users.user_id = u_yf_mail_autologin.ruid WHERE roundcube_users.password <> \'\' AND u_yf_mail_autologin.`key` = ?;', $key);
-		$autologin = false;
-		if ($row = $db->fetch_assoc($sqlResult)) {
-			$autologin = $row;
-			$autologin['params'] = json_decode($autologin['params'], true);
-		}
-		$this->autologin = $autologin;
-		return $autologin;
-	}
-
 	/**
 	 * Parse variables.
 	 *
@@ -626,36 +668,24 @@ if (window && window.rcmail) {
 		return true;
 	}
 
-	public function ytAdressButton($p)
+	public function adressButton(array $args)
 	{
 		if (empty($this->viewData['compose']['composeAddressModules'])) {
-			return $p;
+			return '';
 		}
 		$content = '';
 		foreach ($this->viewData['compose']['composeAddressModules'] as $moduleName => $value) {
-			$text = html::span(['class' => "yfm-{$moduleName}"], '') . ' ' . $value;
-			$content .= html::a(['class' => 'button', 'data-input' => $p['part'], 'data-module' => $moduleName], $text);
+			$text = html::span(['class' => "yfm-$moduleName"], '') . " <span class=\"inner\">$value</span>";
+			$content .= html::a([
+				'class' => 'btn btn-sm btn-outline-dark mr-2 mt-1',
+				'href' => '#',
+				'data-input' => $args['part'],
+				'data-module' => $moduleName,
+				'title' => $value,
+				'onclick' => "return rcmail.command('yetiforce.selectAdress','$moduleName','{$args['part']}')",
+			], $text);
 		}
-		$p['content'] = $content;
-		return $p;
-	}
-
-	/**
-	 * Function to get templates.
-	 */
-	public function getEmailTemplates()
-	{
-		$currentPath = getcwd();
-		chdir($this->rc->config->get('root_directory'));
-		$this->loadCurrentUser();
-		$emailTemplates = App\Mail::getTemplateList('', 'PLL_MAIL');
-		foreach ($emailTemplates as &$template) {
-			$moduleLabel = $template['module_name'];
-			$template['moduleTranslate'] = $moduleLabel ? \App\Language::translate($moduleLabel, $moduleLabel) : '';
-		}
-		echo App\Json::encode($emailTemplates);
-		chdir($currentPath);
-		exit;
+		return $content;
 	}
 
 	/**
@@ -689,39 +719,19 @@ if (window && window.rcmail) {
 	}
 
 	/**
-	 * Set ics data.
-	 *
-	 * @param array $args
-	 */
-	public function setIcsData(array $args)
-	{
-		$this->message = $args['object'];
-		foreach ((array) $this->message->attachments as $attachment) {
-			if ('application/ics' === $attachment->mimetype || 'text/calendar' === $attachment->mimetype) {
-				$this->icsParts[] = ['part' => $attachment->mime_id, 'uid' => $this->message->uid, 'type' => 'attachments'];
-			}
-		}
-		foreach ((array) $this->message->parts as $part) {
-			if ('application/ics' === $part->mimetype || 'text/calendar' === $part->mimetype) {
-				$this->icsParts[] = ['part' => $part->mime_id, 'uid' => $this->message->uid, 'type' => 'parts'];
-			}
-		}
-	}
-
-	/**
 	 * Append ical preview in attachments' area.
+	 * template_object_messageattachments hook handler.
 	 *
 	 * @param array $args
 	 *
 	 * @return mixed
 	 */
-	public function appendIcsPreview($args)
+	public function appendIcsPreview(array $args): array
 	{
-		$ics = [];
 		$currentPath = getcwd();
 		chdir($this->rc->config->get('root_directory'));
 		$this->loadCurrentUser();
-		$counterBtn = $counterList = [];
+		$showPart = $ics = $counterBtn = $counterList = [];
 		foreach ($this->icsParts as $icsPart) {
 			$icsContent = $this->message->get_part_content($icsPart['part'], null, true);
 			$calendar = \App\Integrations\Dav\Calendar::loadFromContent($icsContent);
@@ -736,13 +746,12 @@ if (window && window.rcmail) {
 				}
 			}
 		}
-		$showPart = [];
 		$translationMod = 'Calendar';
 		$showMore = false;
 		foreach ($ics as $data) {
 			$evTemplate = '<div class="c-ical">';
 			[$record, $icsPart] = $data;
-			$fields = '';
+			$dateStart = $fields = '';
 			if (!$record->isEmpty('date_start')) {
 				$dateStart = $record->getDisplayValue('date_start');
 				$dateStartLabel = \App\Language::translate('LBL_START');
@@ -781,30 +790,27 @@ if (window && window.rcmail) {
 				$label = \App\Language::translate('LBL_STATE', $translationMod);
 				$fields .= "<div><span class=\"fas fa-star mr-1\"></span><strong>$label</strong>: $state</div>";
 			}
-			if ($description = $record->getDisplayValue('description', false, false, 100)) {
+			if ($description = $record->getDisplayValue('description', false, false, 50)) {
 				$descriptionLabel = \App\Language::translate('Description', $translationMod);
 				$fields .= "<div><span class=\"fas fa-edit mr-1\"></span><strong>$descriptionLabel</strong>: $description</div>";
 			}
 			$evTemplate .= "<div class=\"w-100 c-ical__event\">
-										<h3 class='c-ical__subject'>{$record->getDisplayValue('subject')}</h3>
-										<div class=\"c-ical__wrapper\">
-										$fields
-										</div>
-									</div>";
+							  <h3 class='c-ical__subject'>{$record->getDisplayValue('subject')} | $dateStart <span class=\"button_to_replace\"></span></h3>
+								<div class=\"c-ical__wrapper\">$fields</div>
+							  </div>";
 			$evTemplate .= '</div>';
 			if (!isset($showPart[$icsPart['part']]) && \App\Privilege::isPermitted('Calendar', 'CreateView')) {
 				$showPart[$icsPart['part']] = $icsPart['part'];
 				$title = \App\Language::translate('LBL_ADD_TO_MY_CALENDAR', 'OSSMail');
 				$counterText = empty($counterBtn[$icsPart['part']]) ? '' : ($counterBtn[$icsPart['part']] > 1 ? " ({$counterBtn[$icsPart['part']]})" : '');
-				$args['content'] .=
-					html::p(['class' => ''],
-						html::a([
-							'href' => 'javascript:void',
-							'class' => 'button',
-							'onclick' => "return rcmail.command('yetiforce.importICS',{$icsPart['part']},'{$icsPart['type']}')",
-							'title' => $title,
-						], html::span(null, "<span class=\"far fa-calendar-plus mr-1\"></span>{$title}{$counterText}"))
-					) . html::div(null, $evTemplate);
+				$btn = html::a([
+					'href' => '#',
+					'class' => 'button',
+					'onclick' => "return rcmail.command('yetiforce.importICS',{$icsPart['part']},'{$icsPart['type']}')",
+					'title' => $title,
+				], html::span(null, "<span class=\"far fa-calendar-plus mr-1\"></span>{$title}{$counterText}"));
+				$evTemplate = str_replace('<span class="button_to_replace"></span>', "<span class=\"importBtn\">{$btn}</span>", $evTemplate);
+				$args['content'] .= html::div(null, $evTemplate);
 			} elseif ($counterList[$icsPart['part']] < 4) {
 				$args['content'] .= html::div(null, $evTemplate);
 			} else {
@@ -823,17 +829,22 @@ if (window && window.rcmail) {
 		return $args;
 	}
 
-	public function importIcs()
+	/**
+	 * Handler for plugin actions (AJAX), import ICS file.
+	 *
+	 * @return void
+	 */
+	public function importIcs(): void
 	{
+		chdir($this->rc->config->get('root_directory'));
+		$this->loadCurrentUser();
 		if (\App\Privilege::isPermitted('Calendar', 'CreateView')) {
+			$mailId = (int) rcube_utils::get_input_value('_mailId', rcube_utils::INPUT_GPC);
 			$uid = App\Purifier::purifyByType(rcube_utils::get_input_value('_uid', rcube_utils::INPUT_GPC), 'Alnum');
 			$mbox = App\Purifier::purifyByType(rcube_utils::get_input_value('_mbox', rcube_utils::INPUT_GPC), 'Alnum');
 			$mime_id = App\Purifier::purifyByType(rcube_utils::get_input_value('_part', rcube_utils::INPUT_GPC), 'Text');
 			$status = 0;
 			if ($uid && $mbox && $mime_id) {
-				$currentPath = getcwd();
-				chdir($this->rc->config->get('root_directory'));
-				$this->loadCurrentUser();
 				$message = new rcube_message($uid, $mbox);
 				$calendar = \App\Integrations\Dav\Calendar::loadFromContent($message->get_part_body($mime_id));
 				foreach ($calendar->getRecordInstance() as $key => $recordModel) {
@@ -841,17 +852,29 @@ if (window && window.rcmail) {
 					$recordModel->save();
 					if ($recordModel->getId()) {
 						$calendar->recordSaveAttendee($recordModel);
+						// if ($mailId) {
+						// 	$relationModel = new OSSMailView_Relation_Model();
+						// 	$relationModel->addRelation($mailId, $recordModel->getId());
+						// }
 						++$status;
 					}
 				}
-				chdir($currentPath);
 			}
-			$message = ['message' => $status ? \App\Language::translateArgs('LBL_FILE_HAS_BEEN_IMPORTED', 'OSSMail', $status) : \App\Language::translate('LBL_ERROR_OCCURRED_DURING_IMPORT', 'OSSMail'),
-			];
+			$this->rc->output->command('display_message', $status ? \App\Language::translateArgs('LBL_FILE_HAS_BEEN_IMPORTED', 'OSSMail', $status) : \App\Language::translate('LBL_ERROR_OCCURRED_DURING_IMPORT', 'OSSMail'), 'notice');
 		} else {
-			$message = ['message' => \App\Language::translate('LBL_PERMISSION_DENIED')];
+			$this->rc->output->command('display_message', \App\Language::translate('LBL_PERMISSION_DENIED'), 'error');
 		}
-		echo App\Json::encode($message);
-		exit;
+	}
+
+	/**
+	 * Translate input object for templates.
+	 *
+	 * @param array $args
+	 *
+	 * @return string
+	 */
+	public function translate(array $args): string
+	{
+		return \App\Language::translate($args['label'], 'OSSMail');
 	}
 }
