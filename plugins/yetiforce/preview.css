@@ -26,14 +26,10 @@
 }
 
 #ytActionBarContent .noRecords {
-	background: #70a8cb;
 	text-align: center;
-	color: #fff;
-	padding: 2px 0;
 }
 
 #ytActionBarContent .noRecords a.importMail {
-	color: #ecf6ff;
 	cursor: pointer;
 	font-weight: 800;
 }
@@ -110,6 +106,8 @@
 
 .ytHeader {
 	margin-bottom: 5px;
+	padding-bottom: 6px;
+	border-bottom: 1px solid #929292;
 }
 .action-bar__head a {
 	text-decoration: none;
@@ -117,8 +115,6 @@
 }
 
 .action-bar__head {
-	padding-bottom: 6px;
-	border-bottom: 1px solid #929292;
 	display: flex;
 	flex-wrap: wrap;
 }
