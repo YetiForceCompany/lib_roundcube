@@ -677,7 +677,7 @@ class yetiforce extends rcube_plugin
 		foreach ($this->viewData['compose']['composeAddressModules'] as $moduleName => $value) {
 			$text = html::span(['class' => "yfm-$moduleName"], '') . " <span class=\"inner\">$value</span>";
 			$content .= html::a([
-				'class' => 'btn btn-sm btn-outline-dark mr-2 mt-1',
+				'class' => 'btn btn-sm btn-outline-dark mr-1 mt-1',
 				'href' => '#',
 				'data-input' => $args['part'],
 				'data-module' => $moduleName,
