@@ -751,52 +751,60 @@ class yetiforce extends rcube_plugin
 		foreach ($ics as $data) {
 			$evTemplate = '<div class="c-ical">';
 			[$record, $icsPart] = $data;
-			$dateStart = $fields = '';
+			$dateStart = $fields = $fieldsDescription = '';
 			if (!$record->isEmpty('date_start')) {
 				$dateStart = $record->getDisplayValue('date_start');
 				$dateStartLabel = \App\Language::translate('LBL_START');
-				$fields .= "<div><span class=\"fas fa-clock mr-1\"></span><strong>$dateStartLabel</strong>: $dateStart</div>";
+				$fields .= "<div class=\"col-lg-4 col-sm-6 col-12\"><span class=\"fas fa-clock mr-1\"></span><strong>$dateStartLabel</strong>: $dateStart</div>";
 			}
 			if (!$record->isEmpty('due_date')) {
 				$dueDate = $record->getDisplayValue('due_date');
 				$dueDateLabel = \App\Language::translate('LBL_END');
-				$fields .= "<div><span class=\"fas fa-clock mr-1\"></span><strong>$dueDateLabel</strong>: $dueDate</div>";
+				$fields .= "<div class=\"col-lg-4 col-sm-6 col-12\"><span class=\"fas fa-clock mr-1\"></span><strong>$dueDateLabel</strong>: $dueDate</div>";
 			}
 			if ($location = $record->getDisplayValue('location', false, false, 100)) {
 				$locationLabel = \App\Language::translate('Location', $translationMod);
-				$fields .= "<div><span class=\"fas fa-map mr-1\"></span><strong>$locationLabel</strong>: $location</div>";
+				$fields .= "<div class=\"col-lg-4 col-sm-6 col-12\"><span class=\"fas fa-map mr-1\"></span><strong>$locationLabel</strong>: $location</div>";
 			}
 			if ($status = $record->getDisplayValue('activitystatus')) {
 				$statusLabel = \App\Language::translate('LBL_STATUS', $translationMod);
-				$fields .= "<div><span class=\"fas fa-question-circle mr-1\"></span><strong>$statusLabel</strong>: $status</div>";
+				$fields .= "<div class=\"col-lg-4 col-sm-6 col-12\"><span class=\"fas fa-question-circle mr-1\"></span><strong>$statusLabel</strong>: $status</div>";
 			}
 			if ($type = $record->getDisplayValue('activitytype')) {
 				$typeLabel = \App\Language::translate('Activity Type', $translationMod);
-				$fields .= "<div><span class=\"fas fa-calendar mr-1\"></span><strong>$typeLabel</strong>: $type</div>";
+				$fields .= "<div class=\"col-lg-4 col-sm-6 col-12\"><span class=\"fas fa-calendar mr-1\"></span><strong>$typeLabel</strong>: $type</div>";
 			}
 			if ($allday = $record->getDisplayValue('allday')) {
 				$alldayLabel = \App\Language::translate('All day', $translationMod);
-				$fields .= "<div><span class=\"fas fa-edit mr-1\"></span><strong>$alldayLabel</strong>: $allday</div>";
+				$fields .= "<div class=\"col-lg-4 col-sm-6 col-12\"><span class=\"fas fa-edit mr-1\"></span><strong>$alldayLabel</strong>: $allday</div>";
 			}
 			if ($visibility = $record->getDisplayValue('visibility')) {
 				$visibilityLabel = \App\Language::translate('Visibility', $translationMod);
-				$fields .= "<div><span class=\"fas fa-eye mr-1\"></span><strong>$visibilityLabel</strong>: $visibility</div>";
+				$fields .= "<div class=\"col-lg-4 col-sm-6 col-12\"><span class=\"fas fa-eye mr-1\"></span><strong>$visibilityLabel</strong>: $visibility</div>";
 			}
 			if ($priority = $record->getDisplayValue('taskpriority')) {
 				$label = \App\Language::translate('Priority', $translationMod);
-				$fields .= "<div><span class=\"fas fa-exclamation-circle mr-1\"></span><strong>$label</strong>: $priority</div>";
+				$fields .= "<div class=\"col-lg-4 col-sm-6 col-12\"><span class=\"fas fa-exclamation-circle mr-1\"></span><strong>$label</strong>: $priority</div>";
 			}
 			if ($state = $record->getDisplayValue('state')) {
 				$label = \App\Language::translate('LBL_STATE', $translationMod);
-				$fields .= "<div><span class=\"fas fa-star mr-1\"></span><strong>$label</strong>: $state</div>";
+				$fields .= "<div class=\"col-lg-4 col-sm-6 col-12\"><span class=\"fas fa-star mr-1\"></span><strong>$label</strong>: $state</div>";
 			}
 			if ($description = $record->getDisplayValue('description', false, false, 50)) {
 				$descriptionLabel = \App\Language::translate('Description', $translationMod);
-				$fields .= "<div><span class=\"fas fa-edit mr-1\"></span><strong>$descriptionLabel</strong>: $description</div>";
+				$fieldsDescription .= "<div class=\"col-12 mt-2\"><span class=\"fas fa-edit mr-1\"></span><strong>$descriptionLabel</strong>: $description</div>";
 			}
-			$evTemplate .= "<div class=\"w-100 c-ical__event\">
-							  <h3 class='c-ical__subject'>{$record->getDisplayValue('subject')} | $dateStart <span class=\"button_to_replace\"></span></h3>
-								<div class=\"c-ical__wrapper\">$fields</div>
+			$evTemplate .= "<div class=\"w-100 c-ical__event card\">
+								<div class=\"card-header c-ical__header py-1 d-flex align-items-center\">
+									<h3 class='c-ical__subject card-title mb-0 mr-auto'>{$record->getDisplayValue('subject')} | $dateStart </h3>
+									<span class=\"button_to_replace\"></span>
+								</div>
+								<div class=\"c-ical__wrapper card-body py-2\">
+									<div class=\"row\">
+										$fields
+										$fieldsDescription
+									</div>
+								</div>
 							  </div>";
 			$evTemplate .= '</div>';
 			if (!isset($showPart[$icsPart['part']]) && \App\Privilege::isPermitted('Calendar', 'CreateView')) {
@@ -805,7 +813,7 @@ class yetiforce extends rcube_plugin
 				$counterText = empty($counterBtn[$icsPart['part']]) ? '' : ($counterBtn[$icsPart['part']] > 1 ? " ({$counterBtn[$icsPart['part']]})" : '');
 				$btn = html::a([
 					'href' => '#',
-					'class' => 'button',
+					'class' => 'button btn btn-sm btn-light',
 					'onclick' => "return rcmail.command('yetiforce.importICS',{$icsPart['part']},'{$icsPart['type']}')",
 					'title' => $title,
 				], html::span(null, "<span class=\"far fa-calendar-plus mr-1\"></span>{$title}{$counterText}"));
