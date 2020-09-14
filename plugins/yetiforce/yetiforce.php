@@ -795,9 +795,9 @@ class yetiforce extends rcube_plugin
 				$fieldsDescription .= "<div class=\"col-12 mt-2\"><span class=\"fas fa-edit mr-1\"></span><strong>$descriptionLabel</strong>: $description</div>";
 			}
 			$evTemplate .= "<div class=\"w-100 c-ical__event card\">
-								<div class=\"card-header c-ical__header py-1 d-flex align-items-center\">
-									<h3 class='c-ical__subject card-title mb-0 mr-auto'>{$record->getDisplayValue('subject')} | $dateStart </h3>
-									<span class=\"button_to_replace\"></span>
+								<div class=\"card-header c-ical__header py-1 d-sm-flex align-items-center text-center\">
+									  <h3 class='c-ical__subject card-title mb-0 mr-auto text-center'>{$record->getDisplayValue('subject')} | $dateStart </h3>
+									  <span class=\"button_to_replace\"></span>
 								</div>
 								<div class=\"c-ical__wrapper card-body py-2\">
 									<div class=\"row\">
