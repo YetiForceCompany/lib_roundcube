@@ -7,13 +7,35 @@ if (window.rcmail) {
 		rcmail.env.message_commands.push('yetiforce.importICS');
 		rcmail.register_command(
 			'yetiforce.importICS',
-			function (part, type) {
-				rcmail.importICS(part, type);
+			function (props, type) {
+				rcmail.importICS(props, type);
 			},
 			true
 		);
+		rcmail.register_command(
+			'plugin.yetiforce.addSenderToList',
+			function (props) {
+				rcmail.addSenderToList(props);
+			},
+			rcmail.env.uid
+		);
+		if (rcmail.message_list) {
+			rcmail.message_list.addEventListener('select', function (list) {
+				rcmail.enable_command('plugin.yetiforce.addSenderToList', list.get_selection(false).length > 0);
+			});
+		}
 	});
 }
+// Add sender to list action
+rcube_webmail.prototype.addSenderToList = function (props) {
+	this.http_post(
+		'plugin.yetiforce-addSenderToList',
+		this.selection_post_data({
+			_props: props
+		}),
+		this.set_busy(true, 'loading')
+	);
+};
 // import ICS file action
 rcube_webmail.prototype.importICS = function (part, type) {
 	this.http_post(
@@ -38,10 +60,7 @@ rcube_webmail.prototype.loadActionBar = function () {
 		rcId: rcmail.env.user_id
 	}).done(function (response) {
 		rcmail.crmContent.find('.ytHeader').html(response);
-		$('#messagecontent').css(
-			'top',
-			rcmail.crmContent.outerHeight() + $('#messageheader').outerHeight() + 'px'
-		);
+		$('#messagecontent').css('top', rcmail.crmContent.outerHeight() + $('#messageheader').outerHeight() + 'px');
 		rcmail.registerEvents();
 	});
 };

@@ -24,7 +24,7 @@
 				<button type="button" class="btn btn-secondary attach" tabindex="2" onclick="rcmail.upload_input('uploadform')"><roundcube:label name="addattachment" /></button>
 
 				<!--------   YetiForce Sp. z o.o.   -------->
-				<button type="button" class="btn btn-secondary attach" tabindex="2" onclick="return rcmail.command('yetiforce.addFilesFromCRM')"><roundcube:object name="yetiforce.translate" label="LBL_FILE_FROM_CRM" /></button>
+				<button type="button" class="btn btn-secondary attach" tabindex="2" onclick="return rcmail.command('yetiforce.addFilesFromCRM')"><roundcube:label name="LBL_FILE_FROM_CRM" /></button>
 				<!--------   YetiForce Sp. z o.o.   -------->
 			</div>
 			<roundcube:object name="composeAttachmentList" id="attachment-list" class="attachmentslist" tabindex="2" />
@@ -123,7 +123,7 @@
 
 			<!--------   YetiForce Sp. z o.o.   -------->
 			<roundcube:if condition="env:isPermittedMailTemplates" />
-			<a href="#templates" class="button download" label="templates" title="<roundcube:object name="yetiforce.translate" label="LBL_MAIL_TEMPLATES" />" onclick="return rcmail.command('yetiforce.selectTemplate')"><roundcube:object name="yetiforce.translate" label="LBL_TEMPLATES" /></a>
+			<a href="#templates" class="button download" label="templates" title="<roundcube:label name="LBL_MAIL_TEMPLATES" />" onclick="return rcmail.command('yetiforce.selectTemplate')"><roundcube:label name="LBL_TEMPLATES" /></a>
 			<roundcube:endif />
 			<!--------   YetiForce Sp. z o.o.   -------->
 

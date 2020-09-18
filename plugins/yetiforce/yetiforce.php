@@ -30,8 +30,8 @@ class yetiforce extends rcube_plugin
 		$this->register_action('plugin.yetiforce-importIcs', [$this, 'importIcs']);
 		$this->register_action('plugin.yetiforce-addFilesToMail', [$this, 'addFilesToMail']);
 		$this->register_action('plugin.yetiforce-getContentEmailTemplate', [$this, 'getContentEmailTemplate']);
+		$this->register_action('plugin.yetiforce-addSenderToList', [$this, 'addSenderToList']);
 
-		$this->rc->output->add_handler('yetiforce.translate', [$this, 'translate']);
 		if ('mail' == $this->rc->task) {
 			$this->include_stylesheet('../../../../../layouts/resources/icons/yfm.css');
 			$this->include_stylesheet('../../../../../libraries/@fortawesome/fontawesome-free/css/all.css');
@@ -39,12 +39,45 @@ class yetiforce extends rcube_plugin
 			chdir($this->rc->config->get('root_directory'));
 			$this->loadCurrentUser();
 
-			if ('preview' === $this->rc->action || 'show' === $this->rc->action) {
+			$this->rc->load_language(null, [
+				'LBL_FILE_FROM_CRM' => \App\Language::translate('LBL_FILE_FROM_CRM', 'OSSMail'),
+				'LBL_MAIL_TEMPLATES' => \App\Language::translate('LBL_MAIL_TEMPLATES', 'OSSMail'),
+				'LBL_TEMPLATES' => \App\Language::translate('LBL_TEMPLATES', 'OSSMail'),
+				'LBL_BLACK_LIST' => \App\Language::translate('LBL_BLACK_LIST', 'OSSMail'),
+				'LBL_BLACK_LIST_DESC' => \App\Language::translate('LBL_BLACK_LIST_DESC', 'OSSMail'),
+				'LBL_WHITE_LIST' => \App\Language::translate('LBL_WHITE_LIST', 'OSSMail'),
+				'LBL_WHITE_LIST_DESC' => \App\Language::translate('LBL_WHITE_LIST_DESC', 'OSSMail'),
+			]);
+
+			if ('preview' === $this->rc->action || 'show' === $this->rc->action || '' == $this->rc->action) {
 				$this->include_script('preview.js');
 				$this->include_stylesheet('preview.css');
 
 				$this->add_hook('template_object_messageattachments', [$this, 'appendIcsPreview']);
 				$this->add_hook('message_load', [$this, 'messageLoad']);
+
+				$this->add_button([
+					'command' => 'plugin.yetiforce.addSenderToList',
+					'type' => 'link',
+					'prop' => 1,
+					'class' => 'button yfi-fa-ban disabled',
+					'classact' => 'button yfi-fa-ban',
+					'classsel' => 'button yfi-fa-ban pressed',
+					'title' => 'LBL_BLACK_LIST_DESC',
+					'label' => 'LBL_BLACK_LIST',
+					'innerclass' => 'inner',
+				], 'toolbar');
+				$this->add_button([
+					'command' => 'plugin.yetiforce.addSenderToList',
+					'type' => 'link',
+					'prop' => 0,
+					'class' => 'button yfi-fa-check-circle disabled',
+					'classact' => 'button yfi-fa-check-circle',
+					'classsel' => 'button yfi-fa-check-circle pressed',
+					'title' => 'LBL_WHITE_LIST_DESC',
+					'label' => 'LBL_WHITE_LIST',
+					'innerclass' => 'inner',
+				], 'toolbar');
 			} elseif ('compose' === $this->rc->action) {
 				$this->include_script('compose.js');
 				$composeAddressModules = [];
@@ -875,14 +908,35 @@ class yetiforce extends rcube_plugin
 	}
 
 	/**
-	 * Translate input object for templates.
+	 * Handler for plugin actions (AJAX), mark mail file.
 	 *
-	 * @param array $args
-	 *
-	 * @return string
+	 * @return void
 	 */
-	public function translate(array $args): string
+	public function addSenderToList(): void
 	{
-		return \App\Language::translate($args['label'], 'OSSMail');
+		$props = (int) rcube_utils::get_input_value('_props', rcube_utils::INPUT_POST);
+		$messageset = rcmail::get_uids(null, null, $multi, rcube_utils::INPUT_POST);
+		if ($messageset) {
+			$imap = $this->rc->get_storage();
+			$db = $this->rc->get_dbh();
+			foreach ($messageset as $mbox => $uids) {
+				$imap->set_folder($mbox);
+
+				if ('*' === $uids) {
+					$index = $imap->index($mbox, null, null, true);
+					$uids = $index->get();
+				}
+				foreach ($uids as $uid) {
+					$headers = $imap->get_raw_headers($uid);
+					$body = null;
+					if (1 === $props) {
+						$message = new rcube_message($uid, $mbox);
+						$body = $message->first_html_part();
+					}
+					$db->query('INSERT INTO `s_yf_mail_rbl_request` (`datetime`,`type`,`user`,`header`,`body`) VALUES (?,?,?,?,?)', date('Y-m-d H:i:s'), $props, $_SESSION['crm']['id'], $headers, $body);
+				}
+			}
+			$this->rc->output->command('display_message', \App\Language::translate('LBL_MESSAGE_HAS_BEEN_ADDED', 'OSSMail'), 'notice');
+		}
 	}
 }
