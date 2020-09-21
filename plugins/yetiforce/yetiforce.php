@@ -893,10 +893,10 @@ class yetiforce extends rcube_plugin
 					$recordModel->save();
 					if ($recordModel->getId()) {
 						$calendar->recordSaveAttendee($recordModel);
-						// if ($mailId) {
-						// 	$relationModel = new OSSMailView_Relation_Model();
-						// 	$relationModel->addRelation($mailId, $recordModel->getId());
-						// }
+						if ($mailId) {
+							$relationModel = new OSSMailView_Relation_Model();
+							$relationModel->addRelation($mailId, $recordModel->getId());
+						}
 						++$status;
 					}
 				}
@@ -915,13 +915,13 @@ class yetiforce extends rcube_plugin
 	public function addSenderToList(): void
 	{
 		$props = (int) rcube_utils::get_input_value('_props', rcube_utils::INPUT_POST);
-		$messageset = rcmail::get_uids(null, null, $multi, rcube_utils::INPUT_POST);
+		$mbox = (string) rcube_utils::get_input_value('_mbox', rcube_utils::INPUT_POST);
+		$messageset = rcmail::get_uids(null, $mbox, $multi, rcube_utils::INPUT_POST);
 		if ($messageset) {
 			$imap = $this->rc->get_storage();
 			$db = $this->rc->get_dbh();
 			foreach ($messageset as $mbox => $uids) {
 				$imap->set_folder($mbox);
-
 				if ('*' === $uids) {
 					$index = $imap->index($mbox, null, null, true);
 					$uids = $index->get();
@@ -935,6 +935,9 @@ class yetiforce extends rcube_plugin
 					}
 					$db->query('INSERT INTO `s_yf_mail_rbl_request` (`datetime`,`type`,`user`,`header`,`body`) VALUES (?,?,?,?,?)', date('Y-m-d H:i:s'), $props, $_SESSION['crm']['id'], $headers, $body);
 				}
+			}
+			if (($junkMbox = $this->rc->config->get('junk_mbox')) && $mbox !== $junkMbox) {
+				$this->rc->output->command('addSenderToListMove', $junkMbox);
 			}
 			$this->rc->output->command('display_message', \App\Language::translate('LBL_MESSAGE_HAS_BEEN_ADDED', 'OSSMail'), 'notice');
 		}
