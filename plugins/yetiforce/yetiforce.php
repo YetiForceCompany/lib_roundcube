@@ -59,7 +59,7 @@ class yetiforce extends rcube_plugin
 				$this->add_button([
 					'command' => 'plugin.yetiforce.addSenderToList',
 					'type' => 'link',
-					'prop' => 1,
+					'prop' => 0,
 					'class' => 'button yfi-fa-ban disabled',
 					'classact' => 'button yfi-fa-ban',
 					'classsel' => 'button yfi-fa-ban pressed',
@@ -70,7 +70,7 @@ class yetiforce extends rcube_plugin
 				$this->add_button([
 					'command' => 'plugin.yetiforce.addSenderToList',
 					'type' => 'link',
-					'prop' => 0,
+					'prop' => 1,
 					'class' => 'button yfi-fa-check-circle disabled',
 					'classact' => 'button yfi-fa-check-circle',
 					'classsel' => 'button yfi-fa-check-circle pressed',
