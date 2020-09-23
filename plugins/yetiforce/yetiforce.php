@@ -27,6 +27,9 @@ class yetiforce extends rcube_plugin
 		$this->add_hook('startup', [$this, 'startup']);
 		$this->add_hook('authenticate', [$this, 'authenticate']);
 
+		$this->add_hook('storage_init', [$this, 'storageInit']);
+		$this->add_hook('messages_list', [$this, 'messagesList']);
+
 		$this->register_action('plugin.yetiforce-importIcs', [$this, 'importIcs']);
 		$this->register_action('plugin.yetiforce-addFilesToMail', [$this, 'addFilesToMail']);
 		$this->register_action('plugin.yetiforce-getContentEmailTemplate', [$this, 'getContentEmailTemplate']);
@@ -929,17 +932,52 @@ class yetiforce extends rcube_plugin
 				foreach ($uids as $uid) {
 					$headers = $imap->get_raw_headers($uid);
 					$body = null;
-					if (1 === $props) {
+					if (0 === $props) {
 						$message = new rcube_message($uid, $mbox);
 						$body = $message->first_html_part();
 					}
 					$db->query('INSERT INTO `s_yf_mail_rbl_request` (`datetime`,`type`,`user`,`header`,`body`) VALUES (?,?,?,?,?)', date('Y-m-d H:i:s'), $props, $_SESSION['crm']['id'], $headers, $body);
 				}
 			}
-			if (($junkMbox = $this->rc->config->get('junk_mbox')) && $mbox !== $junkMbox) {
+			if (0 === $props && ($junkMbox = $this->rc->config->get('junk_mbox')) && $mbox !== $junkMbox) {
 				$this->rc->output->command('addSenderToListMove', $junkMbox);
 			}
 			$this->rc->output->command('display_message', \App\Language::translate('LBL_MESSAGE_HAS_BEEN_ADDED', 'OSSMail'), 'notice');
 		}
+	}
+
+	/**
+	 * storage_init hook handler.
+	 * Adds additional headers to supported headers list.
+	 *
+	 * @param array $p
+	 */
+	public function storageInit(array $p): array
+	{
+		$p['fetch_headers'] = trim($p['fetch_headers'] . ' RECEIVED');
+		return $p;
+	}
+
+	/**
+	 * messages_list hook handler.
+	 * Plugins may set header's list_cols/list_flags and other rcube_message_header variables and list columns.
+	 *
+	 * @param array $p
+	 */
+	public function messagesList(array $p): array
+	{
+		if (!empty($p['messages'])) {
+			$ipList = [];
+			foreach ($p['messages'] as $index => $message) {
+				$recordModel = \App\Mail\Rbl::getInstance([
+					'header' => $message->others['received']
+				]);
+				if ($ip = $recordModel->getSender()['ip'] ?? '') {
+					$ipList[$message->uid] = $ip;
+				}
+			}
+			$this->rc->output->set_env('rbl_list', \App\Mail\Rbl::getColorByIps($ipList));
+		}
+		return $p;
 	}
 }
