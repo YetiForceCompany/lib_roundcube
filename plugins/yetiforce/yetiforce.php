@@ -29,6 +29,7 @@ class yetiforce extends rcube_plugin
 
 		$this->add_hook('storage_init', [$this, 'storageInit']);
 		$this->add_hook('messages_list', [$this, 'messagesList']);
+		$this->add_hook('message_objects', [$this, 'messageObjects']);
 
 		$this->register_action('plugin.yetiforce-importIcs', [$this, 'importIcs']);
 		$this->register_action('plugin.yetiforce-addFilesToMail', [$this, 'addFilesToMail']);
@@ -46,10 +47,11 @@ class yetiforce extends rcube_plugin
 				'LBL_FILE_FROM_CRM' => \App\Language::translate('LBL_FILE_FROM_CRM', 'OSSMail'),
 				'LBL_MAIL_TEMPLATES' => \App\Language::translate('LBL_MAIL_TEMPLATES', 'OSSMail'),
 				'LBL_TEMPLATES' => \App\Language::translate('LBL_TEMPLATES', 'OSSMail'),
-				'LBL_BLACK_LIST' => \App\Language::translate('LBL_BLACK_LIST', 'OSSMail'),
+				'BTN_BLACK_LIST' => \App\Language::translate('LBL_BLACK_LIST', 'OSSMail'),
 				'LBL_BLACK_LIST_DESC' => \App\Language::translate('LBL_BLACK_LIST_DESC', 'OSSMail'),
-				'LBL_WHITE_LIST' => \App\Language::translate('LBL_WHITE_LIST', 'OSSMail'),
+				'BTN_WHITE_LIST' => \App\Language::translate('LBL_WHITE_LIST', 'OSSMail'),
 				'LBL_WHITE_LIST_DESC' => \App\Language::translate('LBL_WHITE_LIST_DESC', 'OSSMail'),
+				'LBL_BLACK_LIST_ALERT' => \App\Language::translate('LBL_BLACK_LIST_ALERT', 'OSSMail'),
 			]);
 
 			if ('preview' === $this->rc->action || 'show' === $this->rc->action || '' == $this->rc->action) {
@@ -67,7 +69,7 @@ class yetiforce extends rcube_plugin
 					'classact' => 'button yfi-fa-ban',
 					'classsel' => 'button yfi-fa-ban pressed',
 					'title' => 'LBL_BLACK_LIST_DESC',
-					'label' => 'LBL_BLACK_LIST',
+					'label' => 'BTN_BLACK_LIST',
 					'innerclass' => 'inner',
 				], 'toolbar');
 				$this->add_button([
@@ -78,7 +80,7 @@ class yetiforce extends rcube_plugin
 					'classact' => 'button yfi-fa-check-circle',
 					'classsel' => 'button yfi-fa-check-circle pressed',
 					'title' => 'LBL_WHITE_LIST_DESC',
-					'label' => 'LBL_WHITE_LIST',
+					'label' => 'BTN_WHITE_LIST',
 					'innerclass' => 'inner',
 				], 'toolbar');
 			} elseif ('compose' === $this->rc->action) {
@@ -968,15 +970,41 @@ class yetiforce extends rcube_plugin
 	{
 		if (!empty($p['messages'])) {
 			$ipList = [];
-			foreach ($p['messages'] as $index => $message) {
-				$recordModel = \App\Mail\Rbl::getInstance([
+			foreach ($p['messages'] as $message) {
+				$recordInstance = \App\Mail\Rbl::getInstance([
 					'header' => $message->others['received']
 				]);
-				if ($ip = $recordModel->getSender()['ip'] ?? '') {
+				if ($ip = $recordInstance->getSender()['ip'] ?? '') {
 					$ipList[$message->uid] = $ip;
 				}
 			}
 			$this->rc->output->set_env('rbl_list', \App\Mail\Rbl::getColorByIps($ipList));
+		}
+		return $p;
+	}
+
+	/**
+	 * message_objects hook handler.
+	 * Show alert in message with sender's server verification.
+	 *
+	 * @param array $p
+	 */
+	public function messageObjects(array $p): array
+	{
+		$recordInstance = \App\Mail\Rbl::getInstance([
+			'header' => $p['message']->headers->others['received']
+		]);
+		if ($ip = $recordInstance->getSender()['ip'] ?? '') {
+			foreach (\App\Mail\Rbl::findIp($ip) as $row) {
+				if (1 !== (int) $row['status']) {
+					if (\App\Mail\Rbl::LIST_TYPE_BLACK_LIST === (int) $row['type'] || \App\Mail\Rbl::LIST_TYPE_PUBLIC_BLACK_LIST === (int) $row['type']) {
+						$p['content'][] = html::p(['class' => 'aligned-buttons boxerror'],
+							html::span(null, rcube::Q($this->rc->gettext('LBL_BLACK_LIST_ALERT')))
+						);
+					}
+					return $p;
+				}
+			}
 		}
 		return $p;
 	}
