@@ -23,6 +23,14 @@ if (window.rcmail) {
 			rcmail.message_list.addEventListener('select', function (list) {
 				rcmail.enable_command('plugin.yetiforce.addSenderToList', list.get_selection(false).length > 0);
 			});
+			rcmail.addEventListener('listupdate', function () {
+				let btns = $('#toolbar-menu .js-spam-btn');
+				if (rcmail.env.mailbox === rcmail.env.junk_mailbox) {
+					btns.hide();
+				} else {
+					btns.show();
+				}
+			});
 		}
 		if (rcmail.env.layout == 'widescreen') {
 			if (rcmail.gui_objects.messagelist) {
