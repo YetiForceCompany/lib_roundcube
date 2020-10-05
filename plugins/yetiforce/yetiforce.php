@@ -35,6 +35,7 @@ class yetiforce extends rcube_plugin
 		$this->register_action('plugin.yetiforce-addFilesToMail', [$this, 'addFilesToMail']);
 		$this->register_action('plugin.yetiforce-getContentEmailTemplate', [$this, 'getContentEmailTemplate']);
 		$this->register_action('plugin.yetiforce-addSenderToList', [$this, 'addSenderToList']);
+		$this->register_action('plugin.yetiforce-loadMailAnalysis', [$this, 'loadMailAnalysis']);
 
 		if ('mail' == $this->rc->task) {
 			$this->include_stylesheet('../../../../../layouts/resources/icons/yfm.css');
@@ -44,14 +45,18 @@ class yetiforce extends rcube_plugin
 			$this->loadCurrentUser();
 
 			$this->rc->load_language(null, [
-				'LBL_FILE_FROM_CRM' => \App\Language::translate('LBL_FILE_FROM_CRM', 'OSSMail'),
-				'LBL_MAIL_TEMPLATES' => \App\Language::translate('LBL_MAIL_TEMPLATES', 'OSSMail'),
-				'LBL_TEMPLATES' => \App\Language::translate('LBL_TEMPLATES', 'OSSMail'),
-				'BTN_BLACK_LIST' => \App\Language::translate('LBL_BLACK_LIST', 'OSSMail'),
-				'LBL_BLACK_LIST_DESC' => \App\Language::translate('LBL_BLACK_LIST_DESC', 'OSSMail'),
-				'BTN_WHITE_LIST' => \App\Language::translate('LBL_WHITE_LIST', 'OSSMail'),
-				'LBL_WHITE_LIST_DESC' => \App\Language::translate('LBL_WHITE_LIST_DESC', 'OSSMail'),
-				'LBL_BLACK_LIST_ALERT' => \App\Language::translate('LBL_BLACK_LIST_ALERT', 'OSSMail'),
+				'LBL_FILE_FROM_CRM' => \App\Language::translate('LBL_FILE_FROM_CRM', 'OSSMail', false, false),
+				'LBL_MAIL_TEMPLATES' => \App\Language::translate('LBL_MAIL_TEMPLATES', 'OSSMail', false, false),
+				'LBL_TEMPLATES' => \App\Language::translate('LBL_TEMPLATES', 'OSSMail', false, false),
+				'BTN_BLACK_LIST' => \App\Language::translate('LBL_BLACK_LIST', 'OSSMail', false, false),
+				'LBL_BLACK_LIST_DESC' => \App\Language::translate('LBL_BLACK_LIST_DESC', 'OSSMail', false, false),
+				'BTN_WHITE_LIST' => \App\Language::translate('LBL_WHITE_LIST', 'OSSMail', false, false),
+				'LBL_WHITE_LIST_DESC' => \App\Language::translate('LBL_WHITE_LIST_DESC', 'OSSMail', false, false),
+				'LBL_ALERT_BLACK_LIST' => \App\Language::translate('LBL_BLACK_LIST_ALERT', 'OSSMail', false, false),
+				'LBL_ALERT_WHITE_LIST' => \App\Language::translate('LBL_WHITE_LIST_ALERT', 'OSSMail', false, false),
+				'LBL_ALERT_FAKE_MAIL' => \App\Language::translate('LBL_ALERT_FAKE_MAIL', 'OSSMail', false, false),
+				'BTN_ANALYSIS_DETAILS' => \App\Language::translate('BTN_ANALYSIS_DETAILS', 'OSSMail', false, false),
+				'LBL_ALERT_FAKE_SENDER' => \App\Language::translate('LBL_ALERT_FAKE_SENDER', 'Settings:MailRbl', false, false),
 			]);
 
 			if ('preview' === $this->rc->action || 'show' === $this->rc->action || '' == $this->rc->action) {
@@ -81,6 +86,16 @@ class yetiforce extends rcube_plugin
 					'classsel' => 'button yfi-fa-ban pressed text-danger',
 					'title' => 'LBL_BLACK_LIST_DESC',
 					'label' => 'BTN_BLACK_LIST',
+					'innerclass' => 'inner',
+				], 'toolbar');
+				$this->add_button([
+					'command' => 'plugin.yetiforce.loadMailAnalysis',
+					'type' => 'link',
+					'class' => 'button yfi-fa-book-reader disabled js-spam-btn text-danger',
+					'classact' => 'button yfi-fa-book-reader text-danger',
+					'classsel' => 'button yfi-fa-book-reader pressed text-danger',
+					'title' => 'BTN_ANALYSIS_DETAILS',
+					'label' => 'BTN_ANALYSIS_DETAILS',
 					'innerclass' => 'inner',
 				], 'toolbar');
 			} elseif ('compose' === $this->rc->action) {
@@ -969,18 +984,49 @@ class yetiforce extends rcube_plugin
 	public function messagesList(array $p): array
 	{
 		if (!empty($p['messages'])) {
-			$ipList = [];
+			$ipList = $senderList = [];
 			foreach ($p['messages'] as $message) {
-				$recordInstance = \App\Mail\Rbl::getInstance([
-					'header' => $message->others['received']
-				]);
-				if ($ip = $recordInstance->getSender()['ip'] ?? '') {
+				$rblInstance = \App\Mail\Rbl::getInstance($this->parseMessage($message));
+				if ($ip = $rblInstance->getSender()['ip'] ?? '') {
 					$ipList[$message->uid] = $ip;
+				}
+				$verify = $rblInstance->verifySender();
+				if (false === $verify['status']) {
+					$senderList[$message->uid] = "<span class=\"fas fa-exclamation-triangle text-danger\" title=\"{$verify['info']}\"></span>";
 				}
 			}
 			$this->rc->output->set_env('rbl_list', \App\Mail\Rbl::getColorByIps($ipList));
+			$this->rc->output->set_env('sender_list', $senderList);
 		}
 		return $p;
+	}
+
+	/**
+	 * Parse message.
+	 *
+	 * @param rcube_message_header $message
+	 *
+	 * @return array
+	 */
+	public function parseMessage(rcube_message_header $message): array
+	{
+		$header = '';
+		$message->others['received'];
+		if (isset($message->from)) {
+			$header .= 'From: ' . $message->from . PHP_EOL;
+		}
+		if (isset($message->others['received'])) {
+			$received = \is_array($message->others['received']) ? implode(PHP_EOL . 'Received: ', $message->others['received']) : $message->others['received'];
+			$header .= 'Received: ' . $received . PHP_EOL;
+		}
+		if (isset($message->others['return-path'])) {
+			$returnPath = \is_array($message->others['return-path']) ? implode(PHP_EOL . 'Return-Path: ', $message->others['return-path']) : $message->others['return-path'];
+			$header .= 'Return-Path: ' . $returnPath . PHP_EOL;
+		}
+		if (isset($message->others['sender'])) {
+			$header .= 'Sender: ' . $message->others['sender'] . PHP_EOL;
+		}
+		return ['header' => $header];
 	}
 
 	/**
@@ -991,21 +1037,63 @@ class yetiforce extends rcube_plugin
 	 */
 	public function messageObjects(array $p): array
 	{
-		$recordInstance = \App\Mail\Rbl::getInstance([
-			'header' => $p['message']->headers->others['received']
-		]);
-		if ($ip = $recordInstance->getSender()['ip'] ?? '') {
+		$rblInstance = \App\Mail\Rbl::getInstance([]);
+		$rblInstance->set('rawBody', $this->rc->imap->get_raw_body($p['message']->uid));
+		$rblInstance->parse();
+		if (($verifySender = $rblInstance->verifySender()) && !$verifySender['status']) {
+			$p['content'][] = html::p(['class' => 'aligned-buttons boxerror'],
+				html::span(null, rcube::Q($this->rc->gettext('LBL_ALERT_FAKE_SENDER'))) .
+				html::tag('button', [
+					'onclick' => "return rcmail.command('plugin.yetiforce.loadMailAnalysis')",
+					'title' => $this->gettext('addvcardmsg'),
+					'class' => 'fakeMail',
+				], rcube::Q($this->rc->gettext('BTN_ANALYSIS_DETAILS')))
+			);
+		} else {
+			$verifySpf = $rblInstance->verifySpf();
+			$verifyDmarc = $rblInstance->verifyDmarc();
+			$verifyDkim = $rblInstance->verifyDkim();
+			$dangerType = \App\Mail\Rbl::SPF_FAIL === $verifySpf['status'] || \App\Mail\Rbl::DMARC_FAIL === $verifyDmarc['status'] || \App\Mail\Rbl::DKIM_FAIL === $verifyDkim['status'];
+			$desc = '';
+			if (\App\Mail\Rbl::SPF_PASS !== $verifySpf['status']) {
+				$desc .= '- ' . \App\Language::translate('LBL_SPF', 'Settings:MailRbl') . ': ' . html::span(['class' => 'badge ' . $verifySpf['class']], html::span(['class' => 'mr-2 alert-icon ' . $verifySpf['icon']], '') . \App\Language::translate($verifySpf['label'], 'Settings:MailRbl')) . ' ' . \call_user_func_array('vsprintf', [\App\Language::translate($verifySpf['desc'], 'Settings:MailRbl', false, false), [$verifySpf['domain']]]) . '<br />';
+			}
+			if (\App\Mail\Rbl::DKIM_PASS !== $verifyDkim['status']) {
+				$desc .= '- ' . \App\Language::translate('LBL_DKIM', 'Settings:MailRbl') . ': ' . html::span(['class' => 'badge ' . $verifyDkim['class'], 'title' => $verifyDkim['log']], html::span(['class' => 'mr-2 alert-icon ' . $verifyDkim['icon']], '') . \App\Language::translate($verifyDkim['label'], 'Settings:MailRbl')) . ' ' . \App\Language::translate($verifyDkim['desc'], 'Settings:MailRbl') . '<br />';
+			}
+			if (\App\Mail\Rbl::DMARC_PASS !== $verifyDmarc['status']) {
+				$desc .= '- ' . \App\Language::translate('LBL_DMARC', 'Settings:MailRbl') . ': ' . html::span(['class' => 'badge ' . $verifyDmarc['class'], 'title' => $verifyDmarc['log']], html::span(['class' => 'mr-2 alert-icon ' . $verifyDmarc['icon']], '') . \App\Language::translate($verifyDmarc['label'], 'Settings:MailRbl')) . ' ' . \App\Language::translate($verifyDmarc['desc'], 'Settings:MailRbl') . '<br />';
+			}
+			if ($desc) {
+				$p['content'][] = html::div(['class' => 'aligned-buttons ' . ($dangerType ? 'boxerror' : 'boxwarning')],
+				html::span(null, rcube::Q($this->rc->gettext('LBL_ALERT_FAKE_MAIL')) . '<br>' . $desc) .
+				html::tag('button', [
+					'onclick' => "return rcmail.command('plugin.yetiforce.loadMailAnalysis')",
+					'title' => $this->gettext('addvcardmsg'),
+					'class' => 'fakeMail',
+				], rcube::Q($this->rc->gettext('BTN_ANALYSIS_DETAILS')))
+			);
+			}
+		}
+		if ($ip = $rblInstance->getSender()['ip'] ?? '') {
 			foreach (\App\Mail\Rbl::findIp($ip) as $row) {
 				if (1 !== (int) $row['status']) {
-					if (\App\Mail\Rbl::LIST_TYPE_BLACK_LIST === (int) $row['type'] || \App\Mail\Rbl::LIST_TYPE_PUBLIC_BLACK_LIST === (int) $row['type']) {
-						$p['content'][] = html::p(['class' => 'aligned-buttons boxerror'],
-							html::span(null, rcube::Q($this->rc->gettext('LBL_BLACK_LIST_ALERT')))
+					$black = \App\Mail\Rbl::LIST_TYPE_BLACK_LIST === (int) $row['type'] || \App\Mail\Rbl::LIST_TYPE_PUBLIC_BLACK_LIST === (int) $row['type'];
+					$type = \App\Mail\Rbl::LIST_TYPES[$row['type']];
+					$p['content'][] = html::p(['class' => 'mail-type-alert', 'style' => 'background:' . $type['color']],
+							html::span(['class' => 'alert-icon ' . $type['icon']], '') .
+							html::span(null, rcube::Q($this->rc->gettext($black ? 'LBL_ALERT_BLACK_LIST' : 'LBL_ALERT_WHITE_LIST')))
 						);
-					}
 					return $p;
 				}
 			}
 		}
 		return $p;
+	}
+
+	public function loadMailAnalysis(): void
+	{
+		$uid = (int) rcube_utils::get_input_value('_uid', rcube_utils::INPUT_POST);
+		$this->rc->output->command('plugin.yetiforce.showMailAnalysis', $this->rc->imap->get_raw_body($uid));
 	}
 }

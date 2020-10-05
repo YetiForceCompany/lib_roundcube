@@ -173,8 +173,7 @@ button {
 	border: 1px solid transparent;
 	padding: 0.2rem 0.3rem;
 	border-radius: 0.25rem;
-	transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
-		border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+	transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
 button:hover {
@@ -239,10 +238,4 @@ button:hover {
 .action-bar__head__message {
 	text-align: center !important;
 	display: block;
-}
-.menu a.yfi-fa-check-circle:before {
-	content: "\f058";
-}
-.menu a.yfi-fa-ban:before {
-	content: "\f05e";
 }

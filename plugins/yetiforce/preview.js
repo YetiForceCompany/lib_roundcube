@@ -19,9 +19,20 @@ if (window.rcmail) {
 			},
 			rcmail.env.uid
 		);
+		rcmail.register_command(
+			'plugin.yetiforce.loadMailAnalysis',
+			function (props) {
+				rcmail.loadMailAnalysis(props);
+			},
+			rcmail.env.uid
+		);
+		rcmail.addEventListener('plugin.yetiforce.showMailAnalysis', function (content) {
+			rcmail.showMailAnalysis(content);
+		});
 		if (rcmail.message_list) {
 			rcmail.message_list.addEventListener('select', function (list) {
 				rcmail.enable_command('plugin.yetiforce.addSenderToList', list.get_selection(false).length > 0);
+				rcmail.enable_command('plugin.yetiforce.loadMailAnalysis', list.get_selection(false).length > 0);
 			});
 			rcmail.addEventListener('listupdate', function () {
 				let btns = $('#toolbar-menu .js-spam-btn');
@@ -37,6 +48,9 @@ if (window.rcmail) {
 				rcmail.addEventListener('insertrow', function (evt) {
 					if (typeof rcmail.env.rbl_list[evt.uid] !== 'undefined') {
 						evt.row.obj.style.backgroundColor = rcmail.env.rbl_list[evt.uid];
+					}
+					if (typeof rcmail.env.sender_list[evt.uid] !== 'undefined') {
+						$('.fromto', evt.row.obj).prepend($('<span class="sender-alert-icon"/>').html(rcmail.env.sender_list[evt.uid]));
 					}
 				});
 			}
@@ -363,4 +377,28 @@ rcube_webmail.prototype.getCrmWindow = function () {
 		return opener.crm;
 	}
 	return false;
+};
+// Get raw mail body
+rcube_webmail.prototype.loadMailAnalysis = function (props) {
+	this.http_post('plugin.yetiforce-loadMailAnalysis', this.selection_post_data(), this.set_busy(true, 'loading'));
+};
+//Show mail analysis modal
+rcube_webmail.prototype.showMailAnalysis = function (content) {
+	let progressIndicatorElement = rcmail.crm.$.progressIndicator();
+	rcmail.crm.AppConnector.request({
+		module: 'AppComponents',
+		view: 'MailMessageAnalysisModal',
+		content: content
+	})
+		.done(function (data) {
+			progressIndicatorElement.progressIndicator({ mode: 'hide' });
+			rcmail.crm.app.showModalWindow(data);
+		})
+		.fail(function () {
+			progressIndicatorElement.progressIndicator({ mode: 'hide' });
+			app.showNotify({
+				text: app.vtranslate('JS_ERROR'),
+				type: 'error'
+			});
+		});
 };
