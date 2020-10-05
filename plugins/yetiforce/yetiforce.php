@@ -54,9 +54,9 @@ class yetiforce extends rcube_plugin
 				'LBL_WHITE_LIST_DESC' => \App\Language::translate('LBL_WHITE_LIST_DESC', 'OSSMail', false, false),
 				'LBL_ALERT_BLACK_LIST' => \App\Language::translate('LBL_BLACK_LIST_ALERT', 'OSSMail', false, false),
 				'LBL_ALERT_WHITE_LIST' => \App\Language::translate('LBL_WHITE_LIST_ALERT', 'OSSMail', false, false),
-				'LBL_ALERT_FAKE_MAIL' => \App\Language::translate('LBL_ALERT_FAKE_MAIL', 'OSSMail', false, false),
+				'LBL_ALERT_FAKE_MAIL' => \App\Language::translate('LBL_ALERT_FAKE_MAIL', 'OSSMail'),
 				'BTN_ANALYSIS_DETAILS' => \App\Language::translate('BTN_ANALYSIS_DETAILS', 'OSSMail', false, false),
-				'LBL_ALERT_FAKE_SENDER' => \App\Language::translate('LBL_ALERT_FAKE_SENDER', 'Settings:MailRbl', false, false),
+				'LBL_ALERT_FAKE_SENDER' => \App\Language::translate('LBL_ALERT_FAKE_SENDER', 'OSSMail'),
 			]);
 
 			if ('preview' === $this->rc->action || 'show' === $this->rc->action || '' == $this->rc->action) {
@@ -1041,8 +1041,9 @@ class yetiforce extends rcube_plugin
 		$rblInstance->set('rawBody', $this->rc->imap->get_raw_body($p['message']->uid));
 		$rblInstance->parse();
 		if (($verifySender = $rblInstance->verifySender()) && !$verifySender['status']) {
+			$desc = \App\Language::translate('LBL_MAIL_SENDER', 'Settings:MailRbl') . ': ' . html::span(['class' => 'badge badge-danger'], html::span(['class' => 'mr-2 alert-icon fas fa-times'], '') . \App\Language::translate('LBL_INCORRECT', 'Settings:MailRbl')) . '<br>' . str_replace('<>', '<br>', $verifySender['info']);
 			$p['content'][] = html::p(['class' => 'aligned-buttons boxerror'],
-				html::span(null, rcube::Q($this->rc->gettext('LBL_ALERT_FAKE_SENDER'))) .
+				html::span(null, $this->rc->gettext('LBL_ALERT_FAKE_SENDER') . '<br>' . $desc) .
 				html::tag('button', [
 					'onclick' => "return rcmail.command('plugin.yetiforce.loadMailAnalysis')",
 					'title' => $this->gettext('addvcardmsg'),
@@ -1066,7 +1067,7 @@ class yetiforce extends rcube_plugin
 			}
 			if ($desc) {
 				$p['content'][] = html::div(['class' => 'aligned-buttons ' . ($dangerType ? 'boxerror' : 'boxwarning')],
-				html::span(null, rcube::Q($this->rc->gettext('LBL_ALERT_FAKE_MAIL')) . '<br>' . $desc) .
+				html::span(null, $this->rc->gettext('LBL_ALERT_FAKE_MAIL') . '<br>' . $desc) .
 				html::tag('button', [
 					'onclick' => "return rcmail.command('plugin.yetiforce.loadMailAnalysis')",
 					'title' => $this->gettext('addvcardmsg'),
