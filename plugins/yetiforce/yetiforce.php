@@ -802,7 +802,7 @@ class yetiforce extends rcube_plugin
 		$translationMod = 'Calendar';
 		$showMore = false;
 		foreach ($ics as $data) {
-			$evTemplate = '<div class="c-ical">';
+			$evTemplate = '<div class="c-ical mb-1">';
 			[$record, $icsPart] = $data;
 			$dateStart = $fields = $fieldsDescription = '';
 			if (!$record->isEmpty('date_start')) {
@@ -871,9 +871,9 @@ class yetiforce extends rcube_plugin
 					'title' => $title,
 				], html::span(null, "<span class=\"far fa-calendar-plus mr-1\"></span>{$title}{$counterText}"));
 				$evTemplate = str_replace('<span class="button_to_replace"></span>', "<span class=\"importBtn\">{$btn}</span>", $evTemplate);
-				$args['content'] .= html::div(null, $evTemplate);
+				$args['content'] .= $evTemplate;
 			} elseif ($counterList[$icsPart['part']] < 4) {
-				$args['content'] .= html::div(null, $evTemplate);
+				$args['content'] .= $evTemplate;
 			} else {
 				$showMore = true;
 			}

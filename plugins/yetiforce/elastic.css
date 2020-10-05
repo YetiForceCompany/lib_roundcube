@@ -68,3 +68,7 @@ button.btn.fakeMail:before {
 		display: none;
 	}
 }
+#message-header,
+#message-content .attachmentslist:not(:empty) {
+	margin-bottom: 0.5rem;
+}
