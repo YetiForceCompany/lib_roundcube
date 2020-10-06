@@ -91,9 +91,9 @@ class yetiforce extends rcube_plugin
 				$this->add_button([
 					'command' => 'plugin.yetiforce.loadMailAnalysis',
 					'type' => 'link',
-					'class' => 'button yfi-fa-book-reader disabled js-spam-btn text-danger',
-					'classact' => 'button yfi-fa-book-reader text-danger',
-					'classsel' => 'button yfi-fa-book-reader pressed text-danger',
+					'class' => 'button yfi-fa-book-reader disabled js-spam-btn text-info',
+					'classact' => 'button yfi-fa-book-reader text-info',
+					'classsel' => 'button yfi-fa-book-reader pressed text-info',
 					'title' => 'BTN_ANALYSIS_DETAILS',
 					'label' => 'BTN_ANALYSIS_DETAILS',
 					'innerclass' => 'inner',
