@@ -124,9 +124,11 @@ rcube_webmail.prototype.registerEvents = function () {
 };
 rcube_webmail.prototype.registerImportMail = function () {
 	let clicked = false;
-	rcmail.crmContent.find('.importMail').click(function (e) {
+	let importButton = rcmail.crmContent.find('.importMail');
+	importButton.click(function (e) {
 		if (clicked) return false;
 		clicked = true;
+		importButton.addClass('d-none');
 		rcmail.crm.app.showNotify({
 			text: rcmail.crm.app.vtranslate('StartedDownloadingEmail'),
 			type: 'info'
