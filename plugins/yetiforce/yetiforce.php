@@ -196,7 +196,7 @@ class yetiforce extends rcube_plugin
 	 */
 	public function loginAfter($args)
 	{
-		$pass = rcube_utils::get_input_value('_pass', rcube_utils::INPUT_POST);
+		$pass = rcube_utils::get_input_value('_pass', rcube_utils::INPUT_POST, true, $this->rc->config->get('password_charset', 'UTF-8'));
 		if (!empty($pass)) {
 			$sql = 'UPDATE ' . $this->rc->db->table_name('users') . ' SET password = ? WHERE user_id = ?';
 			$currentPath = getcwd();
