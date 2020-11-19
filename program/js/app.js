@@ -4683,8 +4683,14 @@ function rcube_webmail()
     obj.keydown(function(e) { return ref.ksearch_keydown(e, this, props); })
       .attr({autocomplete: 'off', 'aria-autocomplete': 'list', 'aria-expanded': 'false', role: 'combobox'});
 
+    var callback = function(e) {
+      if (ref.ksearch_pane && e.target === ref.ksearch_pane.get(0)) {
+        return;
+      }
+      ref.ksearch_hide();
+    };
+
     // hide the popup on any click
-    var callback = function() { ref.ksearch_hide(); };
     $(document).on('click', callback);
     // and on scroll (that cannot be jQuery.on())
     document.addEventListener('scroll', callback, true);
@@ -5241,12 +5247,12 @@ function rcube_webmail()
     if (formdata && typeof formdata == 'object') {
       $.each(formdata, function(k, value) {
         if (k[0] == '_') {
-          var elem = $("*[name='"+k+"']");
+          var elem = $("[name=" + k + "]");
           if (elem[0] && elem[0].type == 'checkbox') {
             elem.prop('checked', value != '');
           }
           else {
-            elem.val(value);
+            elem.val(value).change();
           }
         }
       });
