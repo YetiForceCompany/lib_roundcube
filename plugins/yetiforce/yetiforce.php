@@ -391,17 +391,29 @@ class yetiforce extends rcube_plugin
 		$id = App\Purifier::purifyByType(rcube_utils::get_input_value('_id', rcube_utils::INPUT_GPC), 'Alnum');
 		$row = $_SESSION['compose_data_' . $id]['param']['mailData'];
 		$type = $_SESSION['compose_data_' . $id]['param']['type'];
-		if (!$row) {
-			return;
+		$params = $_SESSION['compose_data_' . $id]['param'];
+		$recordNumber = '';
+		if ($number = \App\Mail\RecordFinder::getRecordNumberFromString("[{$params['recordNumber']}]", $params['crmmodule'])) {
+			$recordNumber = "[{$number}]";
 		}
 		$bodyIsHtml = $args['html'];
+		if (!$row) {
+			if ($recordNumber) {
+				if (!$bodyIsHtml) {
+					$body = "\n ------------------------- \n" . $recordNumber;
+				} else {
+					$body = '<br><br><hr/>' . $recordNumber;
+				}
+				$args['body'] = $body;
+			}
+			return $args;
+		}
+		$body = $row['content'];
 		$date = $row['date'];
 		$from = $row['from_email'];
 		$to = $row['to_email'];
-		$body = $row['content'];
 		$subject = $row['subject'];
 		$replyto = $row['reply_to_email'];
-
 		$prefix = $suffix = '';
 		if ('forward' === $type) {
 			if (!$bodyIsHtml) {
@@ -456,9 +468,15 @@ class yetiforce extends rcube_plugin
 				$body = rcmailWrapAndQuote($body, $LINE_LENGTH);
 				$prefix .= "\n";
 				$body = $prefix . $body . $suffix;
+				if ($recordNumber) {
+					$body .= "\n ------------------------- \n" . $recordNumber;
+				}
 			} else {
 				$prefix = '<p>' . rcube::Q($prefix) . "</p>\n";
 				$body = $prefix . '<blockquote>' . $body . '</blockquote>' . $suffix;
+				if ($recordNumber) {
+					$body .= '<hr/>' . $recordNumber;
+				}
 			}
 		}
 		$this->rc->output->set_env('compose_mode', $type);
