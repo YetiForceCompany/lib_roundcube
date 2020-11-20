@@ -393,9 +393,9 @@ class yetiforce extends rcube_plugin
 		$type = $_SESSION['compose_data_' . $id]['param']['type'];
 		$params = $_SESSION['compose_data_' . $id]['param'];
 		$recordNumber = '';
-		if ($number = \App\Mail\RecordFinder::getRecordNumberFromString("[{$params['recordNumber']}]", $params['crmmodule'])) {
-			$recordNumber = "[{$number}]";
-		}
+		// if ($number = \App\Mail\RecordFinder::getRecordNumberFromString("[{$params['recordNumber']}]", $params['crmmodule'])) {
+		// 	$recordNumber = "[{$number}]";
+		// }
 		$bodyIsHtml = $args['html'];
 		if (!$row) {
 			if ($recordNumber) {
