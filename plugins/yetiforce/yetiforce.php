@@ -217,11 +217,17 @@ class yetiforce extends rcube_plugin
 			if (!empty($row['params']['language'])) {
 				$language = $row['params']['language'];
 			}
-		} else {
+		} elseif (!empty($args['cuid'])) {
 			$_SESSION['crm']['id'] = $args['cuid'];
 			$language = \App\Language::getLanguageTag();
+		} else {
+			if (!empty($_COOKIE['YTSID']) && \App\Session::load()) {
+				$sessionData = \App\Session::getById($_COOKIE['YTSID']);
+				$_SESSION['crm']['id'] = $sessionData['authenticated_user_id'] ?? '';
+				$language = $sessionData['language'] ?? '';
+			}
 		}
-		if (isset($language)) {
+		if (!empty($language)) {
 			$languages = $this->rc->list_languages();
 			$lang = explode('_', $row['params']['language']);
 			$lang[1] = strtoupper($lang[1]);
@@ -953,7 +959,7 @@ class yetiforce extends rcube_plugin
 						$message = new rcube_message($uid, $mbox);
 						$body = $message->first_html_part();
 					}
-					$db->query('INSERT INTO `s_yf_mail_rbl_request` (`datetime`,`type`,`user`,`header`,`body`) VALUES (?,?,?,?,?)', date('Y-m-d H:i:s'), $props, $_SESSION['crm']['id'], $headers, $body);
+					$db->query('INSERT INTO `s_yf_mail_rbl_request` (`datetime`,`type`,`user`,`header`,`body`) VALUES (?,?,?,?,?)', date('Y-m-d H:i:s'), $props, ($_SESSION['crm']['id'] ?: 0), $headers, $body);
 				}
 			}
 			if (0 === $props && ($junkMbox = $this->rc->config->get('junk_mbox')) && $mbox !== $junkMbox) {
