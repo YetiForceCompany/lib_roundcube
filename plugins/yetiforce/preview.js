@@ -50,7 +50,9 @@ if (window.rcmail) {
 						evt.row.obj.style.backgroundColor = rcmail.env.rbl_list[evt.uid];
 					}
 					if (typeof rcmail.env.sender_list[evt.uid] !== 'undefined') {
-						$('.fromto', evt.row.obj).prepend($('<span class="sender-alert-icon"/>').html(rcmail.env.sender_list[evt.uid]));
+						$('.fromto', evt.row.obj).prepend(
+							$('<span class="sender-alert-icon"/>').html(rcmail.env.sender_list[evt.uid])
+						);
 					}
 				});
 			}
@@ -350,7 +352,7 @@ rcube_webmail.prototype.showQuickCreateForm = function (moduleName, record, para
 	relatedParams['email1'] = rcmail.env.fromMail;
 	let messageBody = $('#messagebody').clone();
 	messageBody.find('.image-attachment').remove();
-	relatedParams['description'] = messageBody.text();
+	relatedParams['description'] = messageBody.html();
 	//relatedParams['related_to'] = record;
 	if (params.relatedRecords !== undefined) {
 		relatedParams['relatedRecords'] = params.relatedRecords;
