@@ -1,250 +1,247 @@
+'use strict';
 /* {[The file is published on the basis of MIT License]} */
-window.rcmail &&
-	rcmail.addEventListener('init', function(evt) {
-		window.crm = getCrmWindow();
-		loadActionBar();
+if (window.rcmail) {
+	rcmail.addEventListener('init', function () {
+		rcmail.crm = rcmail.getCrmWindow();
+		rcmail.loadActionBar();
 		rcmail.env.message_commands.push('yetiforce.importICS');
 		rcmail.register_command(
 			'yetiforce.importICS',
-			function(part, type) {
-				jQuery.ajax({
-					type: 'POST',
-					url:
-						'./?_task=mail&_action=plugin.yetiforce.importIcs&_mbox=' +
-						urlencode(rcmail.env.mailbox) +
-						'&_uid=' +
-						urlencode(rcmail.env.uid) +
-						'&_part=' +
-						part +
-						'&_type=' +
-						type,
-					async: false,
-					success: function(data) {
-						data = JSON.parse(data);
-						window.crm.Vtiger_Helper_Js.showPnotify({
-							text: data['message'],
-							type: 'info',
-							animation: 'show'
-						});
-					}
-				});
+			function (props, type) {
+				rcmail.importICS(props, type);
 			},
 			true
 		);
+		rcmail.register_command(
+			'plugin.yetiforce.addSenderToList',
+			function (props) {
+				rcmail.addSenderToList(props);
+			},
+			rcmail.env.uid
+		);
+		rcmail.register_command(
+			'plugin.yetiforce.loadMailAnalysis',
+			function (props) {
+				rcmail.loadMailAnalysis(props);
+			},
+			rcmail.env.uid
+		);
+		rcmail.addEventListener('plugin.yetiforce.showMailAnalysis', function (content) {
+			rcmail.showMailAnalysis(content);
+		});
+		if (rcmail.message_list) {
+			rcmail.message_list.addEventListener('select', function (list) {
+				rcmail.enable_command('plugin.yetiforce.addSenderToList', list.get_selection(false).length > 0);
+				rcmail.enable_command('plugin.yetiforce.loadMailAnalysis', list.get_selection(false).length > 0);
+			});
+			rcmail.addEventListener('listupdate', function () {
+				let btns = $('#toolbar-menu .js-spam-btn');
+				if (rcmail.env.mailbox === rcmail.env.junk_mailbox) {
+					btns.hide();
+				} else {
+					btns.show();
+				}
+			});
+		}
+		if (rcmail.env.layout == 'widescreen') {
+			if (rcmail.gui_objects.messagelist) {
+				rcmail.addEventListener('insertrow', function (evt) {
+					if (typeof rcmail.env.rbl_list[evt.uid] !== 'undefined') {
+						evt.row.obj.style.backgroundColor = rcmail.env.rbl_list[evt.uid];
+					}
+					if (typeof rcmail.env.sender_list[evt.uid] !== 'undefined') {
+						$('.fromto', evt.row.obj).prepend(
+							$('<span class="sender-alert-icon"/>').html(rcmail.env.sender_list[evt.uid])
+						);
+					}
+				});
+			}
+		}
 	});
-
-function loadActionBar() {
-	var content = $('#ytActionBarContent');
-	var params = {
+}
+// Add sender to list action
+rcube_webmail.prototype.addSenderToList = function (props) {
+	this.http_post(
+		'plugin.yetiforce-addSenderToList',
+		this.selection_post_data({
+			_props: props
+		}),
+		this.set_busy(true, 'loading')
+	);
+};
+rcube_webmail.prototype.addSenderToListMove = function (mbox) {
+	this.move_messages(mbox);
+};
+// import ICS file action
+rcube_webmail.prototype.importICS = function (part, type) {
+	this.http_post(
+		'plugin.yetiforce-importIcs',
+		{
+			_mbox: rcmail.env.mailbox,
+			_uid: rcmail.env.uid,
+			_part: part,
+			_type: type,
+			_mailId: this.mailId
+		},
+		this.set_busy(true, 'loading')
+	);
+};
+rcube_webmail.prototype.loadActionBar = function () {
+	this.crmContent = $('#ytActionBarContent');
+	rcmail.crm.AppConnector.request({
 		module: 'OSSMail',
 		view: 'MailActionBar',
 		uid: rcmail.env.uid,
 		folder: rcmail.env.mailbox,
 		rcId: rcmail.env.user_id
-	};
-	window.crm.AppConnector.request(params).done(function(response) {
-		content.find('.ytHeader').html(response);
-		$('#messagecontent').css('top', content.outerHeight() + $('#messageheader').outerHeight() + 'px');
-		registerEvents(content);
+	}).done(function (response) {
+		rcmail.crmContent.find('.ytHeader').html(response);
+		$('#messagecontent').css('top', rcmail.crmContent.outerHeight() + $('#messageheader').outerHeight() + 'px');
+		rcmail.registerEvents();
 	});
-}
-
-function registerEvents(content) {
-	registerAddRecord(content);
-	registerAddAttachments(content);
-	registerAddReletedRecord(content);
-	registerSelectRecord(content);
-	registerRemoveRecord(content);
-	registerImportMail(content);
-	window.crm.app.registerPopover(content.closest('body'));
-	var block = content.find('.ytHeader .js-data');
-	content.find('.hideBtn').click(function() {
+};
+rcube_webmail.prototype.registerEvents = function () {
+	this.mailId = this.crmContent.find('#mailActionBarID').val();
+	this.registerAddRecord();
+	this.registerAddReletedRecord();
+	this.registerSelectRecord();
+	this.registerRemoveRecord();
+	this.registerImportMail();
+	rcmail.crm.app.registerPopover(this.crmContent.closest('body'));
+	rcmail.crm.app.registerIframeAndMoreContent(this.crmContent.closest('body'));
+	var block = this.crmContent.find('.ytHeader .js-data');
+	this.crmContent.find('.hideBtn').click(function () {
 		var button = $(this);
-		var icon = button.find('.glyphicon');
-
+		var icon = button.find('span');
 		if (button.data('type') == '0') {
 			button.data('type', '1');
-			icon.removeClass('glyphicon-chevron-up').addClass('glyphicon-chevron-down');
+			icon.removeClass('fa-chevron-circle-up').addClass('fa-chevron-circle-down');
 		} else {
 			button.data('type', '0');
-			icon.removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-up');
+			icon.removeClass('fa-chevron-circle-down').addClass('fa-chevron-circle-up');
 		}
 		block.toggle();
 		$(window).trigger('resize');
 	});
-}
-
-function registerImportMail(content) {
+};
+rcube_webmail.prototype.registerImportMail = function () {
 	let clicked = false;
-	content.find('.importMail').click(function(e) {
+	let importButton = rcmail.crmContent.find('.importMail');
+	importButton.click(function (e) {
 		if (clicked) return false;
 		clicked = true;
-		window.crm.Vtiger_Helper_Js.showPnotify({
-			text: window.crm.app.vtranslate('StartedDownloadingEmail'),
+		importButton.addClass('d-none');
+		rcmail.crm.app.showNotify({
+			text: rcmail.crm.app.vtranslate('StartedDownloadingEmail'),
 			type: 'info'
 		});
-		window.crm.AppConnector.request({
+		rcmail.crm.AppConnector.request({
 			module: 'OSSMail',
 			action: 'ImportMail',
 			uid: rcmail.env.uid,
 			folder: rcmail.env.mailbox,
 			rcId: rcmail.env.user_id
 		})
-			.done(function(data) {
-				loadActionBar();
-				window.crm.Vtiger_Helper_Js.showPnotify({
-					text: window.crm.app.vtranslate('AddFindEmailInRecord'),
+			.done(function () {
+				rcmail.loadActionBar();
+				rcmail.crm.app.showNotify({
+					text: rcmail.crm.app.vtranslate('AddFindEmailInRecord'),
 					type: 'success'
 				});
 			})
-			.fail(function() {
+			.fail(function () {
 				clicked = false;
 			});
 	});
-}
-
-function registerRemoveRecord(content) {
-	content.find('button.removeRecord').click(function(e) {
-		var row = $(e.currentTarget).closest('.rowRelatedRecord');
-		removeRecord(row.data('id'));
+};
+rcube_webmail.prototype.registerRemoveRecord = function () {
+	rcmail.crmContent.find('button.removeRecord').click(function (e) {
+		rcmail.removeRecord($(e.currentTarget).closest('.rowRelatedRecord').data('id'));
 	});
-}
-
-function registerSelectRecord(content) {
-	let id = content.find('#mailActionBarID').val();
-	content.find('button.selectRecord').click(function(e) {
-		let relationSelect = content.find('#addRelationSelect').val();
-		let getCacheModule = window.crm.app.moduleCacheGet('selectedModuleName');
+};
+rcube_webmail.prototype.registerSelectRecord = function () {
+	rcmail.crmContent.find('button.selectRecord').click(function (e) {
+		let relationSelect = rcmail.crmContent.find('#addRelationSelect').val();
+		let getCacheModule = rcmail.crm.app.moduleCacheGet('selectedModuleName');
 		if (getCacheModule === 'undefined' || relationSelect !== getCacheModule) {
-			window.crm.app.moduleCacheSet('selectedModuleName', relationSelect);
+			rcmail.crm.app.moduleCacheSet('selectedModuleName', relationSelect);
 		}
 		let relParams = {
-			mailId: id
+			mailId: rcmail.mailId
 		};
 		if ($(this).data('type') == 0) {
-			var module = $(this)
-				.closest('.js-head-container')
-				.find('.module')
-				.val();
+			var module = $(this).closest('.js-head-container').find('.module').val();
 			if (module === null) {
 				return;
 			}
 		} else {
 			var module = $(this).data('module');
-			relParams.crmid = $(this)
-				.closest('.rowRelatedRecord')
-				.data('id');
-			relParams.mod = $(this)
-				.closest('.rowRelatedRecord')
-				.data('module');
+			relParams.crmid = $(this).closest('.rowRelatedRecord').data('id');
+			relParams.mod = $(this).closest('.rowRelatedRecord').data('module');
 			relParams.newModule = module;
 		}
-		showPopup(
+		rcmail.showPopup(
 			{
 				module: module,
 				src_module: 'OSSMailView',
-				src_record: id
+				src_record: rcmail.mailId
 			},
 			relParams
 		);
 	});
-}
-
-function registerAddReletedRecord(content) {
-	var id = content.find('#mailActionBarID').val();
-	content.find('button.addRelatedRecord').click(function(e) {
-		var targetElement = $(e.currentTarget);
-		var row = targetElement.closest('.rowRelatedRecord');
-		var params = { sourceModule: row.data('module') };
-		showQuickCreateForm(targetElement.data('module'), row.data('id'), params);
-	});
-
-}
-function registerAddAttachments(content) {
-	const id = content.find('#mailActionBarID').val();
-	content.find('button.addAttachments').click(function (e) {
-		let row = $(e.currentTarget).closest('.rowRelatedRecord');
-		let relatedModule = row.data('module');
-		let relatedRecordId = row.data('id');
-		window.crm.app.showRecordsList({
-				module: 'Documents',
-				related_parent_module: 'OSSMailView',
-				related_parent_id: id,
-				multi_select: true,
-				record_selected: true,
-			}, (modal, instance) => {
-			instance.setSelectEvent((responseData, e) => {
-				window.crm.AppConnector.request({
-					async: false,
-					dataType: 'json',
-					data: {
-						module: relatedModule,
-						action: 'RelationAjax',
-						mode: 'addRelation',
-						related_module: 'Documents',
-						src_record: relatedRecordId,
-						related_record_list: JSON.stringify(Object.keys(responseData))
-					}
-				}).done(function (data) {
-					let notifyParams = {
-						text: window.crm.app.vtranslate('JS_DOCUMENTS_ADDED'),
-						type: 'success',
-						animation: 'show'
-					};
-					if (!data['success']) {
-						notifyParams.type = 'error';
-						notifyParams.text = window.crm.app.vtranslate('JS_ERROR');
-					}
-					window.crm.Vtiger_Helper_Js.showPnotify(notifyParams);
-					loadActionBar();
-				});
-			});
+};
+rcube_webmail.prototype.registerAddReletedRecord = function () {
+	rcmail.crmContent.find('button.addRelatedRecord').click(function (e) {
+		let targetElement = $(e.currentTarget);
+		let row = targetElement.closest('.rowRelatedRecord');
+		rcmail.showQuickCreateForm(targetElement.data('module'), row.data('id'), {
+			sourceModule: row.data('module')
 		});
 	});
-}
-function registerAddRecord(content) {
-	var id = content.find('#mailActionBarID').val();
-	let getCacheModule = window.crm.app.moduleCacheGet('selectedModuleName');
+};
+rcube_webmail.prototype.registerAddRecord = function () {
+	let getCacheModule = rcmail.crm.app.moduleCacheGet('selectedModuleName');
 	if (getCacheModule) {
-		content.find('#addRelationSelect').val(getCacheModule);
+		rcmail.crmContent.find('#addRelationSelect').val(getCacheModule);
 	}
-	content.find('button.addRecord').click(function(e) {
-		var relationSelect = content.find('#addRelationSelect').val();
+	rcmail.crmContent.find('button.addRecord').click(function (e) {
+		let relationSelect = rcmail.crmContent.find('#addRelationSelect').val();
 		if (getCacheModule === 'undefined' || relationSelect !== getCacheModule) {
-			window.crm.app.moduleCacheSet('selectedModuleName', relationSelect);
+			rcmail.crm.app.moduleCacheSet('selectedModuleName', relationSelect);
 		}
-		var col = $(e.currentTarget).closest('.js-head-container');
+		let col = $(e.currentTarget).closest('.js-head-container');
 		let selectValue = col.find('.module').val();
 		if (selectValue !== null) {
 			let relatedRecords = [];
-			content
+			rcmail.crmContent
 				.find('.js-data')
 				.find('.rowRelatedRecord')
 				.each((i, record) => {
 					let data = $(record).data();
-					relatedRecords.push({ module: data.module, id: data.id });
+					relatedRecords.push({
+						module: data.module,
+						id: data.id
+					});
 				});
-			showQuickCreateForm(selectValue, id, { relatedRecords: relatedRecords });
+			rcmail.showQuickCreateForm(selectValue, rcmail.mailId, { relatedRecords: relatedRecords });
 		}
 	});
-}
-
-function removeRecord(crmid) {
-	const id = $('#mailActionBarID').val();
-	let params = {};
-	params.data = {
-		module: 'OSSMail',
-		action: 'ExecuteActions',
-		mode: 'removeRelated',
-		params: {
-			mailId: id,
-			crmid: crmid
+};
+rcube_webmail.prototype.removeRecord = function (crmid) {
+	rcmail.crm.AppConnector.request({
+		async: false,
+		dataType: 'json',
+		data: {
+			module: 'OSSMail',
+			action: 'ExecuteActions',
+			mode: 'removeRelated',
+			params: {
+				mailId: rcmail.mailId,
+				crmid: crmid
+			}
 		}
-	};
-	params.async = false;
-	params.dataType = 'json';
-	window.crm.AppConnector.request(params).done(function(data) {
-		const response = data['result'];
+	}).done(function (data) {
+		let response = data['result'];
 		let notifyParams = {
 			text: response['data'],
 			animation: 'show'
@@ -256,17 +253,16 @@ function removeRecord(crmid) {
 				animation: 'show'
 			};
 		}
-		window.crm.Vtiger_Helper_Js.showPnotify(notifyParams);
-		loadActionBar();
+		rcmail.crm.app.showNotify(notifyParams);
+		rcmail.loadActionBar();
 	});
-}
-
-function showPopup(params, actionsParams) {
+};
+rcube_webmail.prototype.showPopup = function (params, actionsParams) {
 	actionsParams['newModule'] = params['module'];
-	window.crm.app.showRecordsList(params, (modal, instance) => {
+	rcmail.crm.app.showRecordsList(params, (modal, instance) => {
 		instance.setSelectEvent((responseData, e) => {
 			actionsParams['newCrmId'] = responseData.id;
-			window.crm.AppConnector.request({
+			rcmail.crm.AppConnector.request({
 				async: false,
 				dataType: 'json',
 				data: {
@@ -275,7 +271,7 @@ function showPopup(params, actionsParams) {
 					mode: 'addRelated',
 					params: actionsParams
 				}
-			}).done(function(data) {
+			}).done(function (data) {
 				let response = data['result'];
 				if (response['success']) {
 					var notifyParams = {
@@ -289,28 +285,22 @@ function showPopup(params, actionsParams) {
 						animation: 'show'
 					};
 				}
-				window.crm.Vtiger_Helper_Js.showPnotify(notifyParams);
-				loadActionBar();
+				rcmail.crm.app.showNotify(notifyParams);
+				rcmail.loadActionBar();
 			});
 		});
 	});
-}
-
-function showQuickCreateForm(moduleName, record, params = {}) {
-	const content = $('#ytActionBarContent');
+};
+rcube_webmail.prototype.showQuickCreateForm = function (moduleName, record, params = {}) {
 	let relatedParams = {},
 		sourceModule = 'OSSMailView';
 	if (params['sourceModule']) {
 		sourceModule = params['sourceModule'];
 	}
-	const postShown = function(data) {
-		var index, queryParam, queryParamComponents;
+	const postShown = function (data) {
 		$('<input type="hidden" name="sourceModule" value="' + sourceModule + '" />').appendTo(data);
 		$('<input type="hidden" name="sourceRecord" value="' + record + '" />').appendTo(data);
 		$('<input type="hidden" name="relationOperation" value="true" />').appendTo(data);
-	};
-	const postQuickCreate = function(data) {
-		loadActionBar();
 	};
 	const ids = {
 		link: 'modulesLevel0',
@@ -320,19 +310,19 @@ function showQuickCreateForm(moduleName, record, params = {}) {
 		linkextend: 'modulesLevel4'
 	};
 	for (var i in ids) {
-		var element = content.find('#' + ids[i]);
+		var element = rcmail.crmContent.find('#' + ids[i]);
 		var value = element.length ? JSON.parse(element.val()) : [];
 		if ($.inArray(sourceModule, value) >= 0) {
 			relatedParams[i] = record;
 		}
 	}
-	const fillNameFields = first => {
+	const fillNameFields = (first) => {
 		const nameData = rcmail.env.fromName.split(' ');
 		const firstName = nameData.shift();
 		const lastName = nameData.join(' ');
 		return first ? firstName : lastName;
 	};
-	let autoCompleteMapRaw = content.find('.js-mailAutoCompleteFields').val();
+	let autoCompleteMapRaw = rcmail.crmContent.find('.js-mailAutoCompleteFields').val();
 	let autoCompleteMap = autoCompleteMapRaw ? JSON.parse(autoCompleteMapRaw) : [];
 	if (autoCompleteMap && autoCompleteMap[moduleName]) {
 		let map = autoCompleteMap[moduleName];
@@ -358,12 +348,11 @@ function showQuickCreateForm(moduleName, record, params = {}) {
 			}
 		}
 	}
-
 	relatedParams['email'] = rcmail.env.fromMail;
 	relatedParams['email1'] = rcmail.env.fromMail;
 	let messageBody = $('#messagebody').clone();
 	messageBody.find('.image-attachment').remove();
-	relatedParams['description'] = messageBody.text();
+	relatedParams['description'] = messageBody.html();
 	//relatedParams['related_to'] = record;
 	if (params.relatedRecords !== undefined) {
 		relatedParams['relatedRecords'] = params.relatedRecords;
@@ -371,19 +360,17 @@ function showQuickCreateForm(moduleName, record, params = {}) {
 	relatedParams['sourceModule'] = sourceModule;
 	relatedParams['sourceRecord'] = record;
 	relatedParams['relationOperation'] = true;
-	const quickCreateParams = {
-		callbackFunction: data => {
-			loadActionBar();
+	const headerInstance = new rcmail.crm.Vtiger_Header_Js();
+	headerInstance.quickCreateModule(moduleName, {
+		callbackFunction: (data) => {
+			rcmail.loadActionBar();
 		},
 		callbackPostShown: postShown,
 		data: relatedParams,
 		noCache: true
-	};
-	const headerInstance = new window.crm.Vtiger_Header_Js();
-	headerInstance.quickCreateModule(moduleName, quickCreateParams);
-}
-
-function getCrmWindow() {
+	});
+};
+rcube_webmail.prototype.getCrmWindow = function () {
 	if (opener !== null && opener.parent.CONFIG == 'object') {
 		return opener.parent;
 	} else if (typeof parent.CONFIG == 'object') {
@@ -394,4 +381,28 @@ function getCrmWindow() {
 		return opener.crm;
 	}
 	return false;
-}
+};
+// Get raw mail body
+rcube_webmail.prototype.loadMailAnalysis = function (props) {
+	this.http_post('plugin.yetiforce-loadMailAnalysis', this.selection_post_data(), this.set_busy(true, 'loading'));
+};
+//Show mail analysis modal
+rcube_webmail.prototype.showMailAnalysis = function (content) {
+	let progressIndicatorElement = rcmail.crm.$.progressIndicator();
+	rcmail.crm.AppConnector.request({
+		module: 'AppComponents',
+		view: 'MailMessageAnalysisModal',
+		content: content
+	})
+		.done(function (data) {
+			progressIndicatorElement.progressIndicator({ mode: 'hide' });
+			rcmail.crm.app.showModalWindow(data);
+		})
+		.fail(function () {
+			progressIndicatorElement.progressIndicator({ mode: 'hide' });
+			app.showNotify({
+				text: app.vtranslate('JS_ERROR'),
+				type: 'error'
+			});
+		});
+};

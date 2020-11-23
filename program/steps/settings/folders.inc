@@ -2,10 +2,9 @@
 
 /**
  +-----------------------------------------------------------------------+
- | program/steps/settings/folders.inc                                    |
- |                                                                       |
  | This file is part of the Roundcube Webmail client                     |
- | Copyright (C) 2005-2013, The Roundcube Dev Team                       |
+ |                                                                       |
+ | Copyright (C) The Roundcube Dev Team                                  |
  |                                                                       |
  | Licensed under the GNU General Public License version 3 or            |
  | any later version with exceptions for skins & plugins.                |
@@ -13,7 +12,6 @@
  |                                                                       |
  | PURPOSE:                                                              |
  |   Provide functionality of folders management                         |
- |                                                                       |
  +-----------------------------------------------------------------------+
  | Author: Thomas Bruederli <roundcube@gmail.com>                        |
  | Author: Aleksander Machniak <alec@alec.pl>                            |
@@ -182,27 +180,25 @@ $OUTPUT->set_env('quota', (bool) $STORAGE->get_capability('QUOTA'));
 $OUTPUT->include_script('treelist.js');
 
 // add some labels to client
-$OUTPUT->add_label('deletefolderconfirm', 'purgefolderconfirm', 'folderdeleting',
-    'foldermoving', 'foldersubscribing', 'folderunsubscribing', 'quota');
+$OUTPUT->add_label('deletefolderconfirm', 'purgefolderconfirm', 'movefolderconfirm',
+    'folderdeleting', 'foldermoving', 'foldersubscribing', 'folderunsubscribing',
+    'move', 'quota');
 
 // register UI objects
 $OUTPUT->add_handlers(array(
-    'foldersubscription' => 'rcmail_subscription_form',
-    'folderframe'        => 'rcmail_folder_frame',
+    'foldersubscription' => 'rcmail_folder_subscriptions',
     'folderfilter'       => 'rcmail_folder_filter',
     'quotadisplay'       => array($RCMAIL, 'quota_display'),
+    'searchform'         => array($OUTPUT, 'search_form'),
 ));
 
 $OUTPUT->send('folders');
 
 
 // build table with all folders listed by server
-function rcmail_subscription_form($attrib)
+function rcmail_folder_subscriptions($attrib)
 {
     global $RCMAIL, $OUTPUT;
-
-    list($form_start, $form_end) = get_form_tags($attrib, 'folders');
-    unset($attrib['form']);
 
     if (!$attrib['id']) {
         $attrib['id'] = 'rcmSubscriptionlist';
@@ -390,7 +386,7 @@ function rcmail_subscription_form($attrib)
     $OUTPUT->set_env('collapsed_folders', $collapsed);
     $OUTPUT->set_env('delimiter', $delimiter);
 
-    return $form_start . html::tag('ul', $attrib, implode('', $folders), html::$common_attrib) . $form_end;
+    return html::tag('ul', $attrib, implode('', $folders), html::$common_attrib);
 }
 
 function rcmail_folder_tree_element($folders, &$key, &$js_folders)
@@ -420,17 +416,6 @@ function rcmail_folder_tree_element($folders, &$key, &$js_folders)
     return html::tag('li', $attribs, $content);
 }
 
-function rcmail_folder_frame($attrib)
-{
-    global $OUTPUT;
-
-    if (!$attrib['id']) {
-        $attrib['id'] = 'rcmfolderframe';
-    }
-
-    return $OUTPUT->frame($attrib, true);
-}
-
 function rcmail_folder_filter($attrib)
 {
     global $RCMAIL;
@@ -446,7 +431,9 @@ function rcmail_folder_filter($attrib)
         $attrib['id'] = 'rcmfolderfilter';
     }
 
-    $attrib['onchange'] = rcmail_output::JS_OBJECT_NAME . '.folder_filter(this.value)';
+    if (!rcube_utils::get_boolean($attrib['noevent'])) {
+        $attrib['onchange'] = rcmail_output::JS_OBJECT_NAME . '.folder_filter(this.value)';
+    }
 
     $roots  = array();
     $select = new html_select($attrib);

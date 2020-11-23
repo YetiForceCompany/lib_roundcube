@@ -19,6 +19,9 @@ $labels['title_enable_column']  = 'Включить столбец';
 $labels['label_enable_column']  = 'Включить столбец с результатом аутентификации в список сообщений';
 $labels['label_fallback_verifier'] = 'Использовать внутреннюю DKIM проверку (если подпись найдена, но нет заголовка результата аутентификации)';
 
+$labels['title_trusted_mtas'] = 'Доверенные MTA';
+$labels['label_trusted_mtas'] = 'Список разделенных запятыми authserv-id МТА, которым вы доверяете. Будут показаны только результаты от этих MTA';
+
 $labels['title_include_status'] = 'Показывать только следующие статусы';
 $labels['label_include_status1']  = 'Подпись не найдена';
 $labels['label_include_status2']  = 'Подпись найдена, но нет заголовка результата аутентификации';

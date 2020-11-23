@@ -4,12 +4,11 @@
  +-------------------------------------------------------------------------+
  | Mail_mime wrapper for the Enigma Plugin                                 |
  |                                                                         |
- | Copyright (C) 2010-2015 The Roundcube Dev Team                          |
+ | Copyright (C) The Roundcube Dev Team                                    |
  |                                                                         |
  | Licensed under the GNU General Public License version 3 or              |
  | any later version with exceptions for skins & plugins.                  |
  | See the README file for a full license statement.                       |
- |                                                                         |
  +-------------------------------------------------------------------------+
  | Author: Aleksander Machniak <alec@alec.pl>                              |
  +-------------------------------------------------------------------------+
@@ -243,8 +242,6 @@ class enigma_mime_message extends Mail_mime
             }
 
             $this->headers = array_merge($this->headers, $headers);
-
-            return;
         }
         else {
             $output = $message->encode($boundary, $skip_head);
@@ -254,9 +251,16 @@ class enigma_mime_message extends Mail_mime
             }
 
             $this->headers = array_merge($this->headers, $output['headers']);
-
-            return $output['body'];
         }
+
+        // remember the boundary used, in case we'd handle headers() call later
+        if (empty($boundary) && !empty($this->headers['Content-Type'])) {
+            if (preg_match('/boundary="([^"]+)/', $this->headers['Content-Type'], $m)) {
+                $this->build_params['boundary'] = $m[1];
+            }
+        }
+
+        return $filename ? null : $output['body'];
     }
 
     /**
