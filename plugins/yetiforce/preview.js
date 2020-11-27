@@ -3,7 +3,9 @@
 if (window.rcmail) {
 	rcmail.addEventListener('init', function () {
 		rcmail.crm = rcmail.getCrmWindow();
-		rcmail.loadActionBar();
+		if (rcmail.env.uid) {
+			rcmail.loadActionBar();
+		}
 		rcmail.env.message_commands.push('yetiforce.importICS');
 		rcmail.register_command(
 			'yetiforce.importICS',
@@ -35,7 +37,7 @@ if (window.rcmail) {
 				rcmail.enable_command('plugin.yetiforce.loadMailAnalysis', list.get_selection(false).length > 0);
 			});
 			rcmail.addEventListener('listupdate', function () {
-				let btns = $('#toolbar-menu .js-spam-btn');
+				let btns = $('#toolbar-menu .js-white-list-btn');
 				if (rcmail.env.mailbox === rcmail.env.junk_mailbox) {
 					btns.hide();
 				} else {
@@ -48,6 +50,8 @@ if (window.rcmail) {
 				rcmail.addEventListener('insertrow', function (evt) {
 					if (typeof rcmail.env.rbl_list[evt.uid] !== 'undefined') {
 						evt.row.obj.style.backgroundColor = rcmail.env.rbl_list[evt.uid];
+					} else {
+						evt.row.obj.style.backgroundColor = '#eaeaea';
 					}
 					if (typeof rcmail.env.sender_list[evt.uid] !== 'undefined') {
 						$('.fromto', evt.row.obj).prepend(
@@ -400,8 +404,8 @@ rcube_webmail.prototype.showMailAnalysis = function (content) {
 		})
 		.fail(function () {
 			progressIndicatorElement.progressIndicator({ mode: 'hide' });
-			app.showNotify({
-				text: app.vtranslate('JS_ERROR'),
+			rcmail.crm.app.showNotify({
+				text: rcmail.crm.app.vtranslate('JS_ERROR'),
 				type: 'error'
 			});
 		});

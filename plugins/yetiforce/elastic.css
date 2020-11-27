@@ -72,3 +72,7 @@ button.btn.fakeMail:before {
 #message-content .attachmentslist:not(:empty) {
 	margin-bottom: 0.5rem;
 }
+.listing li.selected,
+.listing tr.selected td {
+	background-color: #d0f1ff;
+}
