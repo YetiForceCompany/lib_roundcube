@@ -1125,8 +1125,8 @@ class yetiforce extends rcube_plugin
 				}
 			}
 		} else {
-			$p['content'][] = html::p(['class' => 'mail-type-alert', 'style' => 'background: #ffd45233'],
-				html::span(['class' => 'alert-icon far fa-question-circle mr-2 text-warning'], '') .
+			$p['content'][] = html::p(['class' => 'mail-type-alert', 'style' => 'background: #eaeaea'],
+				html::span(['class' => 'alert-icon far fa-question-circle mr-2'], '') .
 				html::span(null, rcube::Q($this->rc->gettext('LBL_ALERT_NEUTRAL_LIST')))
 			);
 		}
