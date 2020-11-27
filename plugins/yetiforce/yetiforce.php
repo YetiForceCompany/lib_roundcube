@@ -52,6 +52,7 @@ class yetiforce extends rcube_plugin
 				'LBL_BLACK_LIST_DESC' => \App\Language::translate('LBL_BLACK_LIST_DESC', 'OSSMail', false, false),
 				'BTN_WHITE_LIST' => \App\Language::translate('LBL_WHITE_LIST', 'OSSMail', false, false),
 				'LBL_WHITE_LIST_DESC' => \App\Language::translate('LBL_WHITE_LIST_DESC', 'OSSMail', false, false),
+				'LBL_ALERT_NEUTRAL_LIST' => \App\Language::translate('LBL_ALERT_NEUTRAL_LIST', 'OSSMail', false, false),
 				'LBL_ALERT_BLACK_LIST' => \App\Language::translate('LBL_BLACK_LIST_ALERT', 'OSSMail', false, false),
 				'LBL_ALERT_WHITE_LIST' => \App\Language::translate('LBL_WHITE_LIST_ALERT', 'OSSMail', false, false),
 				'LBL_ALERT_FAKE_MAIL' => \App\Language::translate('LBL_ALERT_FAKE_MAIL', 'OSSMail'),
@@ -64,13 +65,14 @@ class yetiforce extends rcube_plugin
 				$this->include_stylesheet('preview.css');
 
 				$this->add_hook('template_object_messageattachments', [$this, 'appendIcsPreview']);
+				$this->add_hook('template_object_messagesummary', [$this, 'messageSummary']);
 				$this->add_hook('message_load', [$this, 'messageLoad']);
 
 				$this->add_button([
 					'command' => 'plugin.yetiforce.addSenderToList',
 					'type' => 'link',
 					'prop' => 1,
-					'class' => 'button yfi-fa-check-circle disabled js-spam-btn text-success',
+					'class' => 'button yfi-fa-check-circle disabled js-white-list-btn text-success',
 					'classact' => 'button yfi-fa-check-circle text-success',
 					'classsel' => 'button yfi-fa-check-circle pressed text-success',
 					'title' => 'LBL_WHITE_LIST_DESC',
@@ -81,7 +83,7 @@ class yetiforce extends rcube_plugin
 					'command' => 'plugin.yetiforce.addSenderToList',
 					'type' => 'link',
 					'prop' => 0,
-					'class' => 'button yfi-fa-ban disabled js-spam-btn text-danger',
+					'class' => 'button yfi-fa-ban disabled text-danger',
 					'classact' => 'button yfi-fa-ban text-danger',
 					'classsel' => 'button yfi-fa-ban pressed text-danger',
 					'title' => 'LBL_BLACK_LIST_DESC',
@@ -91,7 +93,7 @@ class yetiforce extends rcube_plugin
 				$this->add_button([
 					'command' => 'plugin.yetiforce.loadMailAnalysis',
 					'type' => 'link',
-					'class' => 'button yfi-fa-book-reader disabled js-spam-btn text-info',
+					'class' => 'button yfi-fa-book-reader disabled text-info',
 					'classact' => 'button yfi-fa-book-reader text-info',
 					'classsel' => 'button yfi-fa-book-reader pressed text-info',
 					'title' => 'BTN_ANALYSIS_DETAILS',
@@ -522,15 +524,21 @@ class yetiforce extends rcube_plugin
 
 	public function getGlobalSignature()
 	{
+		$currentPath = getcwd();
+		chdir($this->rc->config->get('root_directory'));
 		$config = Settings_Mail_Config_Model::getConfig('signature');
 		$parser = App\TextParser::getInstanceById($this->currentUser->getId(), 'Users');
 		$result['text'] = $result['html'] = $parser->setContent($config['signature'])->parse()->getContent();
+		chdir($currentPath);
 		return $result;
 	}
 
 	public function checkAddSignature()
 	{
+		$currentPath = getcwd();
+		chdir($this->rc->config->get('root_directory'));
 		$config = Settings_Mail_Config_Model::getConfig('signature');
+		chdir($currentPath);
 		return empty($config['addSignature']) || 'false' === $config['addSignature'] ? true : false;
 	}
 
@@ -1100,18 +1108,27 @@ class yetiforce extends rcube_plugin
 			);
 			}
 		}
+		$rows = [];
 		if ($ip = $rblInstance->getSender()['ip'] ?? '') {
-			foreach (\App\Mail\Rbl::findIp($ip) as $row) {
+			$rows = \App\Mail\Rbl::findIp($ip);
+		}
+		if ($rows) {
+			foreach ($rows as $row) {
 				if (1 !== (int) $row['status']) {
 					$black = \App\Mail\Rbl::LIST_TYPE_BLACK_LIST === (int) $row['type'] || \App\Mail\Rbl::LIST_TYPE_PUBLIC_BLACK_LIST === (int) $row['type'];
 					$type = \App\Mail\Rbl::LIST_TYPES[$row['type']];
-					$p['content'][] = html::p(['class' => 'mail-type-alert', 'style' => 'background:' . $type['color']],
+					$p['content'][] = html::p(['class' => 'mail-type-alert', 'style' => 'background:' . $type['alertColor']],
 							html::span(['class' => 'alert-icon ' . $type['icon']], '') .
 							html::span(null, rcube::Q($this->rc->gettext($black ? 'LBL_ALERT_BLACK_LIST' : 'LBL_ALERT_WHITE_LIST')))
 						);
 					return $p;
 				}
 			}
+		} else {
+			$p['content'][] = html::p(['class' => 'mail-type-alert', 'style' => 'background: #ffd45233'],
+				html::span(['class' => 'alert-icon far fa-question-circle mr-2 text-warning'], '') .
+				html::span(null, rcube::Q($this->rc->gettext('LBL_ALERT_NEUTRAL_LIST')))
+			);
 		}
 		return $p;
 	}
@@ -1120,5 +1137,31 @@ class yetiforce extends rcube_plugin
 	{
 		$uid = (int) rcube_utils::get_input_value('_uid', rcube_utils::INPUT_POST);
 		$this->rc->output->command('plugin.yetiforce.showMailAnalysis', $this->rc->imap->get_raw_body($uid));
+	}
+
+	/**
+	 * Message summary area.
+	 * template_object_messagesummary hook handler.
+	 *
+	 * @param array $args
+	 *
+	 * @return array
+	 */
+	public function messageSummary($args)
+	{
+		global $MESSAGE, $RCMAIL;
+		if (!isset($MESSAGE) || empty($MESSAGE->headers)) {
+			return $args;
+		}
+		$header = $MESSAGE->context ? 'from' : rcmail_message_list_smart_column_name();
+		if ('from' === $header) {
+			$mail = $MESSAGE->headers->to;
+			$label = $RCMAIL->gettext('to');
+		} else {
+			$mail = $MESSAGE->headers->from;
+			$label = $RCMAIL->gettext('from');
+		}
+		$args['content'] = str_replace('</span></span></div>', '', rtrim($args['content'])) . "   |  {$label} {$mail}</span></span></div>";
+		return $args;
 	}
 }
