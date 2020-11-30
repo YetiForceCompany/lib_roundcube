@@ -1125,8 +1125,8 @@ class yetiforce extends rcube_plugin
 				}
 			}
 		} else {
-			$p['content'][] = html::p(['class' => 'mail-type-alert', 'style' => 'background: #ffd45233'],
-				html::span(['class' => 'alert-icon far fa-question-circle mr-2 text-warning'], '') .
+			$p['content'][] = html::p(['class' => 'mail-type-alert', 'style' => 'background: #eaeaea'],
+				html::span(['class' => 'alert-icon far fa-question-circle mr-2'], '') .
 				html::span(null, rcube::Q($this->rc->gettext('LBL_ALERT_NEUTRAL_LIST')))
 			);
 		}
@@ -1161,7 +1161,13 @@ class yetiforce extends rcube_plugin
 			$mail = $MESSAGE->headers->from;
 			$label = $RCMAIL->gettext('from');
 		}
-		$args['content'] = str_replace('</span></span></div>', '', rtrim($args['content'])) . "   |  {$label} {$mail}</span></span></div>";
+		if ($mail) {
+			preg_match('/<(.*)>/', $mail, $matches);
+			if (isset($matches[1])) {
+				$mail = $matches[1];
+			}
+			$args['content'] = str_replace('</span></span></div>', '', rtrim($args['content'])) . "   |  {$label} {$mail}</span></span></div>";
+		}
 		return $args;
 	}
 }
