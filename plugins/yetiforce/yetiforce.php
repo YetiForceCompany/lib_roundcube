@@ -39,6 +39,7 @@ class yetiforce extends rcube_plugin
 
 		if ('mail' == $this->rc->task) {
 			$this->include_stylesheet('../../../../../layouts/resources/icons/yfm.css');
+			$this->include_stylesheet('../../../../../layouts/resources/icons/additionalIcons.css');
 			$this->include_stylesheet('../../../../../libraries/@fortawesome/fontawesome-free/css/all.css');
 			$currentPath = getcwd();
 			chdir($this->rc->config->get('root_directory'));
@@ -859,6 +860,10 @@ class yetiforce extends rcube_plugin
 				$typeLabel = \App\Language::translate('Activity Type', $translationMod);
 				$fields .= "<div class=\"col-lg-4 col-sm-6 col-12\"><span class=\"fas fa-calendar mr-1\"></span><strong>$typeLabel</strong>: $type</div>";
 			}
+			if ($location = $record->getDisplayValue('meeting_url', false, false, 40)) {
+				$locationLabel = \App\Language::translate('FL_MEETING_URL', $translationMod);
+				$fields .= "<div class=\"col-lg-4 col-sm-6 col-12\"><span class=\"AdditionalIcon-VideoConference mr-1\"></span><strong>$locationLabel</strong>: $location</div>";
+			}
 			if ($allday = $record->getDisplayValue('allday')) {
 				$alldayLabel = \App\Language::translate('All day', $translationMod);
 				$fields .= "<div class=\"col-lg-4 col-sm-6 col-12\"><span class=\"fas fa-edit mr-1\"></span><strong>$alldayLabel</strong>: $allday</div>";
@@ -870,10 +875,6 @@ class yetiforce extends rcube_plugin
 			if ($priority = $record->getDisplayValue('taskpriority')) {
 				$label = \App\Language::translate('Priority', $translationMod);
 				$fields .= "<div class=\"col-lg-4 col-sm-6 col-12\"><span class=\"fas fa-exclamation-circle mr-1\"></span><strong>$label</strong>: $priority</div>";
-			}
-			if ($state = $record->getDisplayValue('state')) {
-				$label = \App\Language::translate('LBL_STATE', $translationMod);
-				$fields .= "<div class=\"col-lg-4 col-sm-6 col-12\"><span class=\"fas fa-star mr-1\"></span><strong>$label</strong>: $state</div>";
 			}
 			if ($description = $record->getDisplayValue('description', false, false, 50)) {
 				$descriptionLabel = \App\Language::translate('Description', $translationMod);
@@ -1162,9 +1163,9 @@ class yetiforce extends rcube_plugin
 			$label = $RCMAIL->gettext('from');
 		}
 		if ($mail) {
-			preg_match('/<(.*)>/', $mail, $matches);
+			preg_match_all('/<(.*?)>/', $mail, $matches);
 			if (isset($matches[1])) {
-				$mail = $matches[1];
+				$mail = implode(',', $matches[1]);
 			}
 			$args['content'] = str_replace('</span></span></div>', '', rtrim($args['content'])) . "   |  {$label} {$mail}</span></span></div>";
 		}
