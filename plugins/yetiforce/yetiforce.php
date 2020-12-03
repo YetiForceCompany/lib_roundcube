@@ -1073,15 +1073,37 @@ class yetiforce extends rcube_plugin
 		$rblInstance = \App\Mail\Rbl::getInstance([]);
 		$rblInstance->set('rawBody', $this->rc->imap->get_raw_body($p['message']->uid));
 		$rblInstance->parse();
+
+		$sender = $rows = [];
+		if ($ip = $rblInstance->getSender()['ip'] ?? '') {
+			$rows = \App\Mail\Rbl::findIp($ip);
+		}
+		if ($rows) {
+			foreach ($rows as $row) {
+				if (1 !== (int) $row['status']) {
+					$row['type'] = (int) $row['type'];
+					$row['isBlack'] = \App\Mail\Rbl::LIST_TYPE_BLACK_LIST === $sender['type'] || \App\Mail\Rbl::LIST_TYPE_PUBLIC_BLACK_LIST === $sender['type'];
+					$sender = $row;
+					break;
+				}
+			}
+		}
+		$collapseShow = 'show';
+		if (isset($sender['isBlack']) && false === $sender['isBlack']) {
+			$collapseShow = '';
+		}
 		if (($verifySender = $rblInstance->verifySender()) && !$verifySender['status']) {
 			$desc = \App\Language::translate('LBL_MAIL_SENDER', 'Settings:MailRbl') . ': ' . html::span(['class' => 'badge badge-danger'], html::span(['class' => 'mr-2 alert-icon fas fa-times'], '') . \App\Language::translate('LBL_INCORRECT', 'Settings:MailRbl')) . '<br>' . str_replace('<>', '<br>', $verifySender['info']);
-			$p['content'][] = html::p(['class' => 'aligned-buttons boxerror'],
-				html::span(null, $this->rc->gettext('LBL_ALERT_FAKE_SENDER') . '<br>' . $desc) .
-				html::tag('button', [
-					'onclick' => "return rcmail.command('plugin.yetiforce.loadMailAnalysis')",
-					'title' => $this->gettext('addvcardmsg'),
-					'class' => 'fakeMail',
-				], rcube::Q($this->rc->gettext('BTN_ANALYSIS_DETAILS')))
+			$alert = '';
+			$alert .= html::span(['class' => 'float-right'], '<button class="btn btn-sm" type="button" data-toggle="collapse" data-target="#alert_collapse" aria-expanded="false" aria-controls="alert_collapse"><span class="fas fa-chevron-circle-down h3"></span></button>');
+			$alert .= html::span(null, $this->rc->gettext('LBL_ALERT_FAKE_SENDER'));
+			$alert .= html::span(['class' => 'd-block'], html::span(['class' => 'collapse ' . $collapseShow, 'id' => 'alert_collapse'], html::tag('button', [
+				'onclick' => "return rcmail.command('plugin.yetiforce.loadMailAnalysis')",
+				'title' => $this->gettext('addvcardmsg'),
+				'class' => 'fakeMail float-right',
+			], rcube::Q($this->rc->gettext('BTN_ANALYSIS_DETAILS'))) . $desc));
+			$p['content'][] = html::div(['class' => 'aligned-buttons boxerror'],
+				html::span(null, $alert)
 			);
 		} else {
 			$verifySpf = $rblInstance->verifySpf();
@@ -1099,38 +1121,31 @@ class yetiforce extends rcube_plugin
 				$desc .= '- ' . \App\Language::translate('LBL_DMARC', 'Settings:MailRbl') . ': ' . html::span(['class' => 'badge ' . $verifyDmarc['class'], 'title' => $verifyDmarc['log']], html::span(['class' => 'mr-2 alert-icon ' . $verifyDmarc['icon']], '') . \App\Language::translate($verifyDmarc['label'], 'Settings:MailRbl')) . ' ' . \App\Language::translate($verifyDmarc['desc'], 'Settings:MailRbl') . '<br />';
 			}
 			if ($desc) {
-				$p['content'][] = html::div(['class' => 'aligned-buttons ' . ($dangerType ? 'boxerror' : 'boxwarning')],
-				html::span(null, $this->rc->gettext('LBL_ALERT_FAKE_MAIL') . '<br>' . $desc) .
-				html::tag('button', [
+				$alert = '';
+				$alert .= html::span(['class' => 'float-right'], '<button class="btn btn-sm" type="button" data-toggle="collapse" data-target="#alert_collapse" aria-expanded="false" aria-controls="alert_collapse"><span class="fas fa-chevron-circle-down h3"></span></button>');
+				$alert .= html::span(null, $this->rc->gettext('LBL_ALERT_FAKE_MAIL'));
+				$alert .= html::span(['class' => 'd-block'], html::span(['class' => 'collapse ' . $collapseShow, 'id' => 'alert_collapse'], html::tag('button', [
 					'onclick' => "return rcmail.command('plugin.yetiforce.loadMailAnalysis')",
 					'title' => $this->gettext('addvcardmsg'),
-					'class' => 'fakeMail',
-				], rcube::Q($this->rc->gettext('BTN_ANALYSIS_DETAILS')))
-			);
+					'class' => 'fakeMail float-right',
+				], rcube::Q($this->rc->gettext('BTN_ANALYSIS_DETAILS'))) . $desc));
+				$p['content'][] = html::div(['class' => 'aligned-buttons ' . ($dangerType ? 'boxerror' : 'boxwarning')],
+					html::span(null, $alert)
+				);
 			}
 		}
-		$rows = [];
-		if ($ip = $rblInstance->getSender()['ip'] ?? '') {
-			$rows = \App\Mail\Rbl::findIp($ip);
-		}
-		if ($rows) {
-			foreach ($rows as $row) {
-				if (1 !== (int) $row['status']) {
-					$black = \App\Mail\Rbl::LIST_TYPE_BLACK_LIST === (int) $row['type'] || \App\Mail\Rbl::LIST_TYPE_PUBLIC_BLACK_LIST === (int) $row['type'];
-					$type = \App\Mail\Rbl::LIST_TYPES[$row['type']];
-					$p['content'][] = html::p(['class' => 'mail-type-alert', 'style' => 'background:' . $type['alertColor']],
-							html::span(['class' => 'alert-icon ' . $type['icon']], '') .
-							html::span(null, rcube::Q($this->rc->gettext($black ? 'LBL_ALERT_BLACK_LIST' : 'LBL_ALERT_WHITE_LIST')))
-						);
-					return $p;
-				}
-			}
-		} else {
-			$p['content'][] = html::p(['class' => 'mail-type-alert', 'style' => 'background: #eaeaea'],
-				html::span(['class' => 'alert-icon far fa-question-circle mr-2'], '') .
-				html::span(null, rcube::Q($this->rc->gettext('LBL_ALERT_NEUTRAL_LIST')))
+		if ($sender) {
+			$type = \App\Mail\Rbl::LIST_TYPES[$sender['type']];
+			$p['content'][] = html::p(['class' => 'mail-type-alert', 'style' => 'background:' . $type['alertColor']],
+				html::span(['class' => 'alert-icon ' . $type['icon']], '') .
+				html::span(null, rcube::Q($this->rc->gettext($sender['isBlack'] ? 'LBL_ALERT_BLACK_LIST' : 'LBL_ALERT_WHITE_LIST')))
 			);
+			return $p;
 		}
+		$p['content'][] = html::p(['class' => 'mail-type-alert', 'style' => 'background: #eaeaea'],
+			html::span(['class' => 'alert-icon far fa-question-circle mr-2'], '') .
+			html::span(null, rcube::Q($this->rc->gettext('LBL_ALERT_NEUTRAL_LIST')))
+		);
 		return $p;
 	}
 
