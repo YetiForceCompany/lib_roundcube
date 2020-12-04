@@ -48,14 +48,14 @@ if (window.rcmail) {
 		if (rcmail.env.layout == 'widescreen') {
 			if (rcmail.gui_objects.messagelist) {
 				rcmail.addEventListener('insertrow', function (evt) {
-					if (typeof rcmail.env.rbl_list[evt.uid] !== 'undefined') {
-						evt.row.obj.style.backgroundColor = rcmail.env.rbl_list[evt.uid];
+					if (typeof rcmail.env.yf_rblList[evt.uid] !== 'undefined') {
+						evt.row.obj.style.backgroundColor = rcmail.env.yf_rblList[evt.uid];
 					} else {
 						evt.row.obj.style.backgroundColor = '#eaeaea';
 					}
-					if (typeof rcmail.env.sender_list[evt.uid] !== 'undefined') {
+					if (typeof rcmail.env.yf_senderList[evt.uid] !== 'undefined') {
 						$('.fromto', evt.row.obj).prepend(
-							$('<span class="sender-alert-icon"/>').html(rcmail.env.sender_list[evt.uid])
+							$('<span class="sender-alert-icon"/>').html(rcmail.env.yf_senderList[evt.uid])
 						);
 					}
 				});
@@ -321,7 +321,7 @@ rcube_webmail.prototype.showQuickCreateForm = function (moduleName, record, para
 		}
 	}
 	const fillNameFields = (first) => {
-		const nameData = rcmail.env.fromName.split(' ');
+		const nameData = rcmail.env.yf_fromName.split(' ');
 		const firstName = nameData.shift();
 		const lastName = nameData.join(' ');
 		return first ? firstName : lastName;
@@ -340,21 +340,21 @@ rcube_webmail.prototype.showQuickCreateForm = function (moduleName, record, para
 						relatedParams[name] = fillNameFields(false);
 						break;
 					case 'fromName':
-						relatedParams[name] = rcmail.env.fromName;
+						relatedParams[name] = rcmail.env.yf_fromName;
 						break;
 					case 'subject':
-						relatedParams[name] = rcmail.env.subject;
+						relatedParams[name] = rcmail.env.yf_subject;
 						break;
 					case 'email':
-						relatedParams[name] = rcmail.env.fromMail;
+						relatedParams[name] = rcmail.env.yf_fromMail;
 						break;
 				}
 			}
 		}
 	}
-	relatedParams['email'] = rcmail.env.fromMail;
-	relatedParams['email1'] = rcmail.env.fromMail;
-	let messageBody = $('#messagebody').clone();
+	relatedParams['email'] = rcmail.env.yf_fromMail;
+	relatedParams['email1'] = rcmail.env.yf_fromMail;
+	let messageBody = $('#messagebody .rcmBody').clone();
 	messageBody.find('.image-attachment').remove();
 	relatedParams['description'] = messageBody.html();
 	//relatedParams['related_to'] = record;
