@@ -110,7 +110,7 @@ class yetiforce extends rcube_plugin
 					}
 				}
 				$this->viewData['compose']['composeAddressModules'] = $composeAddressModules;
-				$this->rc->output->set_env('isPermittedMailTemplates', \App\Privilege::isPermitted('EmailTemplates'));
+				$this->rc->output->set_env('yf_isPermittedMailTemplates', \App\Privilege::isPermitted('EmailTemplates'));
 
 				$this->rc->output->add_handler('yetiforce.adressbutton', [$this, 'adressButton']);
 				$this->add_hook('render_page', [$this, 'loadSignature']);
@@ -121,13 +121,13 @@ class yetiforce extends rcube_plugin
 				if ($id = rcube_utils::get_input_value('_id', rcube_utils::INPUT_GPC)) {
 					$id = App\Purifier::purifyByType($id, 'Alnum');
 					if (isset($_SESSION['compose_data_' . $id]['param']['crmmodule'])) {
-						$this->rc->output->set_env('crmModule', $_SESSION['compose_data_' . $id]['param']['crmmodule']);
+						$this->rc->output->set_env('yf_crmModule', $_SESSION['compose_data_' . $id]['param']['crmmodule']);
 					}
 					if (isset($_SESSION['compose_data_' . $id]['param']['crmrecord'])) {
-						$this->rc->output->set_env('crmRecord', $_SESSION['compose_data_' . $id]['param']['crmrecord']);
+						$this->rc->output->set_env('yf_crmRecord', $_SESSION['compose_data_' . $id]['param']['crmrecord']);
 					}
 					if (isset($_SESSION['compose_data_' . $id]['param']['crmview'])) {
-						$this->rc->output->set_env('crmView', $_SESSION['compose_data_' . $id]['param']['crmview']);
+						$this->rc->output->set_env('yf_crmView', $_SESSION['compose_data_' . $id]['param']['crmview']);
 					}
 				}
 			}
@@ -287,9 +287,9 @@ class yetiforce extends rcube_plugin
 		} else {
 			$fromMail = $from[0];
 		}
-		$this->rc->output->set_env('fromName', $fromName);
-		$this->rc->output->set_env('fromMail', $fromMail);
-		$this->rc->output->set_env('subject', $this->message->headers->subject);
+		$this->rc->output->set_env('yf_fromName', $fromName);
+		$this->rc->output->set_env('yf_fromMail', $fromMail);
+		$this->rc->output->set_env('yf_subject', rcube_mime::decode_header($this->message->headers->subject, $this->message->headers->charset));
 		foreach ((array) $this->message->attachments as $attachment) {
 			if ('application/ics' === $attachment->mimetype || 'text/calendar' === $attachment->mimetype) {
 				$this->icsParts[] = ['part' => $attachment->mime_id, 'uid' => $this->message->uid, 'type' => 'attachments'];
@@ -1028,8 +1028,8 @@ class yetiforce extends rcube_plugin
 					$senderList[$message->uid] = "<span class=\"fas fa-exclamation-triangle text-danger\" title=\"{$verify['info']}\"></span>";
 				}
 			}
-			$this->rc->output->set_env('rbl_list', \App\Mail\Rbl::getColorByIps($ipList));
-			$this->rc->output->set_env('sender_list', $senderList);
+			$this->rc->output->set_env('yf_rblList', \App\Mail\Rbl::getColorByIps($ipList));
+			$this->rc->output->set_env('yf_senderList', $senderList);
 		}
 		return $p;
 	}
@@ -1098,8 +1098,8 @@ class yetiforce extends rcube_plugin
 			$alert .= html::span(['class' => 'float-right'], '<button class="btn btn-sm" type="button" data-toggle="collapse" data-target="#alert_collapse" aria-expanded="false" aria-controls="alert_collapse"><span class="fas fa-chevron-circle-down h3"></span></button>');
 			$alert .= html::span(null, $this->rc->gettext('LBL_ALERT_FAKE_SENDER'));
 			$alert .= html::span(['class' => 'd-block'], html::span(['class' => 'collapse ' . $collapseShow, 'id' => 'alert_collapse'], html::tag('button', [
-				'onclick' => "return rcmail.command('plugin.yetiforce.loadMailAnalysis')",
-				'title' => $this->gettext('addvcardmsg'),
+					'onclick' => "return rcmail.command('plugin.yetiforce.loadMailAnalysis')",
+					'title' => $this->gettext('addvcardmsg'),
 				'class' => 'fakeMail float-right',
 			], rcube::Q($this->rc->gettext('BTN_ANALYSIS_DETAILS'))) . $desc));
 			$p['content'][] = html::div(['class' => 'aligned-buttons boxerror'],
@@ -1131,21 +1131,21 @@ class yetiforce extends rcube_plugin
 				], rcube::Q($this->rc->gettext('BTN_ANALYSIS_DETAILS'))) . $desc));
 				$p['content'][] = html::div(['class' => 'aligned-buttons ' . ($dangerType ? 'boxerror' : 'boxwarning')],
 					html::span(null, $alert)
-				);
+			);
 			}
 		}
 		if ($sender) {
 			$type = \App\Mail\Rbl::LIST_TYPES[$sender['type']];
-			$p['content'][] = html::p(['class' => 'mail-type-alert', 'style' => 'background:' . $type['alertColor']],
-				html::span(['class' => 'alert-icon ' . $type['icon']], '') .
+					$p['content'][] = html::p(['class' => 'mail-type-alert', 'style' => 'background:' . $type['alertColor']],
+							html::span(['class' => 'alert-icon ' . $type['icon']], '') .
 				html::span(null, rcube::Q($this->rc->gettext($sender['isBlack'] ? 'LBL_ALERT_BLACK_LIST' : 'LBL_ALERT_WHITE_LIST')))
+						);
+					return $p;
+				}
+			$p['content'][] = html::p(['class' => 'mail-type-alert', 'style' => 'background: #eaeaea'],
+				html::span(['class' => 'alert-icon far fa-question-circle mr-2'], '') .
+				html::span(null, rcube::Q($this->rc->gettext('LBL_ALERT_NEUTRAL_LIST')))
 			);
-			return $p;
-		}
-		$p['content'][] = html::p(['class' => 'mail-type-alert', 'style' => 'background: #eaeaea'],
-			html::span(['class' => 'alert-icon far fa-question-circle mr-2'], '') .
-			html::span(null, rcube::Q($this->rc->gettext('LBL_ALERT_NEUTRAL_LIST')))
-		);
 		return $p;
 	}
 
