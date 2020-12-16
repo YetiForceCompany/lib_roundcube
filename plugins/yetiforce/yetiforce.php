@@ -1082,7 +1082,7 @@ class yetiforce extends rcube_plugin
 			foreach ($rows as $row) {
 				if (1 !== (int) $row['status']) {
 					$row['type'] = (int) $row['type'];
-					$row['isBlack'] = \App\Mail\Rbl::LIST_TYPE_BLACK_LIST === $sender['type'] || \App\Mail\Rbl::LIST_TYPE_PUBLIC_BLACK_LIST === $sender['type'];
+					$row['isBlack'] = \App\Mail\Rbl::LIST_TYPE_BLACK_LIST === $row['type'] || \App\Mail\Rbl::LIST_TYPE_PUBLIC_BLACK_LIST === $row['type'];
 					$sender = $row;
 					break;
 				}
@@ -1098,8 +1098,8 @@ class yetiforce extends rcube_plugin
 			$alert .= html::span(['class' => 'float-right'], '<button class="btn btn-sm" type="button" data-toggle="collapse" data-target="#alert_collapse" aria-expanded="false" aria-controls="alert_collapse"><span class="fas fa-chevron-circle-down h3"></span></button>');
 			$alert .= html::span(null, $this->rc->gettext('LBL_ALERT_FAKE_SENDER'));
 			$alert .= html::span(['class' => 'd-block'], html::span(['class' => 'collapse ' . $collapseShow, 'id' => 'alert_collapse'], html::tag('button', [
-					'onclick' => "return rcmail.command('plugin.yetiforce.loadMailAnalysis')",
-					'title' => $this->gettext('addvcardmsg'),
+				'onclick' => "return rcmail.command('plugin.yetiforce.loadMailAnalysis')",
+				'title' => $this->gettext('addvcardmsg'),
 				'class' => 'fakeMail float-right',
 			], rcube::Q($this->rc->gettext('BTN_ANALYSIS_DETAILS'))) . $desc));
 			$p['content'][] = html::div(['class' => 'aligned-buttons boxerror'],
@@ -1136,13 +1136,13 @@ class yetiforce extends rcube_plugin
 		}
 		if ($sender) {
 			$type = \App\Mail\Rbl::LIST_TYPES[$sender['type']];
-					$p['content'][] = html::p(['class' => 'mail-type-alert', 'style' => 'background:' . $type['alertColor']],
+			$p['content'][] = html::p(['class' => 'mail-type-alert', 'style' => 'background:' . $type['alertColor']],
 							html::span(['class' => 'alert-icon ' . $type['icon']], '') .
 				html::span(null, rcube::Q($this->rc->gettext($sender['isBlack'] ? 'LBL_ALERT_BLACK_LIST' : 'LBL_ALERT_WHITE_LIST')))
 						);
-					return $p;
-				}
-			$p['content'][] = html::p(['class' => 'mail-type-alert', 'style' => 'background: #eaeaea'],
+			return $p;
+		}
+		$p['content'][] = html::p(['class' => 'mail-type-alert', 'style' => 'background: #eaeaea'],
 				html::span(['class' => 'alert-icon far fa-question-circle mr-2'], '') .
 				html::span(null, rcube::Q($this->rc->gettext('LBL_ALERT_NEUTRAL_LIST')))
 			);
