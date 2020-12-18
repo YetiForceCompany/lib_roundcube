@@ -1178,9 +1178,11 @@ class yetiforce extends rcube_plugin
 			$label = $RCMAIL->gettext('from');
 		}
 		if ($mail) {
-			preg_match_all('/<(.*?)>/', $mail, $matches);
-			if (isset($matches[1])) {
-				$mail = implode(',', $matches[1]);
+			if (false !== strpos($mail, '<')) {
+				preg_match_all('/<(.*?)>/', $mail, $matches);
+				if (isset($matches[1])) {
+					$mail = implode(',', $matches[1]);
+				}
 			}
 			$args['content'] = str_replace('</span></span></div>', '', rtrim($args['content'])) . "   |  {$label} {$mail}</span></span></div>";
 		}
