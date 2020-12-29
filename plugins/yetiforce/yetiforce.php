@@ -990,6 +990,7 @@ class yetiforce extends rcube_plugin
 				}
 			}
 			if (0 === $props && ($junkMbox = $this->rc->config->get('junk_mbox')) && $mbox !== $junkMbox) {
+				var_dump($junkMbox);
 				$this->rc->output->command('addSenderToListMove', $junkMbox);
 			}
 			$this->rc->output->command('display_message', \App\Language::translate('LBL_MESSAGE_HAS_BEEN_ADDED', 'OSSMail'), 'notice');
@@ -1070,6 +1071,9 @@ class yetiforce extends rcube_plugin
 	 */
 	public function messageObjects(array $p): array
 	{
+		if (!\App\Config::component('Mail', 'rcListCheckRbl', false)) {
+			return $p;
+		}
 		$rblInstance = \App\Mail\Rbl::getInstance([]);
 		$rblInstance->set('rawBody', $this->rc->imap->get_raw_body($p['message']->uid));
 		$rblInstance->parse();
