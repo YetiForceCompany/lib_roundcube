@@ -3,6 +3,9 @@
 if (window.rcmail) {
 	rcmail.addEventListener('init', function () {
 		rcmail.crm = rcmail.getCrmWindow();
+		if (rcmail.crm === false) {
+			return;
+		}
 		if (rcmail.env.uid) {
 			rcmail.loadActionBar();
 		}
@@ -60,6 +63,16 @@ if (window.rcmail) {
 					}
 				});
 			}
+		}
+		if (rcmail.env.action == 'preview') {
+			$('#moreAlertBtn').on('click', function () {
+				let alert = $('#moreAlert');
+				if (alert.hasClass('d-none')) {
+					alert.removeClass('d-none');
+				} else {
+					alert.addClass('d-none');
+				}
+			});
 		}
 	});
 }
@@ -381,7 +394,7 @@ rcube_webmail.prototype.getCrmWindow = function () {
 		return parent;
 	} else if (typeof parent.parent.CONFIG == 'object') {
 		return parent.parent;
-	} else if (typeof opener.crm.CONFIG == 'object') {
+	} else if (opener !== null && typeof opener.crm.CONFIG == 'object') {
 		return opener.crm;
 	}
 	return false;

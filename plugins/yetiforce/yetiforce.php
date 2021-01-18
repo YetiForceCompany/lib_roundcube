@@ -132,6 +132,9 @@ class yetiforce extends rcube_plugin
 				}
 			}
 			chdir($currentPath);
+		} elseif ('settings' == $this->rc->task) {
+			$this->add_hook('preferences_list', [$this, 'settingsDisplayPrefs']);
+			$this->add_hook('preferences_save', [$this, 'settingsSavePrefs']);
 		}
 	}
 
@@ -1017,6 +1020,9 @@ class yetiforce extends rcube_plugin
 	 */
 	public function messagesList(array $p): array
 	{
+		if (!\App\Config::component('Mail', 'rcListCheckRbl', false)) {
+			return $p;
+		}
 		if (!empty($p['messages'])) {
 			$ipList = $senderList = [];
 			foreach ($p['messages'] as $message) {
@@ -1071,9 +1077,6 @@ class yetiforce extends rcube_plugin
 	 */
 	public function messageObjects(array $p): array
 	{
-		if (!\App\Config::component('Mail', 'rcListCheckRbl', false)) {
-			return $p;
-		}
 		$rblInstance = \App\Mail\Rbl::getInstance([]);
 		$rblInstance->set('rawBody', $this->rc->imap->get_raw_body($p['message']->uid));
 		$rblInstance->parse();
@@ -1092,24 +1095,21 @@ class yetiforce extends rcube_plugin
 				}
 			}
 		}
-		$collapseShow = 'show';
-		if (isset($sender['isBlack']) && false === $sender['isBlack']) {
-			$collapseShow = '';
-		}
 		if (($verifySender = $rblInstance->verifySender()) && !$verifySender['status']) {
+			$btnMoreIcon = 'fas fa-chevron-circle-down';
 			$desc = \App\Language::translate('LBL_MAIL_SENDER', 'Settings:MailRbl') . ': ' . html::span(['class' => 'badge badge-danger'], html::span(['class' => 'mr-2 alert-icon fas fa-times'], '') . \App\Language::translate('LBL_INCORRECT', 'Settings:MailRbl')) . '<br>' . str_replace('<>', '<br>', $verifySender['info']);
 			$alert = '';
-			$alert .= html::span(['class' => 'float-right'], '<button class="btn btn-sm" type="button" data-toggle="collapse" data-target="#alert_collapse" aria-expanded="false" aria-controls="alert_collapse"><span class="fas fa-chevron-circle-down h3"></span></button>');
 			$alert .= html::span(null, $this->rc->gettext('LBL_ALERT_FAKE_SENDER'));
-			$alert .= html::span(['class' => 'd-block'], html::span(['class' => 'collapse ' . $collapseShow, 'id' => 'alert_collapse'], html::tag('button', [
+			$alert .= html::span(['class' => 'd-block'], html::span([], html::tag('button', [
 				'onclick' => "return rcmail.command('plugin.yetiforce.loadMailAnalysis')",
 				'title' => $this->gettext('addvcardmsg'),
 				'class' => 'fakeMail float-right',
 			], rcube::Q($this->rc->gettext('BTN_ANALYSIS_DETAILS'))) . $desc));
-			$p['content'][] = html::div(['class' => 'aligned-buttons boxerror'],
+			$alertBlock = html::div(['id' => 'moreAlert', 'class' => 'd-none aligned-buttons boxerror '],
 				html::span(null, $alert)
 			);
 		} else {
+			$btnMoreIcon = 'fas fa-exclamation-triangle text-warning';
 			$verifySpf = $rblInstance->verifySpf();
 			$verifyDmarc = $rblInstance->verifyDmarc();
 			$verifyDkim = $rblInstance->verifyDkim();
@@ -1126,30 +1126,31 @@ class yetiforce extends rcube_plugin
 			}
 			if ($desc) {
 				$alert = '';
-				$alert .= html::span(['class' => 'float-right'], '<button class="btn btn-sm" type="button" data-toggle="collapse" data-target="#alert_collapse" aria-expanded="false" aria-controls="alert_collapse"><span class="fas fa-chevron-circle-down h3"></span></button>');
+
 				$alert .= html::span(null, $this->rc->gettext('LBL_ALERT_FAKE_MAIL'));
-				$alert .= html::span(['class' => 'd-block'], html::span(['class' => 'collapse ' . $collapseShow, 'id' => 'alert_collapse'], html::tag('button', [
+				$alert .= html::span(['class' => 'd-block'], html::span([], html::tag('button', [
 					'onclick' => "return rcmail.command('plugin.yetiforce.loadMailAnalysis')",
 					'title' => $this->gettext('addvcardmsg'),
 					'class' => 'fakeMail float-right',
 				], rcube::Q($this->rc->gettext('BTN_ANALYSIS_DETAILS'))) . $desc));
-				$p['content'][] = html::div(['class' => 'aligned-buttons ' . ($dangerType ? 'boxerror' : 'boxwarning')],
+				$alertBlock = html::div(['id' => 'moreAlert', 'class' => 'd-none aligned-buttons ' . ($dangerType ? 'boxerror' : 'boxwarning')],
 					html::span(null, $alert)
 			);
 			}
 		}
+		$btnMore = html::span(['class' => 'float-right', 'style' => 'margin-left: auto;'], '<button class="btn btn-sm m-0 p-0" type="button" id="moreAlertBtn"><span class="' . $btnMoreIcon . ' h3"></span></button>');
 		if ($sender) {
 			$type = \App\Mail\Rbl::LIST_TYPES[$sender['type']];
-			$p['content'][] = html::p(['class' => 'mail-type-alert', 'style' => 'background:' . $type['alertColor']],
-							html::span(['class' => 'alert-icon ' . $type['icon']], '') .
-				html::span(null, rcube::Q($this->rc->gettext($sender['isBlack'] ? 'LBL_ALERT_BLACK_LIST' : 'LBL_ALERT_WHITE_LIST')))
-						);
+			$p['content'][] = html::div(['class' => 'mail-type-alert', 'style' => 'background:' . $type['alertColor']],
+				html::span(['class' => 'alert-icon ' . $type['icon']], '') .
+				html::span(null, rcube::Q($this->rc->gettext($sender['isBlack'] ? 'LBL_ALERT_BLACK_LIST' : 'LBL_ALERT_WHITE_LIST'))) . $btnMore
+			) . $alertBlock;
 			return $p;
 		}
-		$p['content'][] = html::p(['class' => 'mail-type-alert', 'style' => 'background: #eaeaea'],
-				html::span(['class' => 'alert-icon far fa-question-circle mr-2'], '') .
-				html::span(null, rcube::Q($this->rc->gettext('LBL_ALERT_NEUTRAL_LIST')))
-			);
+		$p['content'][] = html::div(['class' => 'mail-type-alert', 'style' => 'background: #eaeaea'],
+			html::span(['class' => 'alert-icon far fa-question-circle mr-2'], '') .
+			html::span(null, rcube::Q($this->rc->gettext('LBL_ALERT_NEUTRAL_LIST'))) . $btnMore
+		) . $alertBlock;
 		return $p;
 	}
 
@@ -1167,19 +1168,20 @@ class yetiforce extends rcube_plugin
 	 *
 	 * @return array
 	 */
-	public function messageSummary($args)
+	public function messageSummary(array $args): array
 	{
-		global $MESSAGE, $RCMAIL;
-		if (!isset($MESSAGE) || empty($MESSAGE->headers)) {
+		$yetiShowTo = $this->rc->config->get('yeti_show_to');
+		global $MESSAGE;
+		if (empty($yetiShowTo) || !isset($MESSAGE) || empty($MESSAGE->headers)) {
 			return $args;
 		}
 		$header = $MESSAGE->context ? 'from' : rcmail_message_list_smart_column_name();
 		if ('from' === $header) {
 			$mail = $MESSAGE->headers->to;
-			$label = $RCMAIL->gettext('to');
+			$label = $this->rc->gettext('to');
 		} else {
 			$mail = $MESSAGE->headers->from;
-			$label = $RCMAIL->gettext('from');
+			$label = $this->rc->gettext('from');
 		}
 		if ($mail) {
 			if (false !== strpos($mail, '<')) {
@@ -1188,8 +1190,48 @@ class yetiforce extends rcube_plugin
 					$mail = implode(',', $matches[1]);
 				}
 			}
-			$args['content'] = str_replace('</span></span></div>', '', rtrim($args['content'])) . "   |  {$label} {$mail}</span></span></div>";
+			$separator = '<br>';
+			if ('same' === $yetiShowTo) {
+				$separator = '   |  ';
+			}
+			$args['content'] = str_replace('</span></span></div>', '', rtrim($args['content'])) . " {$separator}{$label} {$mail}</span></span></div>";
 		}
+		return $args;
+	}
+
+	/**
+	 * Hook to inject plugin-specific user settings.
+	 *
+	 * @param array $args
+	 */
+	public function settingsDisplayPrefs(array $args): array
+	{
+		$type = $this->rc->config->get('yeti_show_to');
+
+		$showTo = new html_select(['name' => '_yeti_show_to', 'id' => 'ff_yeti_show_to']);
+		$showTo->add($this->gettext('none'), '');
+		$showTo->add($this->gettext('show_to_same_line'), 'same');
+		$showTo->add($this->gettext('show_to_new_line'), 'new');
+
+		$args['blocks']['YetiForce'] = [
+			'name' => 'YetiForce',
+			'options' => ['yeti_show_to' => [
+				'title' => html::label('ff_yeti_show_to', rcube::Q($this->gettext('show_to'))),
+				'content' => $showTo->show($type)
+			]
+			]
+		];
+		return $args;
+	}
+
+	/**
+	 * Hook to save plugin-specific user settings.
+	 *
+	 * @param mixed $args
+	 */
+	public function settingsSavePrefs(array $args): array
+	{
+		$args['prefs']['yeti_show_to'] = rcube_utils::get_input_value('_yeti_show_to', rcube_utils::INPUT_POST);
 		return $args;
 	}
 }
