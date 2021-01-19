@@ -49,7 +49,11 @@ if (window.rcmail) {
 			});
 		}
 		if (rcmail.env.layout == 'widescreen') {
-			if (rcmail.gui_objects.messagelist) {
+			if (
+				rcmail.gui_objects.messagelist &&
+				typeof rcmail.env.yf_rblList !== 'undefined' &&
+				typeof rcmail.env.yf_senderList !== 'undefined'
+			) {
 				rcmail.addEventListener('insertrow', function (evt) {
 					if (typeof rcmail.env.yf_rblList[evt.uid] !== 'undefined') {
 						evt.row.obj.style.backgroundColor = rcmail.env.yf_rblList[evt.uid];
