@@ -49,21 +49,19 @@ if (window.rcmail) {
 			});
 		}
 		if (rcmail.env.layout == 'widescreen') {
-			if (
-				rcmail.gui_objects.messagelist &&
-				typeof rcmail.env.yf_rblList !== 'undefined' &&
-				typeof rcmail.env.yf_senderList !== 'undefined'
-			) {
+			if (rcmail.gui_objects.messagelist) {
 				rcmail.addEventListener('insertrow', function (evt) {
-					if (typeof rcmail.env.yf_rblList[evt.uid] !== 'undefined') {
-						evt.row.obj.style.backgroundColor = rcmail.env.yf_rblList[evt.uid];
-					} else {
-						evt.row.obj.style.backgroundColor = '#eaeaea';
-					}
-					if (typeof rcmail.env.yf_senderList[evt.uid] !== 'undefined') {
-						$('.fromto', evt.row.obj).prepend(
-							$('<span class="sender-alert-icon"/>').html(rcmail.env.yf_senderList[evt.uid])
-						);
+					if (typeof rcmail.env.yf_rblList !== 'undefined' && typeof rcmail.env.yf_senderList !== 'undefined') {
+						if (typeof rcmail.env.yf_rblList[evt.uid] !== 'undefined') {
+							evt.row.obj.style.backgroundColor = rcmail.env.yf_rblList[evt.uid];
+						} else {
+							evt.row.obj.style.backgroundColor = '#eaeaea';
+						}
+						if (typeof rcmail.env.yf_senderList[evt.uid] !== 'undefined') {
+							$('.fromto', evt.row.obj).prepend(
+								$('<span class="sender-alert-icon"/>').html(rcmail.env.yf_senderList[evt.uid])
+							);
+						}
 					}
 				});
 			}

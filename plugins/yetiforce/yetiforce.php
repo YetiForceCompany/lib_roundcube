@@ -1096,7 +1096,7 @@ class yetiforce extends rcube_plugin
 			}
 		}
 		if (($verifySender = $rblInstance->verifySender()) && !$verifySender['status']) {
-			$btnMoreIcon = 'fas fa-chevron-circle-down';
+			$btnMoreIcon = 'fas fa-exclamation-circle text-danger';
 			$desc = \App\Language::translate('LBL_MAIL_SENDER', 'Settings:MailRbl') . ': ' . html::span(['class' => 'badge badge-danger'], html::span(['class' => 'mr-2 alert-icon fas fa-times'], '') . \App\Language::translate('LBL_INCORRECT', 'Settings:MailRbl')) . '<br>' . str_replace('<>', '<br>', $verifySender['info']);
 			$alert = '';
 			$alert .= html::span(null, $this->rc->gettext('LBL_ALERT_FAKE_SENDER'));
@@ -1109,12 +1109,12 @@ class yetiforce extends rcube_plugin
 				html::span(null, $alert)
 			);
 		} else {
-			$btnMoreIcon = 'fas fa-exclamation-triangle text-warning';
 			$verifySpf = $rblInstance->verifySpf();
 			$verifyDmarc = $rblInstance->verifyDmarc();
 			$verifyDkim = $rblInstance->verifyDkim();
 			$dangerType = \App\Mail\Rbl::SPF_FAIL === $verifySpf['status'] || \App\Mail\Rbl::DMARC_FAIL === $verifyDmarc['status'] || \App\Mail\Rbl::DKIM_FAIL === $verifyDkim['status'];
 			$desc = '';
+			$btnMoreIcon = $dangerType ? 'fas fa-exclamation-circle text-danger' : 'fas fa-exclamation-triangle text-warning';
 			if (\App\Mail\Rbl::SPF_PASS !== $verifySpf['status']) {
 				$desc .= '- ' . \App\Language::translate('LBL_SPF', 'Settings:MailRbl') . ': ' . html::span(['class' => 'badge ' . $verifySpf['class']], html::span(['class' => 'mr-2 alert-icon ' . $verifySpf['icon']], '') . \App\Language::translate($verifySpf['label'], 'Settings:MailRbl')) . ' ' . \call_user_func_array('vsprintf', [\App\Language::translate($verifySpf['desc'], 'Settings:MailRbl', false, false), [$verifySpf['domain']]]) . '<br />';
 			}
