@@ -993,7 +993,6 @@ class yetiforce extends rcube_plugin
 				}
 			}
 			if (0 === $props && ($junkMbox = $this->rc->config->get('junk_mbox')) && $mbox !== $junkMbox) {
-				var_dump($junkMbox);
 				$this->rc->output->command('addSenderToListMove', $junkMbox);
 			}
 			$this->rc->output->command('display_message', \App\Language::translate('LBL_MESSAGE_HAS_BEEN_ADDED', 'OSSMail'), 'notice');
