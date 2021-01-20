@@ -1186,7 +1186,7 @@ class yetiforce extends rcube_plugin
 			if (false !== strpos($mail, '<')) {
 				preg_match_all('/<(.*?)>/', $mail, $matches);
 				if (isset($matches[1])) {
-					$mail = implode(',', $matches[1]);
+					$mail = implode(', ', $matches[1]);
 				}
 			}
 			$separator = '<br>';
@@ -1205,6 +1205,9 @@ class yetiforce extends rcube_plugin
 	 */
 	public function settingsDisplayPrefs(array $args): array
 	{
+		if ('general' != $args['section']) {
+			return $args;
+		}
 		$type = $this->rc->config->get('yeti_show_to');
 
 		$showTo = new html_select(['name' => '_yeti_show_to', 'id' => 'ff_yeti_show_to']);
