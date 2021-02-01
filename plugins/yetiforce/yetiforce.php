@@ -976,7 +976,6 @@ class yetiforce extends rcube_plugin
 		$messageset = rcmail::get_uids(null, $mbox, $multi, rcube_utils::INPUT_POST);
 		if ($messageset) {
 			$imap = $this->rc->get_storage();
-			$db = $this->rc->get_dbh();
 			foreach ($messageset as $mbox => $uids) {
 				$imap->set_folder($mbox);
 				if ('*' === $uids) {
@@ -990,7 +989,11 @@ class yetiforce extends rcube_plugin
 						$message = new rcube_message($uid, $mbox);
 						$body = $message->first_html_part();
 					}
-					$db->query('INSERT INTO `s_yf_mail_rbl_request` (`datetime`,`type`,`user`,`header`,`body`) VALUES (?,?,?,?,?)', date('Y-m-d H:i:s'), $props, ($_SESSION['crm']['id'] ?: 0), $headers, $body);
+					\App\Mail\Rbl::addReport([
+						'type' => $props,
+						'header' => $headers,
+						'body' => $body,
+					]);
 				}
 			}
 			if (0 === $props && ($junkMbox = $this->rc->config->get('junk_mbox')) && $mbox !== $junkMbox) {
