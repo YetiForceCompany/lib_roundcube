@@ -12,6 +12,7 @@ class yetiforce extends rcube_plugin
 	private $rc;
 	private $autologin;
 	private $currentUser;
+	private $rbl;
 	private $viewData = [];
 	/**
 	 * @var array
@@ -562,7 +563,7 @@ class yetiforce extends rcube_plugin
 			$COMPOSE = &$_SESSION[$SESSION_KEY];
 		}
 		if (!$COMPOSE) {
-			die('Invalid session var!');
+			exit('Invalid session var!');
 		}
 		$index = 0;
 		foreach ($this->getAttachment($ids, false) as $attachment) {
@@ -975,7 +976,6 @@ class yetiforce extends rcube_plugin
 		$messageset = rcmail::get_uids(null, $mbox, $multi, rcube_utils::INPUT_POST);
 		if ($messageset) {
 			$imap = $this->rc->get_storage();
-			$db = $this->rc->get_dbh();
 			foreach ($messageset as $mbox => $uids) {
 				$imap->set_folder($mbox);
 				if ('*' === $uids) {
@@ -989,7 +989,11 @@ class yetiforce extends rcube_plugin
 						$message = new rcube_message($uid, $mbox);
 						$body = $message->first_html_part();
 					}
-					$db->query('INSERT INTO `s_yf_mail_rbl_request` (`datetime`,`type`,`user`,`header`,`body`) VALUES (?,?,?,?,?)', date('Y-m-d H:i:s'), $props, ($_SESSION['crm']['id'] ?: 0), $headers, $body);
+					\App\Mail\Rbl::addReport([
+						'type' => $props,
+						'header' => $headers,
+						'body' => $body,
+					]);
 				}
 			}
 			if (0 === $props && ($junkMbox = $this->rc->config->get('junk_mbox')) && $mbox !== $junkMbox) {
@@ -1076,12 +1080,13 @@ class yetiforce extends rcube_plugin
 	 */
 	public function messageObjects(array $p): array
 	{
-		$rblInstance = \App\Mail\Rbl::getInstance([]);
-		$rblInstance->set('rawBody', $this->rc->imap->get_raw_body($p['message']->uid));
-		$rblInstance->parse();
-
+		if (empty($this->rbl)) {
+			$this->rbl = \App\Mail\Rbl::getInstance([]);
+			$this->rbl->set('rawBody', $this->rc->imap->get_raw_body($p['message']->uid));
+			$this->rbl->parse();
+		}
 		$sender = $rows = [];
-		if ($ip = $rblInstance->getSender()['ip'] ?? '') {
+		if ($ip = $this->rbl->getSender()['ip'] ?? '') {
 			$rows = \App\Mail\Rbl::findIp($ip);
 		}
 		if ($rows) {
@@ -1094,7 +1099,7 @@ class yetiforce extends rcube_plugin
 				}
 			}
 		}
-		if (($verifySender = $rblInstance->verifySender()) && !$verifySender['status']) {
+		if (($verifySender = $this->rbl->verifySender()) && !$verifySender['status']) {
 			$btnMoreIcon = 'fas fa-exclamation-circle text-danger';
 			$desc = \App\Language::translate('LBL_MAIL_SENDER', 'Settings:MailRbl') . ': ' . html::span(['class' => 'badge badge-danger'], html::span(['class' => 'mr-2 alert-icon fas fa-times'], '') . \App\Language::translate('LBL_INCORRECT', 'Settings:MailRbl')) . '<br>' . str_replace('<>', '<br>', $verifySender['info']);
 			$alert = '';
@@ -1108,9 +1113,9 @@ class yetiforce extends rcube_plugin
 				html::span(null, $alert)
 			);
 		} else {
-			$verifySpf = $rblInstance->verifySpf();
-			$verifyDmarc = $rblInstance->verifyDmarc();
-			$verifyDkim = $rblInstance->verifyDkim();
+			$verifySpf = $this->rbl->verifySpf();
+			$verifyDmarc = $this->rbl->verifyDmarc();
+			$verifyDkim = $this->rbl->verifyDkim();
 			$dangerType = \App\Mail\Rbl::SPF_FAIL === $verifySpf['status'] || \App\Mail\Rbl::DMARC_FAIL === $verifyDmarc['status'] || \App\Mail\Rbl::DKIM_FAIL === $verifyDkim['status'];
 			$desc = '';
 			$btnMoreIcon = $dangerType ? 'fas fa-exclamation-circle text-danger' : 'fas fa-exclamation-triangle text-warning';
@@ -1171,30 +1176,43 @@ class yetiforce extends rcube_plugin
 	{
 		$yetiShowTo = $this->rc->config->get('yeti_show_to');
 		global $MESSAGE;
-		if (empty($yetiShowTo) || !isset($MESSAGE) || empty($MESSAGE->headers)) {
+		if (!isset($MESSAGE) || empty($MESSAGE->headers)) {
 			return $args;
 		}
-		$header = $MESSAGE->context ? 'from' : rcmail_message_list_smart_column_name();
-		if ('from' === $header) {
-			$mail = $MESSAGE->headers->to;
-			$label = $this->rc->gettext('to');
-		} else {
-			$mail = $MESSAGE->headers->from;
-			$label = $this->rc->gettext('from');
-		}
-		if ($mail) {
-			if (false !== strpos($mail, '<')) {
-				preg_match_all('/<(.*?)>/', $mail, $matches);
-				if (isset($matches[1])) {
-					$mail = implode(',', $matches[1]);
+		$contnet = $end = '';
+		if (!empty($yetiShowTo)) {
+			$header = $MESSAGE->context ? 'from' : rcmail_message_list_smart_column_name();
+			if ('from' === $header) {
+				$mail = $MESSAGE->headers->to;
+				$label = $this->rc->gettext('to');
+			} else {
+				$mail = $MESSAGE->headers->from;
+				$label = $this->rc->gettext('from');
+			}
+			if ($mail) {
+				if (false !== strpos($mail, '<')) {
+					preg_match_all('/<(.*?)>/', $mail, $matches);
+					if (isset($matches[1])) {
+						$mail = implode(', ', $matches[1]);
+					}
 				}
+				$separator = '<br>';
+				if ('same' === $yetiShowTo) {
+					$separator = '   |  ';
+				}
+				$contnet = " {$separator}{$label} {$mail}";
 			}
-			$separator = '<br>';
-			if ('same' === $yetiShowTo) {
-				$separator = '   |  ';
-			}
-			$args['content'] = str_replace('</span></span></div>', '', rtrim($args['content'])) . " {$separator}{$label} {$mail}</span></span></div>";
 		}
+		$this->rbl = \App\Mail\Rbl::getInstance([]);
+		$this->rbl->set('rawBody', $this->rc->imap->get_raw_body($MESSAGE->uid));
+		$this->rbl->parse();
+		if ($ip = $this->rbl->getSender()['ip'] ?? '') {
+			$end = html::span(['class' => 'float-right'], '<span class="btn-group" role="group" aria-label="SOC">
+			<button type="button" class="btn btn-sm btn-info" title="YetiForce Security Operations Center">YF-SOC</button>
+			<a href="https://soc.yetiforce.com/search?ip=' . $ip . '" title="soc.yetiforce.com" target="_blank" class="btn btn-sm btn-outline-info">' . $ip . '</a>
+		  </span>');
+		}
+		$args['content'] = str_replace('</span></span></div>', '', rtrim($args['content'])) . "{$contnet}</span></span>{$end}</div>";
 		return $args;
 	}
 
@@ -1205,6 +1223,9 @@ class yetiforce extends rcube_plugin
 	 */
 	public function settingsDisplayPrefs(array $args): array
 	{
+		if ('general' != $args['section']) {
+			return $args;
+		}
 		$type = $this->rc->config->get('yeti_show_to');
 
 		$showTo = new html_select(['name' => '_yeti_show_to', 'id' => 'ff_yeti_show_to']);
