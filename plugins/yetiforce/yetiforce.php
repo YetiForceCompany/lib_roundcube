@@ -975,6 +975,7 @@ class yetiforce extends rcube_plugin
 		$mbox = (string) rcube_utils::get_input_value('_mbox', rcube_utils::INPUT_POST);
 		$messageset = rcmail::get_uids(null, $mbox, $multi, rcube_utils::INPUT_POST);
 		if ($messageset) {
+			chdir($this->rc->config->get('root_directory'));
 			$imap = $this->rc->get_storage();
 			foreach ($messageset as $mbox => $uids) {
 				$imap->set_folder($mbox);
