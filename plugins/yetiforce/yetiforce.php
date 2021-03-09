@@ -1030,13 +1030,16 @@ class yetiforce extends rcube_plugin
 		if (!empty($p['messages'])) {
 			$ipList = $senderList = [];
 			foreach ($p['messages'] as $message) {
-				$rblInstance = \App\Mail\Rbl::getInstance($this->parseMessage($message));
-				if ($ip = $rblInstance->getSender()['ip'] ?? '') {
-					$ipList[$message->uid] = $ip;
-				}
-				$verify = $rblInstance->verifySender();
-				if (false === $verify['status']) {
-					$senderList[$message->uid] = "<span class=\"fas fa-exclamation-triangle text-danger\" title=\"{$verify['info']}\"></span>";
+				$parseMessage = $this->parseMessage($message);
+				if ('' !== $parseMessage['header']) {
+					$rblInstance = \App\Mail\Rbl::getInstance($parseMessage);
+					if ($ip = $rblInstance->getSender()['ip'] ?? '') {
+						$ipList[$message->uid] = $ip;
+					}
+					$verify = $rblInstance->verifySender();
+					if (false === $verify['status']) {
+						$senderList[$message->uid] = "<span class=\"fas fa-exclamation-triangle text-danger\" title=\"{$verify['info']}\"></span>";
+					}
 				}
 			}
 			$this->rc->output->set_env('yf_rblList', \App\Mail\Rbl::getColorByIps($ipList));
