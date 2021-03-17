@@ -155,7 +155,7 @@ class thunderbird_labels extends rcube_plugin
 				'name' => $key,
 				'id' => $key
 			]);
-			$select->add([$this->gettext('thunderbird'), $this->gettext('bullets')], ['thunderbird', 'bullets']);
+			$select->add([$this->gettext('thunderbird'), $this->gettext('bullets'), $this->gettext('badges')], ['thunderbird', 'bullets', 'badges']);
 			$content = $select->show($this->rc->config->get($key));
 
 			$args['blocks']['tb_label']['options'][$key] = [

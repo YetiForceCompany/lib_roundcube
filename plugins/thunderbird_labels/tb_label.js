@@ -66,7 +66,7 @@ $(function () {
 	if (labels_for_message) {
 		labelbox_parent = $('div.message-headers');
 		if (!labelbox_parent.length) {
-			labelbox_parent = $('table.headers-table tbody tr:first-child');
+			labelbox_parent = $('.header-links');
 		}
 		labelbox_parent.append('<div id="labelbox"></div>');
 		labels_for_message.sort(function (a, b) {
@@ -235,7 +235,7 @@ rcm_tb_label_css = (function () {
 })();
 
 rcm_tb_label_insert = function (uid, row) {
-	var i, j, label_name, len, len1, message, ref, ref1, rowobj, spanobj;
+	var i, label_name, len, message, ref, rowobj, spanobj;
 	if (typeof rcmail.env === 'undefined' || typeof rcmail.env.messages === 'undefined') {
 		return;
 	}
@@ -248,18 +248,24 @@ rcm_tb_label_insert = function (uid, row) {
 			message.flags.tb_labels.sort(function (a, b) {
 				return a - b;
 			});
+			ref = message.flags.tb_labels;
 			if (rcmail.env.tb_label_style === 'bullets') {
-				ref = message.flags.tb_labels;
 				for (i = 0, len = ref.length; i < len; i++) {
 					label_name = ref[i];
 					spanobj.append(
 						'<span class="tb_label_' + label_name + '" title="' + i18n_label(label_name) + '">&#8226;</span>'
 					);
 				}
+			} else if (rcmail.env.tb_label_style === 'badges') {
+				for (i = 0, len = ref.length; i < len; i++) {
+					label_name = ref[i];
+					spanobj.append(
+						'<span class="tb_label_badges badge ' + label_name.toLowerCase() + '">' + i18n_label(label_name) + '</span>'
+					);
+				}
 			} else {
-				ref1 = message.flags.tb_labels;
-				for (j = 0, len1 = ref1.length; j < len1; j++) {
-					label_name = ref1[j];
+				for (i = 0, len = ref.length; i < len; i++) {
+					label_name = ref[i];
 					rowobj.addClass('tb_label_' + label_name);
 				}
 			}
@@ -342,10 +348,10 @@ rcm_tb_label_flag_toggle = function (flag_uids, toggle_label_no, onoff) {
 	}
 	if (headers_table.length) {
 		if (onoff === true) {
-			if (rcmail.env.tb_label_style === 'bullets') {
+			if (rcmail.env.tb_label_style === 'bullets' || rcmail.env.tb_label_style === 'badges') {
 				label_box.find('span.box_tb_label_' + escape_jquery_selector(toggle_label_no)).remove();
 				label_box.append(
-					'<span class="box_tb_label_' + toggle_label_no + '">' + i18n_label(toggle_label_no) + '</span>'
+					'<span class="badge box_tb_label_' + toggle_label_no + '">' + i18n_label(toggle_label_no) + '</span>'
 				);
 			} else {
 				headers_table.removeClass('tb_label_' + toggle_label_no);
@@ -353,7 +359,8 @@ rcm_tb_label_flag_toggle = function (flag_uids, toggle_label_no, onoff) {
 			}
 			labels_for_message.push(toggle_label_no);
 		} else {
-			if (rcmail.env.tb_label_style === 'bullets') {
+			if (rcmail.env.tb_label_style === 'bullets' || rcmail.env.tb_label_style === 'badges') {
+				console.log(22);
 				label_box.find('span.box_tb_label_' + escape_jquery_selector(toggle_label_no)).remove();
 			} else {
 				headers_table.removeClass('tb_label_' + toggle_label_no);
@@ -385,6 +392,15 @@ rcm_tb_label_flag_toggle = function (flag_uids, toggle_label_no, onoff) {
 				spanobj.append(
 					'<span class="tb_label_' + toggle_label_no + '" title="' + i18n_label(toggle_label_no) + '">&#8226;</span>'
 				);
+			} else if (rcmail.env.tb_label_style === 'badges') {
+				console.log(33);
+				spanobj.append(
+					'<span class="tb_label_badges badge ' +
+						toggle_label_no.toLowerCase() +
+						'">' +
+						i18n_label(toggle_label_no) +
+						'</span>'
+				);
 			} else {
 				rowobj.addClass('tb_label_' + toggle_label_no);
 			}
@@ -393,6 +409,9 @@ rcm_tb_label_flag_toggle = function (flag_uids, toggle_label_no, onoff) {
 			rowobj = $(row.obj);
 			if (rcmail.env.tb_label_style === 'bullets') {
 				rowobj.find('td.subject span.tb_label_dots span.tb_label_' + toggle_label_no).remove();
+			} else if (rcmail.env.tb_label_style === 'badges') {
+				console.log(44);
+				rowobj.find('td.subject span.tb_label_dots span.tb_label_badges.' + toggle_label_no.toLowerCase()).remove();
 			} else {
 				rowobj.removeClass('tb_label_' + toggle_label_no);
 			}
