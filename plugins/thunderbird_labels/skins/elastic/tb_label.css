@@ -34,12 +34,13 @@ span.tb_label_dots span {
 }
 
 span.tb_label_dots span.tb_label_badges {
-	font-size: 12px;
-	line-height: 12px !important;
+	font-size: 11px;
+	line-height: 11px !important;
 	color: #fff;
-	margin-right: 5px;
+	margin-right: 8px;
 	margin-bottom: 3px;
 	margin-top: -2px;
+	background-color: #c9c9c9;
 }
 .tb_label_badges.label1 {
 	background-color: #ff0000 !important;

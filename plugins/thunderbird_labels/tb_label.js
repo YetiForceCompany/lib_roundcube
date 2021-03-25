@@ -259,9 +259,15 @@ rcm_tb_label_insert = function (uid, row) {
 			} else if (rcmail.env.tb_label_style === 'badges') {
 				for (i = 0, len = ref.length; i < len; i++) {
 					label_name = ref[i];
-					spanobj.append(
-						'<span class="tb_label_badges badge ' + label_name.toLowerCase() + '">' + i18n_label(label_name) + '</span>'
-					);
+					if (rcmail.env.tb_label_custom_labels[label_name]) {
+						spanobj.append(
+							'<span class="tb_label_badges badge ' +
+								label_name.toLowerCase() +
+								'">' +
+								i18n_label(label_name) +
+								'</span>'
+						);
+					}
 				}
 			} else {
 				for (i = 0, len = ref.length; i < len; i++) {
@@ -360,7 +366,6 @@ rcm_tb_label_flag_toggle = function (flag_uids, toggle_label_no, onoff) {
 			labels_for_message.push(toggle_label_no);
 		} else {
 			if (rcmail.env.tb_label_style === 'bullets' || rcmail.env.tb_label_style === 'badges') {
-				console.log(22);
 				label_box.find('span.box_tb_label_' + escape_jquery_selector(toggle_label_no)).remove();
 			} else {
 				headers_table.removeClass('tb_label_' + toggle_label_no);
@@ -393,7 +398,6 @@ rcm_tb_label_flag_toggle = function (flag_uids, toggle_label_no, onoff) {
 					'<span class="tb_label_' + toggle_label_no + '" title="' + i18n_label(toggle_label_no) + '">&#8226;</span>'
 				);
 			} else if (rcmail.env.tb_label_style === 'badges') {
-				console.log(33);
 				spanobj.append(
 					'<span class="tb_label_badges badge ' +
 						toggle_label_no.toLowerCase() +
@@ -410,7 +414,6 @@ rcm_tb_label_flag_toggle = function (flag_uids, toggle_label_no, onoff) {
 			if (rcmail.env.tb_label_style === 'bullets') {
 				rowobj.find('td.subject span.tb_label_dots span.tb_label_' + toggle_label_no).remove();
 			} else if (rcmail.env.tb_label_style === 'badges') {
-				console.log(44);
 				rowobj.find('td.subject span.tb_label_dots span.tb_label_badges.' + toggle_label_no.toLowerCase()).remove();
 			} else {
 				rowobj.removeClass('tb_label_' + toggle_label_no);
