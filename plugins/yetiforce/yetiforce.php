@@ -624,9 +624,12 @@ class yetiforce extends rcube_plugin
 			foreach ($files as $file) {
 				$orgFileName = $file['name'] ?? basename($file);
 				$orgFilePath = $file['path'] ?? $file;
-				$orgFile = $this->rc->config->get('root_directory') . $orgFilePath;
 				[, $sec] = explode(' ', microtime());
 				$filePath = $this->rc->config->get('temp_dir') . DIRECTORY_SEPARATOR . "{$sec}_{$userid}_{$index}.tmp";
+				$orgFile = $orgFilePath;
+				if (!file_exists($orgFile)) {
+					$orgFile = $this->rc->config->get('root_directory') . $orgFilePath;
+				}
 				if (file_exists($orgFile)) {
 					copy($orgFile, $filePath);
 					$attachment = [
