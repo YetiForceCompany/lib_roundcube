@@ -195,6 +195,8 @@ rcube_webmail.prototype.getCrmWindow = function () {
 		return parent.parent;
 	} else if (typeof opener.crm.CONFIG == 'object') {
 		return opener.crm;
+	} else if (typeof opener.CONFIG == 'object') {
+		return opener;
 	}
 	return false;
 };
