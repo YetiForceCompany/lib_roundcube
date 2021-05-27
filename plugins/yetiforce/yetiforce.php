@@ -32,6 +32,9 @@ class yetiforce extends rcube_plugin
 		$this->add_hook('messages_list', [$this, 'messagesList']);
 		$this->add_hook('message_objects', [$this, 'messageObjects']);
 
+		$this->add_hook('message_before_send', [$this, 'beforeSent']);
+		$this->add_hook('message_sent', [$this, 'afterSent']);
+
 		$this->register_action('plugin.yetiforce-importIcs', [$this, 'importIcs']);
 		$this->register_action('plugin.yetiforce-addFilesToMail', [$this, 'addFilesToMail']);
 		$this->register_action('plugin.yetiforce-getContentEmailTemplate', [$this, 'getContentEmailTemplate']);
@@ -395,7 +398,7 @@ class yetiforce extends rcube_plugin
 	public function messageComposeBody(array $args)
 	{
 		$this->rc = rcmail::get_instance();
-		$id = App\Purifier::purifyByType(rcube_utils::get_input_value('_id', rcube_utils::INPUT_GPC), 'Alnum');
+		$id = rcube_utils::get_input_value('_id', rcube_utils::INPUT_GPC);
 		$row = $_SESSION['compose_data_' . $id]['param']['mailData'];
 		$type = $_SESSION['compose_data_' . $id]['param']['type'];
 		$params = $_SESSION['compose_data_' . $id]['param'];
@@ -1260,5 +1263,39 @@ class yetiforce extends rcube_plugin
 	{
 		$args['prefs']['yeti_show_to'] = rcube_utils::get_input_value('_yeti_show_to', rcube_utils::INPUT_POST);
 		return $args;
+	}
+
+	/**
+	 * Hook message_before_send.
+	 *
+	 * @param mixed $args
+	 */
+	public function beforeSent(array $args): array
+	{
+		$eventHandler = new \App\EventHandler();
+		$eventHandler->setModuleName('OSSMail');
+		$eventHandler->setParams([
+			'composeData' => $_SESSION['compose_data_' . rcube_utils::get_input_value('_id', rcube_utils::INPUT_GPC)] ?? [],
+			'mailData' => $args
+		]);
+		$eventHandler->trigger('OSSMailBeforeSend');
+		return $eventHandler->getParams()['mailData'];
+	}
+
+	/**
+	 * Hook message_sent.
+	 *
+	 * @param mixed $args
+	 */
+	public function afterSent(array $args): array
+	{
+		$eventHandler = new \App\EventHandler();
+		$eventHandler->setModuleName('OSSMail');
+		$eventHandler->setParams([
+			'composeData' => $_SESSION['compose_data_' . rcube_utils::get_input_value('_id', rcube_utils::INPUT_GPC)] ?? [],
+			'mailData' => $args
+		]);
+		$eventHandler->trigger('OSSMailAfterSend');
+		return $eventHandler->getParams()['mailData'];
 	}
 }
