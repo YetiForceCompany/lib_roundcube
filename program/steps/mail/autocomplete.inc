@@ -9,8 +9,7 @@ if (\strlen($search)) {
 	$crmUserId = false;
 	if (isset($_SESSION['crm']['id'])) {
 		$crmUserId = $_SESSION['crm']['id'];
-	}
-	if ($RCMAIL->user->data['crm_user_id']) {
+	} elseif ($RCMAIL->user->data['crm_user_id']) {
 		$crmUserId = $RCMAIL->user->data['crm_user_id'];
 	}
 	if ($crmUserId) {
