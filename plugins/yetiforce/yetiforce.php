@@ -32,6 +32,9 @@ class yetiforce extends rcube_plugin
 		$this->add_hook('messages_list', [$this, 'messagesList']);
 		$this->add_hook('message_objects', [$this, 'messageObjects']);
 
+		$this->add_hook('message_before_send', [$this, 'beforeSent']);
+		$this->add_hook('message_sent', [$this, 'afterSent']);
+
 		$this->register_action('plugin.yetiforce-importIcs', [$this, 'importIcs']);
 		$this->register_action('plugin.yetiforce-addFilesToMail', [$this, 'addFilesToMail']);
 		$this->register_action('plugin.yetiforce-getContentEmailTemplate', [$this, 'getContentEmailTemplate']);
@@ -395,7 +398,7 @@ class yetiforce extends rcube_plugin
 	public function messageComposeBody(array $args)
 	{
 		$this->rc = rcmail::get_instance();
-		$id = App\Purifier::purifyByType(rcube_utils::get_input_value('_id', rcube_utils::INPUT_GPC), 'Alnum');
+		$id = rcube_utils::get_input_value('_id', rcube_utils::INPUT_GPC);
 		$row = $_SESSION['compose_data_' . $id]['param']['mailData'];
 		$type = $_SESSION['compose_data_' . $id]['param']['type'];
 		$params = $_SESSION['compose_data_' . $id]['param'];
@@ -624,9 +627,12 @@ class yetiforce extends rcube_plugin
 			foreach ($files as $file) {
 				$orgFileName = $file['name'] ?? basename($file);
 				$orgFilePath = $file['path'] ?? $file;
-				$orgFile = $this->rc->config->get('root_directory') . $orgFilePath;
 				[, $sec] = explode(' ', microtime());
 				$filePath = $this->rc->config->get('temp_dir') . DIRECTORY_SEPARATOR . "{$sec}_{$userid}_{$index}.tmp";
+				$orgFile = $orgFilePath;
+				if (!file_exists($orgFile)) {
+					$orgFile = $this->rc->config->get('root_directory') . $orgFilePath;
+				}
 				if (file_exists($orgFile)) {
 					copy($orgFile, $filePath);
 					$attachment = [
@@ -884,7 +890,7 @@ class yetiforce extends rcube_plugin
 				$descriptionLabel = \App\Language::translate('Description', $translationMod);
 				$fieldsDescription .= "<div class=\"col-12 mt-2\"><span class=\"fas fa-edit mr-1\"></span><strong>$descriptionLabel</strong>: $description</div>";
 			}
-			$evTemplate .= "<div class=\"w-100 c-ical__event card\">
+			$evTemplate .= "<div class=\"w-100 c-ical__event card border-primary\">
 								<div class=\"card-header c-ical__header py-1 d-sm-flex align-items-center text-center\">
 									  <h3 class='c-ical__subject card-title mb-0 mr-auto text-center'>{$record->getDisplayValue('subject')} | $dateStart </h3>
 									  <span class=\"button_to_replace\"></span>
@@ -975,6 +981,7 @@ class yetiforce extends rcube_plugin
 		$mbox = (string) rcube_utils::get_input_value('_mbox', rcube_utils::INPUT_POST);
 		$messageset = rcmail::get_uids(null, $mbox, $multi, rcube_utils::INPUT_POST);
 		if ($messageset) {
+			chdir($this->rc->config->get('root_directory'));
 			$imap = $this->rc->get_storage();
 			foreach ($messageset as $mbox => $uids) {
 				$imap->set_folder($mbox);
@@ -1029,13 +1036,16 @@ class yetiforce extends rcube_plugin
 		if (!empty($p['messages'])) {
 			$ipList = $senderList = [];
 			foreach ($p['messages'] as $message) {
-				$rblInstance = \App\Mail\Rbl::getInstance($this->parseMessage($message));
-				if ($ip = $rblInstance->getSender()['ip'] ?? '') {
-					$ipList[$message->uid] = $ip;
-				}
-				$verify = $rblInstance->verifySender();
-				if (false === $verify['status']) {
-					$senderList[$message->uid] = "<span class=\"fas fa-exclamation-triangle text-danger\" title=\"{$verify['info']}\"></span>";
+				$parseMessage = $this->parseMessage($message);
+				if ('' !== $parseMessage['header']) {
+					$rblInstance = \App\Mail\Rbl::getInstance($parseMessage);
+					if ($ip = $rblInstance->getSender()['ip'] ?? '') {
+						$ipList[$message->uid] = $ip;
+					}
+					$verify = $rblInstance->verifySender();
+					if (false === $verify['status']) {
+						$senderList[$message->uid] = "<span class=\"fas fa-exclamation-triangle text-danger\" title=\"{$verify['info']}\"></span>";
+					}
 				}
 			}
 			$this->rc->output->set_env('yf_rblList', \App\Mail\Rbl::getColorByIps($ipList));
@@ -1253,5 +1263,39 @@ class yetiforce extends rcube_plugin
 	{
 		$args['prefs']['yeti_show_to'] = rcube_utils::get_input_value('_yeti_show_to', rcube_utils::INPUT_POST);
 		return $args;
+	}
+
+	/**
+	 * Hook message_before_send.
+	 *
+	 * @param mixed $args
+	 */
+	public function beforeSent(array $args): array
+	{
+		$eventHandler = new \App\EventHandler();
+		$eventHandler->setModuleName('OSSMail');
+		$eventHandler->setParams([
+			'composeData' => $_SESSION['compose_data_' . rcube_utils::get_input_value('_id', rcube_utils::INPUT_GPC)] ?? [],
+			'mailData' => $args
+		]);
+		$eventHandler->trigger('OSSMailBeforeSend');
+		return $eventHandler->getParams()['mailData'];
+	}
+
+	/**
+	 * Hook message_sent.
+	 *
+	 * @param mixed $args
+	 */
+	public function afterSent(array $args): array
+	{
+		$eventHandler = new \App\EventHandler();
+		$eventHandler->setModuleName('OSSMail');
+		$eventHandler->setParams([
+			'composeData' => $_SESSION['compose_data_' . rcube_utils::get_input_value('_id', rcube_utils::INPUT_GPC)] ?? [],
+			'mailData' => $args
+		]);
+		$eventHandler->trigger('OSSMailAfterSend');
+		return $eventHandler->getParams()['mailData'];
 	}
 }
