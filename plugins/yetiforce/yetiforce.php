@@ -1272,6 +1272,9 @@ class yetiforce extends rcube_plugin
 	 */
 	public function beforeSent(array $args): array
 	{
+		$currentPath = getcwd();
+		chdir($this->rc->config->get('root_directory'));
+		$this->loadCurrentUser();
 		$eventHandler = new \App\EventHandler();
 		$eventHandler->setModuleName('OSSMail');
 		$eventHandler->setParams([
@@ -1279,6 +1282,7 @@ class yetiforce extends rcube_plugin
 			'mailData' => $args
 		]);
 		$eventHandler->trigger('OSSMailBeforeSend');
+		chdir($currentPath);
 		return $eventHandler->getParams()['mailData'];
 	}
 
@@ -1289,6 +1293,9 @@ class yetiforce extends rcube_plugin
 	 */
 	public function afterSent(array $args): array
 	{
+		$currentPath = getcwd();
+		chdir($this->rc->config->get('root_directory'));
+		$this->loadCurrentUser();
 		$eventHandler = new \App\EventHandler();
 		$eventHandler->setModuleName('OSSMail');
 		$eventHandler->setParams([
@@ -1296,6 +1303,7 @@ class yetiforce extends rcube_plugin
 			'mailData' => $args
 		]);
 		$eventHandler->trigger('OSSMailAfterSend');
+		chdir($currentPath);
 		return $eventHandler->getParams()['mailData'];
 	}
 }
