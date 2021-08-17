@@ -379,8 +379,7 @@ rcube_webmail.prototype.showQuickCreateForm = function (moduleName, record, para
 	relatedParams['sourceModule'] = sourceModule;
 	relatedParams['sourceRecord'] = record;
 	relatedParams['relationOperation'] = true;
-	const headerInstance = new rcmail.crm.Vtiger_Header_Js();
-	headerInstance.quickCreateModule(moduleName, {
+	rcmail.crm.App.Components.QuickCreate.createRecord(moduleName, {
 		callbackFunction: (data) => {
 			rcmail.loadActionBar();
 		},
