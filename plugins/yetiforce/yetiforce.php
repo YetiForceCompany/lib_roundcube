@@ -514,7 +514,7 @@ class yetiforce extends rcube_plugin
 			return;
 		}
 		$signatures = [];
-		foreach ($OUTPUT->get_env('signatures') as $identityId => $signature) {
+		foreach (($OUTPUT->get_env('signatures') ?? []) as $identityId => $signature) {
 			$signatures[$identityId]['text'] = $signature['text'] . PHP_EOL . $gS['text'];
 			$signatures[$identityId]['html'] = $signature['html'] . '<div class="pre global">' . $gS['html'] . '</div>';
 		}
