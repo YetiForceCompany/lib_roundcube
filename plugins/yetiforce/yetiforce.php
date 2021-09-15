@@ -996,17 +996,17 @@ class yetiforce extends rcube_plugin
 						$message = new rcube_message($uid, $mbox);
 						$body = $message->first_html_part();
 					}
-					\App\Mail\Rbl::addReport([
+					$message = \App\Mail\Rbl::addReport([
 						'type' => $props,
 						'header' => $headers,
 						'body' => $body,
 					]);
+					$this->rc->output->command('display_message', \App\Language::translate($message, 'OSSMail'), 'notice');
 				}
 			}
 			if (0 === $props && ($junkMbox = $this->rc->config->get('junk_mbox')) && $mbox !== $junkMbox) {
 				$this->rc->output->command('addSenderToListMove', $junkMbox);
 			}
-			$this->rc->output->command('display_message', \App\Language::translate('LBL_MESSAGE_HAS_BEEN_ADDED', 'OSSMail'), 'notice');
 		}
 	}
 
