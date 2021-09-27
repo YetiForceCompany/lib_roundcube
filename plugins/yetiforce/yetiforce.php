@@ -1124,6 +1124,9 @@ class yetiforce extends rcube_plugin
 		if (($verifySender = $this->rbl->verifySender()) && !$verifySender['status']) {
 			$btnMoreIcon = 'fas fa-exclamation-circle text-danger';
 			$desc = \App\Language::translate('LBL_MAIL_SENDER', 'Settings:MailRbl') . ': ' . html::span(['class' => 'badge badge-danger'], html::span(['class' => 'mr-2 alert-icon fas fa-times'], '') . \App\Language::translate('LBL_INCORRECT', 'Settings:MailRbl')) . '<br>' . str_replace('<>', '<br>', $verifySender['info']);
+			if ($sender['comment']) {
+				$desc .= html::span(['class' => 'alert-icon far fa-comment-alt mr-2'], '') . $sender['comment'];
+			}
 			$alert = '';
 			$alert .= html::span(null, $this->rc->gettext('LBL_ALERT_FAKE_SENDER'));
 			$alert .= html::span(['class' => 'd-block'], html::span([], html::tag('button', [
@@ -1150,6 +1153,9 @@ class yetiforce extends rcube_plugin
 			if (\App\Mail\Rbl::DMARC_PASS !== $verifyDmarc['status']) {
 				$desc .= '- ' . \App\Language::translate('LBL_DMARC', 'Settings:MailRbl') . ': ' . html::span(['class' => 'badge ' . $verifyDmarc['class'], 'title' => $verifyDmarc['log']], html::span(['class' => 'mr-2 alert-icon ' . $verifyDmarc['icon']], '') . \App\Language::translate($verifyDmarc['label'], 'Settings:MailRbl')) . ' ' . \App\Language::translate($verifyDmarc['desc'], 'Settings:MailRbl') . '<br />';
 			}
+			if ($sender['comment']) {
+				$desc .= html::span(['class' => 'alert-icon far fa-comment-alt mr-2'], '') . $sender['comment'];
+			}
 			if ($desc) {
 				$alert = '';
 
@@ -1167,9 +1173,13 @@ class yetiforce extends rcube_plugin
 		$btnMore = html::span(['class' => 'float-right', 'style' => 'margin-left: auto;'], '<button class="btn btn-sm m-0 p-0" type="button" id="moreAlertBtn"><span class="' . $btnMoreIcon . ' h3"></span></button>');
 		if ($sender) {
 			$type = \App\Mail\Rbl::LIST_TYPES[$sender['type']];
+			$comment = '';
+			if ($sender['comment']) {
+				$comment = html::span(['class' => 'alert-icon far fa-comment-alt ml-2', 'title' => $sender['comment']], '');
+			}
 			$p['content'][] = html::div(['class' => 'mail-type-alert', 'style' => 'background:' . $type['alertColor']],
 				html::span(['class' => 'alert-icon ' . $type['icon']], '') .
-				html::span(null, rcube::Q($this->rc->gettext($sender['isBlack'] ? 'LBL_ALERT_BLACK_LIST' : 'LBL_ALERT_WHITE_LIST'))) . $btnMore
+				html::span(null, rcube::Q($this->rc->gettext($sender['isBlack'] ? 'LBL_ALERT_BLACK_LIST' : 'LBL_ALERT_WHITE_LIST'))) . $comment . $btnMore
 			) . $alertBlock;
 			chdir($currentPath);
 			return $p;
