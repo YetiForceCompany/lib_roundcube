@@ -63,7 +63,7 @@ rcube_webmail.prototype.contextmenu = {
 
         // backwards compatibility, list_object changed to string in v3.0
         if (typeof props.list_object == 'object') {
-            console.log('Roundcube Contextmenu plugin: init_list() list_object param object detected, expected string.');
+            console.log('Roundcube ContextMenu plugin: init_list() list_object param object detected, expected string.');
             var id = $(props.list_object.list).attr('id');
             props.list_object = null;
 
@@ -138,7 +138,7 @@ rcube_webmail.prototype.contextmenu = {
 
             var uids = null;
             $.each(rcmail.env.contextmenus, function() {
-                if ((rcmail.env.contextmenu_opening == 'beforeactivate' || $(this.container).is(':visible')) && this.menu_selection.length > 0) {
+                if (this.menu_selection.length > 0 && (rcmail.env.contextmenu_opening == 'beforeactivate' || $(this.container).is(':visible'))) {
                     uids = this.menu_selection;
                     return false;
                 }
@@ -429,7 +429,7 @@ rcube_webmail.prototype.contextmenu = {
             }
             // if menu is opened on difference folder then get message count for the folder
             else if (rcmail.env.context_menu_source_id != rcmail.env.mailbox && !rcmail.env.contextmenu_messagecount_request) {
-                p.abort = true;
+                p.enabled = false;
 
                 // folder check called async to prevent slowdown on menu load
                 rcmail.env.contextmenu_messagecount_request = $.ajax({
@@ -442,8 +442,8 @@ rcube_webmail.prototype.contextmenu = {
                             rcmail.env.exists = data.messagecount;
                             rcmail.env.mailbox = rcmail.env.context_menu_source_id;
 
-                            $('#rcm_folderlist').find('a.cmd_expunge').addClass(rcmail.contextmenu.settings.classes.button_active).removeClass(rcmail.contextmenu.settings.classes.button_disabled);
-                            if (rcmail.purge_mailbox_test() || (rcmail.env.task == 'settings' && data.messagecount > 0)) {
+                            if (data.messagecount > 0) {
+                                $('#rcm_folderlist').find('a.cmd_expunge').addClass(rcmail.contextmenu.settings.classes.button_active).removeClass(rcmail.contextmenu.settings.classes.button_disabled);
                                 $('#rcm_folderlist').find('a.cmd_purge').addClass(rcmail.contextmenu.settings.classes.button_active).removeClass(rcmail.contextmenu.settings.classes.button_disabled);
                             }
 
@@ -527,7 +527,7 @@ function rcm_callbackmenu_init(props, ext_events) { rcm_log('rcm_callbackmenu_in
 function rcm_show_menu(e, obj, id, menu) { rcm_log('rcm_show_menu'); rcmail.contextmenu.show_one(e, obj, id, menu); }
 function rcm_hide_menu(e, sub_only, no_trigger) { rcm_log('rcm_hide_menu'); rcmail.contextmenu.hide_all(e, sub_only, no_trigger); }
 function rcm_check_button_state(btn, active) { rcm_log('rcm_check_button_state'); return rcmail.contextmenu.ui_button_check(btn, active); }
-function rcm_log(fname) { console.log('Roundcube Contextmenu plugin: Use of ' + fname + ' is depreciated. This will be removed in future versions.'); }
+function rcm_log(fname) { console.log('Roundcube ContextMenu plugin: Use of ' + fname + ' is depreciated. This will be removed in future versions.'); }
 
 function rcube_context_menu(p) {
     this.menu_name = null;
@@ -677,7 +677,8 @@ function rcube_context_menu(p) {
 
                     // add command name element
                     var tmp = span.clone();
-                    tmp.text($.trim(elem.text()).length > 0 ? $.trim(elem.text()) : elem.attr('title'));
+                    var label = elem.text().trim();
+                    tmp.text(label.length > 0 ? label : elem.attr('title'));
                     tmp.addClass(elem.children('span').attr('class'));
                     a.append(tmp);
                     a.addClass(elem.attr('class'));

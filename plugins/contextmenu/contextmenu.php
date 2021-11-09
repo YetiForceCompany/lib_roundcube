@@ -35,16 +35,16 @@ class contextmenu extends rcube_plugin
     {
         $this->rcube = rcube::get_instance();
 
-        if ($this->rcube->output->type == 'html') {
+        if (is_object($this->rcube->output) && $this->rcube->output->type == 'html') {
             $this->include_script('contextmenu.js');
             $this->include_stylesheet($this->local_skin_path() . '/contextmenu.css');
             $this->include_script($this->local_skin_path() . '/functions.js');
             $this->rcube->output->set_env('contextmenu', true);
             $this->rcube->output->set_env('contextmenu_mouseover_timeout', $this->rcube->config->get('contextmenu_mouseover_timeout', 400));
-            $this->add_hook('render_page', array($this, 'additional_menus'));
+            $this->add_hook('render_page', [$this, 'additional_menus']);
         }
 
-        $this->register_action('plugin.contextmenu.messagecount', array($this, 'messagecount'));
+        $this->register_action('plugin.contextmenu.messagecount', [$this, 'messagecount']);
     }
 
     public function additional_menus($args)
@@ -55,12 +55,12 @@ class contextmenu extends rcube_plugin
             return;
         }
 
-        // add additional menus from skins folder
-        $path = '/' . $this->local_skin_path() . '/includes/' . $this->rcube->task . '.html';
-        $filepath = slashify($this->home) . $path;
-        if (is_file($filepath) && is_readable($filepath)) {
+        // add additional menus for current task from skins folder if they exist
+        if ($file_info = $this->_get_include_file($this->rcube->task . '.html')) {
             $this->add_texts('localization/');
-            $html = $this->rcube->output->just_parse("<roundcube:include file=\"$path\" skinpath=\"plugins/contextmenu\" />");
+
+            list($path, $include_path) = $file_info;
+            $html = $this->rcube->output->just_parse("<roundcube:include file=\"/$path\" skinpath=\"$include_path\" />");
             $this->rcube->output->add_footer($html);
         }
     }
@@ -68,11 +68,34 @@ class contextmenu extends rcube_plugin
     public function messagecount()
     {
         $storage = $this->rcube->get_storage();
-        $mbox = rcube_utils::get_input_value('_mbox', rcube_utils::INPUT_POST);
+        $mbox = rcube_utils::get_input_string('_mbox', rcube_utils::INPUT_POST);
 
         // send output
         header("Content-Type: application/json; charset=" . RCUBE_CHARSET);
-        echo json_encode(array('messagecount' => $storage->count($mbox, 'EXISTS')));
+        echo json_encode(['messagecount' => $storage->count($mbox, 'EXISTS')]);
         exit;
+    }
+
+    private function _get_include_file($file)
+    {
+        $file_info = false;
+
+        $base_path = slashify($this->home);
+        $rel_path = $this->local_skin_path() . '/includes/' . $file;
+        // path to skin folder relative to Roundcube root for template engine
+        $template_include_path = 'plugins/' . $this->ID;
+
+        // check if the skin dir is in the plugin folder or in the core skins
+        // folder (external to this plugin) see RC #7445 for more info
+        if (strpos($rel_path, 'plugins/') !== false) {
+            $base_path = slashify(RCUBE_INSTALL_PATH);
+            $template_include_path = '.';
+        }
+
+        if (is_file($base_path . $rel_path) && is_readable($base_path . $rel_path)) {
+            $file_info = [$rel_path, $template_include_path];
+        }
+
+        return $file_info;
     }
 }
