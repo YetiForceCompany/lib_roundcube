@@ -22,6 +22,11 @@
 			<div class="upload-form">
 				<roundcube:object name="composeAttachmentForm" mode="hint" />
 				<button type="button" class="btn btn-secondary attach" tabindex="2" onclick="rcmail.upload_input('uploadform')"><roundcube:label name="addattachment" /></button>
+
+				<!--------   YetiForce Sp. z o.o.   -------->
+				<button type="button" class="btn btn-secondary attach" tabindex="2" onclick="return rcmail.command('yetiforce.addFilesFromCRM')"><roundcube:label name="LBL_FILE_FROM_CRM" /></button>
+				<!--------   YetiForce Sp. z o.o.   -------->
+
 			</div>
 			<roundcube:object name="composeAttachmentList" id="attachment-list" class="attachmentslist" tabindex="2" />
 			<roundcube:object name="fileDropArea" id="compose-attachments" />
@@ -68,6 +73,11 @@
 	<h2 id="aria-label-toolbar" class="voice"><roundcube:label name="arialabeltoolbar" /></h2>
 	<div class="header">
 		<a class="button icon task-menu-button" href="#menu"><span class="inner"><roundcube:label name="menu" /></span></a>
+
+		<!--------   YetiForce Sp. z o.o.   -------->
+		<roundcube:button command="mail" label="mail" type="link" innerClass="inner" class="button icon mail" title="mail" tabindex="2" style="margin-left: 1rem !important;" />
+		<!--------   YetiForce Sp. z o.o.   -------->
+
 		<span class="header-title"><roundcube:label name="compose" /></span>
 		<div id="composestatusbar" class="position-absolute"></div>
 		<!-- toolbar -->
@@ -75,6 +85,13 @@
 			<a class="options" href="#options" onclick="UI.show_sidebar()" data-hidden="big">
 				<span class="inner"><roundcube:label name="optionsandattachments"></span>
 			</a>
+
+
+			<!--------   YetiForce Sp. z o.o.   -------->
+			<roundcube:button command="mail" label="mail" type="link" innerClass="inner" class="mail" title="mail" tabindex="2" />
+			<!--------   YetiForce Sp. z o.o.   -------->
+
+
 			<roundcube:button command="savedraft" type="link" class="save draft disabled" classAct="save draft"
 				label="save" title="savemessage" tabindex="2" innerclass="inner" data-content-button="true" />
 			<span class="spacer"></span>
@@ -105,6 +122,15 @@
 					<span class="inner"><roundcube:label name="encryptmessagemailvelope" /></span>
 				</a>
 			</span>
+
+			<!--------   YetiForce Sp. z o.o.   -------->
+			<roundcube:if condition="env:yf_isPermittedMailTemplates" />
+			<a href="#templates" class="button download" label="templates" title="<roundcube:label name="LBL_MAIL_TEMPLATES" />" onclick="return rcmail.command('yetiforce.selectTemplate')">
+				<roundcube:label name="LBL_TEMPLATES" />
+			</a>
+			<roundcube:endif />
+			<!--------   YetiForce Sp. z o.o.   -------->
+
 			<roundcube:container name="toolbar" id="compose-toolbar" />
 		</div>
 	</div>
@@ -132,13 +158,17 @@
 						<div class="input-group">
 							<roundcube:object name="composeHeaders" part="to" id="_to" form="form" tabindex="1" aria-required="true" data-recipient-input="true" />
 							<span class="input-group-append">
-								<a href="#add-contact" onclick="UI.recipient_selector('to')" class="input-group-text icon add recipient" title="<roundcube:label name="addcontact" />" tabindex="1"><span class="inner"><roundcube:label name="addcontact" /></span></a>
-							</span>
-							<span class="input-group-append">
 								<a href="#add-header" data-popup="headers-menu" class="input-group-text icon add" title="<roundcube:label name="addheader" />" tabindex="1"><span class="inner"><roundcube:label name="addheader" /></span></a>
 							</span>
 						</div>
 					</div>
+
+					<!--------   YetiForce Sp. z o.o.   -------->
+					<div class="col-2"></div><div class="col-10 compose-address-modules">
+						<roundcube:object name="yetiforce.adressButton" part="_to" />
+					</div>
+					<!--------   YetiForce Sp. z o.o.   -------->
+
 				</div>
 				<div id="compose_cc" class="hidden form-group row">
 					<label for="_cc" class="col-2 col-form-label"><roundcube:label name="cc" /></label>
@@ -146,13 +176,17 @@
 						<div class="input-group">
 							<roundcube:object name="composeHeaders" part="cc" id="_cc" form="form" tabindex="1" data-recipient-input="true" />
 							<span class="input-group-append">
-								<a href="#add-contact" onclick="UI.recipient_selector('cc')" class="input-group-text icon add recipient" title="<roundcube:label name="addcontact" />" tabindex="1"><span class="inner"><roundcube:label name="addcontact" /></span></a>
-							</span>
-							<span class="input-group-append">
 								<a href="#delete" onclick="UI.header_reset('_cc')" class="input-group-text icon delete" title="<roundcube:label name='delete' />" tabindex="1"><span class="inner"><roundcube:label name="delete" /></span></a>
 							</span>
 						</div>
 					</div>
+
+					<!--------   YetiForce Sp. z o.o.   -------->
+					<div class="col-2"></div><div class="col-10 compose-address-modules">
+						<roundcube:object name="yetiforce.adressButton" part="_cc" />
+					</div>
+					<!--------   YetiForce Sp. z o.o.   -------->
+
 				</div>
 				<div id="compose_bcc" class="hidden form-group row">
 					<label for="_bcc" class="col-2 col-form-label"><roundcube:label name="bcc" /></label>
@@ -160,13 +194,17 @@
 						<div class="input-group">
 							<roundcube:object name="composeHeaders" part="bcc" id="_bcc" form="form" tabindex="1" data-recipient-input="true" />
 							<span class="input-group-append">
-								<a href="#add-contact" onclick="UI.recipient_selector('bcc')" class="input-group-text icon add recipient" title="<roundcube:label name="addcontact" />" tabindex="1"><span class="inner"><roundcube:label name="addcontact" /></span></a>
-							</span>
-							<span class="input-group-append">
 								<a href="#delete" onclick="UI.header_reset('_bcc')" class="input-group-text icon delete" title="<roundcube:label name='delete' />" tabindex="1"><span class="inner"><roundcube:label name="delete" /></span></a>
 							</span>
 						</div>
 					</div>
+
+					<!--------   YetiForce Sp. z o.o.   -------->
+					<div class="col-2"></div><div class="col-10 compose-address-modules">
+						<roundcube:object name="yetiforce.adressButton" part="_bcc" />
+					</div>
+					<!--------   YetiForce Sp. z o.o.   -------->
+
 				</div>
 				<div id="compose_replyto" class="hidden form-group row">
 					<label for="_replyto" class="col-2 col-form-label"><roundcube:label name="replyto" /></label>
@@ -174,13 +212,17 @@
 						<div class="input-group">
 							<roundcube:object name="composeHeaders" part="replyto" id="_replyto" form="form" tabindex="1" data-recipient-input="true" />
 							<span class="input-group-append">
-								<a href="#add-contact" onclick="UI.recipient_selector('replyto')" class="input-group-text icon add recipient" title="<roundcube:label name="addcontact" />" tabindex="1"><span class="inner"><roundcube:label name="addcontact" /></span></a>
-							</span>
-							<span class="input-group-append">
 								<a href="#delete" onclick="UI.header_reset('_replyto')" class="input-group-text icon delete" title="<roundcube:label name='delete' />" tabindex="1"><span class="inner"><roundcube:label name="delete" /></span></a>
 							</span>
 						</div>
 					</div>
+
+					<!--------   YetiForce Sp. z o.o.   -------->
+					<div class="col-2"></div><div class="col-10 compose-address-modules">
+						<roundcube:object name="yetiforce.adressButton" part="_replyto" />
+					</div>
+					<!--------   YetiForce Sp. z o.o.   -------->
+
 				</div>
 				<div id="compose_followupto" class="hidden form-group row">
 					<label for="_followupto" class="col-2 col-form-label"><roundcube:label name="followupto" /></label>
@@ -188,13 +230,17 @@
 						<div class="input-group">
 							<roundcube:object name="composeHeaders" part="followupto" id="_followupto" form="form" tabindex="1" data-recipient-input="true" />
 							<span class="input-group-append">
-								<a href="#add-contact" onclick="UI.recipient_selector('followupto')" class="input-group-text icon add recipient" title="<roundcube:label name="addcontact" />" tabindex="1"><span class="inner"><roundcube:label name="addcontact" /></span></a>
-							</span>
-							<span class="input-group-append">
 								<a href="#delete" onclick="UI.header_reset('_followupto')" class="input-group-text icon delete" title="<roundcube:label name='delete' />" tabindex="1"><span class="inner"><roundcube:label name="delete" /></span></a>
 							</span>
 						</div>
 					</div>
+
+					<!--------   YetiForce Sp. z o.o.   -------->
+					<div class="col-2"></div><div class="col-10 compose-address-modules">
+						<roundcube:object name="yetiforce.adressButton" part="_followupto" />
+					</div>
+					<!--------   YetiForce Sp. z o.o.   -------->
+
 				</div>
 				<div id="compose_subject" class="form-group row">
 					<label for="compose-subject" class="col-2 col-form-label"><roundcube:label name="subject" /></label>

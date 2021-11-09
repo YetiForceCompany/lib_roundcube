@@ -7,6 +7,11 @@
 <div id="layout-sidebar" class="listbox" role="navigation" aria-labelledby="aria-label-folderlist">
 	<div class="header">
 		<a class="button icon back-list-button" href="#back"><span class="inner"><roundcube:label name="back" /></span></a>
+
+		<!--------   YetiForce Sp. z o.o.   -------->
+		<roundcube:button command="settings" label="settings" type="link" innerClass="inner" class="button icon settings" title="settings" style="margin-left: 0.2rem;"/>
+		<!--------   YetiForce Sp. z o.o.   -------->
+
 		<span class="header-title username"><roundcube:object name="username" /></span>
 		<roundcube:button name="folderactions" type="link" title="folderactions" label="actions"
 			class="button icon sidebar-menu" innerclass="inner" data-popup="mailboxoptions-menu" />
@@ -16,6 +21,11 @@
 		<roundcube:object name="mailboxlist" id="mailboxlist" class="treelist listing folderlist" folder_filter="mail" unreadwrap="%s" />
 	</div>
 	<div class="footer small">
+
+		<!--------   YetiForce Sp. z o.o.   -------->
+		<roundcube:button command="logout" label="logout" type="link" class="button icon logout" innerClass="inner" />
+		<!--------   YetiForce Sp. z o.o.   -------->
+
 		<roundcube:if condition="env:quota" />
 			<div id="quotadisplay" class="quota-widget">
 				<span class="voice"><roundcube:label name="quota"></span>
@@ -30,6 +40,14 @@
 	<div id="messagelist-header" class="header">
 		<a class="button icon task-menu-button" href="#menu"><span class="inner"><roundcube:label name="menu" /></span></a>
 		<a class="button icon back-sidebar-button folders" href="#sidebar"><span class="inner"><roundcube:label name="mailboxlist" /></span></a>
+
+		<!--------   YetiForce Sp. z o.o.   -------->
+		<roundcube:button command="compose" type="link" class="button icon toolbar-button compose" label="compose" title="writenewmessage" innerclass="inner" />
+		<roundcube:if condition="env:action == 'compose' and env:task == 'mail'" />
+			<roundcube:button command="mail" label="mail" type="link" innerClass="inner" class="mail" />
+		<roundcube:endif />
+		<!--------   YetiForce Sp. z o.o.   -------->
+
 		<span class="header-title"></span>
 		<div class="toolbar menu" role="toolbar">
 			<a href="#select" class="select disabled" data-popup="listselect-menu" data-toggle-button="list-toggle-button" title="<roundcube:label name="select" />"><span class="inner"><roundcube:label name="select" /></span></a>
