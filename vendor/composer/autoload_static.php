@@ -4,12 +4,45 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInitf59da13b1fa2a3966544edcd7fbef9e8
+class ComposerStaticInit02445b9be128fbf386de6d2452f6254a
 {
+    public static $files = array (
+        '5255c38a0faeba867671b61dfda6d864' => __DIR__ . '/..' . '/paragonie/random_compat/lib/random.php',
+        '25072dd6e2470089de65ae7bf11d3109' => __DIR__ . '/..' . '/symfony/polyfill-php72/bootstrap.php',
+        '023d27dca8066ef29e6739335ea73bad' => __DIR__ . '/..' . '/symfony/polyfill-php70/bootstrap.php',
+        'e69f7f6ee287b969198c3c9d6777bd38' => __DIR__ . '/..' . '/symfony/polyfill-intl-normalizer/bootstrap.php',
+        '7b11c4dc42b3b3023073cb14e519683c' => __DIR__ . '/..' . '/ralouphie/getallheaders/src/getallheaders.php',
+        'f598d06aa772fa33d905e87be6398fb1' => __DIR__ . '/..' . '/symfony/polyfill-intl-idn/bootstrap.php',
+        'a0edc8309cc5e1d60e3047b5df6b7052' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/functions_include.php',
+        'c964ee0ededf28c96ebd9db5099ef910' => __DIR__ . '/..' . '/guzzlehttp/promises/src/functions_include.php',
+        '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
+    );
+
     public static $prefixLengthsPsr4 = array (
+        'S' => 
+        array (
+            'Symfony\\Polyfill\\Php72\\' => 23,
+            'Symfony\\Polyfill\\Php70\\' => 23,
+            'Symfony\\Polyfill\\Intl\\Normalizer\\' => 33,
+            'Symfony\\Polyfill\\Intl\\Idn\\' => 26,
+        ),
+        'R' => 
+        array (
+            'RtfHtmlPhp\\' => 11,
+        ),
+        'P' => 
+        array (
+            'Psr\\Http\\Message\\' => 17,
+        ),
         'M' => 
         array (
             'Masterminds\\' => 12,
+        ),
+        'G' => 
+        array (
+            'GuzzleHttp\\Psr7\\' => 16,
+            'GuzzleHttp\\Promise\\' => 19,
+            'GuzzleHttp\\' => 11,
         ),
         'E' => 
         array (
@@ -18,9 +51,45 @@ class ComposerStaticInitf59da13b1fa2a3966544edcd7fbef9e8
     );
 
     public static $prefixDirsPsr4 = array (
+        'Symfony\\Polyfill\\Php72\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/polyfill-php72',
+        ),
+        'Symfony\\Polyfill\\Php70\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/polyfill-php70',
+        ),
+        'Symfony\\Polyfill\\Intl\\Normalizer\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/polyfill-intl-normalizer',
+        ),
+        'Symfony\\Polyfill\\Intl\\Idn\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/polyfill-intl-idn',
+        ),
+        'RtfHtmlPhp\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/roundcube/rtf-html-php/src',
+        ),
+        'Psr\\Http\\Message\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/psr/http-message/src',
+        ),
         'Masterminds\\' => 
         array (
             0 => __DIR__ . '/..' . '/masterminds/html5/src',
+        ),
+        'GuzzleHttp\\Psr7\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/guzzlehttp/psr7/src',
+        ),
+        'GuzzleHttp\\Promise\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/guzzlehttp/promises/src',
+        ),
+        'GuzzleHttp\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/guzzlehttp/guzzle/src',
         ),
         'Endroid\\QrCode\\' => 
         array (
@@ -40,9 +109,8 @@ class ComposerStaticInitf59da13b1fa2a3966544edcd7fbef9e8
         array (
             'Net' => 
             array (
-                0 => __DIR__ . '/..' . '/pear/net_idna2',
+                0 => __DIR__ . '/..' . '/pear/net_socket',
                 1 => __DIR__ . '/..' . '/pear/net_smtp',
-                2 => __DIR__ . '/..' . '/pear/net_socket',
             ),
         ),
         'M' => 
@@ -56,8 +124,8 @@ class ComposerStaticInitf59da13b1fa2a3966544edcd7fbef9e8
         array (
             'Console' => 
             array (
-                0 => __DIR__ . '/..' . '/pear/console_commandline',
-                1 => __DIR__ . '/..' . '/pear/console_getopt',
+                0 => __DIR__ . '/..' . '/pear/console_getopt',
+                1 => __DIR__ . '/..' . '/pear/console_commandline',
             ),
         ),
         'A' => 
@@ -74,6 +142,9 @@ class ComposerStaticInitf59da13b1fa2a3966544edcd7fbef9e8
     );
 
     public static $classMap = array (
+        'ArithmeticError' => __DIR__ . '/..' . '/symfony/polyfill-php70/Resources/stubs/ArithmeticError.php',
+        'AssertionError' => __DIR__ . '/..' . '/symfony/polyfill-php70/Resources/stubs/AssertionError.php',
+        'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
         'Crypt_GPG' => __DIR__ . '/..' . '/pear/crypt_gpg/Crypt/GPG.php',
         'Crypt_GPGAbstract' => __DIR__ . '/..' . '/pear/crypt_gpg/Crypt/GPGAbstract.php',
         'Crypt_GPG_BadPassphraseException' => __DIR__ . '/..' . '/pear/crypt_gpg/Crypt/GPG/Exceptions.php',
@@ -96,6 +167,8 @@ class ComposerStaticInitf59da13b1fa2a3966544edcd7fbef9e8
         'Crypt_GPG_SignatureCreationInfo' => __DIR__ . '/..' . '/pear/crypt_gpg/Crypt/GPG/SignatureCreationInfo.php',
         'Crypt_GPG_SubKey' => __DIR__ . '/..' . '/pear/crypt_gpg/Crypt/GPG/SubKey.php',
         'Crypt_GPG_UserId' => __DIR__ . '/..' . '/pear/crypt_gpg/Crypt/GPG/UserId.php',
+        'DivisionByZeroError' => __DIR__ . '/..' . '/symfony/polyfill-php70/Resources/stubs/DivisionByZeroError.php',
+        'Error' => __DIR__ . '/..' . '/symfony/polyfill-php70/Resources/stubs/Error.php',
         'Net_LDAP2' => __DIR__ . '/..' . '/pear/net_ldap2/Net/LDAP2.php',
         'Net_LDAP2_Entry' => __DIR__ . '/..' . '/pear/net_ldap2/Net/LDAP2/Entry.php',
         'Net_LDAP2_Error' => __DIR__ . '/..' . '/pear/net_ldap2/Net/LDAP2.php',
@@ -110,18 +183,22 @@ class ComposerStaticInitf59da13b1fa2a3966544edcd7fbef9e8
         'Net_LDAP3' => __DIR__ . '/..' . '/kolab/net_ldap3/lib/Net/LDAP3.php',
         'Net_LDAP3_Result' => __DIR__ . '/..' . '/kolab/net_ldap3/lib/Net/LDAP3/Result.php',
         'Net_Sieve' => __DIR__ . '/..' . '/pear/net_sieve/Sieve.php',
+        'Normalizer' => __DIR__ . '/..' . '/symfony/polyfill-intl-normalizer/Resources/stubs/Normalizer.php',
         'PEAR_Exception' => __DIR__ . '/..' . '/pear/pear_exception/PEAR/Exception.php',
+        'ParseError' => __DIR__ . '/..' . '/symfony/polyfill-php70/Resources/stubs/ParseError.php',
+        'SessionUpdateTimestampHandlerInterface' => __DIR__ . '/..' . '/symfony/polyfill-php70/Resources/stubs/SessionUpdateTimestampHandlerInterface.php',
         'SieveTest' => __DIR__ . '/..' . '/pear/net_sieve/tests/SieveTest.php',
+        'TypeError' => __DIR__ . '/..' . '/symfony/polyfill-php70/Resources/stubs/TypeError.php',
     );
 
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInitf59da13b1fa2a3966544edcd7fbef9e8::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInitf59da13b1fa2a3966544edcd7fbef9e8::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInitf59da13b1fa2a3966544edcd7fbef9e8::$prefixesPsr0;
-            $loader->fallbackDirsPsr0 = ComposerStaticInitf59da13b1fa2a3966544edcd7fbef9e8::$fallbackDirsPsr0;
-            $loader->classMap = ComposerStaticInitf59da13b1fa2a3966544edcd7fbef9e8::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit02445b9be128fbf386de6d2452f6254a::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit02445b9be128fbf386de6d2452f6254a::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInit02445b9be128fbf386de6d2452f6254a::$prefixesPsr0;
+            $loader->fallbackDirsPsr0 = ComposerStaticInit02445b9be128fbf386de6d2452f6254a::$fallbackDirsPsr0;
+            $loader->classMap = ComposerStaticInit02445b9be128fbf386de6d2452f6254a::$classMap;
 
         }, null, ClassLoader::class);
     }

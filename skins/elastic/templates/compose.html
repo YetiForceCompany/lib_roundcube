@@ -26,6 +26,7 @@
 				<!--------   YetiForce Sp. z o.o.   -------->
 				<button type="button" class="btn btn-secondary attach" tabindex="2" onclick="return rcmail.command('yetiforce.addFilesFromCRM')"><roundcube:label name="LBL_FILE_FROM_CRM" /></button>
 				<!--------   YetiForce Sp. z o.o.   -------->
+
 			</div>
 			<roundcube:object name="composeAttachmentList" id="attachment-list" class="attachmentslist" tabindex="2" />
 			<roundcube:object name="fileDropArea" id="compose-attachments" />
@@ -53,14 +54,14 @@
 			<div class="form-group row">
 				<label for="compose-priority" class="col-form-label col-6"><roundcube:label name="priority" /></label>
 				<div class="col-6">
-					<roundcube:object name="prioritySelector" id="compose-priority" noform="true" tabindex="2" />
+					<roundcube:object name="prioritySelector" id="compose-priority" noform="true" tabindex="2" class="custom-select" />
 				</div>
 			</div>
 			<roundcube:if condition="!config:no_save_sent_messages" />
 			<div class="form-group row">
 				<label for="compose-store-target" class="col-form-label col-6"><roundcube:label name="savesentmessagein" /></label>
 				<div class="col-6">
-					<roundcube:object name="storetarget" id="compose-store-target" noform="true" tabindex="2" />
+					<roundcube:object name="storetarget" id="compose-store-target" noform="true" tabindex="2" class="custom-select" />
 				</div>
 			</div>
 			<roundcube:endif />
@@ -74,8 +75,7 @@
 		<a class="button icon task-menu-button" href="#menu"><span class="inner"><roundcube:label name="menu" /></span></a>
 
 		<!--------   YetiForce Sp. z o.o.   -------->
-		<roundcube:button command="mail" label="mail" type="link" innerClass="inner" class="button icon mail" title="mail" tabindex="2" style="margin-left: 1rem !important;
-"/>
+		<roundcube:button command="mail" label="mail" type="link" innerClass="inner" class="button icon mail" title="mail" tabindex="2" style="margin-left: 1rem !important;" />
 		<!--------   YetiForce Sp. z o.o.   -------->
 
 		<span class="header-title"><roundcube:label name="compose" /></span>
@@ -86,9 +86,11 @@
 				<span class="inner"><roundcube:label name="optionsandattachments"></span>
 			</a>
 
+
 			<!--------   YetiForce Sp. z o.o.   -------->
 			<roundcube:button command="mail" label="mail" type="link" innerClass="inner" class="mail" title="mail" tabindex="2" />
 			<!--------   YetiForce Sp. z o.o.   -------->
+
 
 			<roundcube:button command="savedraft" type="link" class="save draft disabled" classAct="save draft"
 				label="save" title="savemessage" tabindex="2" innerclass="inner" data-content-button="true" />
@@ -123,15 +125,18 @@
 
 			<!--------   YetiForce Sp. z o.o.   -------->
 			<roundcube:if condition="env:yf_isPermittedMailTemplates" />
-			<a href="#templates" class="button download" label="templates" title="<roundcube:label name="LBL_MAIL_TEMPLATES" />" onclick="return rcmail.command('yetiforce.selectTemplate')"><roundcube:label name="LBL_TEMPLATES" /></a>
+			<a href="#templates" class="button download" label="templates" title="<roundcube:label name="LBL_MAIL_TEMPLATES" />" onclick="return rcmail.command('yetiforce.selectTemplate')">
+				<roundcube:label name="LBL_TEMPLATES" />
+			</a>
 			<roundcube:endif />
 			<!--------   YetiForce Sp. z o.o.   -------->
 
 			<roundcube:container name="toolbar" id="compose-toolbar" />
 		</div>
 	</div>
-	<div id="compose-content" class="formcontainer content scroller">
-		<roundcube:object name="composeFormHead" role="main" class="formcontent" />
+	<div id="compose-content" class="formcontainer content">
+		<roundcube:object name="composeFormHead" role="main" class="formcontent scroller" />
+		<roundcube:object name="composeObjects" id="compose-objects" class="mb-3" />
 		<!-- message headers -->
 		<div id="compose-headers" role="region" aria-labelledby="aria-label-composeheaders">
 			<h2 id="aria-label-composeheaders" class="voice"><roundcube:label name="arialabelmessageheaders" /></h2>
@@ -157,11 +162,13 @@
 							</span>
 						</div>
 					</div>
+
 					<!--------   YetiForce Sp. z o.o.   -------->
 					<div class="col-2"></div><div class="col-10 compose-address-modules">
 						<roundcube:object name="yetiforce.adressButton" part="_to" />
 					</div>
 					<!--------   YetiForce Sp. z o.o.   -------->
+
 				</div>
 				<div id="compose_cc" class="hidden form-group row">
 					<label for="_cc" class="col-2 col-form-label"><roundcube:label name="cc" /></label>
@@ -173,11 +180,13 @@
 							</span>
 						</div>
 					</div>
+
 					<!--------   YetiForce Sp. z o.o.   -------->
 					<div class="col-2"></div><div class="col-10 compose-address-modules">
 						<roundcube:object name="yetiforce.adressButton" part="_cc" />
 					</div>
 					<!--------   YetiForce Sp. z o.o.   -------->
+
 				</div>
 				<div id="compose_bcc" class="hidden form-group row">
 					<label for="_bcc" class="col-2 col-form-label"><roundcube:label name="bcc" /></label>
@@ -189,11 +198,13 @@
 							</span>
 						</div>
 					</div>
+
 					<!--------   YetiForce Sp. z o.o.   -------->
 					<div class="col-2"></div><div class="col-10 compose-address-modules">
 						<roundcube:object name="yetiforce.adressButton" part="_bcc" />
 					</div>
 					<!--------   YetiForce Sp. z o.o.   -------->
+
 				</div>
 				<div id="compose_replyto" class="hidden form-group row">
 					<label for="_replyto" class="col-2 col-form-label"><roundcube:label name="replyto" /></label>
@@ -205,11 +216,13 @@
 							</span>
 						</div>
 					</div>
+
 					<!--------   YetiForce Sp. z o.o.   -------->
 					<div class="col-2"></div><div class="col-10 compose-address-modules">
 						<roundcube:object name="yetiforce.adressButton" part="_replyto" />
 					</div>
 					<!--------   YetiForce Sp. z o.o.   -------->
+
 				</div>
 				<div id="compose_followupto" class="hidden form-group row">
 					<label for="_followupto" class="col-2 col-form-label"><roundcube:label name="followupto" /></label>
@@ -221,11 +234,13 @@
 							</span>
 						</div>
 					</div>
+
 					<!--------   YetiForce Sp. z o.o.   -------->
 					<div class="col-2"></div><div class="col-10 compose-address-modules">
 						<roundcube:object name="yetiforce.adressButton" part="_followupto" />
 					</div>
 					<!--------   YetiForce Sp. z o.o.   -------->
+
 				</div>
 				<div id="compose_subject" class="form-group row">
 					<label for="compose-subject" class="col-2 col-form-label"><roundcube:label name="subject" /></label>
@@ -246,6 +261,9 @@
 		</form>
 		<div class="formbuttons">
 			<roundcube:button command="send" class="btn btn-primary send" label="send" tabindex="1" data-content-button="true" />
+			<div class="float-right">
+				<roundcube:button command="extwin" type="link" label="openinextwin" data-hidden="small" class="button icon btn btn-link extwin" data-tabindex="1" condition="!env:extwin" />
+			</div>
 		</div>
 	</div>
 </div>
@@ -268,7 +286,7 @@
 	<h3 id="aria-label-responsesmenu" class="voice"><roundcube:label name="arialabelresponsesmenu" /></h3>
 	<ul class="menu listing" role="menu" aria-labelledby="aria-label-responsesmenu">
 		<li role="separator" class="separator"><label><roundcube:label name="insertresponse" /></label></li>
-		<roundcube:object name="responseslist" id="responseslist" tagname="ul" itemclass="active" />
+		<roundcube:object name="responseslist" id="responseslist" tagname="ul" class="rounded-0" itemclass="active" list-placeholder="noresponsesavailable" />
 		<li role="separator" class="separator"><label><roundcube:label name="manageresponses" /></label></li>
 		<roundcube:button command="save-response" type="link-menuitem" label="newresponse" class="create responses disabled" classAct="create responses active" unselectable="on" />
 		<roundcube:button name="responses" type="link-menuitem" label="editresponses" class="edit responses active" onclick="return rcmail.command('switch-task', 'settings/responses')" />

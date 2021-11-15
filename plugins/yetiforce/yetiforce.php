@@ -158,7 +158,7 @@ class yetiforce extends rcube_plugin
 			$this->rc->plugins->exec_hook('logout_after', [
 				'user' => $_SESSION['username'],
 				'host' => $_SESSION['storage_host'],
-				'lang' => $this->rc->user->language
+				'lang' => $this->rc->user->language,
 			]);
 		}
 		if (empty($_SESSION['user_id']) && !empty($_GET['_autologin'])) {
@@ -467,7 +467,7 @@ class yetiforce extends rcube_plugin
 				'vars' => [
 					'date' => $this->rc->format_date($date, $this->rc->config->get('date_long')),
 					'sender' => $from,
-				]
+				],
 			]);
 			if (!$bodyIsHtml) {
 				global $LINE_LENGTH;
@@ -514,7 +514,7 @@ class yetiforce extends rcube_plugin
 			return;
 		}
 		$signatures = [];
-		foreach ($OUTPUT->get_env('signatures') as $identityId => $signature) {
+		foreach (($OUTPUT->get_env('signatures') ?? []) as $identityId => $signature) {
 			$signatures[$identityId]['text'] = $signature['text'] . PHP_EOL . $gS['text'];
 			$signatures[$identityId]['html'] = $signature['html'] . '<div class="pre global">' . $gS['html'] . '</div>';
 		}
@@ -669,7 +669,7 @@ class yetiforce extends rcube_plugin
 		if (($icon = $COMPOSE['deleteicon']) && is_file($icon)) {
 			$button = html::img([
 				'src' => $icon,
-				'alt' => $RCMAIL->gettext('delete')
+				'alt' => $RCMAIL->gettext('delete'),
 			]);
 		} elseif ($COMPOSE['textbuttons']) {
 			$button = rcube::Q($RCMAIL->gettext('delete'));
@@ -701,7 +701,7 @@ class yetiforce extends rcube_plugin
 			'name' => $attachment['name'],
 			'mimetype' => $attachment['mimetype'],
 			'classname' => rcube_utils::file2class($attachment['mimetype'], $attachment['name']),
-			'complete' => true], $uploadid);
+			'complete' => true, ], $uploadid);
 	}
 
 	public function rcmailWrapAndQuote($text, $length = 72)
@@ -808,7 +808,7 @@ class yetiforce extends rcube_plugin
 		echo App\Json::encode([
 			'subject' => $mail['subject'] ?? null,
 			'content' => $mail['content'] ?? null,
-			'attachments' => $mail['attachments'] ?? null
+			'attachments' => $mail['attachments'] ?? null,
 		]);
 		chdir($currentPath);
 		exit;
@@ -996,17 +996,17 @@ class yetiforce extends rcube_plugin
 						$message = new rcube_message($uid, $mbox);
 						$body = $message->first_html_part();
 					}
-					\App\Mail\Rbl::addReport([
+					$message = \App\Mail\Rbl::addReport([
 						'type' => $props,
 						'header' => $headers,
 						'body' => $body,
 					]);
+					$this->rc->output->command('display_message', \App\Language::translate($message, 'OSSMail'), 'notice');
 				}
 			}
 			if (0 === $props && ($junkMbox = $this->rc->config->get('junk_mbox')) && $mbox !== $junkMbox) {
 				$this->rc->output->command('addSenderToListMove', $junkMbox);
 			}
-			$this->rc->output->command('display_message', \App\Language::translate('LBL_MESSAGE_HAS_BEEN_ADDED', 'OSSMail'), 'notice');
 		}
 	}
 
@@ -1030,7 +1030,11 @@ class yetiforce extends rcube_plugin
 	 */
 	public function messagesList(array $p): array
 	{
+		$currentPath = getcwd();
+		chdir($this->rc->config->get('root_directory'));
+		$this->loadCurrentUser();
 		if (!\App\Config::component('Mail', 'rcListCheckRbl', false)) {
+			chdir($currentPath);
 			return $p;
 		}
 		if (!empty($p['messages'])) {
@@ -1051,6 +1055,7 @@ class yetiforce extends rcube_plugin
 			$this->rc->output->set_env('yf_rblList', \App\Mail\Rbl::getColorByIps($ipList));
 			$this->rc->output->set_env('yf_senderList', $senderList);
 		}
+		chdir($currentPath);
 		return $p;
 	}
 
@@ -1090,6 +1095,13 @@ class yetiforce extends rcube_plugin
 	 */
 	public function messageObjects(array $p): array
 	{
+		$currentPath = getcwd();
+		chdir($this->rc->config->get('root_directory'));
+		$this->loadCurrentUser();
+		if (!\App\Config::component('Mail', 'rcDetailCheckRbl', false)) {
+			chdir($currentPath);
+			return $p;
+		}
 		if (empty($this->rbl)) {
 			$this->rbl = \App\Mail\Rbl::getInstance([]);
 			$this->rbl->set('rawBody', $this->rc->imap->get_raw_body($p['message']->uid));
@@ -1112,6 +1124,9 @@ class yetiforce extends rcube_plugin
 		if (($verifySender = $this->rbl->verifySender()) && !$verifySender['status']) {
 			$btnMoreIcon = 'fas fa-exclamation-circle text-danger';
 			$desc = \App\Language::translate('LBL_MAIL_SENDER', 'Settings:MailRbl') . ': ' . html::span(['class' => 'badge badge-danger'], html::span(['class' => 'mr-2 alert-icon fas fa-times'], '') . \App\Language::translate('LBL_INCORRECT', 'Settings:MailRbl')) . '<br>' . str_replace('<>', '<br>', $verifySender['info']);
+			if ($sender['comment']) {
+				$desc .= html::span(['class' => 'alert-icon far fa-comment-alt mr-2'], '') . $sender['comment'];
+			}
 			$alert = '';
 			$alert .= html::span(null, $this->rc->gettext('LBL_ALERT_FAKE_SENDER'));
 			$alert .= html::span(['class' => 'd-block'], html::span([], html::tag('button', [
@@ -1138,6 +1153,9 @@ class yetiforce extends rcube_plugin
 			if (\App\Mail\Rbl::DMARC_PASS !== $verifyDmarc['status']) {
 				$desc .= '- ' . \App\Language::translate('LBL_DMARC', 'Settings:MailRbl') . ': ' . html::span(['class' => 'badge ' . $verifyDmarc['class'], 'title' => $verifyDmarc['log']], html::span(['class' => 'mr-2 alert-icon ' . $verifyDmarc['icon']], '') . \App\Language::translate($verifyDmarc['label'], 'Settings:MailRbl')) . ' ' . \App\Language::translate($verifyDmarc['desc'], 'Settings:MailRbl') . '<br />';
 			}
+			if ($sender['comment']) {
+				$desc .= html::span(['class' => 'alert-icon far fa-comment-alt mr-2'], '') . $sender['comment'];
+			}
 			if ($desc) {
 				$alert = '';
 
@@ -1155,16 +1173,22 @@ class yetiforce extends rcube_plugin
 		$btnMore = html::span(['class' => 'float-right', 'style' => 'margin-left: auto;'], '<button class="btn btn-sm m-0 p-0" type="button" id="moreAlertBtn"><span class="' . $btnMoreIcon . ' h3"></span></button>');
 		if ($sender) {
 			$type = \App\Mail\Rbl::LIST_TYPES[$sender['type']];
+			$comment = '';
+			if ($sender['comment']) {
+				$comment = html::span(['class' => 'alert-icon far fa-comment-alt ml-2', 'title' => $sender['comment']], '');
+			}
 			$p['content'][] = html::div(['class' => 'mail-type-alert', 'style' => 'background:' . $type['alertColor']],
 				html::span(['class' => 'alert-icon ' . $type['icon']], '') .
-				html::span(null, rcube::Q($this->rc->gettext($sender['isBlack'] ? 'LBL_ALERT_BLACK_LIST' : 'LBL_ALERT_WHITE_LIST'))) . $btnMore
+				html::span(null, rcube::Q($this->rc->gettext($sender['isBlack'] ? 'LBL_ALERT_BLACK_LIST' : 'LBL_ALERT_WHITE_LIST'))) . $comment . $btnMore
 			) . $alertBlock;
+			chdir($currentPath);
 			return $p;
 		}
 		$p['content'][] = html::div(['class' => 'mail-type-alert', 'style' => 'background: #eaeaea'],
 			html::span(['class' => 'alert-icon far fa-question-circle mr-2'], '') .
 			html::span(null, rcube::Q($this->rc->gettext('LBL_ALERT_NEUTRAL_LIST'))) . $btnMore
 		) . $alertBlock;
+		chdir($currentPath);
 		return $p;
 	}
 
@@ -1247,9 +1271,9 @@ class yetiforce extends rcube_plugin
 			'name' => 'YetiForce',
 			'options' => ['yeti_show_to' => [
 				'title' => html::label('ff_yeti_show_to', rcube::Q($this->gettext('show_to'))),
-				'content' => $showTo->show($type)
-			]
-			]
+				'content' => $showTo->show($type),
+			],
+			],
 		];
 		return $args;
 	}
@@ -1275,13 +1299,15 @@ class yetiforce extends rcube_plugin
 		$currentPath = getcwd();
 		chdir($this->rc->config->get('root_directory'));
 		$this->loadCurrentUser();
+
 		$eventHandler = new \App\EventHandler();
 		$eventHandler->setModuleName('OSSMail');
 		$eventHandler->setParams([
 			'composeData' => $_SESSION['compose_data_' . rcube_utils::get_input_value('_id', rcube_utils::INPUT_GPC)] ?? [],
-			'mailData' => $args
+			'mailData' => $args,
 		]);
 		$eventHandler->trigger('OSSMailBeforeSend');
+
 		chdir($currentPath);
 		return $eventHandler->getParams()['mailData'];
 	}
@@ -1296,13 +1322,15 @@ class yetiforce extends rcube_plugin
 		$currentPath = getcwd();
 		chdir($this->rc->config->get('root_directory'));
 		$this->loadCurrentUser();
+
 		$eventHandler = new \App\EventHandler();
 		$eventHandler->setModuleName('OSSMail');
 		$eventHandler->setParams([
 			'composeData' => $_SESSION['compose_data_' . rcube_utils::get_input_value('_id', rcube_utils::INPUT_GPC)] ?? [],
-			'mailData' => $args
+			'mailData' => $args,
 		]);
 		$eventHandler->trigger('OSSMailAfterSend');
+
 		chdir($currentPath);
 		return $eventHandler->getParams()['mailData'];
 	}
