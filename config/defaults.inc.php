@@ -1215,12 +1215,12 @@ $config['contact_form_mode'] = 'private';
 // The addressbook source to store automatically collected recipients in.
 // Default: true (the built-in "Collected recipients" addressbook, source id = '1')
 // Note: It can be set to any writeable addressbook, e.g. 'sql'
-$config['collected_recipients'] = true;
+$config['collected_recipients'] = false;
 
 // The addressbook source to store trusted senders in.
 // Default: true (the built-in "Trusted senders" addressbook, source id = '2')
 // Note: It can be set to any writeable addressbook, e.g. 'sql'
-$config['collected_senders'] = true;
+$config['collected_senders'] = false;
 
 
 // ----------------------------------
