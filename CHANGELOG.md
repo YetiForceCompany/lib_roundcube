@@ -1,5 +1,29 @@
 # Changelog Roundcube Webmail
 
+## Release 1.5.1
+
+- Fix importing contacts with no email address (#8227)
+- Fix so session's search scope is not used if search is not active (#8199)
+- Fix some PHP8 warnings (#8239)
+- Fix so dark mode state is retained after closing the browser (#8237)
+- Fix bug where new messages were not added to the list on refresh if skip_deleted=true (#8234)
+- Fix colors on "Show source" page in dark mode (#8246)
+- Fix handling of dark_mode_support:false setting in skins meta.json - also when devel_mode=false (#8249)
+- Fix database initialization if db_prefix is a schema prefix (#8221)
+- Fix undefined constant error in Installer on Windows (#8258)
+- Fix installation/upgrade on MySQL 5.5 - Index column size too large (#8231)
+- Fix regression in setting of contact listing name (#8260)
+- Fix bug in Larry skin where headers toggle state was reset on full page preview (#8203)
+- Fix bug where \u200b characters were added into the recipient input preventing mail delivery (#8269)
+- Fix charset conversion errors on PHP < 8 for charsets not supported by mbstring (#8252)
+- Fix bug where adding a contact to trusted senders via "Always allow from..." button didn't work (#8264, #8268)
+- Fix bug with show_images setting where option 1 and 3 were swapped (#8268)
+- Fix PHP fatal error on an undefined constant in contacts import action (#8277)
+- Fix fetching headers of multiple message parts at once in rcube_imap_generic::fetchMIMEHeaders() (#8282)
+- Fix bug where attachment download could sometimes fail with a CSRF check error (#8283)
+- Fix an infinite loop when parsing environment variables with float/integer values (#8293)
+- Fix so 'small-dark' logo has more priority than the 'small' logo (#8298)
+
 ## Release 1.5.0
 
 - Support displaying RTF content (including encapsulated HTML) from a TNEF attachment

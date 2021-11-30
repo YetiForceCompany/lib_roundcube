@@ -29,12 +29,12 @@
             'dev_requirement' => false,
         ),
         'guzzlehttp/promises' => array(
-            'pretty_version' => '1.5.0',
-            'version' => '1.5.0.0',
+            'pretty_version' => '1.5.1',
+            'version' => '1.5.1.0',
             'type' => 'library',
             'install_path' => __DIR__ . '/../guzzlehttp/promises',
             'aliases' => array(),
-            'reference' => '136a635e2b4a49b9d79e9c8fee267ffb257fdba0',
+            'reference' => 'fe752aedc9fd8fcca3fe7ad05d419d32998a06da',
             'dev_requirement' => false,
         ),
         'guzzlehttp/psr7' => array(
@@ -83,12 +83,12 @@
             'dev_requirement' => false,
         ),
         'pear/console_commandline' => array(
-            'pretty_version' => 'v1.2.3',
-            'version' => '1.2.3.0',
+            'pretty_version' => 'v1.2.4',
+            'version' => '1.2.4.0',
             'type' => 'library',
             'install_path' => __DIR__ . '/../pear/console_commandline',
             'aliases' => array(),
-            'reference' => '331b295d00c9fa2dae30fe14538d430d72d954c6',
+            'reference' => 'cce06166765c5da31f3e8c1acf42512c64344cdb',
             'dev_requirement' => false,
         ),
         'pear/console_getopt' => array(
@@ -197,12 +197,12 @@
             'dev_requirement' => false,
         ),
         'roundcube/plugin-installer' => array(
-            'pretty_version' => '0.3.0',
-            'version' => '0.3.0.0',
+            'pretty_version' => '0.3.1',
+            'version' => '0.3.1.0',
             'type' => 'composer-plugin',
             'install_path' => __DIR__ . '/../roundcube/plugin-installer',
             'aliases' => array(),
-            'reference' => 'c7909610e9d8a72fa57b39d1feebab764cf9b2d1',
+            'reference' => '9c66c276b795eea1a32eb864b2c6c1f682cdc027',
             'dev_requirement' => false,
         ),
         'roundcube/roundcubemail' => array(

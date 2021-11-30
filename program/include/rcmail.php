@@ -732,7 +732,7 @@ class rcmail extends rcube
             }
             else if (strpos($username, '@')) {
                 // lowercase domain name
-                list($local, $domain) = explode('@', $username);
+                list($local, $domain) = rcube_utils::explode('@', $username);
                 $username = $local . '@' . mb_strtolower($domain);
             }
         }
@@ -951,7 +951,7 @@ class rcmail extends rcube
             $post_host = rcube_utils::get_input_value('_host', rcube_utils::INPUT_POST);
             $post_user = rcube_utils::get_input_value('_user', rcube_utils::INPUT_POST);
 
-            list(, $domain) = explode('@', $post_user);
+            list(, $domain) = rcube_utils::explode('@', $post_user);
 
             // direct match in default_host array
             if ($default_host[$post_host] || in_array($post_host, array_values($default_host))) {
@@ -1127,6 +1127,12 @@ class rcmail extends rcube
         }
 
         $this->address_books = [];
+
+        // In CLI stop here, prevent from errors when the console.log might exist,
+        // but be not accessible
+        if (php_sapi_name() == 'cli') {
+            return;
+        }
 
         // write performance stats to logs/console
         if ($this->config->get('devel_mode') || $this->config->get('performance_stats')) {

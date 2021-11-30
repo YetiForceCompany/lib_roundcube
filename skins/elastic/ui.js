@@ -809,7 +809,7 @@ function rcube_elastic_ui()
         $('#taskmenu a.theme').on('click', function() {
             color_mode = $(this).is('.dark') ? 'dark' : 'light';
             switch_color_mode();
-            rcmail.set_cookie('colorMode', color_mode);
+            rcmail.set_cookie('colorMode', color_mode, false);
         });
 
         // Note: this does not work in IE and Safari
@@ -1730,11 +1730,11 @@ function rcube_elastic_ui()
                 $('#logo').data('src-default', $('#logo').attr('src'));
             }
 
-            if (mode == 'phone' && logos['small']) {
-                $('#logo').attr('src', logos['small']);
-            }
-            else if (mode == 'phone' && color_mode == 'dark' && logos['small-dark']) {
+            if (mode == 'phone' && color_mode == 'dark' && logos['small-dark']) {
                 $('#logo').attr('src', logos['small-dark']);
+            }
+            else if (mode == 'phone' && logos['small']) {
+                $('#logo').attr('src', logos['small']);
             }
             else if (color_mode == 'dark' && logos['dark']) {
                 $('#logo').attr('src', logos['dark']);
@@ -4139,6 +4139,15 @@ function rcube_elastic_ui()
      */
     function window_open(url, small, toolbar, force_window)
     {
+        var colorFunc = function (body) {
+            $(body).css({
+                color: $(document.body).css('color'),
+                backgroundColor: $(document.body).css('background-color')
+            })
+        };
+
+        var setColor = color_mode == 'dark' && /_task=mail/.test(url) && /_action=viewsource/.test(url);
+
         // Use 4th argument to bypass the dialog-mode e.g. for external windows
         if (!is_mobile() || force_window === true) {
             // On attachment preview page we do not display the properties sidebar
@@ -4147,7 +4156,14 @@ function rcube_elastic_ui()
                 small = true;
             }
 
-            return env.open_window.call(rcmail, url, small, toolbar);
+            var win = env.open_window.call(rcmail, url, small, toolbar);
+
+            // Switch the plain/text window to dark-mode
+            if (setColor) {
+                $(win).on('load', function() { colorFunc(win.document.body); });
+            }
+
+            return win;
         }
 
         // _extwin=1, _framed=1 are required to display attachment preview
@@ -4165,6 +4181,11 @@ function rcube_elastic_ui()
 
         if (/_frame=1/.test(url)) {
             props.dialogClass = 'no-titlebar';
+        }
+
+        // Switch the plain/text iframe to dark-mode
+        if (setColor) {
+            frame.on('load', function() { colorFunc(frame[0].contentWindow.document.body); });
         }
 
         rcmail.simple_dialog(frame, title, null, props);
@@ -4244,9 +4265,7 @@ function rcube_elastic_ui()
         // write prefs to local storage (if supported)
         if (!rcmail.local_storage_set_item('prefs.elastic', prefs)) {
             // store value in cookie
-            var exp = new Date();
-            exp.setYear(exp.getFullYear() + 1);
-            rcmail.set_cookie(key, val, exp);
+            rcmail.set_cookie(key, val, false);
         }
     };
 }
