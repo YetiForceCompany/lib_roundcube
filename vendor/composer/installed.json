@@ -133,17 +133,17 @@
         },
         {
             "name": "guzzlehttp/promises",
-            "version": "1.5.0",
-            "version_normalized": "1.5.0.0",
+            "version": "1.5.1",
+            "version_normalized": "1.5.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/promises.git",
-                "reference": "136a635e2b4a49b9d79e9c8fee267ffb257fdba0"
+                "reference": "fe752aedc9fd8fcca3fe7ad05d419d32998a06da"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/promises/zipball/136a635e2b4a49b9d79e9c8fee267ffb257fdba0",
-                "reference": "136a635e2b4a49b9d79e9c8fee267ffb257fdba0",
+                "url": "https://api.github.com/repos/guzzle/promises/zipball/fe752aedc9fd8fcca3fe7ad05d419d32998a06da",
+                "reference": "fe752aedc9fd8fcca3fe7ad05d419d32998a06da",
                 "shasum": ""
             },
             "require": {
@@ -152,7 +152,7 @@
             "require-dev": {
                 "symfony/phpunit-bridge": "^4.4 || ^5.1"
             },
-            "time": "2021-10-07T13:05:22+00:00",
+            "time": "2021-10-22T20:56:57+00:00",
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -200,7 +200,7 @@
             ],
             "support": {
                 "issues": "https://github.com/guzzle/promises/issues",
-                "source": "https://github.com/guzzle/promises/tree/1.5.0"
+                "source": "https://github.com/guzzle/promises/tree/1.5.1"
             },
             "funding": [
                 {
@@ -579,17 +579,17 @@
         },
         {
             "name": "pear/console_commandline",
-            "version": "v1.2.3",
-            "version_normalized": "1.2.3.0",
+            "version": "v1.2.4",
+            "version_normalized": "1.2.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pear/Console_CommandLine.git",
-                "reference": "331b295d00c9fa2dae30fe14538d430d72d954c6"
+                "reference": "cce06166765c5da31f3e8c1acf42512c64344cdb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pear/Console_CommandLine/zipball/331b295d00c9fa2dae30fe14538d430d72d954c6",
-                "reference": "331b295d00c9fa2dae30fe14538d430d72d954c6",
+                "url": "https://api.github.com/repos/pear/Console_CommandLine/zipball/cce06166765c5da31f3e8c1acf42512c64344cdb",
+                "reference": "cce06166765c5da31f3e8c1acf42512c64344cdb",
                 "shasum": ""
             },
             "require": {
@@ -601,7 +601,7 @@
             "require-dev": {
                 "phpunit/phpunit": "*"
             },
-            "time": "2020-04-16T15:04:15+00:00",
+            "time": "2021-11-15T19:53:25+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -1283,17 +1283,17 @@
         },
         {
             "name": "roundcube/plugin-installer",
-            "version": "0.3.0",
-            "version_normalized": "0.3.0.0",
+            "version": "0.3.1",
+            "version_normalized": "0.3.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/roundcube/plugin-installer.git",
-                "reference": "c7909610e9d8a72fa57b39d1feebab764cf9b2d1"
+                "reference": "9c66c276b795eea1a32eb864b2c6c1f682cdc027"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/roundcube/plugin-installer/zipball/c7909610e9d8a72fa57b39d1feebab764cf9b2d1",
-                "reference": "c7909610e9d8a72fa57b39d1feebab764cf9b2d1",
+                "url": "https://api.github.com/repos/roundcube/plugin-installer/zipball/9c66c276b795eea1a32eb864b2c6c1f682cdc027",
+                "reference": "9c66c276b795eea1a32eb864b2c6c1f682cdc027",
                 "shasum": ""
             },
             "require": {
@@ -1302,7 +1302,7 @@
             "require-dev": {
                 "composer/composer": "*"
             },
-            "time": "2021-06-19T19:49:23+00:00",
+            "time": "2021-10-24T13:38:11+00:00",
             "type": "composer-plugin",
             "extra": {
                 "class": [
@@ -1336,7 +1336,7 @@
             "description": "A composer-installer for Roundcube plugins and skins.",
             "support": {
                 "issues": "https://github.com/roundcube/plugin-installer/issues",
-                "source": "https://github.com/roundcube/plugin-installer/tree/0.3.0"
+                "source": "https://github.com/roundcube/plugin-installer/tree/0.3.1"
             },
             "install-path": "../roundcube/plugin-installer"
         },

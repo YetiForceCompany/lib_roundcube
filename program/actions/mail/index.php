@@ -98,8 +98,8 @@ class rcmail_action_mail_index extends rcmail_action
             if (empty($rcmail->action)) {
                 $rcmail->output->set_env('search_mods', self::search_mods());
 
-                $scope = rcube_utils::get_input_value('_scope', rcube_utils::INPUT_GET);
-                if (!$scope && isset($_SESSION['search_scope'])) {
+                $scope = rcube_utils::get_input_string('_scope', rcube_utils::INPUT_GET);
+                if (!$scope && isset($_SESSION['search_scope']) && $rcmail->output->get_env('search_request')) {
                     $scope = $_SESSION['search_scope'];
                 }
 
@@ -862,12 +862,12 @@ class rcmail_action_mail_index extends rcmail_action
             && $message->has_html_part()
         ) {
             switch ($show_images) {
-            case 1: // trusted senders only
-            case 3: // all my contacts
+            case 3: // trusted senders only
+            case 1: // all my contacts
                 if (!empty($message->sender['mailto'])) {
                     $type = rcube_addressbook::TYPE_TRUSTED_SENDER;
 
-                    if ($show_images == 3) {
+                    if ($show_images == 1) {
                         $type |= rcube_addressbook::TYPE_RECIPIENT | rcube_addressbook::TYPE_WRITEABLE;
                     }
 

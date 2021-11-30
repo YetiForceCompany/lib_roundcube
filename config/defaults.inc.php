@@ -1204,7 +1204,7 @@ $config['contactlist_fields'] = ['name', 'firstname', 'surname', 'email'];
 
 // Template of contact entry on the autocompletion list.
 // You can use contact fields as: name, email, organization, department, etc.
-// See program/steps/addressbook/func.inc for a list
+// See program/actions/contacts/index.php for a list
 $config['contact_search_name'] = '{name} <{email}>';
 
 // Contact mode. If your contacts are mostly business, switch it to 'business'.
@@ -1265,11 +1265,11 @@ $config['timezone'] = 'auto';
 // prefer displaying HTML messages
 $config['prefer_html'] = true;
 
-// Display remote resources (inline images, styles) in HTML messages
+// Display remote resources (inline images, styles) in HTML messages. Default: 0.
 // 0 - Never, always ask
 // 1 - Allow from my contacts (all writeable addressbooks + collected senders and recipients)
 // 2 - Always allow
-// 3 - Allow from trusted senders
+// 3 - Allow from trusted senders only
 $config['show_images'] = 0;
 
 // open messages in new window
