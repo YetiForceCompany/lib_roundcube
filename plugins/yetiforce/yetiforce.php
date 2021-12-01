@@ -9,31 +9,74 @@
  */
 class yetiforce extends rcube_plugin
 {
-	private $rc;
-	private $autologin;
-	private $currentUser;
-	private $rbl;
-	private $viewData = [];
 	/**
+	 * [
+	 *   'output'  => $output_headers,
+	 *   'headers' => $headers_obj,
+	 *   'exclude' => $exclude_headers,       // readonly
+	 *   'folder'  => self::$MESSAGE->folder, // readonly
+	 *   'uid'     => self::$MESSAGE->uid,    // readonly
+	 *  ].
+	 *
 	 * @var array
 	 */
+	protected $messageHeaders;
+
+	/**
+	 * [
+	 *   'message'    => $message,
+	 *   'identities' => $identities,
+	 *   'selected'   => $from_idx
+	 *  ].
+	 *
+	 * @var array
+	 */
+	protected $identitySelect;
+
+	/** @var array|bool */
+	private $autologin;
+
+	/** @var array */
+	private $viewData = [];
+
+	/** @var \App\User */
+	private $currentUser;
+
+	/** @var \App\Mail\Rbl */
+	private $rbl;
+
+	/** @var rcmail */
+	private $rc;
+
+	/** @var string|null */
+	protected static $SESSION_KEY;
+
+	/** @var array|null */
+	protected static $COMPOSE;
+
+	/** @var string|null */
+	protected static $COMPOSE_ID;
+
+	/** @var array */
 	private $icsParts = [];
 
+	/**
+	 * Plugin initialization.
+	 */
 	public function init()
 	{
 		$this->rc = rcmail::get_instance();
 		$this->include_stylesheet('elastic.css');
 
-		$this->add_hook('login_after', [$this, 'loginAfter']);
+		$this->add_hook('login_after', [$this, 'login_after']);
 		$this->add_hook('startup', [$this, 'startup']);
 		$this->add_hook('authenticate', [$this, 'authenticate']);
-
-		$this->add_hook('storage_init', [$this, 'storageInit']);
-		$this->add_hook('messages_list', [$this, 'messagesList']);
-		$this->add_hook('message_objects', [$this, 'messageObjects']);
-
-		$this->add_hook('message_before_send', [$this, 'beforeSent']);
-		$this->add_hook('message_sent', [$this, 'afterSent']);
+		$this->add_hook('storage_init', [$this, 'storage_init']);
+		$this->add_hook('messages_list', [$this, 'messages_list']);
+		$this->add_hook('message_objects', [$this, 'message_objects']);
+		$this->add_hook('message_headers_output', [$this, 'message_headers_output']);
+		$this->add_hook('message_before_send', [$this, 'message_before_send']);
+		$this->add_hook('message_sent', [$this, 'message_sent']);
 
 		$this->register_action('plugin.yetiforce-importIcs', [$this, 'importIcs']);
 		$this->register_action('plugin.yetiforce-addFilesToMail', [$this, 'addFilesToMail']);
@@ -71,7 +114,7 @@ class yetiforce extends rcube_plugin
 
 				$this->add_hook('template_object_messageattachments', [$this, 'appendIcsPreview']);
 				$this->add_hook('template_object_messagesummary', [$this, 'messageSummary']);
-				$this->add_hook('message_load', [$this, 'messageLoad']);
+				$this->add_hook('message_load', [$this, 'message_load']);
 
 				$this->add_button([
 					'command' => 'plugin.yetiforce.addSenderToList',
@@ -117,10 +160,11 @@ class yetiforce extends rcube_plugin
 				$this->rc->output->set_env('yf_isPermittedMailTemplates', \App\Privilege::isPermitted('EmailTemplates'));
 
 				$this->rc->output->add_handler('yetiforce.adressbutton', [$this, 'adressButton']);
+				$this->add_hook('identity_select', [$this, 'identity_select']);
 				$this->add_hook('render_page', [$this, 'loadSignature']);
 
-				$this->add_hook('message_compose_body', [$this, 'messageComposeBody']);
-				$this->add_hook('message_compose', [$this, 'messageComposeHead']);
+				$this->add_hook('message_compose_body', [$this, 'message_compose_body']);
+				$this->add_hook('message_compose', [$this, 'message_compose']);
 
 				if ($id = rcube_utils::get_input_value('_id', rcube_utils::INPUT_GPC)) {
 					$id = App\Purifier::purifyByType($id, 'Alnum');
@@ -136,18 +180,17 @@ class yetiforce extends rcube_plugin
 				}
 			}
 			chdir($currentPath);
-		} elseif ('settings' == $this->rc->task) {
-			$this->add_hook('preferences_list', [$this, 'settingsDisplayPrefs']);
-			$this->add_hook('preferences_save', [$this, 'settingsSavePrefs']);
 		}
 	}
 
 	/**
-	 * startup hook handler.
+	 * 'startup' hook handler.
 	 *
-	 * @param array $args
+	 * @param array $args Hook arguments
+	 *
+	 * @return array Hook arguments
 	 */
-	public function startup($args)
+	public function startup($args): array
 	{
 		if (empty($_GET['_autologin']) || !($row = $this->getAutoLogin())) {
 			return $args;
@@ -168,11 +211,13 @@ class yetiforce extends rcube_plugin
 	}
 
 	/**
-	 * authenticate hook handler.
+	 * 'authenticate' hook handler.
 	 *
-	 * @param array $args
+	 * @param array $args Hook arguments
+	 *
+	 * @return array Hook arguments
 	 */
-	public function authenticate($args)
+	public function authenticate($args): array
 	{
 		if (!empty($_GET['_autologin']) && ($row = $this->getAutoLogin())) {
 			$host = false;
@@ -204,7 +249,7 @@ class yetiforce extends rcube_plugin
 	 *
 	 * @param array $args
 	 */
-	public function loginAfter($args)
+	public function login_after($args): array
 	{
 		$pass = rcube_utils::get_input_value('_pass', rcube_utils::INPUT_POST, true, $this->rc->config->get('password_charset', 'UTF-8'));
 		if (!empty($pass)) {
@@ -275,12 +320,12 @@ class yetiforce extends rcube_plugin
 	}
 
 	/**
-	 * Set environment variables in JS, needed for QuickCreateForm
-	 * message_load hook handler.
+	 * Handler for message_load hook.
+	 * Set environment variables in JS, needed for QuickCreateForm.
 	 *
 	 * @param array $args
 	 */
-	public function messageLoad(array $args)
+	public function message_load(array $args): void
 	{
 		if (!isset($args['object'])) {
 			return;
@@ -309,11 +354,16 @@ class yetiforce extends rcube_plugin
 		}
 	}
 
-	public function messageComposeHead(array $args)
+	/**
+	 * Handle message_compose hook.
+	 *
+	 * @param array $args
+	 *
+	 * @return array
+	 */
+	public function message_compose(array $args): array
 	{
-		$this->rc = rcmail::get_instance();
 		$db = $this->rc->get_dbh();
-		global $COMPOSE_ID;
 		if (empty($_GET['_composeKey'])) {
 			return $args;
 		}
@@ -330,8 +380,8 @@ class yetiforce extends rcube_plugin
 				$userid = $this->rc->user->ID;
 				[$usec, $sec] = explode(' ', microtime());
 				$dId = preg_replace('/[^0-9]/', '', $userid . $sec . $usec);
-				foreach (self::getAttachment($params['crmrecord'], $params['filePath']) as $index => $attachment) {
-					$attachment['group'] = $COMPOSE_ID;
+				foreach ($this->getAttachment($params['crmrecord'], $params['filePath']) as $index => $attachment) {
+					$attachment['group'] = $args['id'];
 					$attachment['id'] = $dId . $index;
 					$args['attachments'][$attachment['id']] = $attachment;
 				}
@@ -395,31 +445,24 @@ class yetiforce extends rcube_plugin
 		return $args;
 	}
 
-	public function messageComposeBody(array $args)
+	/**
+	 * Handle message_compose_body hook.
+	 *
+	 * @param array $args
+	 *
+	 * @return array
+	 */
+	public function message_compose_body(array $args): array
 	{
-		$this->rc = rcmail::get_instance();
-		$id = rcube_utils::get_input_value('_id', rcube_utils::INPUT_GPC);
-		$row = $_SESSION['compose_data_' . $id]['param']['mailData'];
-		$type = $_SESSION['compose_data_' . $id]['param']['type'];
-		$params = $_SESSION['compose_data_' . $id]['param'];
-		$recordNumber = '';
-		// if ($number = \App\Mail\RecordFinder::getRecordNumberFromString("[{$params['recordNumber']}]", $params['crmmodule'])) {
-		// 	$recordNumber = "[{$number}]";
-		// }
 		$bodyIsHtml = $args['html'];
+		$id = rcube_utils::get_input_value('_id', rcube_utils::INPUT_GPC);
+		$row = $_SESSION['compose_data_' . $id]['param']['mailData'] ?? [];
 		if (!$row) {
-			if ($recordNumber) {
-				if (!$bodyIsHtml) {
-					$body = "\n ------------------------- \n" . $recordNumber;
-				} else {
-					$body = '<br><br><hr/>' . $recordNumber;
-				}
-				$args['body'] = $body;
-			}
 			return $args;
 		}
+		$type = $_SESSION['compose_data_' . $id]['param']['type'] ?? '';
 		$body = $row['content'];
-		$date = $row['date'];
+		$date = $this->rc->format_date($row['date'], $this->rc->config->get('date_long'));
 		$from = $row['from_email'];
 		$to = $row['to_email'];
 		$subject = $row['subject'];
@@ -439,8 +482,8 @@ class yetiforce extends rcube_plugin
 					$prefix .= $this->rc->gettext('replyto') . ': ' . $replyto . "\n";
 				}
 				$prefix .= "\n";
-				global $LINE_LENGTH;
-				$txt = new rcube_html2text($body, false, true, $LINE_LENGTH);
+				$line_length = $this->rc->config->get('line_length', 72);
+				$txt = new rcube_html2text($body, false, true, $line_length);
 				$body = $txt->get_text();
 				$body = preg_replace('/\r?\n/', "\n", $body);
 				$body = trim($body, "\n");
@@ -465,28 +508,22 @@ class yetiforce extends rcube_plugin
 			$prefix = $this->rc->gettext([
 				'name' => 'mailreplyintro',
 				'vars' => [
-					'date' => $this->rc->format_date($date, $this->rc->config->get('date_long')),
+					'date' => $date,
 					'sender' => $from,
 				],
 			]);
 			if (!$bodyIsHtml) {
-				global $LINE_LENGTH;
-				$txt = new rcube_html2text($body, false, true, $LINE_LENGTH);
+				$line_length = $this->rc->config->get('line_length', 72);
+				$txt = new rcube_html2text($body, false, true, $line_length);
 				$body = $txt->get_text();
 				$body = preg_replace('/\r?\n/', "\n", $body);
 				$body = trim($body, "\n");
-				$body = rcmailWrapAndQuote($body, $LINE_LENGTH);
+				$body = rcmail_action_mail_compose::wrap_and_quote($body, $line_length);
 				$prefix .= "\n";
 				$body = $prefix . $body . $suffix;
-				if ($recordNumber) {
-					$body .= "\n ------------------------- \n" . $recordNumber;
-				}
 			} else {
-				$prefix = '<p>' . rcube::Q($prefix) . "</p>\n";
+				$prefix = '<p id="reply-intro">' . rcube::Q($prefix) . '</p>';
 				$body = $prefix . '<blockquote>' . $body . '</blockquote>' . $suffix;
-				if ($recordNumber) {
-					$body .= '<hr/>' . $recordNumber;
-				}
 			}
 		}
 		$this->rc->output->set_env('compose_mode', $type);
@@ -494,17 +531,33 @@ class yetiforce extends rcube_plugin
 		return $args;
 	}
 
-	//	Loading signature
-	public function loadSignature(array $args)
+	/**
+	 * Identity selection.
+	 *
+	 * @param array $args
+	 */
+	public function identity_select(array $args): array
 	{
-		global $OUTPUT, $MESSAGE;
-		if ($this->rc->config->get('enable_variables_in_signature') && !empty($OUTPUT->get_env('signatures'))) {
+		$this->identitySelect = $args;
+		return $args;
+	}
+
+	/**
+	 * Loading signature.
+	 *
+	 * @param array $args
+	 *
+	 * @return void
+	 */
+	public function loadSignature(array $args): void
+	{
+		if ($this->rc->config->get('enable_variables_in_signature') && !empty($this->rc->output->get_env('signatures'))) {
 			$signatures = [];
-			foreach ($OUTPUT->get_env('signatures') as $identityId => $signature) {
+			foreach ($this->rc->output->get_env('signatures') as $identityId => $signature) {
 				$signatures[$identityId]['text'] = $this->parseVariables($signature['text']);
 				$signatures[$identityId]['html'] = $this->parseVariables($signature['html']);
 			}
-			$OUTPUT->set_env('signatures', $signatures);
+			$this->rc->output->set_env('signatures', $signatures);
 		}
 		if ($this->checkAddSignature()) {
 			return;
@@ -514,12 +567,12 @@ class yetiforce extends rcube_plugin
 			return;
 		}
 		$signatures = [];
-		foreach (($OUTPUT->get_env('signatures') ?? []) as $identityId => $signature) {
+		foreach (($this->rc->output->get_env('signatures') ?? []) as $identityId => $signature) {
 			$signatures[$identityId]['text'] = $signature['text'] . PHP_EOL . $gS['text'];
 			$signatures[$identityId]['html'] = $signature['html'] . '<div class="pre global">' . $gS['html'] . '</div>';
 		}
-		if ($MESSAGE->identities) {
-			foreach ($MESSAGE->identities as &$identity) {
+		if (isset($this->identitySelect['message']) && $this->identitySelect['message']->identities) {
+			foreach ($this->identitySelect['message']->identities as $identity) {
 				$identityId = $identity['identity_id'];
 				if (!isset($signatures[$identityId])) {
 					$signatures[$identityId]['text'] = "--\n" . $gS['text'];
@@ -527,21 +580,31 @@ class yetiforce extends rcube_plugin
 				}
 			}
 		}
-		$OUTPUT->set_env('signatures', $signatures);
+		$this->rc->output->set_env('signatures', $signatures);
 	}
 
-	public function getGlobalSignature()
+	/**
+	 * Get global signature.
+	 *
+	 * @return array
+	 */
+	public function getGlobalSignature(): array
 	{
 		$currentPath = getcwd();
 		chdir($this->rc->config->get('root_directory'));
 		$config = Settings_Mail_Config_Model::getConfig('signature');
 		$parser = App\TextParser::getInstanceById($this->currentUser->getId(), 'Users');
-		$result['text'] = $result['html'] = $parser->setContent($config['signature'])->parse()->getContent();
+		$result = $parser->setContent($config['signature'])->parse()->getContent();
 		chdir($currentPath);
-		return $result;
+		return ['text' => $result, 'html' => $result];
 	}
 
-	public function checkAddSignature()
+	/**
+	 * Check add signature.
+	 *
+	 * @return bool
+	 */
+	public function checkAddSignature(): bool
 	{
 		$currentPath = getcwd();
 		chdir($this->rc->config->get('root_directory'));
@@ -552,22 +615,23 @@ class yetiforce extends rcube_plugin
 
 	/**
 	 * Add files to mail.
+	 * Action: plugin.yetiforce-addFilesToMail.
 	 *
 	 * @return void
 	 */
-	public function addFilesToMail()
+	public function addFilesToMail(): void
 	{
-		$COMPOSE_ID = App\Purifier::purifyByType(rcube_utils::get_input_value('_id', rcube_utils::INPUT_GPC), 'Alnum');
-		$uploadid = App\Purifier::purifyByType(rcube_utils::get_input_value('_uploadid', rcube_utils::INPUT_GPC), 'Integer');
-		$ids = App\Purifier::purifyByType(rcube_utils::get_input_value('ids', rcube_utils::INPUT_GPC), 'Integer');
-		$COMPOSE = null;
-		if ($COMPOSE_ID && $_SESSION['compose_data_' . $COMPOSE_ID]) {
-			$SESSION_KEY = 'compose_data_' . $COMPOSE_ID;
-			$COMPOSE = &$_SESSION[$SESSION_KEY];
+		self::$COMPOSE_ID = App\Purifier::purifyByType(rcube_utils::get_input_value('_id', rcube_utils::INPUT_GPC), 'Alnum');
+		self::$COMPOSE = null;
+		self::$SESSION_KEY = 'compose_data_' . self::$COMPOSE_ID;
+		if (self::$COMPOSE_ID && !empty($_SESSION[self::$SESSION_KEY])) {
+			self::$COMPOSE = &$_SESSION[self::$SESSION_KEY];
 		}
-		if (!$COMPOSE) {
+		if (!self::$COMPOSE) {
 			exit('Invalid session var!');
 		}
+		$uploadid = App\Purifier::purifyByType(rcube_utils::get_input_value('_uploadid', rcube_utils::INPUT_GPC), 'Integer');
+		$ids = App\Purifier::purifyByType(rcube_utils::get_input_value('ids', rcube_utils::INPUT_GPC), 'Integer');
 		$index = 0;
 		foreach ($this->getAttachment($ids, false) as $attachment) {
 			++$index;
@@ -575,10 +639,10 @@ class yetiforce extends rcube_plugin
 			[$usec, $sec] = explode(' ', microtime());
 			$id = preg_replace('/[^0-9]/', '', $userid . $sec . $usec) . $index;
 			$attachment['id'] = $id;
-			$attachment['group'] = $COMPOSE_ID;
+			$attachment['group'] = self::$COMPOSE_ID;
 			@chmod($attachment['path'], 0600);  // set correct permissions (#1488996)
-			$_SESSION['plugins']['filesystem_attachments'][$COMPOSE_ID][$id] = realpath($attachment['path']);
-			$this->rc->session->append($SESSION_KEY . '.attachments', $id, $attachment);
+			$_SESSION['plugins']['filesystem_attachments'][self::$COMPOSE_ID][$id] = realpath($attachment['path']);
+			$this->rc->session->append(self::$SESSION_KEY . '.attachments', $id, $attachment);
 			$this->rcmail_attachment_success($attachment, $uploadid);
 		}
 		$this->rc->output->command('auto_save_start');
@@ -591,9 +655,9 @@ class yetiforce extends rcube_plugin
 	 * @param mixed $ids
 	 * @param mixed $files
 	 *
-	 * @return void
+	 * @return array
 	 */
-	public function getAttachment($ids, $files)
+	public function getAttachment($ids, $files): array
 	{
 		$attachments = [];
 		if (empty($ids) && empty($files)) {
@@ -653,32 +717,32 @@ class yetiforce extends rcube_plugin
 	}
 
 	/**
-	 * Copy functions from a file public_html/modules/OSSMail/roundcube/program/steps/mail/attachments.inc.
+	 * Copy attachment_success functions from a file public_html/modules/OSSMail/roundcube/program/actions/mail/attachment_upload.php.
 	 *
 	 * @param array  $attachment
 	 * @param string $uploadid
 	 *
 	 * @return void
 	 */
-	public function rcmail_attachment_success($attachment, $uploadid)
+	public function rcmail_attachment_success(array $attachment, $uploadid): void
 	{
-		global $RCMAIL, $COMPOSE;
-
 		$id = $attachment['id'];
 
-		if (($icon = $COMPOSE['deleteicon']) && is_file($icon)) {
+		if (!empty(self::$COMPOSE['deleteicon']) && is_file(self::$COMPOSE['deleteicon'])) {
 			$button = html::img([
-				'src' => $icon,
-				'alt' => $RCMAIL->gettext('delete'),
+				'src' => self::$COMPOSE['deleteicon'],
+				'alt' => $this->rc->gettext('delete'),
 			]);
-		} elseif ($COMPOSE['textbuttons']) {
-			$button = rcube::Q($RCMAIL->gettext('delete'));
+		} elseif (!empty(self::$COMPOSE['textbuttons'])) {
+			$button = rcube::Q($this->rc->gettext('delete'));
 		} else {
 			$button = '';
 		}
 
-		$link_content = sprintf('<span class="attachment-name">%s</span><span class="attachment-size">(%s)</span>',
-		rcube::Q($attachment['name']), $RCMAIL->show_bytes($attachment['size']));
+		$link_content = sprintf(
+			'<span class="attachment-name">%s</span><span class="attachment-size">(%s)</span>',
+			rcube::Q($attachment['name']), rcmail_action_mail_attachment_upload::show_bytes($attachment['size'])
+		);
 
 		$content_link = html::a([
 			'href' => '#load',
@@ -689,50 +753,20 @@ class yetiforce extends rcube_plugin
 		$delete_link = html::a([
 			'href' => '#delete',
 			'onclick' => sprintf("return %s.command('remove-attachment','rcmfile%s', this, event)", rcmail_output::JS_OBJECT_NAME, $id),
-			'title' => $RCMAIL->gettext('delete'),
+			'title' => $this->rc->gettext('delete'),
 			'class' => 'delete',
-			'aria-label' => $RCMAIL->gettext('delete') . ' ' . $attachment['name'],
+			'aria-label' => $this->rc->gettext('delete') . ' ' . $attachment['name'],
 		], $button);
 
-		$content = 'left' == $COMPOSE['icon_pos'] ? $delete_link . $content_link : $content_link . $delete_link;
+		$content = !empty(self::$COMPOSE['icon_pos']) && 'left' == self::$COMPOSE['icon_pos'] ? ($delete_link . $content_link) : ($content_link . $delete_link);
 
-		$RCMAIL->output->command('add2attachment_list', "rcmfile$id", [
+		$this->rc->output->command('add2attachment_list', "rcmfile$id", [
 			'html' => $content,
 			'name' => $attachment['name'],
 			'mimetype' => $attachment['mimetype'],
 			'classname' => rcube_utils::file2class($attachment['mimetype'], $attachment['name']),
-			'complete' => true, ], $uploadid);
-	}
-
-	public function rcmailWrapAndQuote($text, $length = 72)
-	{
-		// Rebuild the message body with a maximum of $max chars, while keeping quoted message.
-		$max = max(75, $length + 8);
-		$lines = preg_split('/\r?\n/', trim($text));
-		$out = '';
-		foreach ($lines as $line) {
-			// don't wrap already quoted lines
-			if ('>' == $line[0]) {
-				$line = '>' . rtrim($line);
-			} elseif (mb_strlen($line) > $max) {
-				$newline = '';
-
-				foreach (explode("\n", rcube_mime::wordwrap($line, $length - 2)) as $l) {
-					if (\strlen($l)) {
-						$newline .= '> ' . $l . "\n";
-					} else {
-						$newline .= ">\n";
-					}
-				}
-
-				$line = rtrim($newline);
-			} else {
-				$line = '> ' . $line;
-			}
-			// Append the line
-			$out .= $line . "\n";
-		}
-		return rtrim($out, "\n");
+			'complete' => true,
+		], $uploadid);
 	}
 
 	/**
@@ -742,7 +776,7 @@ class yetiforce extends rcube_plugin
 	 *
 	 * @return string
 	 */
-	protected function parseVariables($text)
+	protected function parseVariables(string $text): string
 	{
 		$currentPath = getcwd();
 		chdir($this->rc->config->get('root_directory'));
@@ -752,7 +786,12 @@ class yetiforce extends rcube_plugin
 		return $text;
 	}
 
-	protected function loadCurrentUser()
+	/**
+	 * Load current user.
+	 *
+	 * @return bool
+	 */
+	protected function loadCurrentUser(): bool
 	{
 		if (isset($this->currentUser)) {
 			return true;
@@ -764,7 +803,14 @@ class yetiforce extends rcube_plugin
 		return true;
 	}
 
-	public function adressButton(array $args)
+	/**
+	 * `yetiforce.adressbutton`  handler.
+	 *
+	 * @param array $args
+	 *
+	 * @return string
+	 */
+	public function adressButton(array $args): string
 	{
 		if (empty($this->viewData['compose']['composeAddressModules'])) {
 			return '';
@@ -786,8 +832,10 @@ class yetiforce extends rcube_plugin
 
 	/**
 	 * Function to get info about email template.
+	 *
+	 * @return void
 	 */
-	public function getContentEmailTemplate()
+	public function getContentEmailTemplate(): void
 	{
 		$templateId = App\Purifier::purifyByType(rcube_utils::get_input_value('id', rcube_utils::INPUT_GPC), 'Integer');
 		$currentPath = getcwd();
@@ -803,6 +851,10 @@ class yetiforce extends rcube_plugin
 					);
 				$mail['subject'] = $textParser->setContent($mail['subject'])->parse()->getContent();
 				$mail['content'] = $textParser->setContent($mail['content'])->parse()->getContent();
+			} else {
+				$textParser = \App\TextParser::getInstance();
+				$mail['subject'] = $textParser->setContent($mail['subject'])->parse()->getContent();
+				$mail['content'] = $textParser->setContent($mail['content'])->parse()->getContent();
 			}
 		}
 		echo App\Json::encode([
@@ -816,7 +868,7 @@ class yetiforce extends rcube_plugin
 
 	/**
 	 * Append ical preview in attachments' area.
-	 * template_object_messageattachments hook handler.
+	 * `template_object_messageattachments` hook handler.
 	 *
 	 * @param array $args
 	 *
@@ -979,8 +1031,7 @@ class yetiforce extends rcube_plugin
 	{
 		$props = (int) rcube_utils::get_input_value('_props', rcube_utils::INPUT_POST);
 		$mbox = (string) rcube_utils::get_input_value('_mbox', rcube_utils::INPUT_POST);
-		$messageset = rcmail::get_uids(null, $mbox, $multi, rcube_utils::INPUT_POST);
-		if ($messageset) {
+		if ($messageset = rcmail_action::get_uids(null, $mbox, $multi, rcube_utils::INPUT_POST)) {
 			chdir($this->rc->config->get('root_directory'));
 			$imap = $this->rc->get_storage();
 			foreach ($messageset as $mbox => $uids) {
@@ -1016,9 +1067,9 @@ class yetiforce extends rcube_plugin
 	 *
 	 * @param array $p
 	 */
-	public function storageInit(array $p): array
+	public function storage_init(array $p): array
 	{
-		$p['fetch_headers'] = trim($p['fetch_headers'] . ' RECEIVED');
+		$p['fetch_headers'] = trim(($p['fetch_headers'] ?? '') . ' RECEIVED');
 		return $p;
 	}
 
@@ -1028,7 +1079,7 @@ class yetiforce extends rcube_plugin
 	 *
 	 * @param array $p
 	 */
-	public function messagesList(array $p): array
+	public function messages_list(array $p): array
 	{
 		$currentPath = getcwd();
 		chdir($this->rc->config->get('root_directory'));
@@ -1069,7 +1120,6 @@ class yetiforce extends rcube_plugin
 	public function parseMessage(rcube_message_header $message): array
 	{
 		$header = '';
-		$message->others['received'];
 		if (isset($message->from)) {
 			$header .= 'From: ' . $message->from . PHP_EOL;
 		}
@@ -1088,12 +1138,28 @@ class yetiforce extends rcube_plugin
 	}
 
 	/**
+	 * Handler for 'message_headers_output' hook, where we add the additional
+	 * headers to the output.
+	 *
+	 * @params array @p Hook parameters
+	 *
+	 * @param mixed $p
+	 *
+	 * @return array Modified hook parameters
+	 */
+	public function message_headers_output($p)
+	{
+		$this->messageHeaders = $p;
+		return $p;
+	}
+
+	/**
 	 * message_objects hook handler.
 	 * Show alert in message with sender's server verification.
 	 *
 	 * @param array $p
 	 */
-	public function messageObjects(array $p): array
+	public function message_objects(array $p): array
 	{
 		$currentPath = getcwd();
 		chdir($this->rc->config->get('root_directory'));
@@ -1124,7 +1190,7 @@ class yetiforce extends rcube_plugin
 		if (($verifySender = $this->rbl->verifySender()) && !$verifySender['status']) {
 			$btnMoreIcon = 'fas fa-exclamation-circle text-danger';
 			$desc = \App\Language::translate('LBL_MAIL_SENDER', 'Settings:MailRbl') . ': ' . html::span(['class' => 'badge badge-danger'], html::span(['class' => 'mr-2 alert-icon fas fa-times'], '') . \App\Language::translate('LBL_INCORRECT', 'Settings:MailRbl')) . '<br>' . str_replace('<>', '<br>', $verifySender['info']);
-			if ($sender['comment']) {
+			if (isset($sender['comment'])) {
 				$desc .= html::span(['class' => 'alert-icon far fa-comment-alt mr-2'], '') . $sender['comment'];
 			}
 			$alert = '';
@@ -1141,6 +1207,7 @@ class yetiforce extends rcube_plugin
 			$verifySpf = $this->rbl->verifySpf();
 			$verifyDmarc = $this->rbl->verifyDmarc();
 			$verifyDkim = $this->rbl->verifyDkim();
+
 			$dangerType = \App\Mail\Rbl::SPF_FAIL === $verifySpf['status'] || \App\Mail\Rbl::DMARC_FAIL === $verifyDmarc['status'] || \App\Mail\Rbl::DKIM_FAIL === $verifyDkim['status'];
 			$desc = '';
 			$btnMoreIcon = $dangerType ? 'fas fa-exclamation-circle text-danger' : 'fas fa-exclamation-triangle text-warning';
@@ -1148,12 +1215,12 @@ class yetiforce extends rcube_plugin
 				$desc .= '- ' . \App\Language::translate('LBL_SPF', 'Settings:MailRbl') . ': ' . html::span(['class' => 'badge ' . $verifySpf['class']], html::span(['class' => 'mr-2 alert-icon ' . $verifySpf['icon']], '') . \App\Language::translate($verifySpf['label'], 'Settings:MailRbl')) . ' ' . \call_user_func_array('vsprintf', [\App\Language::translate($verifySpf['desc'], 'Settings:MailRbl', false, false), [$verifySpf['domain']]]) . '<br />';
 			}
 			if (\App\Mail\Rbl::DKIM_PASS !== $verifyDkim['status']) {
-				$desc .= '- ' . \App\Language::translate('LBL_DKIM', 'Settings:MailRbl') . ': ' . html::span(['class' => 'badge ' . $verifyDkim['class'], 'title' => $verifyDkim['log']], html::span(['class' => 'mr-2 alert-icon ' . $verifyDkim['icon']], '') . \App\Language::translate($verifyDkim['label'], 'Settings:MailRbl')) . ' ' . \App\Language::translate($verifyDkim['desc'], 'Settings:MailRbl') . '<br />';
+				$desc .= '- ' . \App\Language::translate('LBL_DKIM', 'Settings:MailRbl') . ': ' . html::span(['class' => 'badge ' . $verifyDkim['class'], 'title' => $verifyDkim['logs']], html::span(['class' => 'mr-2 alert-icon ' . $verifyDkim['icon']], '') . \App\Language::translate($verifyDkim['label'], 'Settings:MailRbl')) . ' ' . \App\Language::translate($verifyDkim['desc'], 'Settings:MailRbl') . '<br />';
 			}
 			if (\App\Mail\Rbl::DMARC_PASS !== $verifyDmarc['status']) {
-				$desc .= '- ' . \App\Language::translate('LBL_DMARC', 'Settings:MailRbl') . ': ' . html::span(['class' => 'badge ' . $verifyDmarc['class'], 'title' => $verifyDmarc['log']], html::span(['class' => 'mr-2 alert-icon ' . $verifyDmarc['icon']], '') . \App\Language::translate($verifyDmarc['label'], 'Settings:MailRbl')) . ' ' . \App\Language::translate($verifyDmarc['desc'], 'Settings:MailRbl') . '<br />';
+				$desc .= '- ' . \App\Language::translate('LBL_DMARC', 'Settings:MailRbl') . ': ' . html::span(['class' => 'badge ' . $verifyDmarc['class'], 'title' => $verifyDmarc['logs']], html::span(['class' => 'mr-2 alert-icon ' . $verifyDmarc['icon']], '') . \App\Language::translate($verifyDmarc['label'], 'Settings:MailRbl')) . ' ' . \App\Language::translate($verifyDmarc['desc'], 'Settings:MailRbl') . '<br />';
 			}
-			if ($sender['comment']) {
+			if (!empty($sender['comment'])) {
 				$desc .= html::span(['class' => 'alert-icon far fa-comment-alt mr-2'], '') . $sender['comment'];
 			}
 			if ($desc) {
@@ -1208,37 +1275,9 @@ class yetiforce extends rcube_plugin
 	 */
 	public function messageSummary(array $args): array
 	{
-		$yetiShowTo = $this->rc->config->get('yeti_show_to');
-		global $MESSAGE;
-		if (!isset($MESSAGE) || empty($MESSAGE->headers)) {
-			return $args;
-		}
-		$contnet = $end = '';
-		if (!empty($yetiShowTo)) {
-			$header = $MESSAGE->context ? 'from' : rcmail_message_list_smart_column_name();
-			if ('from' === $header) {
-				$mail = $MESSAGE->headers->to;
-				$label = $this->rc->gettext('to');
-			} else {
-				$mail = $MESSAGE->headers->from;
-				$label = $this->rc->gettext('from');
-			}
-			if ($mail) {
-				if (false !== strpos($mail, '<')) {
-					preg_match_all('/<(.*?)>/', $mail, $matches);
-					if (isset($matches[1])) {
-						$mail = implode(', ', $matches[1]);
-					}
-				}
-				$separator = '<br>';
-				if ('same' === $yetiShowTo) {
-					$separator = '   |  ';
-				}
-				$contnet = " {$separator}{$label} {$mail}";
-			}
-		}
+		$end = '';
 		$this->rbl = \App\Mail\Rbl::getInstance([]);
-		$this->rbl->set('rawBody', $this->rc->imap->get_raw_body($MESSAGE->uid));
+		$this->rbl->set('rawBody', $this->rc->imap->get_raw_body($this->messageHeaders['uid']));
 		$this->rbl->parse();
 		if ($ip = $this->rbl->getSender()['ip'] ?? '') {
 			$end = html::span(['class' => 'float-right'], '<span class="btn-group" role="group" aria-label="SOC">
@@ -1246,46 +1285,7 @@ class yetiforce extends rcube_plugin
 			<a href="https://soc.yetiforce.com/search?ip=' . $ip . '" title="soc.yetiforce.com" target="_blank" class="btn btn-sm btn-outline-info">' . $ip . '</a>
 		  </span>');
 		}
-		$args['content'] = str_replace('</span></span></div>', '', rtrim($args['content'])) . "{$contnet}</span></span>{$end}</div>";
-		return $args;
-	}
-
-	/**
-	 * Hook to inject plugin-specific user settings.
-	 *
-	 * @param array $args
-	 */
-	public function settingsDisplayPrefs(array $args): array
-	{
-		if ('general' != $args['section']) {
-			return $args;
-		}
-		$type = $this->rc->config->get('yeti_show_to');
-
-		$showTo = new html_select(['name' => '_yeti_show_to', 'id' => 'ff_yeti_show_to']);
-		$showTo->add($this->gettext('none'), '');
-		$showTo->add($this->gettext('show_to_same_line'), 'same');
-		$showTo->add($this->gettext('show_to_new_line'), 'new');
-
-		$args['blocks']['YetiForce'] = [
-			'name' => 'YetiForce',
-			'options' => ['yeti_show_to' => [
-				'title' => html::label('ff_yeti_show_to', rcube::Q($this->gettext('show_to'))),
-				'content' => $showTo->show($type),
-			],
-			],
-		];
-		return $args;
-	}
-
-	/**
-	 * Hook to save plugin-specific user settings.
-	 *
-	 * @param mixed $args
-	 */
-	public function settingsSavePrefs(array $args): array
-	{
-		$args['prefs']['yeti_show_to'] = rcube_utils::get_input_value('_yeti_show_to', rcube_utils::INPUT_POST);
+		$args['content'] = str_replace('</span></span></div>', '', rtrim($args['content'])) . "</span></span>{$end}</div>";
 		return $args;
 	}
 
@@ -1294,7 +1294,7 @@ class yetiforce extends rcube_plugin
 	 *
 	 * @param mixed $args
 	 */
-	public function beforeSent(array $args): array
+	public function message_before_send(array $args): array
 	{
 		$currentPath = getcwd();
 		chdir($this->rc->config->get('root_directory'));
@@ -1317,7 +1317,7 @@ class yetiforce extends rcube_plugin
 	 *
 	 * @param mixed $args
 	 */
-	public function afterSent(array $args): array
+	public function message_sent(array $args): array
 	{
 		$currentPath = getcwd();
 		chdir($this->rc->config->get('root_directory'));
