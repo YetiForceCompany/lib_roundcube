@@ -68,9 +68,9 @@ class yetiforce extends rcube_plugin
 		$this->rc = rcmail::get_instance();
 		$skin = $this->rc->config->get('yeti_skin');
 		if (empty($skin) || 'elastic' === $skin) {
-			$this->include_stylesheet('elastic.css');
+			$this->include_stylesheet('skin_elastic.css');
 		} else {
-			$this->include_stylesheet($skin . '.css');
+			$this->include_stylesheet("skin_{$skin}.css");
 		}
 
 		$this->add_hook('login_after', [$this, 'login_after']);
