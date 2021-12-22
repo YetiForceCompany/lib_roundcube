@@ -1,0 +1,78 @@
+a.compose:before {
+	content: '\f044';
+}
+.header a.mail:before {
+	content: '\f0e0';
+}
+.footer a.logout:before {
+	content: '\f011';
+}
+.menu a.yfi-fa-check-circle:before {
+	content: '\f058';
+}
+.menu a.yfi-fa-ban:before {
+	content: '\f05e';
+}
+.menu a.yfi-fa-book-reader:before {
+	content: '\f00e';
+}
+.compose-address-modules a .inner {
+	font-size: 1rem;
+	line-height: 1.3;
+}
+.compose-address-modules a [class^='yfm-'] {
+	font-size: 1rem;
+}
+.chevronBtnCube {
+	position: relative;
+	float: right;
+}
+.chevronBtnCube button {
+	font-size: 1.5em;
+}
+a.button.icon.fakeMail:before,
+button.btn.fakeMail:before {
+	content: '\f00e';
+}
+.sender-alert-icon {
+	position: relative;
+	right: 8px;
+}
+.mail-type-alert .alert-icon {
+	flex: 0;
+	margin-right: 10px !important;
+	font-size: 1.5rem;
+}
+@media screen and (min-width: 481px) {
+	#layout-menu {
+		width: 0;
+	}
+	#taskmenu .special-buttons {
+		display: none;
+	}
+}
+@media screen and (min-width: 769px) {
+	.action-compose .header .button.icon.mail {
+		display: none;
+	}
+}
+@media screen and (max-width: 768px) {
+	.compose-address-modules {
+		text-align: center;
+		margin-top: 5px;
+	}
+	.compose-address-modules a [class^='yfm-'] {
+		font-size: 1.3rem;
+	}
+	.compose-address-modules a .inner {
+		display: none;
+	}
+}
+#message-header,
+#message-content .attachmentslist:not(:empty) {
+	margin-bottom: 0.5rem;
+}
+.listing li.selected,
+.listing tr.selected td {
+	background-color: #d0f1ff;
+}
