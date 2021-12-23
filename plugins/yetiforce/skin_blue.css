@@ -1,3 +1,16 @@
+/* -- ICONS -- */
+a.compose:before {
+	content: '\f044';
+}
+.menu a.yfi-fa-check-circle:before {
+	content: '\f058';
+}
+.menu a.yfi-fa-ban:before {
+	content: '\f05e';
+}
+.menu a.yfi-fa-book-reader:before {
+	content: '\f00e';
+}
 .date.skip-on-drag,
 .fromto.skip-on-drag {
 	font-family: "Segoe UI Web (East European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;
@@ -28,13 +41,6 @@ a.button.icon.settings:before {
 ul.treelist li>a {
 	padding-left: 1.8em;
 }
-a.compose:before,
-.menu a:before,
-.folderlist li>a:before {
-	font-family: IconFont !important;
-	/* font-weight: normal !important; */
-}
-
 .folderlist li a:before {
 	margin-left: 8px;
 }
