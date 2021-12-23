@@ -66,7 +66,12 @@ class yetiforce extends rcube_plugin
 	public function init()
 	{
 		$this->rc = rcmail::get_instance();
-		$this->include_stylesheet('elastic.css');
+		$skin = $this->rc->config->get('yeti_skin');
+		if (empty($skin) || 'elastic' === $skin) {
+			$this->include_stylesheet('skin_elastic.css');
+		} else {
+			$this->include_stylesheet("skin_{$skin}.css");
+		}
 
 		$this->add_hook('login_after', [$this, 'login_after']);
 		$this->add_hook('startup', [$this, 'startup']);
@@ -180,6 +185,9 @@ class yetiforce extends rcube_plugin
 				}
 			}
 			chdir($currentPath);
+		} elseif ('settings' == $this->rc->task) {
+			$this->add_hook('preferences_list', [$this, 'settingsDisplayPrefs']);
+			$this->add_hook('preferences_save', [$this, 'settingsSavePrefs']);
 		}
 	}
 
@@ -1333,5 +1341,44 @@ class yetiforce extends rcube_plugin
 
 		chdir($currentPath);
 		return $eventHandler->getParams()['mailData'];
+	}
+
+	/**
+	 * Hook to inject plugin-specific user settings.
+	 *
+	 * @param array $args
+	 */
+	public function settingsDisplayPrefs(array $args): array
+	{
+		if ('general' !== $args['section']) {
+			return $args;
+		}
+		$skin = $this->rc->config->get('yeti_skin');
+
+		$showTo = new html_select(['name' => '_yeti_skin', 'id' => 'ff_yeti_skin']);
+		$showTo->add('-', '');
+		$showTo->add('elastic', 'elastic');
+		$showTo->add('blue', 'blue');
+
+		$args['blocks']['YetiForce'] = [
+			'name' => 'YetiForce',
+			'options' => ['yeti_skin' => [
+				'title' => html::label('ff_yeti_skin', rcube::Q($this->gettext('skin'))),
+				'content' => $showTo->show($skin),
+			],
+			],
+		];
+		return $args;
+	}
+
+	/**
+	 * Hook to save plugin-specific user settings.
+	 *
+	 * @param mixed $args
+	 */
+	public function settingsSavePrefs(array $args): array
+	{
+		$args['prefs']['yeti_skin'] = rcube_utils::get_input_value('_yeti_skin', rcube_utils::INPUT_POST);
+		return $args;
 	}
 }

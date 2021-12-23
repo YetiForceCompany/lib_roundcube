@@ -1,0 +1,360 @@
+/* -- ICONS -- */
+a.compose:before {
+	content: '\f044';
+}
+.menu a.yfi-fa-check-circle:before {
+	content: '\f058';
+}
+.menu a.yfi-fa-ban:before {
+	content: '\f05e';
+}
+.menu a.yfi-fa-book-reader:before {
+	content: '\f00e';
+}
+.date.skip-on-drag,
+.fromto.skip-on-drag {
+	font-family: "Segoe UI Web (East European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;
+	color: #201f1e !important;
+	font-weight: 400;
+}
+.date.skip-on-drag {
+	font-size: 12px !important;
+}
+.messagelist td.subject {
+	padding: 9px 0px 9px !important;
+}
+.messagelist td.subject a {
+
+	font-size: 14px !important;
+}
+.messagelist td.subject span.msgicon.status:before,
+.messagelist td.subject a {
+	color: #737677;
+}
+ul.treelist li div.treetoggle {
+	padding-left: 8px;
+}
+a.button.icon.sidebar-menu:before,
+a.button.icon.settings:before {
+	height: unset !important;
+}
+ul.treelist li>a {
+	padding-left: 1.8em;
+}
+.folderlist li a:before {
+	margin-left: 8px;
+}
+.menu.toolbar a:before {
+	height: 1.5rem!important;
+}
+a::before {
+	font-size: 15px !important;
+
+}
+#layout-list,
+#layout-sidebar {
+	border-right: unset;
+}
+@media screen and (min-width: 1201px) {
+	#layout-sidebar {
+		width: 320px !important;
+	}
+	#layout-sidebar .header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between!important;
+	}
+	.menu .dropbutton {
+		display: flex !important;
+	}
+	.menu.toolbar   li a,
+	#layout-sidebar .compose,
+	#messagelist-header .refresh  {
+		display: flex;
+		align-items: center!important;
+		padding: 0px 10px 0px 10px;
+		height: 37px;
+		border-radius: 4px;
+	}
+	#messagelist-header {
+		display: flex;
+		align-items: center;
+
+	}
+	.menu.toolbar {
+		display: flex;
+	}
+	.menu.toolbar a {
+		max-width: none !important;
+	}
+	a.toolbar-button:before,
+	.menu.toolbar .dropbutton a.dropdown:before {
+		line-height: 1.7;
+		height: unset;
+	}
+
+	.menu.toolbar li {
+		display: inline-flex;
+		align-items: center!important;
+	}
+}
+#layout-sidebar .icon.toolbar-button.compose,
+#layout-sidebar .header,
+#layout-menu .header {
+	display: flex;
+	align-items: center;
+}
+#layout-sidebar .button.icon.back,
+#layout-sidebar .icon.toolbar-button.compose,
+#layout-sidebar .button.icon.back-list-button {
+	line-height: normal;
+}
+.layout-phone #layout-sidebar .icon.toolbar-button.compose,
+.layout-phone #layout-sidebar .button.icon.back-list-button,
+.layout-small #layout-sidebar .icon.toolbar-button.compose,
+.layout-small #layout-sidebar .button.icon.back-list-button,
+.layout-small #layout-sidebar .button.icon.back,
+.layout-phone #layout-sidebar .button.icon.back {
+	line-height:  unset;
+}
+a.compose,
+a.button.icon.sidebar-menu {
+	margin-left: auto !important;
+}
+@media screen and (max-width: 768px) {
+	#layout>div>.header a.button.icon.sidebar-menu {
+		margin-left: auto !important;
+	}
+}
+a.compose {
+	padding: 0px 10px 0px 10px;
+    height: 37px;
+    border-radius: 4px;
+}
+.menu.toolbar .inner,
+#messagelist-header .inner,
+#layout-sidebar a {
+	font-weight: 400;
+    font-family: "Segoe UI Web (East European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;
+    font-size: 14px;
+}
+#layout-sidebar li.selected a {
+	font-weight: 600 !important;
+}
+.compose-address-modules a .inner {
+	font-size: 1rem;
+	line-height: 1.3;
+}
+.compose-address-modules a [class^='yfm-'] {
+	font-size: 1rem;
+}
+.chevronBtnCube {
+	position: relative;
+	float: right;
+}
+.chevronBtnCube button {
+	font-size: 1.5em;
+}
+.sender-alert-icon {
+	position: relative;
+	right: 8px;
+}
+.mail-type-alert .alert-icon {
+	flex: 0;
+	margin-right: 10px !important;
+	font-size: 1.5rem;
+}
+@media screen and (min-width: 481px) {
+	#layout-menu {
+		width: 0;
+
+	}
+	#taskmenu .special-buttons {
+		display: none;
+	}
+}
+@media screen and (min-width: 769px) {
+	.action-compose .header .button.icon.mail {
+		display: none;
+	}
+}
+@media screen and (max-width: 768px) {
+	.compose-address-modules {
+		text-align: center;
+		margin-top: 5px;
+	}
+	.compose-address-modules a [class^='yfm-'] {
+		font-size: 1.3rem;
+	}
+	.compose-address-modules a .inner {
+		display: none;
+	}
+	#layout-sidebar .compose {
+		display: none !important;
+	}
+	#layout-sidebar.sidebar-menu.active {
+		margin-right: 0.3rem!important;
+		margin-left: auto!important;
+	}
+}
+#message-contents .attachmentslist:not(:empty) {
+	margin-bottom: 0.5rem;
+}
+ul.treelist li.selected>a, ul.treelist li.selected>div>a,
+.listing li.selected,
+.listing tr.selected td {
+	background-color: #deecf9;
+}
+ul.treelist li.selected>a, ul.treelist li.selected>div>a,
+#layout>div>.header  ::before {
+	color: #005A9E;
+
+}
+#folderlist-content,
+#layout>div>.header {
+	background: #f3f2f1 !important;
+	border-bottom: unset;
+}
+#layout-sidebar .header {
+	border-bottom: 1px solid #edebe9 !important;
+}
+.footer,
+#layout-content,
+#layout-content .iframe-wrapper iframe {
+	background: #faf9f8 !important;
+}
+#message-content,
+#message-header {
+	padding: 11px;
+}
+#message-header,
+#message-content,
+#messagelist-content tr {
+		background-color: white !important;
+		margin-bottom: 0px;
+}
+#message-header,
+#message-content{
+	border-left: 1px solid #d0d0d0;
+	border-right: 1px solid #d0d0d0;
+}
+#message-header{
+	border-top: 1px solid #d0d0d0;
+}
+#message-content{
+	border-bottom: 1px solid #d0d0d0;
+}
+#layout-sidebar .compose{
+	background: #005a9e;
+}
+#layout>div>.header  ::before {
+	font-size: 1.1rem;
+}
+#layout-sidebar .compose span, #layout-sidebar .compose::before {
+	color: white !important;
+
+}
+.noRecords {
+	background: white !important;
+}
+.text-info::before {
+	color: #17a2b8 !important;
+}
+.text-danger::before {
+	color: #dc3545!important;
+}
+.text-success::before {
+	color:  #28a745!important
+}
+.compose-headers {
+	background: white !important;
+	padding: 4px;
+	text-align: right;
+}
+.compose-headers #compose_from,
+.compose-headers #compose_to,
+.compose-headers #compose_cc,
+.compose-headers #compose_bcc,
+.compose-headers #compose_replyto,
+.compose-headers #compose_followupto {
+	text-align: center;
+	padding-left: 14px;
+    align-items: center;
+}
+.compose-headers .col-10 {
+	flex: 0 0 91.666667%;
+    max-width: 91.666667%;
+}
+.compose-headers div:not(#compose_subject) label {
+	background: #eff6fc;
+    color: #005a9e;
+
+}
+.compose-headers div label {
+	flex: 0 0 8.333333%;
+	max-width: 8.333333%
+}
+div.tox .tox-toolbar-overlord>div {
+	background: white;
+    border-bottom: 1px solid #edebe9;
+	padding: 5px;
+}
+.tox:not([dir=rtl]) .tox-toolbar__group:not(:last-of-type) {
+	border-right: unset !important;
+}
+#compose-headers ul.form-control,
+#compose-headers input,
+#compose-headers select.form-control  {
+	border-top: unset !important;
+	border-right: unset !important;
+	border-left: unset !important;
+	border-color: #edebe9 !important;
+	border-radius: unset !important;
+	box-shadow: unset;
+}
+
+#compose-headers .col-10 {
+	padding-left: 10px;
+}
+#compose-headers .input-group-text {
+	border-top: unset !important;
+	border-right: unset !important;
+	border-left: unset !important;
+	border-color:  #edebe9 !important;
+	background: white;
+}
+#compose-headers .input-group-text:hover {
+	background: #deecf9;
+}
+
+.formbuttons .send {
+	background: #0078d4;
+	box-shadow: unset;
+	border-color: unset;
+	width: 120px;
+}
+.formbuttons .send::before {
+	margin-right: 12px;
+}
+.formbuttons .send:hover {
+	background: #106ebe;
+}
+.formbuttons .btn-primary:not(:disabled):not(.disabled):active:focus {
+	box-shadow: unset;
+}
+#compose_subject .col-form-label {
+	border-bottom: 1px solid #edebe9;
+}
+
+#compose_subject  .col-10 {
+	padding-left: 0px !important;
+}
+.inner {
+	margin-left: 8px;;
+}
+#username {
+	border-top: 1px solid #867f7f;
+	background: #e9e9e9;
+	font-weight: 600;
+	text-align: center;
+}
