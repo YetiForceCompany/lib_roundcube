@@ -21,6 +21,8 @@ a.button.icon:before {
 }
 .menu a.more:before,
 .menu a.markmessage:before,
+.menu a.more:before,
+.menu a.markmessage:before,
 .menu a.options:before,
 .folderlist li.drafts a:before,
 .menu a.threads:before,
