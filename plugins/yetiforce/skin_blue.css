@@ -1,14 +1,170 @@
 /* -- ICONS -- */
-a.compose:before {
-	content: '\f044';
+@font-face {
+    font-family: 'mail';
+    src: url('../yetiforce/mail.eot');
+    src: url('../yetiforce/mail.eot?#iefix') format('embedded-opentype'),
+         url('../yetiforce/mail.woff') format('woff'),
+         url('../yetiforce/mail.ttf') format('truetype'),
+         url('../yetiforce/mail.svg#mail') format('svg');
+    font-weight: normal;
+    font-style: normal;
 }
-.menu a.yfi-fa-check-circle:before {
+.folderlist li.trash a:before,
+.searchbar form:before,
+.listing.iconized li a:before,
+button.btn:before,
+.menu a:before,
+.folderlist li a:before,
+a.button.icon:before {
+	font-family: 'mail';
+	font-weight: normal;
+}
+.menu a.more:before,
+.menu a.markmessage:before,
+.menu a.more:before,
+.menu a.markmessage:before,
+.menu a.options:before,
+.folderlist li.drafts a:before,
+.menu a.threads:before,
+.menu a.select:before {
+	font-family: 'Icons' !important;
+	font-weight: 900 !important;
+}
+.folderlist li.inbox>a:before {
+	content:'\0041';
+}
+.menu a.print:before {
+	content:'\0042';
+}
+.icon-edytuj:before {
+	content:'\0043';
+}
+.menu a.edit:before {
+	content:'\0044';
+}
+.menu a.download.eml:before,
+.menu a.download.maildir:before,
+.menu a.download.mbox:before,
+.menu a.download:before {
+	content:'\0045';
+}
+.menu .submenu a.tb-label:before,
+.toolbar a.button.tb-label:before {
+	content:'\0046';
+}
+.messagelist span.flagged:before{
+	content:'\0047';
+}
+.menu a.import:before,
+.menu a.upload:before {
+	content:'\0048';
+}
+.menu a.copy:before {
+	content:'\0049';
+}
+.menu a.prevpage:before {
+	content:'\004a';
+}
+.menu a.reply:before {
+	content:'\004b';
+}
+.menu .submenu a.reply-all:before,
+.menu a.reply.all:before,
+.menu a.reply-all:before,
+.menu a.reply.list:before {
+	content:'\004c';
+}
+.menu a.responses:before {
+	content:'\004d';
+}
+a.button.icon.refresh:before,
+button.btn.refresh:before {
+	content:'\004e';
+}
+.folderlist li.trash a:before,
+.menu a.purge:before,
+.menu a.delete:before {
+	content:'\004f';
+}
+.menu a.firstpage:before {
+	content:'\0050';
+}
+.menu a.lastpage:before {
+	content:'\0051';
+}
+div.contextmenu a.cmd_plugin-contextmenu-openextwin::before,
+.menu a.extwin:before,
+a.button.icon.extwin:before,
+button.btn.extwin:before {
+	content:'\0052';
+}
+.menu a.spellcheck:before {
+	content:'\0053';
+}
+.menu a.mail:before {
+	content:'\0054';
+}
+.menu a.signature:before {
+	content:'\0055';
+}
+.menu a.nextpage:before {
+	content:'\0057';
+}
+.menu .submenu a.forward:before,
+.menu a.forward.attachment:before,
+.menu a.forward.bounce:before,
+.menu a.forward.inline:before,
+.menu a.forward:before {
+	content:'\0058';
+}
+.menu a.move:before {
+	content:'\0059';
+}
+.folderlist li a:before {
+	content:'\005a';
+}
+.searchbar form:before {
+	content:'\0061';
+}
+.menu a.encrypt.sign:before,
+.menu a.encrypt:before,
+.menu a.enigma:before {
+	content:'\0062';
+}
+a.compose:before {
+	content:'\0063';
+}
+.folderlist li.sent a:before {
+	content:'\0064';
+}
+a.button.icon.bounce:before,
+a.button.icon.send:before,
+button.btn.bounce:before,
+button.btn.send:before {
+	content:'\0065';
+}
+.menu a.save:before {
+	content:'\0066';
+}
+.icon-zapisz_menu:before {
+	content:'\0067';
+}
+.menu a.source:before {
+	content:'\0068';
+}
+.menu li a.yfi-fa-check-circle:before {
+	font-family: Icons !important;
+	font-weight: 900 !important;
 	content: '\f058';
 }
-.menu a.yfi-fa-ban:before {
+.menu li a.yfi-fa-ban:before {
+	font-family: Icons !important;
+	font-weight: 900 !important;
 	content: '\f05e';
 }
-.menu a.yfi-fa-book-reader:before {
+.menu li a.yfi-fa-book-reader:before {
+	font-family: Icons !important;
+	font-weight: 900 !important;
 	content: '\f00e';
 }
 .date.skip-on-drag,
