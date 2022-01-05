@@ -9,6 +9,8 @@
     font-weight: normal;
     font-style: normal;
 }
+.messagelist span.attachment span:before,
+.messagelist span.flagged:before,
 .folderlist li.trash a:before,
 .searchbar form:before,
 .listing.iconized li a:before,
@@ -19,26 +21,17 @@ a.button.icon:before {
 	font-family: 'mail';
 	font-weight: normal;
 }
-.menu a.more:before,
-.menu a.markmessage:before,
-.menu a.more:before,
-.menu a.markmessage:before,
-.menu a.options:before,
-.folderlist li.drafts a:before,
-.menu a.threads:before,
 .menu a.select:before {
-	font-family: 'Icons' !important;
-	font-weight: 900 !important;
+	content:'\0070';
 }
+.menu a.read:before,
 .folderlist li.inbox>a:before {
 	content:'\0041';
 }
 .menu a.print:before {
 	content:'\0042';
 }
-.icon-edytuj:before {
-	content:'\0043';
-}
+
 .menu a.edit:before {
 	content:'\0044';
 }
@@ -52,12 +45,13 @@ a.button.icon:before {
 .toolbar a.button.tb-label:before {
 	content:'\0046';
 }
+.menu a.flag:before, .menu a.select.flagged:before,
 .messagelist span.flagged:before{
-	content:'\0047';
+	content:'\0048';
 }
 .menu a.import:before,
 .menu a.upload:before {
-	content:'\0048';
+	content:'\0063';
 }
 .menu a.copy:before {
 	content:'\0049';
@@ -110,6 +104,43 @@ button.btn.extwin:before {
 .menu a.nextpage:before {
 	content:'\0057';
 }
+.searchbar.open a.options:before,
+.menu a.options:before {
+	content:'\0069';
+}
+.menu a.download.eml:before,
+.menu a.download.maildir:before,
+.menu a.download.mbox:before,
+.menu a.download:before {
+	content:'\006a';
+}
+a.button.icon.settings:before,
+a.button.icon.tools:before,
+button.btn.settings:before,
+button.btn.tools:before {
+	content:'\006c';
+}
+.menu a.more:before {
+	content:'\006e';
+}
+.menu a.attach:before,
+.menu a.vcard:before,
+a.button.icon.attach:before,
+button.btn.attach:before,
+.messagelist span.attachment span:before{
+	content:'\006f';
+}
+.menu a.threads:before {
+	content:'\0071';
+}
+a.button.icon.sidebar-menu:before,
+a.button.icon.toolbar-list-button:before,
+a.button.icon.toolbar-menu-button:before,
+button.btn.sidebar-menu:before,
+button.btn.toolbar-list-button:before,
+button.btn.toolbar-menu-button:before{
+	content:'\005a';
+}
 .menu .submenu a.forward:before,
 .menu a.forward.attachment:before,
 .menu a.forward.bounce:before,
@@ -120,19 +151,20 @@ button.btn.extwin:before {
 .menu a.move:before {
 	content:'\0059';
 }
-.folderlist li a:before {
-	content:'\005a';
+.folderlist li.drafts a:before {
+	content:'\0045';
 }
 .searchbar form:before {
 	content:'\0061';
 }
+.messagelist span.attachment span.encrypted:before,
 .menu a.encrypt.sign:before,
 .menu a.encrypt:before,
 .menu a.enigma:before {
 	content:'\0062';
 }
 a.compose:before {
-	content:'\0063';
+	content:'\006d';
 }
 .folderlist li.sent a:before {
 	content:'\0064';
@@ -146,9 +178,7 @@ button.btn.send:before {
 .menu a.save:before {
 	content:'\0066';
 }
-.icon-zapisz_menu:before {
-	content:'\0067';
-}
+
 .menu a.source:before {
 	content:'\0068';
 }
@@ -283,8 +313,8 @@ a.button.icon.sidebar-menu {
 }
 a.compose {
 	padding: 0px 10px 0px 10px;
-    height: 37px;
-    border-radius: 4px;
+	height: 37px;
+	border-radius: 4px;
 }
 .menu.toolbar .inner,
 #messagelist-header .inner,
@@ -451,7 +481,7 @@ ul.treelist li.selected>a, ul.treelist li.selected>div>a,
 }
 div.tox .tox-toolbar-overlord>div {
 	background: white;
-    border-bottom: 1px solid #edebe9;
+	border-bottom: 1px solid #edebe9;
 	padding: 5px;
 }
 .tox:not([dir=rtl]) .tox-toolbar__group:not(:last-of-type) {
@@ -543,10 +573,10 @@ div.tox .tox-toolbar-overlord>div {
 	left: 18px;
 }
 .custom-switch .custom-control-input:checked~.custom-control-label::before {
-    border-color: #005a9e;
-    background-color: #005a9e;
+	border-color: #005a9e;
+	background-color: #005a9e;
 }
 .task-settings .formbuttons .submit {
 	background: #005a9e;
-    border-color: #005a9e;
+	border-color: #005a9e;
 }
