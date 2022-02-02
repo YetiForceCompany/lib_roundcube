@@ -118,7 +118,9 @@ class yetiforce extends rcube_plugin
 				$this->include_stylesheet('preview.css');
 
 				$this->add_hook('template_object_messageattachments', [$this, 'appendIcsPreview']);
-				$this->add_hook('template_object_messagesummary', [$this, 'messageSummary']);
+				if (\App\Config::component('Mail', 'rcDetailCheckRbl', false)) {
+					$this->add_hook('template_object_messagesummary', [$this, 'messageSummary']);
+				}
 				$this->add_hook('message_load', [$this, 'message_load']);
 
 				$this->add_button([
