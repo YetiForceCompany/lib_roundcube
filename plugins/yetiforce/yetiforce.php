@@ -95,94 +95,94 @@ class yetiforce extends rcube_plugin
 			$this->include_stylesheet('../../../../../libraries/@fortawesome/fontawesome-free/css/all.css');
 			$currentPath = getcwd();
 			chdir($this->rc->config->get('root_directory'));
-			$this->loadCurrentUser();
+			if ($this->loadCurrentUser()) {
+				$this->rc->load_language(null, [
+					'LBL_FILE_FROM_CRM' => \App\Language::translate('LBL_FILE_FROM_CRM', 'OSSMail', false, false),
+					'LBL_MAIL_TEMPLATES' => \App\Language::translate('LBL_MAIL_TEMPLATES', 'OSSMail', false, false),
+					'LBL_TEMPLATES' => \App\Language::translate('LBL_TEMPLATES', 'OSSMail', false, false),
+					'BTN_BLACK_LIST' => \App\Language::translate('LBL_BLACK_LIST', 'OSSMail', false, false),
+					'LBL_BLACK_LIST_DESC' => \App\Language::translate('LBL_BLACK_LIST_DESC', 'OSSMail', false, false),
+					'BTN_WHITE_LIST' => \App\Language::translate('LBL_WHITE_LIST', 'OSSMail', false, false),
+					'LBL_WHITE_LIST_DESC' => \App\Language::translate('LBL_WHITE_LIST_DESC', 'OSSMail', false, false),
+					'LBL_ALERT_NEUTRAL_LIST' => \App\Language::translate('LBL_ALERT_NEUTRAL_LIST', 'OSSMail', false, false),
+					'LBL_ALERT_BLACK_LIST' => \App\Language::translate('LBL_BLACK_LIST_ALERT', 'OSSMail', false, false),
+					'LBL_ALERT_WHITE_LIST' => \App\Language::translate('LBL_WHITE_LIST_ALERT', 'OSSMail', false, false),
+					'LBL_ALERT_FAKE_MAIL' => \App\Language::translate('LBL_ALERT_FAKE_MAIL', 'OSSMail'),
+					'BTN_ANALYSIS_DETAILS' => \App\Language::translate('BTN_ANALYSIS_DETAILS', 'OSSMail', false, false),
+					'LBL_ALERT_FAKE_SENDER' => \App\Language::translate('LBL_ALERT_FAKE_SENDER', 'OSSMail'),
+				]);
 
-			$this->rc->load_language(null, [
-				'LBL_FILE_FROM_CRM' => \App\Language::translate('LBL_FILE_FROM_CRM', 'OSSMail', false, false),
-				'LBL_MAIL_TEMPLATES' => \App\Language::translate('LBL_MAIL_TEMPLATES', 'OSSMail', false, false),
-				'LBL_TEMPLATES' => \App\Language::translate('LBL_TEMPLATES', 'OSSMail', false, false),
-				'BTN_BLACK_LIST' => \App\Language::translate('LBL_BLACK_LIST', 'OSSMail', false, false),
-				'LBL_BLACK_LIST_DESC' => \App\Language::translate('LBL_BLACK_LIST_DESC', 'OSSMail', false, false),
-				'BTN_WHITE_LIST' => \App\Language::translate('LBL_WHITE_LIST', 'OSSMail', false, false),
-				'LBL_WHITE_LIST_DESC' => \App\Language::translate('LBL_WHITE_LIST_DESC', 'OSSMail', false, false),
-				'LBL_ALERT_NEUTRAL_LIST' => \App\Language::translate('LBL_ALERT_NEUTRAL_LIST', 'OSSMail', false, false),
-				'LBL_ALERT_BLACK_LIST' => \App\Language::translate('LBL_BLACK_LIST_ALERT', 'OSSMail', false, false),
-				'LBL_ALERT_WHITE_LIST' => \App\Language::translate('LBL_WHITE_LIST_ALERT', 'OSSMail', false, false),
-				'LBL_ALERT_FAKE_MAIL' => \App\Language::translate('LBL_ALERT_FAKE_MAIL', 'OSSMail'),
-				'BTN_ANALYSIS_DETAILS' => \App\Language::translate('BTN_ANALYSIS_DETAILS', 'OSSMail', false, false),
-				'LBL_ALERT_FAKE_SENDER' => \App\Language::translate('LBL_ALERT_FAKE_SENDER', 'OSSMail'),
-			]);
+				if ('preview' === $this->rc->action || 'show' === $this->rc->action || '' == $this->rc->action) {
+					$this->include_script('preview.js');
+					$this->include_stylesheet('preview.css');
 
-			if ('preview' === $this->rc->action || 'show' === $this->rc->action || '' == $this->rc->action) {
-				$this->include_script('preview.js');
-				$this->include_stylesheet('preview.css');
-
-				$this->add_hook('template_object_messageattachments', [$this, 'appendIcsPreview']);
-				if (\App\Config::component('Mail', 'rcDetailCheckRbl', false)) {
-					$this->add_hook('template_object_messagesummary', [$this, 'messageSummary']);
-				}
-				$this->add_hook('message_load', [$this, 'message_load']);
-
-				$this->add_button([
-					'command' => 'plugin.yetiforce.addSenderToList',
-					'type' => 'link',
-					'prop' => 1,
-					'class' => 'button yfi-fa-check-circle disabled js-white-list-btn text-success',
-					'classact' => 'button yfi-fa-check-circle text-success',
-					'classsel' => 'button yfi-fa-check-circle pressed text-success',
-					'title' => 'LBL_WHITE_LIST_DESC',
-					'label' => 'BTN_WHITE_LIST',
-					'innerclass' => 'inner',
-				], 'toolbar');
-				$this->add_button([
-					'command' => 'plugin.yetiforce.addSenderToList',
-					'type' => 'link',
-					'prop' => 0,
-					'class' => 'button yfi-fa-ban disabled text-danger',
-					'classact' => 'button yfi-fa-ban text-danger',
-					'classsel' => 'button yfi-fa-ban pressed text-danger',
-					'title' => 'LBL_BLACK_LIST_DESC',
-					'label' => 'BTN_BLACK_LIST',
-					'innerclass' => 'inner',
-				], 'toolbar');
-				$this->add_button([
-					'command' => 'plugin.yetiforce.loadMailAnalysis',
-					'type' => 'link',
-					'class' => 'button yfi-fa-book-reader disabled text-info',
-					'classact' => 'button yfi-fa-book-reader text-info',
-					'classsel' => 'button yfi-fa-book-reader pressed text-info',
-					'title' => 'BTN_ANALYSIS_DETAILS',
-					'label' => 'BTN_ANALYSIS_DETAILS',
-					'innerclass' => 'inner',
-				], 'toolbar');
-			} elseif ('compose' === $this->rc->action) {
-				$this->include_script('compose.js');
-				$composeAddressModules = [];
-				foreach (\App\Config::component('Mail', 'RC_COMPOSE_ADDRESS_MODULES') as $moduleName) {
-					if (\App\Privilege::isPermitted($moduleName)) {
-						$composeAddressModules[$moduleName] = \App\Language::translate($moduleName, $moduleName);
+					$this->add_hook('template_object_messageattachments', [$this, 'appendIcsPreview']);
+					if (\App\Config::component('Mail', 'rcDetailCheckRbl', false)) {
+						$this->add_hook('template_object_messagesummary', [$this, 'messageSummary']);
 					}
-				}
-				$this->viewData['compose']['composeAddressModules'] = $composeAddressModules;
-				$this->rc->output->set_env('yf_isPermittedMailTemplates', \App\Privilege::isPermitted('EmailTemplates'));
+					$this->add_hook('message_load', [$this, 'message_load']);
 
-				$this->rc->output->add_handler('yetiforce.adressbutton', [$this, 'adressButton']);
-				$this->add_hook('identity_select', [$this, 'identity_select']);
-				$this->add_hook('render_page', [$this, 'loadSignature']);
-
-				$this->add_hook('message_compose_body', [$this, 'message_compose_body']);
-				$this->add_hook('message_compose', [$this, 'message_compose']);
-
-				if ($id = rcube_utils::get_input_value('_id', rcube_utils::INPUT_GPC)) {
-					$id = App\Purifier::purifyByType($id, 'Alnum');
-					if (isset($_SESSION['compose_data_' . $id]['param']['crmmodule'])) {
-						$this->rc->output->set_env('yf_crmModule', $_SESSION['compose_data_' . $id]['param']['crmmodule']);
+					$this->add_button([
+						'command' => 'plugin.yetiforce.addSenderToList',
+						'type' => 'link',
+						'prop' => 1,
+						'class' => 'button yfi-fa-check-circle disabled js-white-list-btn text-success',
+						'classact' => 'button yfi-fa-check-circle text-success',
+						'classsel' => 'button yfi-fa-check-circle pressed text-success',
+						'title' => 'LBL_WHITE_LIST_DESC',
+						'label' => 'BTN_WHITE_LIST',
+						'innerclass' => 'inner',
+					], 'toolbar');
+					$this->add_button([
+						'command' => 'plugin.yetiforce.addSenderToList',
+						'type' => 'link',
+						'prop' => 0,
+						'class' => 'button yfi-fa-ban disabled text-danger',
+						'classact' => 'button yfi-fa-ban text-danger',
+						'classsel' => 'button yfi-fa-ban pressed text-danger',
+						'title' => 'LBL_BLACK_LIST_DESC',
+						'label' => 'BTN_BLACK_LIST',
+						'innerclass' => 'inner',
+					], 'toolbar');
+					$this->add_button([
+						'command' => 'plugin.yetiforce.loadMailAnalysis',
+						'type' => 'link',
+						'class' => 'button yfi-fa-book-reader disabled text-info',
+						'classact' => 'button yfi-fa-book-reader text-info',
+						'classsel' => 'button yfi-fa-book-reader pressed text-info',
+						'title' => 'BTN_ANALYSIS_DETAILS',
+						'label' => 'BTN_ANALYSIS_DETAILS',
+						'innerclass' => 'inner',
+					], 'toolbar');
+				} elseif ('compose' === $this->rc->action) {
+					$this->include_script('compose.js');
+					$composeAddressModules = [];
+					foreach (\App\Config::component('Mail', 'RC_COMPOSE_ADDRESS_MODULES') as $moduleName) {
+						if (\App\Privilege::isPermitted($moduleName)) {
+							$composeAddressModules[$moduleName] = \App\Language::translate($moduleName, $moduleName);
+						}
 					}
-					if (isset($_SESSION['compose_data_' . $id]['param']['crmrecord'])) {
-						$this->rc->output->set_env('yf_crmRecord', $_SESSION['compose_data_' . $id]['param']['crmrecord']);
-					}
-					if (isset($_SESSION['compose_data_' . $id]['param']['crmview'])) {
-						$this->rc->output->set_env('yf_crmView', $_SESSION['compose_data_' . $id]['param']['crmview']);
+					$this->viewData['compose']['composeAddressModules'] = $composeAddressModules;
+					$this->rc->output->set_env('yf_isPermittedMailTemplates', \App\Privilege::isPermitted('EmailTemplates'));
+
+					$this->rc->output->add_handler('yetiforce.adressbutton', [$this, 'adressButton']);
+					$this->add_hook('identity_select', [$this, 'identity_select']);
+					$this->add_hook('render_page', [$this, 'loadSignature']);
+
+					$this->add_hook('message_compose_body', [$this, 'message_compose_body']);
+					$this->add_hook('message_compose', [$this, 'message_compose']);
+
+					if ($id = rcube_utils::get_input_value('_id', rcube_utils::INPUT_GPC)) {
+						$id = App\Purifier::purifyByType($id, 'Alnum');
+						if (isset($_SESSION['compose_data_' . $id]['param']['crmmodule'])) {
+							$this->rc->output->set_env('yf_crmModule', $_SESSION['compose_data_' . $id]['param']['crmmodule']);
+						}
+						if (isset($_SESSION['compose_data_' . $id]['param']['crmrecord'])) {
+							$this->rc->output->set_env('yf_crmRecord', $_SESSION['compose_data_' . $id]['param']['crmrecord']);
+						}
+						if (isset($_SESSION['compose_data_' . $id]['param']['crmview'])) {
+							$this->rc->output->set_env('yf_crmView', $_SESSION['compose_data_' . $id]['param']['crmview']);
+						}
 					}
 				}
 			}
@@ -433,12 +433,12 @@ class yetiforce extends rcube_plugin
 			if (!empty($params['recordNumber']) && !empty($params['crmmodule'])) {
 				$currentPath = getcwd();
 				chdir($this->rc->config->get('root_directory'));
-				$this->loadCurrentUser();
-
-				$subjectNumber = \App\Mail\RecordFinder::getRecordNumberFromString($subject, $params['crmmodule']);
-				$recordNumber = \App\Mail\RecordFinder::getRecordNumberFromString("[{$params['recordNumber']}]", $params['crmmodule']);
-				if (false === $subject || (false !== $subject && $subjectNumber !== $recordNumber)) {
-					$subject = "[{$params['recordNumber']}] $subject";
+				if ($this->loadCurrentUser()) {
+					$subjectNumber = \App\Mail\RecordFinder::getRecordNumberFromString($subject, $params['crmmodule']);
+					$recordNumber = \App\Mail\RecordFinder::getRecordNumberFromString("[{$params['recordNumber']}]", $params['crmmodule']);
+					if (false === $subject || (false !== $subject && $subjectNumber !== $recordNumber)) {
+						$subject = "[{$params['recordNumber']}] $subject";
+					}
 				}
 				chdir($currentPath);
 			}
@@ -790,8 +790,9 @@ class yetiforce extends rcube_plugin
 	{
 		$currentPath = getcwd();
 		chdir($this->rc->config->get('root_directory'));
-		$this->loadCurrentUser();
-		$text = \App\TextParser::getInstance()->setContent($text)->parse()->getContent();
+		if ($this->loadCurrentUser()) {
+			$text = \App\TextParser::getInstance()->setContent($text)->parse()->getContent();
+		}
 		chdir($currentPath);
 		return $text;
 	}
@@ -805,6 +806,9 @@ class yetiforce extends rcube_plugin
 	{
 		if (isset($this->currentUser)) {
 			return true;
+		}
+		if (empty($_SESSION['crm']['id'])) {
+			return false;
 		}
 		require 'include/main/WebUI.php';
 		$this->currentUser = \App\User::getUserModel($_SESSION['crm']['id']);
@@ -850,9 +854,8 @@ class yetiforce extends rcube_plugin
 		$templateId = App\Purifier::purifyByType(rcube_utils::get_input_value('id', rcube_utils::INPUT_GPC), 'Integer');
 		$currentPath = getcwd();
 		chdir($this->rc->config->get('root_directory'));
-		$this->loadCurrentUser();
 		$mail = [];
-		if (\App\Privilege::isPermitted('EmailTemplates', 'DetailView', $templateId)) {
+		if ($this->loadCurrentUser() && \App\Privilege::isPermitted('EmailTemplates', 'DetailView', $templateId)) {
 			$mail = \App\Mail::getTemplate($templateId);
 			if ($recordId = rcube_utils::get_input_value('record_id', rcube_utils::INPUT_GPC)) {
 				$textParser = \App\TextParser::getInstanceById(
@@ -888,108 +891,109 @@ class yetiforce extends rcube_plugin
 	{
 		$currentPath = getcwd();
 		chdir($this->rc->config->get('root_directory'));
-		$this->loadCurrentUser();
-		$showPart = $ics = $counterBtn = $counterList = [];
-		foreach ($this->icsParts as $icsPart) {
-			$icsContent = $this->message->get_part_content($icsPart['part'], null, true);
-			$calendar = \App\Integrations\Dav\Calendar::loadFromContent($icsContent);
-			foreach ($calendar->getRecordInstance() as $key => $recordModel) {
-				if (!isset($ics[$key])) {
-					$ics[$key] = [$recordModel, $icsPart];
-					if (isset($counterBtn[$icsPart['part']])) {
-						++$counterBtn[$icsPart['part']];
-					} else {
-						$counterBtn[$icsPart['part']] = 1;
+		if ($this->loadCurrentUser()) {
+			$showPart = $ics = $counterBtn = $counterList = [];
+			foreach ($this->icsParts as $icsPart) {
+				$icsContent = $this->message->get_part_content($icsPart['part'], null, true);
+				$calendar = \App\Integrations\Dav\Calendar::loadFromContent($icsContent);
+				foreach ($calendar->getRecordInstance() as $key => $recordModel) {
+					if (!isset($ics[$key])) {
+						$ics[$key] = [$recordModel, $icsPart];
+						if (isset($counterBtn[$icsPart['part']])) {
+							++$counterBtn[$icsPart['part']];
+						} else {
+							$counterBtn[$icsPart['part']] = 1;
+						}
 					}
 				}
 			}
-		}
-		$translationMod = 'Calendar';
-		$showMore = false;
-		foreach ($ics as $data) {
-			$evTemplate = '<div class="c-ical mb-1">';
-			[$record, $icsPart] = $data;
-			$dateStart = $fields = $fieldsDescription = '';
-			if (!$record->isEmpty('date_start')) {
-				$dateStart = $record->getDisplayValue('date_start');
-				$dateStartLabel = \App\Language::translate('LBL_START');
-				$fields .= "<div class=\"col-lg-4 col-sm-6 col-12\"><span class=\"fas fa-clock mr-1\"></span><strong>$dateStartLabel</strong>: $dateStart</div>";
-			}
-			if (!$record->isEmpty('due_date')) {
-				$dueDate = $record->getDisplayValue('due_date');
-				$dueDateLabel = \App\Language::translate('LBL_END');
-				$fields .= "<div class=\"col-lg-4 col-sm-6 col-12\"><span class=\"fas fa-clock mr-1\"></span><strong>$dueDateLabel</strong>: $dueDate</div>";
-			}
-			if ($location = $record->getDisplayValue('location', false, false, 100)) {
-				$locationLabel = \App\Language::translate('Location', $translationMod);
-				$fields .= "<div class=\"col-lg-4 col-sm-6 col-12\"><span class=\"fas fa-map mr-1\"></span><strong>$locationLabel</strong>: $location</div>";
-			}
-			if ($status = $record->getDisplayValue('activitystatus')) {
-				$statusLabel = \App\Language::translate('LBL_STATUS', $translationMod);
-				$fields .= "<div class=\"col-lg-4 col-sm-6 col-12\"><span class=\"fas fa-question-circle mr-1\"></span><strong>$statusLabel</strong>: $status</div>";
-			}
-			if ($type = $record->getDisplayValue('activitytype')) {
-				$typeLabel = \App\Language::translate('Activity Type', $translationMod);
-				$fields .= "<div class=\"col-lg-4 col-sm-6 col-12\"><span class=\"fas fa-calendar mr-1\"></span><strong>$typeLabel</strong>: $type</div>";
-			}
-			if ($location = $record->getDisplayValue('meeting_url', false, false, 40)) {
-				$locationLabel = \App\Language::translate('FL_MEETING_URL', $translationMod);
-				$fields .= "<div class=\"col-lg-4 col-sm-6 col-12\"><span class=\"AdditionalIcon-VideoConference mr-1\"></span><strong>$locationLabel</strong>: $location</div>";
-			}
-			if ($allday = $record->getDisplayValue('allday')) {
-				$alldayLabel = \App\Language::translate('All day', $translationMod);
-				$fields .= "<div class=\"col-lg-4 col-sm-6 col-12\"><span class=\"fas fa-edit mr-1\"></span><strong>$alldayLabel</strong>: $allday</div>";
-			}
-			if ($visibility = $record->getDisplayValue('visibility')) {
-				$visibilityLabel = \App\Language::translate('Visibility', $translationMod);
-				$fields .= "<div class=\"col-lg-4 col-sm-6 col-12\"><span class=\"fas fa-eye mr-1\"></span><strong>$visibilityLabel</strong>: $visibility</div>";
-			}
-			if ($priority = $record->getDisplayValue('taskpriority')) {
-				$label = \App\Language::translate('Priority', $translationMod);
-				$fields .= "<div class=\"col-lg-4 col-sm-6 col-12\"><span class=\"fas fa-exclamation-circle mr-1\"></span><strong>$label</strong>: $priority</div>";
-			}
-			if ($description = $record->getDisplayValue('description', false, false, 50)) {
-				$descriptionLabel = \App\Language::translate('Description', $translationMod);
-				$fieldsDescription .= "<div class=\"col-12 mt-2\"><span class=\"fas fa-edit mr-1\"></span><strong>$descriptionLabel</strong>: $description</div>";
-			}
-			$evTemplate .= "<div class=\"w-100 c-ical__event card border-primary\">
-								<div class=\"card-header c-ical__header py-1 d-sm-flex align-items-center text-center\">
-									  <h3 class='c-ical__subject card-title mb-0 mr-auto text-center'>{$record->getDisplayValue('subject')} | $dateStart </h3>
-									  <span class=\"button_to_replace\"></span>
-								</div>
-								<div class=\"c-ical__wrapper card-body py-2\">
-									<div class=\"row\">
-										$fields
-										$fieldsDescription
+			$translationMod = 'Calendar';
+			$showMore = false;
+			foreach ($ics as $data) {
+				$evTemplate = '<div class="c-ical mb-1">';
+				[$record, $icsPart] = $data;
+				$dateStart = $fields = $fieldsDescription = '';
+				if (!$record->isEmpty('date_start')) {
+					$dateStart = $record->getDisplayValue('date_start');
+					$dateStartLabel = \App\Language::translate('LBL_START');
+					$fields .= "<div class=\"col-lg-4 col-sm-6 col-12\"><span class=\"fas fa-clock mr-1\"></span><strong>$dateStartLabel</strong>: $dateStart</div>";
+				}
+				if (!$record->isEmpty('due_date')) {
+					$dueDate = $record->getDisplayValue('due_date');
+					$dueDateLabel = \App\Language::translate('LBL_END');
+					$fields .= "<div class=\"col-lg-4 col-sm-6 col-12\"><span class=\"fas fa-clock mr-1\"></span><strong>$dueDateLabel</strong>: $dueDate</div>";
+				}
+				if ($location = $record->getDisplayValue('location', false, false, 100)) {
+					$locationLabel = \App\Language::translate('Location', $translationMod);
+					$fields .= "<div class=\"col-lg-4 col-sm-6 col-12\"><span class=\"fas fa-map mr-1\"></span><strong>$locationLabel</strong>: $location</div>";
+				}
+				if ($status = $record->getDisplayValue('activitystatus')) {
+					$statusLabel = \App\Language::translate('LBL_STATUS', $translationMod);
+					$fields .= "<div class=\"col-lg-4 col-sm-6 col-12\"><span class=\"fas fa-question-circle mr-1\"></span><strong>$statusLabel</strong>: $status</div>";
+				}
+				if ($type = $record->getDisplayValue('activitytype')) {
+					$typeLabel = \App\Language::translate('Activity Type', $translationMod);
+					$fields .= "<div class=\"col-lg-4 col-sm-6 col-12\"><span class=\"fas fa-calendar mr-1\"></span><strong>$typeLabel</strong>: $type</div>";
+				}
+				if ($location = $record->getDisplayValue('meeting_url', false, false, 40)) {
+					$locationLabel = \App\Language::translate('FL_MEETING_URL', $translationMod);
+					$fields .= "<div class=\"col-lg-4 col-sm-6 col-12\"><span class=\"AdditionalIcon-VideoConference mr-1\"></span><strong>$locationLabel</strong>: $location</div>";
+				}
+				if ($allday = $record->getDisplayValue('allday')) {
+					$alldayLabel = \App\Language::translate('All day', $translationMod);
+					$fields .= "<div class=\"col-lg-4 col-sm-6 col-12\"><span class=\"fas fa-edit mr-1\"></span><strong>$alldayLabel</strong>: $allday</div>";
+				}
+				if ($visibility = $record->getDisplayValue('visibility')) {
+					$visibilityLabel = \App\Language::translate('Visibility', $translationMod);
+					$fields .= "<div class=\"col-lg-4 col-sm-6 col-12\"><span class=\"fas fa-eye mr-1\"></span><strong>$visibilityLabel</strong>: $visibility</div>";
+				}
+				if ($priority = $record->getDisplayValue('taskpriority')) {
+					$label = \App\Language::translate('Priority', $translationMod);
+					$fields .= "<div class=\"col-lg-4 col-sm-6 col-12\"><span class=\"fas fa-exclamation-circle mr-1\"></span><strong>$label</strong>: $priority</div>";
+				}
+				if ($description = $record->getDisplayValue('description', false, false, 50)) {
+					$descriptionLabel = \App\Language::translate('Description', $translationMod);
+					$fieldsDescription .= "<div class=\"col-12 mt-2\"><span class=\"fas fa-edit mr-1\"></span><strong>$descriptionLabel</strong>: $description</div>";
+				}
+				$evTemplate .= "<div class=\"w-100 c-ical__event card border-primary\">
+									<div class=\"card-header c-ical__header py-1 d-sm-flex align-items-center text-center\">
+										  <h3 class='c-ical__subject card-title mb-0 mr-auto text-center'>{$record->getDisplayValue('subject')} | $dateStart </h3>
+										  <span class=\"button_to_replace\"></span>
 									</div>
-								</div>
-							  </div>";
-			$evTemplate .= '</div>';
-			if (!isset($showPart[$icsPart['part']]) && \App\Privilege::isPermitted('Calendar', 'CreateView')) {
-				$showPart[$icsPart['part']] = $icsPart['part'];
-				$title = \App\Language::translate('LBL_ADD_TO_MY_CALENDAR', 'OSSMail');
-				$counterText = empty($counterBtn[$icsPart['part']]) ? '' : ($counterBtn[$icsPart['part']] > 1 ? " ({$counterBtn[$icsPart['part']]})" : '');
-				$btn = html::a([
-					'href' => '#',
-					'class' => 'button btn btn-sm btn-light',
-					'onclick' => "return rcmail.command('yetiforce.importICS',{$icsPart['part']},'{$icsPart['type']}')",
-					'title' => $title,
-				], html::span(null, "<span class=\"far fa-calendar-plus mr-1\"></span>{$title}{$counterText}"));
-				$evTemplate = str_replace('<span class="button_to_replace"></span>', "<span class=\"importBtn\">{$btn}</span>", $evTemplate);
-				$args['content'] .= $evTemplate;
-			} elseif ($counterList[$icsPart['part']] < 4) {
-				$args['content'] .= $evTemplate;
-			} else {
-				$showMore = true;
+									<div class=\"c-ical__wrapper card-body py-2\">
+										<div class=\"row\">
+											$fields
+											$fieldsDescription
+										</div>
+									</div>
+								  </div>";
+				$evTemplate .= '</div>';
+				if (!isset($showPart[$icsPart['part']]) && \App\Privilege::isPermitted('Calendar', 'CreateView')) {
+					$showPart[$icsPart['part']] = $icsPart['part'];
+					$title = \App\Language::translate('LBL_ADD_TO_MY_CALENDAR', 'OSSMail');
+					$counterText = empty($counterBtn[$icsPart['part']]) ? '' : ($counterBtn[$icsPart['part']] > 1 ? " ({$counterBtn[$icsPart['part']]})" : '');
+					$btn = html::a([
+						'href' => '#',
+						'class' => 'button btn btn-sm btn-light',
+						'onclick' => "return rcmail.command('yetiforce.importICS',{$icsPart['part']},'{$icsPart['type']}')",
+						'title' => $title,
+					], html::span(null, "<span class=\"far fa-calendar-plus mr-1\"></span>{$title}{$counterText}"));
+					$evTemplate = str_replace('<span class="button_to_replace"></span>', "<span class=\"importBtn\">{$btn}</span>", $evTemplate);
+					$args['content'] .= $evTemplate;
+				} elseif ($counterList[$icsPart['part']] < 4) {
+					$args['content'] .= $evTemplate;
+				} else {
+					$showMore = true;
+				}
+				if (isset($counterList[$icsPart['part']])) {
+					++$counterList[$icsPart['part']];
+				} else {
+					$counterList[$icsPart['part']] = 1;
+				}
 			}
-			if (isset($counterList[$icsPart['part']])) {
-				++$counterList[$icsPart['part']];
-			} else {
-				$counterList[$icsPart['part']] = 1;
+			if ($showMore) {
+				$args['content'] .= html::div(null, '...');
 			}
-		}
-		if ($showMore) {
-			$args['content'] .= html::div(null, '...');
 		}
 		chdir($currentPath);
 		return $args;
@@ -1003,8 +1007,7 @@ class yetiforce extends rcube_plugin
 	public function importIcs(): void
 	{
 		chdir($this->rc->config->get('root_directory'));
-		$this->loadCurrentUser();
-		if (\App\Privilege::isPermitted('Calendar', 'CreateView')) {
+		if ($this->loadCurrentUser() && \App\Privilege::isPermitted('Calendar', 'CreateView')) {
 			$mailId = (int) rcube_utils::get_input_value('_mailId', rcube_utils::INPUT_GPC);
 			$uid = App\Purifier::purifyByType(rcube_utils::get_input_value('_uid', rcube_utils::INPUT_GPC), 'Alnum');
 			$mbox = App\Purifier::purifyByType(rcube_utils::get_input_value('_mbox', rcube_utils::INPUT_GPC), 'Alnum');
@@ -1093,8 +1096,7 @@ class yetiforce extends rcube_plugin
 	{
 		$currentPath = getcwd();
 		chdir($this->rc->config->get('root_directory'));
-		$this->loadCurrentUser();
-		if (!\App\Config::component('Mail', 'rcListCheckRbl', false)) {
+		if (!$this->loadCurrentUser() || !\App\Config::component('Mail', 'rcListCheckRbl', false)) {
 			chdir($currentPath);
 			return $p;
 		}
@@ -1173,8 +1175,7 @@ class yetiforce extends rcube_plugin
 	{
 		$currentPath = getcwd();
 		chdir($this->rc->config->get('root_directory'));
-		$this->loadCurrentUser();
-		if (!\App\Config::component('Mail', 'rcDetailCheckRbl', false)) {
+		if (!$this->loadCurrentUser() || !\App\Config::component('Mail', 'rcDetailCheckRbl', false)) {
 			chdir($currentPath);
 			return $p;
 		}
@@ -1308,16 +1309,15 @@ class yetiforce extends rcube_plugin
 	{
 		$currentPath = getcwd();
 		chdir($this->rc->config->get('root_directory'));
-		$this->loadCurrentUser();
-
-		$eventHandler = new \App\EventHandler();
-		$eventHandler->setModuleName('OSSMail');
-		$eventHandler->setParams([
-			'composeData' => $_SESSION['compose_data_' . rcube_utils::get_input_value('_id', rcube_utils::INPUT_GPC)] ?? [],
-			'mailData' => $args,
-		]);
-		$eventHandler->trigger('OSSMailBeforeSend');
-
+		if ($this->loadCurrentUser()) {
+			$eventHandler = new \App\EventHandler();
+			$eventHandler->setModuleName('OSSMail');
+			$eventHandler->setParams([
+				'composeData' => $_SESSION['compose_data_' . rcube_utils::get_input_value('_id', rcube_utils::INPUT_GPC)] ?? [],
+				'mailData' => $args,
+			]);
+			$eventHandler->trigger('OSSMailBeforeSend');
+		}
 		chdir($currentPath);
 		return $eventHandler->getParams()['mailData'];
 	}
