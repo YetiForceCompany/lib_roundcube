@@ -387,20 +387,32 @@ class yetiforce extends rcube_plugin
 				$args['param'][$key] = $value;
 			}
 			if ((isset($params['crmmodule']) && 'Documents' == $params['crmmodule']) || (isset($params['filePath']) && $params['filePath'])) {
-				$userid = $this->rc->user->ID;
 				[$usec, $sec] = explode(' ', microtime());
-				$dId = preg_replace('/[^0-9]/', '', $userid . $sec . $usec);
-				foreach ($this->getAttachment($params['crmrecord'], $params['filePath']) as $index => $attachment) {
-					$attachment['group'] = $args['id'];
-					$attachment['id'] = $dId . $index;
-					$args['attachments'][$attachment['id']] = $attachment;
+				foreach ($this->getAttachment($params['crmrecord'], $params['filePath']) as $attachment) {
+					$args['attachments'][] = $attachment;
 				}
 			}
 			if (!isset($params['mailId'])) {
 				return $args;
 			}
+			$currentPath = getcwd();
+			chdir($this->rc->config->get('root_directory'));
+			$loadCurrentUser = $this->loadCurrentUser();
+
 			$result = $db->query('SELECT content,reply_to_email,date,from_email,to_email,cc_email,subject FROM vtiger_ossmailview WHERE ossmailviewid = ?;', $params['mailId']);
 			$row = $db->fetch_assoc($result);
+
+			if ($loadCurrentUser) {
+				self::$COMPOSE = &$_SESSION['compose_data_' . $args['id']];
+				$content = $row['content'];
+				[$usec, $sec] = explode(' ', microtime());
+				$dId = preg_replace('/[^0-9]/', '', $this->rc->user->ID . $sec . $usec);
+				foreach ($this->decodeCustomTag($content, $args) as $attachment) {
+					$_SESSION['plugins']['filesystem_attachments'][$args['id']][$attachment['id']] = realpath($attachment['path']);
+					self::$COMPOSE['attachments'][$attachment['id']] = $attachment;
+				}
+				$row['content'] = $content;
+			}
 			$args['param']['type'] = $params['type'];
 			$args['param']['mailData'] = $row;
 			switch ($params['type']) {
@@ -430,17 +442,12 @@ class yetiforce extends rcube_plugin
 					}
 					break;
 			}
-			if (!empty($params['recordNumber']) && !empty($params['crmmodule'])) {
-				$currentPath = getcwd();
-				chdir($this->rc->config->get('root_directory'));
-				if ($this->loadCurrentUser()) {
-					$subjectNumber = \App\Mail\RecordFinder::getRecordNumberFromString($subject, $params['crmmodule']);
-					$recordNumber = \App\Mail\RecordFinder::getRecordNumberFromString("[{$params['recordNumber']}]", $params['crmmodule']);
-					if (false === $subject || (false !== $subject && $subjectNumber !== $recordNumber)) {
-						$subject = "[{$params['recordNumber']}] $subject";
-					}
+			if (!empty($params['recordNumber']) && !empty($params['crmmodule']) && $loadCurrentUser) {
+				$subjectNumber = \App\Mail\RecordFinder::getRecordNumberFromString($subject, $params['crmmodule']);
+				$recordNumber = \App\Mail\RecordFinder::getRecordNumberFromString("[{$params['recordNumber']}]", $params['crmmodule']);
+				if (false === $subject || (false !== $subject && $subjectNumber !== $recordNumber)) {
+					$subject = "[{$params['recordNumber']}] $subject";
 				}
-				chdir($currentPath);
 			}
 			if (!empty($to)) {
 				$args['param']['to'] = $to;
@@ -452,6 +459,7 @@ class yetiforce extends rcube_plugin
 				$args['param']['subject'] = $subject;
 			}
 		}
+		chdir($currentPath);
 		return $args;
 	}
 
@@ -485,8 +493,8 @@ class yetiforce extends rcube_plugin
 				$prefix .= $this->rc->gettext('date') . ': ' . $date . "\n";
 				$prefix .= $this->rc->gettext('from') . ': ' . $from . "\n";
 				$prefix .= $this->rc->gettext('to') . ': ' . $to . "\n";
-				if ($cc = $row['cc_email']) {
-					$prefix .= $this->rc->gettext('cc') . ': ' . $cc . "\n";
+				if ($row['cc_email']) {
+					$prefix .= $this->rc->gettext('cc') . ': ' . $row['cc_email'] . "\n";
 				}
 				if ($replyto != $from) {
 					$prefix .= $this->rc->gettext('replyto') . ': ' . $replyto . "\n";
@@ -504,11 +512,16 @@ class yetiforce extends rcube_plugin
 					'<tr><th align="right" nowrap="nowrap" valign="baseline">%s: </th><td>%s</td></tr>' .
 					'<tr><th align="right" nowrap="nowrap" valign="baseline">%s: </th><td>%s</td></tr>' .
 					'<tr><th align="right" nowrap="nowrap" valign="baseline">%s: </th><td>%s</td></tr>' .
-					'<tr><th align="right" nowrap="nowrap" valign="baseline">%s: </th><td>%s</td></tr>', $this->rc->gettext('subject'), rcube::Q($subject), $this->rc->gettext('date'), rcube::Q($date), $this->rc->gettext('from'), rcube::Q($from, 'replace'), $this->rc->gettext('to'), rcube::Q($to, 'replace'));
-				if ($cc = $row['cc_email']) {
-					$prefix .= sprintf('<tr><th align="right" nowrap="nowrap" valign="baseline">%s: </th><td>%s</td></tr>', $this->rc->gettext('cc'), rcube::Q($cc, 'replace'));
+					'<tr><th align="right" nowrap="nowrap" valign="baseline">%s: </th><td>%s</td></tr>',
+					$this->rc->gettext('subject'), rcube::Q($subject),
+					$this->rc->gettext('date'), rcube::Q($date),
+					$this->rc->gettext('from'), rcube::Q($from, 'replace'),
+					$this->rc->gettext('to'), rcube::Q($to, 'replace'));
+
+				if ($row['cc_email']) {
+					$prefix .= sprintf('<tr><th align="right" nowrap="nowrap" valign="baseline">%s: </th><td>%s</td></tr>', $this->rc->gettext('cc'), rcube::Q($row['cc_email'], 'replace'));
 				}
-				if ($replyto != $from) {
+				if ($replyto !== $from) {
 					$prefix .= sprintf('<tr><th align="right" nowrap="nowrap" valign="baseline">%s: </th><td>%s</td></tr>', $this->rc->gettext('replyto'), rcube::Q($replyto, 'replace'));
 				}
 				$prefix .= '</tbody></table>';
@@ -645,9 +658,8 @@ class yetiforce extends rcube_plugin
 		$index = 0;
 		foreach ($this->getAttachment($ids, false) as $attachment) {
 			++$index;
-			$userid = rcmail::get_instance()->user->ID;
 			[$usec, $sec] = explode(' ', microtime());
-			$id = preg_replace('/[^0-9]/', '', $userid . $sec . $usec) . $index;
+			$id = preg_replace('/[^0-9]/', '', $this->rc->user->ID . $sec . $usec) . $index;
 			$attachment['id'] = $id;
 			$attachment['group'] = self::$COMPOSE_ID;
 			@chmod($attachment['path'], 0600);  // set correct permissions (#1488996)
@@ -681,7 +693,7 @@ class yetiforce extends rcube_plugin
 		if ($ids) {
 			foreach (App\Mail::getAttachmentsFromDocument($ids, false) as $filePath => $row) {
 				[, $sec] = explode(' ', microtime());
-				$path = $this->rc->config->get('temp_dir') . DIRECTORY_SEPARATOR . "{$sec}_{$userid}_{$row['attachmentsid']}_$index.tmp";
+				$path = $this->rc->config->get('temp_dir') . DIRECTORY_SEPARATOR . "yfcrm_{$sec}_{$userid}_{$row['attachmentsid']}_{$index}.tmp";
 				if (file_exists($filePath)) {
 					copy($filePath, $path);
 					$attachments[] = [
@@ -702,7 +714,7 @@ class yetiforce extends rcube_plugin
 				$orgFileName = $file['name'] ?? basename($file);
 				$orgFilePath = $file['path'] ?? $file;
 				[, $sec] = explode(' ', microtime());
-				$filePath = $this->rc->config->get('temp_dir') . DIRECTORY_SEPARATOR . "{$sec}_{$userid}_{$index}.tmp";
+				$filePath = $this->rc->config->get('temp_dir') . DIRECTORY_SEPARATOR . "yfcrm_{$sec}_{$userid}_{$index}.tmp";
 				$orgFile = $orgFilePath;
 				if (!file_exists($orgFile)) {
 					$orgFile = $this->rc->config->get('root_directory') . $orgFilePath;
@@ -1382,5 +1394,57 @@ class yetiforce extends rcube_plugin
 	{
 		$args['prefs']['yeti_skin'] = rcube_utils::get_input_value('_yeti_skin', rcube_utils::INPUT_POST);
 		return $args;
+	}
+
+	/**
+	 * Decode custom yetiforce tag.
+	 *
+	 * @see \App\Utils\Completions::decodeCustomTag
+	 *
+	 * @param string $content
+	 * @param array  $args
+	 *
+	 * @return array
+	 */
+	public function decodeCustomTag(string &$content, array $args): array
+	{
+		$attachments = [];
+		if (false !== strpos($content, '<yetiforce')) {
+			$userid = $this->rc->user->ID;
+			$index = 0;
+			[$usec, $sec] = explode(' ', microtime());
+			$dId = preg_replace('/[^0-9]/', '', $userid . $sec . $usec);
+			$content = preg_replace_callback('/<yetiforce\s(.*)><\/yetiforce>/', function (array $matches) use (&$attachments, &$index, $sec, $userid, $dId, $args) {
+				$attributes = \App\TextUtils::getTagAttributes($matches[0]);
+				$return = '';
+				if (!empty($attributes['type'])) {
+					switch ($attributes['type']) {
+						case 'Documents':
+							$recordModel = \Vtiger_Record_Model::getInstanceById($attributes['crm-id'], 'Documents');
+							if (($filePath = $recordModel->getFilePath()) && file_exists($filePath)) {
+								$tmpPath = $this->rc->config->get('temp_dir') . DIRECTORY_SEPARATOR . "yfcrm_{$sec}_{$userid}_{$attributes['attachment-id']}_{$index}.tmp";
+								copy($filePath, $tmpPath);
+								$attachment = [
+									'group' => $args['id'],
+									'id' => $dId . $index,
+									'path' => $tmpPath,
+									'name' => $recordModel->get('filename'),
+									'size' => filesize($tmpPath),
+									'mimetype' => rcube_mime::file_content_type($tmpPath, $recordModel->get('filename'), $recordModel->getFileDetails()['type']),
+								];
+								$url = sprintf('%s&_id=%s&_action=display-attachment&_file=rcmfile%s', $this->rc->comm_path, $args['id'], $attachment['id']);
+								$return = '<img src="' . $url . '" />';
+								$attachments[$index] = $attachment;
+								++$index;
+							}
+							break;
+						default:
+							break;
+					}
+				}
+				return $return;
+			}, $content);
+		}
+		return $attachments;
 	}
 }
