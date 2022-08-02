@@ -34,7 +34,7 @@ class rcmail_action_mail_show extends rcmail_action_mail_index
         self::$PRINT_MODE = $rcmail->action == 'print';
 
         // Read browser capabilities and store them in session
-        if ($caps = rcube_utils::get_input_value('_caps', rcube_utils::INPUT_GET)) {
+        if ($caps = rcube_utils::get_input_string('_caps', rcube_utils::INPUT_GET)) {
             $browser_caps = [];
             foreach (explode(',', $caps) as $cap) {
                 $cap = explode('=', $cap);
@@ -44,7 +44,7 @@ class rcmail_action_mail_show extends rcmail_action_mail_index
             $_SESSION['browser_caps'] = $browser_caps;
         }
 
-        $msg_id    = rcube_utils::get_input_value('_uid', rcube_utils::INPUT_GET);
+        $msg_id    = rcube_utils::get_input_string('_uid', rcube_utils::INPUT_GET);
         $uid       = preg_replace('/\.[0-9.]+$/', '', $msg_id);
         $mbox_name = $rcmail->storage->get_folder();
 
@@ -176,6 +176,13 @@ class rcmail_action_mail_show extends rcmail_action_mail_index
         exit;
     }
 
+    /**
+     * Handler for the template object 'messageattachments'.
+     *
+     * @param array $attrib Named parameters
+     *
+     * @return string HTML content showing the message attachments list
+     */
     public static function message_attachments($attrib)
     {
         if (empty(self::$MESSAGE->attachments)) {
@@ -196,6 +203,11 @@ class rcmail_action_mail_show extends rcmail_action_mail_index
 
             if ($mimetype == 'application/octet-stream' && ($type = rcube_mime::file_ext_type($filename))) {
                 $mimetype = $type;
+            }
+
+            // Skip inline images
+            if (strpos($mimetype, 'image/') === 0 && !self::is_attachment(self::$MESSAGE, $attach_prop)) {
+                continue;
             }
 
             if (!empty($attrib['maxlength']) && mb_strlen($filename) > $attrib['maxlength']) {
@@ -329,6 +341,14 @@ class rcmail_action_mail_show extends rcmail_action_mail_index
         return html::div($attrib, $msg);
     }
 
+    /**
+     * Handler for the template object 'messageobjects' that contains
+     * warning/info boxes, buttons, etc. related to the displayed message.
+     *
+     * @param array $attrib Named parameters
+     *
+     * @return string HTML content showing the message objects
+     */
     public static function message_objects($attrib)
     {
         if (empty($attrib['id'])) {
@@ -350,6 +370,13 @@ class rcmail_action_mail_show extends rcmail_action_mail_index
         return html::div($attrib, $content);
     }
 
+    /**
+     * Handler for the template object 'contactphoto'.
+     *
+     * @param array $attrib Named parameters
+     *
+     * @return string HTML content for the IMG tag
+     */
     public static function message_contactphoto($attrib)
     {
         $rcmail        = rcmail::get_instance();
@@ -371,6 +398,7 @@ class rcmail_action_mail_show extends rcmail_action_mail_index
                     '_action' => 'photo',
                     '_email'  => self::$MESSAGE->sender['mailto'],
                     '_error'  => $error_handler ? 1 : null,
+                    '_bgcolor' => $attrib['bg-color'] ?? null
             ]);
         }
         else {
@@ -420,8 +448,8 @@ class rcmail_action_mail_show extends rcmail_action_mail_index
         $exclude_headers = !empty($attrib['exclude']) ? explode(',', $attrib['exclude']) : [];
         $output_headers  = [];
 
-        $attr_max     = isset($attrib['max']) ? $attrib['max'] : null;
-        $attr_addicon = isset($attrib['addicon']) ? $attrib['addicon'] : null;
+        $attr_max     = $attrib['max'] ?? null;
+        $attr_addicon = $attrib['addicon'] ?? null;
         $charset      = !empty($headers['charset']) ? $headers['charset'] : null;
 
         foreach ($standard_headers as $hkey) {
@@ -735,7 +763,7 @@ class rcmail_action_mail_show extends rcmail_action_mail_index
         else {
             // Check if we have enough memory to handle the message in it
             // #1487424: we need up to 10x more memory than the body
-            if (!rcube_utils::mem_check(strlen(self::$MESSAGE->body) * 10)) {
+            if (isset(self::$MESSAGE->body) && !rcube_utils::mem_check(strlen(self::$MESSAGE->body) * 10)) {
                 $out .= self::part_too_big_message(self::$MESSAGE, 0);
             }
             else {
@@ -754,13 +782,13 @@ class rcmail_action_mail_show extends rcmail_action_mail_index
             $download_label   = rcube::Q($rcmail->gettext('download'));
 
             foreach (self::$MESSAGE->attachments as $attach_prop) {
-                // skip inline images
-                if (!empty($attach_prop->content_id) && $attach_prop->disposition == 'inline') {
-                    continue;
-                }
-
                 // Content-Type: image/*...
                 if ($mimetype = self::part_image_type($attach_prop)) {
+                    // Skip inline images
+                    if (!self::is_attachment(self::$MESSAGE, $attach_prop)) {
+                        continue;
+                    }
+
                     // display thumbnails
                     if ($thumbnail_size) {
                         $supported = in_array($mimetype, self::$CLIENT_MIMETYPES);
@@ -823,8 +851,13 @@ class rcmail_action_mail_show extends rcmail_action_mail_index
 
     /**
      * Returns a HTML notice element for too big message parts
+     *
+     * @param rcube_message $message Email message object
+     * @param string        $part_id Message part identifier
+     *
+     * @return string HTML content
      */
-    public static function part_too_big_message($MESSAGE, $part_id)
+    public static function part_too_big_message($message, $part_id)
     {
         $rcmail = rcmail::get_instance();
         $token  = $rcmail->get_request_token();
@@ -832,17 +865,20 @@ class rcmail_action_mail_show extends rcmail_action_mail_index
                 'task'     => 'mail',
                 'action'   => 'get',
                 'download' => 1,
-                'uid'      => $MESSAGE->uid,
+                'uid'      => $message->uid,
                 'part'     => $part_id,
-                'mbox'     => $MESSAGE->folder,
+                'mbox'     => $message->folder,
                 'token'    => $token,
         ]);
 
-        return html::span('part-notice', $rcmail->gettext('messagetoobig') . '&nbsp;' . html::a($url, $rcmail->gettext('download')));
+        return html::span('part-notice', $rcmail->gettext('messagetoobig')
+            . '&nbsp;' . html::a($url, $rcmail->gettext('download')));
     }
 
     /**
      * Handle disposition notification requests
+     *
+     * @param rcube_message $message Email message object
      */
     public static function mdn_request_handler($message)
     {
@@ -897,5 +933,31 @@ class rcmail_action_mail_show extends rcmail_action_mail_index
                 $rcmail->output->set_env('mdn_request', true);
             }
         }
+    }
+
+    /**
+     * Check whether the message part is a normal attachment
+     *
+     * @param rcube_message      $message Message object
+     * @param rcube_message_part $part    Message part
+     *
+     * @return bool
+     */
+    protected static function is_attachment($message, $part)
+    {
+        // Inline attachment with Content-Id specified
+        if (!empty($part->content_id) && $part->disposition == 'inline') {
+            return false;
+        }
+
+        // Any image attached to multipart/related message (#7184)
+        $parent_id = preg_replace('/\.[0-9]+$/', '', $part->mime_id);
+        $parent = $message->mime_parts[$parent_id] ?? null;
+
+        if ($parent && $parent->mimetype == 'multipart/related') {
+            return false;
+        }
+
+        return true;
     }
 }

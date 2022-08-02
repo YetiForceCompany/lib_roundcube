@@ -172,7 +172,7 @@ class yetiforce extends rcube_plugin
 					$this->add_hook('message_compose_body', [$this, 'message_compose_body']);
 					$this->add_hook('message_compose', [$this, 'message_compose']);
 
-					if ($id = rcube_utils::get_input_value('_id', rcube_utils::INPUT_GPC)) {
+					if ($id = rcube_utils::get_input_string('_id', rcube_utils::INPUT_GPC)) {
 						$id = App\Purifier::purifyByType($id, 'Alnum');
 						if (isset($_SESSION['compose_data_' . $id]['param']['crmmodule'])) {
 							$this->rc->output->set_env('yf_crmModule', $_SESSION['compose_data_' . $id]['param']['crmmodule']);
@@ -261,7 +261,7 @@ class yetiforce extends rcube_plugin
 	 */
 	public function login_after($args): array
 	{
-		$pass = rcube_utils::get_input_value('_pass', rcube_utils::INPUT_POST, true, $this->rc->config->get('password_charset', 'UTF-8'));
+		$pass = rcube_utils::get_input_string('_pass', rcube_utils::INPUT_POST, true, $this->rc->config->get('password_charset', 'UTF-8'));
 		if (!empty($pass)) {
 			$sql = 'UPDATE ' . $this->rc->db->table_name('users') . ' SET password = ? WHERE user_id = ?';
 			$currentPath = getcwd();
@@ -275,7 +275,7 @@ class yetiforce extends rcube_plugin
 		if ($_GET['_autologin'] && !empty($_GET['_composeKey'])) {
 			$args['_action'] = 'compose';
 			$args['_task'] = 'mail';
-			$args['_composeKey'] = App\Purifier::purifyByType(rcube_utils::get_input_value('_composeKey', rcube_utils::INPUT_GET), 'Alnum');
+			$args['_composeKey'] = App\Purifier::purifyByType(rcube_utils::get_input_string('_composeKey', rcube_utils::INPUT_GET), 'Alnum');
 		}
 		if ($row = $this->getAutoLogin()) {
 			$_SESSION['crm']['id'] = $row['cuid'];
@@ -317,7 +317,7 @@ class yetiforce extends rcube_plugin
 		if (isset($this->autologin)) {
 			return $this->autologin;
 		}
-		$key = App\Purifier::purifyByType(rcube_utils::get_input_value('_autologinKey', rcube_utils::INPUT_GPC), 'Alnum');
+		$key = App\Purifier::purifyByType(rcube_utils::get_input_string('_autologinKey', rcube_utils::INPUT_GPC), 'Alnum');
 		$db = $this->rc->get_dbh();
 		$sqlResult = $db->query('SELECT * FROM u_yf_mail_autologin INNER JOIN roundcube_users ON roundcube_users.user_id = u_yf_mail_autologin.ruid WHERE roundcube_users.password <> \'\' AND u_yf_mail_autologin.`key` = ?;', $key);
 		$autologin = false;
@@ -377,7 +377,7 @@ class yetiforce extends rcube_plugin
 		if (empty($_GET['_composeKey'])) {
 			return $args;
 		}
-		$composeKey = App\Purifier::purifyByType(rcube_utils::get_input_value('_composeKey', rcube_utils::INPUT_GET), 'Alnum');
+		$composeKey = App\Purifier::purifyByType(rcube_utils::get_input_string('_composeKey', rcube_utils::INPUT_GET), 'Alnum');
 		$result = $db->query('SELECT * FROM `u_yf_mail_compose_data` WHERE `key` = ?', $composeKey);
 		$params = $db->fetch_assoc($result);
 		$db->query('DELETE FROM `u_yf_mail_compose_data` WHERE `key` = ?;', $composeKey);
@@ -473,7 +473,7 @@ class yetiforce extends rcube_plugin
 	public function message_compose_body(array $args): array
 	{
 		$bodyIsHtml = $args['html'];
-		$id = rcube_utils::get_input_value('_id', rcube_utils::INPUT_GPC);
+		$id = rcube_utils::get_input_string('_id', rcube_utils::INPUT_GPC);
 		$row = $_SESSION['compose_data_' . $id]['param']['mailData'] ?? [];
 		if (!$row) {
 			return $args;
@@ -644,7 +644,7 @@ class yetiforce extends rcube_plugin
 	 */
 	public function addFilesToMail(): void
 	{
-		self::$COMPOSE_ID = App\Purifier::purifyByType(rcube_utils::get_input_value('_id', rcube_utils::INPUT_GPC), 'Alnum');
+		self::$COMPOSE_ID = App\Purifier::purifyByType(rcube_utils::get_input_string('_id', rcube_utils::INPUT_GPC), 'Alnum');
 		self::$COMPOSE = null;
 		self::$SESSION_KEY = 'compose_data_' . self::$COMPOSE_ID;
 		if (self::$COMPOSE_ID && !empty($_SESSION[self::$SESSION_KEY])) {
@@ -653,8 +653,8 @@ class yetiforce extends rcube_plugin
 		if (!self::$COMPOSE) {
 			exit('Invalid session var!');
 		}
-		$uploadid = App\Purifier::purifyByType(rcube_utils::get_input_value('_uploadid', rcube_utils::INPUT_GPC), 'Integer');
-		$ids = App\Purifier::purifyByType(rcube_utils::get_input_value('ids', rcube_utils::INPUT_GPC), 'Integer');
+		$uploadid = App\Purifier::purifyByType(rcube_utils::get_input_string('_uploadid', rcube_utils::INPUT_GPC), 'Integer');
+		$ids = App\Purifier::purifyByType(rcube_utils::get_input_string('ids', rcube_utils::INPUT_GPC), 'Integer');
 		$index = 0;
 		foreach ($this->getAttachment($ids, false) as $attachment) {
 			++$index;
@@ -863,16 +863,16 @@ class yetiforce extends rcube_plugin
 	 */
 	public function getContentEmailTemplate(): void
 	{
-		$templateId = App\Purifier::purifyByType(rcube_utils::get_input_value('id', rcube_utils::INPUT_GPC), 'Integer');
+		$templateId = App\Purifier::purifyByType(rcube_utils::get_input_string('id', rcube_utils::INPUT_GPC), 'Integer');
 		$currentPath = getcwd();
 		chdir($this->rc->config->get('root_directory'));
 		$mail = [];
 		if ($this->loadCurrentUser() && \App\Privilege::isPermitted('EmailTemplates', 'DetailView', $templateId)) {
 			$mail = \App\Mail::getTemplate($templateId);
-			if ($recordId = rcube_utils::get_input_value('record_id', rcube_utils::INPUT_GPC)) {
+			if ($recordId = rcube_utils::get_input_string('record_id', rcube_utils::INPUT_GPC)) {
 				$textParser = \App\TextParser::getInstanceById(
 					App\Purifier::purifyByType($recordId, 'Integer'),
-					App\Purifier::purifyByType(rcube_utils::get_input_value('select_module', rcube_utils::INPUT_GPC), 'Alnum')
+					App\Purifier::purifyByType(rcube_utils::get_input_string('select_module', rcube_utils::INPUT_GPC), 'Alnum')
 					);
 				$mail['subject'] = $textParser->setContent($mail['subject'])->parse()->getContent();
 				$mail['content'] = $textParser->setContent($mail['content'])->parse()->getContent();
@@ -1020,10 +1020,10 @@ class yetiforce extends rcube_plugin
 	{
 		chdir($this->rc->config->get('root_directory'));
 		if ($this->loadCurrentUser() && \App\Privilege::isPermitted('Calendar', 'CreateView')) {
-			$mailId = (int) rcube_utils::get_input_value('_mailId', rcube_utils::INPUT_GPC);
-			$uid = App\Purifier::purifyByType(rcube_utils::get_input_value('_uid', rcube_utils::INPUT_GPC), 'Alnum');
-			$mbox = App\Purifier::purifyByType(rcube_utils::get_input_value('_mbox', rcube_utils::INPUT_GPC), 'Alnum');
-			$mime_id = App\Purifier::purifyByType(rcube_utils::get_input_value('_part', rcube_utils::INPUT_GPC), 'Text');
+			$mailId = (int) rcube_utils::get_input_string('_mailId', rcube_utils::INPUT_GPC);
+			$uid = App\Purifier::purifyByType(rcube_utils::get_input_string('_uid', rcube_utils::INPUT_GPC), 'Alnum');
+			$mbox = App\Purifier::purifyByType(rcube_utils::get_input_string('_mbox', rcube_utils::INPUT_GPC), 'Alnum');
+			$mime_id = App\Purifier::purifyByType(rcube_utils::get_input_string('_part', rcube_utils::INPUT_GPC), 'Text');
 			$status = 0;
 			if ($uid && $mbox && $mime_id) {
 				$message = new rcube_message($uid, $mbox);
@@ -1054,8 +1054,8 @@ class yetiforce extends rcube_plugin
 	 */
 	public function addSenderToList(): void
 	{
-		$props = (int) rcube_utils::get_input_value('_props', rcube_utils::INPUT_POST);
-		$mbox = (string) rcube_utils::get_input_value('_mbox', rcube_utils::INPUT_POST);
+		$props = (int) rcube_utils::get_input_string('_props', rcube_utils::INPUT_POST);
+		$mbox = (string) rcube_utils::get_input_string('_mbox', rcube_utils::INPUT_POST);
 		if ($messageset = rcmail_action::get_uids(null, $mbox, $multi, rcube_utils::INPUT_POST)) {
 			chdir($this->rc->config->get('root_directory'));
 			$imap = $this->rc->get_storage();
@@ -1284,7 +1284,7 @@ class yetiforce extends rcube_plugin
 
 	public function loadMailAnalysis(): void
 	{
-		$uid = (int) rcube_utils::get_input_value('_uid', rcube_utils::INPUT_POST);
+		$uid = (int) rcube_utils::get_input_string('_uid', rcube_utils::INPUT_POST);
 		$this->rc->output->command('plugin.yetiforce.showMailAnalysis', $this->rc->imap->get_raw_body($uid));
 	}
 
@@ -1325,7 +1325,7 @@ class yetiforce extends rcube_plugin
 			$eventHandler = new \App\EventHandler();
 			$eventHandler->setModuleName('OSSMail');
 			$eventHandler->setParams([
-				'composeData' => $_SESSION['compose_data_' . rcube_utils::get_input_value('_id', rcube_utils::INPUT_GPC)] ?? [],
+				'composeData' => $_SESSION['compose_data_' . rcube_utils::get_input_string('_id', rcube_utils::INPUT_GPC)] ?? [],
 				'mailData' => $args,
 			]);
 			$eventHandler->trigger('OSSMailBeforeSend');
@@ -1348,7 +1348,7 @@ class yetiforce extends rcube_plugin
 		$eventHandler = new \App\EventHandler();
 		$eventHandler->setModuleName('OSSMail');
 		$eventHandler->setParams([
-			'composeData' => $_SESSION['compose_data_' . rcube_utils::get_input_value('_id', rcube_utils::INPUT_GPC)] ?? [],
+			'composeData' => $_SESSION['compose_data_' . rcube_utils::get_input_string('_id', rcube_utils::INPUT_GPC)] ?? [],
 			'mailData' => $args,
 		]);
 		$eventHandler->trigger('OSSMailAfterSend');
@@ -1392,7 +1392,7 @@ class yetiforce extends rcube_plugin
 	 */
 	public function settingsSavePrefs(array $args): array
 	{
-		$args['prefs']['yeti_skin'] = rcube_utils::get_input_value('_yeti_skin', rcube_utils::INPUT_POST);
+		$args['prefs']['yeti_skin'] = rcube_utils::get_input_string('_yeti_skin', rcube_utils::INPUT_POST);
 		return $args;
 	}
 

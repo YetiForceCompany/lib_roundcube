@@ -36,9 +36,16 @@ class rcmail_install
     public $configured        = false;
     public $legacy_config     = false;
     public $email_pattern     = '([a-z0-9][a-z0-9\-\.\+\_]*@[a-z0-9]([a-z0-9\-][.]?)*[a-z0-9])';
-    public $bool_config_props = [];
 
-    public $local_config    = ['db_dsnw', 'default_host', 'support_url', 'des_key', 'plugins'];
+    public $bool_config_props = [
+        'ip_check'          => 1,
+        'enable_spellcheck' => 1,
+        'auto_create_user'  => 1,
+        'smtp_log'          => 1,
+        'prefer_html'       => 1,
+    ];
+
+    public $local_config    = ['db_dsnw', 'imap_host', 'support_url', 'des_key', 'plugins'];
     public $obsolete_config = ['db_backend', 'db_max_length', 'double_auth', 'preview_pane', 'debug_level', 'referer_check'];
     public $replaced_config = [
         'skin_path'            => 'skin',
@@ -50,6 +57,19 @@ class rcmail_install
         'top_posting'          => 'reply_mode',
         'keep_alive'           => 'refresh_interval',
         'min_keep_alive'       => 'min_refresh_interval',
+        'default_host'         => 'imap_host',
+        'smtp_server'          => 'smtp_host',
+    ];
+
+    // List of configuration options supported by the Installer
+    public $supported_config = [
+        'product_name', 'support_url', 'temp_dir', 'des_key', 'ip_check', 'enable_spellcheck',
+        'spellcheck_engine', 'identities_level', 'log_driver', 'log_dir', 'syslog_id',
+        'syslog_facility', 'db_dsnw', 'db_prefix', 'imap_host', 'username_domain',
+        'auto_create_user', 'sent_mbox', 'trash_mbox', 'drafts_mbox', 'junk_mbox',
+        'smtp_host', 'smtp_user', 'smtp_pass', 'smtp_log', 'language', 'skin', 'mail_pagesize',
+        'addressbook_pagesize', 'prefer_html', 'htmleditor', 'draft_autosave', 'mdn_requests',
+        'mime_param_folding', 'plugins',
     ];
 
     // list of supported database drivers
@@ -152,7 +172,7 @@ class rcmail_install
                     $in_config = true;
                     if ($buffer && $tokens[$i+1] == '[' && $tokens[$i+2][0] == T_CONSTANT_ENCAPSED_STRING) {
                         $propname = trim($tokens[$i+2][1], "'\"");
-                        $this->comments[$propname] = $buffer;
+                        $this->comments[$propname] = preg_replace('/\n\n/', "\n", $buffer);
                         $buffer = '';
                         $i += 3;
                     }
@@ -176,7 +196,7 @@ class rcmail_install
      */
     public function getprop($name, $default = '')
     {
-        $value = isset($this->config[$name]) ? $this->config[$name] : null;
+        $value = $this->config[$name] ?? null;
 
         if ($name == 'des_key' && !$this->configured && !isset($_REQUEST["_$name"])) {
             $value = rcube_utils::random_bytes(24);
@@ -196,7 +216,7 @@ class rcmail_install
         $config = [];
 
         foreach ($this->config as $prop => $default) {
-            $is_default = !isset($_POST["_$prop"]);
+            $is_default = !isset($_POST["_$prop"]) || empty($this->supported_config[$prop]);
             $value      = !$is_default || $this->bool_config_props[$prop] ? $_POST["_$prop"] : $default;
 
             // always disable installer
@@ -220,10 +240,7 @@ class rcmail_install
                         rawurlencode($_POST['_dbuser']), rawurlencode($_POST['_dbpass']), $_POST['_dbhost'], $_POST['_dbname']);
                 }
             }
-            else if ($prop == 'smtp_auth_type' && $value == '0') {
-                $value = '';
-            }
-            else if ($prop == 'default_host' && is_array($value)) {
+            else if ($prop == 'imap_host' && is_array($value)) {
                 $value = self::_clean_array($value);
                 if (count($value) <= 1) {
                     $value = $value[0];
@@ -592,7 +609,7 @@ class rcmail_install
      */
     public function get_error()
     {
-        return $this->last_error['message'];
+        return $this->last_error['message'] ?? null;
     }
 
     /**
@@ -600,13 +617,13 @@ class rcmail_install
      *
      * @return array Clean list with imap/smtp hosts
      */
-    public function get_hostlist($prop = 'default_host')
+    public function get_hostlist($prop = 'imap_host')
     {
         $hosts     = (array) $this->getprop($prop);
         $out       = [];
         $imap_host = '';
 
-        if ($prop == 'smtp_server') {
+        if ($prop == 'smtp_host') {
             // Set the imap host name for the %h macro
             $default_hosts = $this->get_hostlist();
             $imap_host = !empty($default_hosts) ? $default_hosts[0] : '';
@@ -614,7 +631,7 @@ class rcmail_install
 
         foreach ($hosts as $key => $name) {
             if (!empty($name)) {
-                if ($prop == 'smtp_server') {
+                if ($prop == 'smtp_host') {
                     // SMTP host array uses `IMAP host => SMTP host` format
                     $host = $name;
                 }

@@ -471,7 +471,7 @@ abstract class rcube_addressbook
      * This filter mechanism is applied in addition to other filter mechanisms, see the description of the count()
      * operation.
      *
-     * @param null|0|string $gid Database identifier of the group. 0/"0"/null to reset the group filter.
+     * @param null|int|string $gid Database identifier of the group. Use 0/"0"/null to reset the group filter.
      */
     function set_group($group_id)
     {
@@ -640,7 +640,7 @@ abstract class rcube_addressbook
     public static function compose_display_name($contact, $full_email = false)
     {
         $contact = rcube::get_instance()->plugins->exec_hook('contact_displayname', $contact);
-        $fn      = isset($contact['name']) ? $contact['name'] : '';
+        $fn      = $contact['name'] ?? '';
 
         // default display name composition according to vcard standard
         if (!$fn) {
@@ -651,7 +651,7 @@ abstract class rcube_addressbook
 
         // use email address part for name
         $email = self::get_col_values('email', $contact, true);
-        $email = isset($email[0]) ? $email[0] : null;
+        $email = $email[0] ?? null;
 
         if ($email && (empty($fn) || $fn == $email)) {
             // return full email
@@ -827,7 +827,7 @@ abstract class rcube_addressbook
      */
     public static function compose_contact_key($contact, $sort_col)
     {
-        $key = $contact[$sort_col];
+        $key = isset($contact[$sort_col]) ? $contact[$sort_col] : null;
 
         // add email to a key to not skip contacts with the same name (#1488375)
         if (($email = self::get_col_values('email', $contact, true)) && !empty($email)) {

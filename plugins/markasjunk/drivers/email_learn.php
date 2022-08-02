@@ -43,7 +43,7 @@ class markasjunk_email_learn
         $this->rcube  = rcube::get_instance();
         $identity     = $this->rcube->user->get_identity();
         $from         = $identity['email'];
-        $from_string  = format_email_recipient($$from, $identity['name']);
+        $from_string  = format_email_recipient($from, $identity['name']);
         $attach       = $this->rcube->config->get('markasjunk_email_attach', false);
         $debug        = $this->rcube->config->get('markasjunk_debug');
         $product      = $this->rcube->config->get('product_name');
@@ -76,8 +76,8 @@ class markasjunk_email_learn
                     'mailto'        => $mailto,
                     'dsn_enabled'   => false,
                     'charset'       => 'UTF-8',
-                    'error_handler' => function() use ($OUTPUT) {
-                        call_user_func_array([$OUTPUT, 'show_message'], func_get_args());
+                    'error_handler' => function(...$args) use ($OUTPUT) {
+                        call_user_func_array([$OUTPUT, 'show_message'], $args);
                         $OUTPUT->send();
                     }
             ]);
