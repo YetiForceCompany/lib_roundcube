@@ -231,7 +231,7 @@ class yetiforce extends rcube_plugin
 	{
 		if (!empty($_GET['_autologin']) && ($row = $this->getAutoLogin())) {
 			$host = false;
-			foreach ($this->rc->config->get('default_host') as $key => $value) {
+			foreach ($this->rc->config->get('imap_host') as $key => $value) {
 				if (false !== strpos($key, $row['mail_host'])) {
 					$host = $key;
 				}
