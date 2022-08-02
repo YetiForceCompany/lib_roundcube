@@ -131,11 +131,12 @@ $config['redis_debug'] = false;
 // IMAP
 // ----------------------------------
 
-// The IMAP host chosen to perform the log-in.
+// The IMAP host (and optionally port number) chosen to perform the log-in.
 // Leave blank to show a textbox at login, give a list of hosts
 // to display a pulldown menu or set one host as string.
 // Enter hostname with prefix ssl:// to use Implicit TLS, or use
 // prefix tls:// to use STARTTLS.
+// If port number is omitted it will be set to 993 (for ssl://) or 143 otherwise.
 // Supported replacement variables:
 // %n - hostname ($_SERVER['SERVER_NAME'])
 // %t - hostname without the first part
@@ -144,10 +145,7 @@ $config['redis_debug'] = false;
 // For example %n = mail.domain.tld, %t = domain.tld
 // WARNING: After hostname change update of mail_host column in users table is
 //          required to match old user data records with the new host.
-$config['default_host'] = 'localhost';
-
-// TCP port used for IMAP connections
-$config['default_port'] = 143;
+$config['imap_host'] = 'localhost:143';
 
 // IMAP authentication method (DIGEST-MD5, CRAM-MD5, LOGIN, PLAIN or null).
 // Use 'IMAP' to authenticate with IMAP LOGIN command.
@@ -257,9 +255,10 @@ $config['messages_cache_threshold'] = 50;
 // SMTP
 // ----------------------------------
 
-// SMTP server host (for sending mails).
+// SMTP server host (and optional port number) for sending mails.
 // Enter hostname with prefix ssl:// to use Implicit TLS, or use
 // prefix tls:// to use STARTTLS.
+// If port number is omitted it will be set to 465 (for ssl://) or 587 otherwise.
 // Supported replacement variables:
 // %h - user's IMAP hostname
 // %n - hostname ($_SERVER['SERVER_NAME'])
@@ -269,10 +268,7 @@ $config['messages_cache_threshold'] = 50;
 // For example %n = mail.domain.tld, %t = domain.tld
 // To specify different SMTP servers for different IMAP hosts provide an array
 // of IMAP host (no prefix or port) and SMTP server e.g. ['imap.example.com' => 'smtp.example.net']
-$config['smtp_server'] = 'localhost';
-
-// SMTP port. Use 25 for cleartext, 465 for Implicit TLS, or 587 for STARTTLS (default)
-$config['smtp_port'] = 587;
+$config['smtp_host'] = 'localhost:587';
 
 // SMTP username (if required) if you use %u as the username Roundcube
 // will use the current username for login
@@ -388,8 +384,8 @@ $config['oauth_login_redirect'] = false;
 // - use https://<your-roundcube-url>/index.php/login/oauth as redirect URL
 // - grant permissions to Microsoft Graph API "IMAP.AccessAsUser.All", "SMTP.Send", "User.Read" and "offline_access"
 
-// $config['default_host'] = 'ssl://outlook.office365.com';
-// $config['smtp_server'] = 'ssl://smtp.office365.com';
+// $config['imap_host'] = 'ssl://outlook.office365.com';
+// $config['smtp_host'] = 'ssl://smtp.office365.com';
 
 // $config['oauth_provider'] = 'outlook';
 // $config['oauth_provider_name'] = 'Outlook.com';
@@ -493,10 +489,12 @@ $config['blankpage_url'] = '/watermark.html';
 // is made up of (up to) 3 parts:
 // - skin name prefix (always with colon, can be replaced with *)
 // - template name (or * for all templates)
-// - logo type - it is used for logos used on multiple templates
-//   the available types include '[favicon]' for favicon, '[print]' for logo on all print
-//   templates (e.g. messageprint, contactprint) and '[small]' for small screen logo in supported skins
-//   '[dark]' and '[small-dark]' for dark mode logo in supported skins
+// - logo type - it is used for logos used on multiple templates and the available types include:
+//      '[favicon]' for favicon
+//      '[print]' for logo on all print templates (e.g. messageprint, contactprint)
+//      '[small]' for small screen logo in supported skins
+//      '[dark]' and '[small-dark]' for dark mode logo in supported skins
+//      '[link]' for adding a URL link to the logo image
 //
 // Example config for skin_logo
 /*
@@ -505,6 +503,12 @@ $config['blankpage_url'] = '/watermark.html';
      "elastic:login[small]" => "/images/logo_login_small.png",
      // show the image /images/logo_login.png for the Login screen in the Elastic skin
      "elastic:login" => "/images/logo_login.png",
+     // add a link to the logo on the Login screen in the Elastic skin
+     "elastic:login[link]" => "https://www.example.com",
+     // add a link to the logo on all screens in the Elastic skin
+     "elastic:*[link]" => "https://www.example.com",
+     // add a link to the logo on all screens for all skins
+     "[link]" => "https://www.example.com",
      // show the image /images/logo_small.png in the Elastic skin
      "elastic:*[small]" => "/images/logo_small.png",
      // show the image /images/larry.png in the Larry skin
@@ -743,9 +747,13 @@ $config['mdn_use_from'] = false;
 // 4 - one identity with possibility to edit only signature
 $config['identities_level'] = 0;
 
-// Maximum size of uploaded image in kilobytes
-// Images (in html signatures) are stored in database as data URIs
+// Maximum size of uploaded image (in kilobytes) for HTML identities.
+// Images (in html signatures) are stored in database as data URIs.
 $config['identity_image_size'] = 64;
+
+// Maximum size of uploaded image (in kilobytes) for HTML responses.
+// Images (in html responses) are stored in database as data URIs.
+$config['response_image_size'] = 64;
 
 // Mimetypes supported by the browser.
 // Attachments of these types will open in a preview window.
@@ -855,14 +863,14 @@ $config['list_cols'] = ['subject', 'status', 'fromto', 'date', 'size', 'flag', '
 // RFC1766 formatted language name like en_US, de_DE, de_CH, fr_FR, pt_BR
 $config['language'] = null;
 
-// use this format for date display (date or strftime format)
+// use this format for date display (PHP DateTime format)
 $config['date_format'] = 'Y-m-d';
 
 // give this choice of date formats to the user to select from
 // Note: do not use ambiguous formats like m/d/Y
 $config['date_formats'] = ['Y-m-d', 'Y/m/d', 'Y.m.d', 'd-m-Y', 'd/m/Y', 'd.m.Y', 'j.n.Y'];
 
-// use this format for time display (date or strftime format)
+// use this format for time display (PHP DateTime format)
 $config['time_format'] = 'H:i';
 
 // give this choice of time formats to the user to select from
@@ -976,6 +984,15 @@ $config['mailvelope_main_keyring'] = false;
 // It maybe desirable to use 2048 for sites with many mobile users.
 $config['mailvelope_keysize'] = 4096;
 
+// Html2Text link handling options:
+// 0 - links will be removed
+// 1 - a list of link URLs should be listed at the end of the text (default)
+// 2 - link should be displayed to the original point in the text they appeared
+$config['html2text_links'] = 1;
+
+// Html2Text text width. Maximum width of the formatted text, in columns. Default: 75.
+$config['html2text_width'] = 75;
+
 // ----------------------------------
 // ADDRESSBOOK SETTINGS
 // ----------------------------------
@@ -1018,9 +1035,9 @@ $config['ldap_public']['Verisign'] = [
   // %z - IMAP domain (IMAP hostname without the first part)
   // For example %n = mail.domain.tld, %t = domain.tld
   // Note: Host can also be a full URI e.g. ldaps://hostname.local:636 (for SSL)
-  'hosts'         => array('directory.verisign.com'),
-  'port'          => 389,
-  'use_tls'       => false,
+  // Note: If port number is omitted, it will be set to 636 (for ldaps://) or 389 otherwise.
+  // Note: To enable TLS use tls:// prefix
+  'hosts'         => array('directory.verisign.com:389'),
   'ldap_version'  => 3,       // using LDAPv3
   'network_timeout' => 10,    // The timeout (in seconds) for connect + bind attempts. This is only supported in PHP >= 5.3.0 with OpenLDAP 2.x
   'user_specific' => false,   // If true the base_dn, bind_dn and bind_pass default to the user's IMAP login.
@@ -1306,7 +1323,8 @@ $config['layout'] = 'widescreen';
 // Set to -1 if messages should not be marked as read
 $config['mail_read_time'] = 0;
 
-// Clear Trash on logout
+// Clear Trash on logout. Remove all messages or only older than N days.
+// Supported values: false, true, 30, 60, 90. Default: false.
 $config['logout_purge'] = false;
 
 // Compact INBOX on logout
@@ -1383,7 +1401,7 @@ $config['force_7bit'] = false;
 // Default fields configuration for mail search.
 // The array can contain a per-folder list of header fields which should be considered when searching
 // The entry with key '*' stands for all folders which do not have a specific list set.
-// Supported fields: subject, from, to, cc, bcc, body, text.
+// Supported fields: subject, from, to, cc, bcc, replyto, followupto, body, text.
 // Please note that folder names should to be in sync with $config['*_mbox'] options
 $config['search_mods'] = null;  // Example: ['*' => ['subject'=>1, 'from'=>1], 'Sent' => ['subject'=>1, 'to'=>1]];
 
@@ -1407,7 +1425,6 @@ $config['mdn_requests'] = 0;
 $config['mdn_default'] = 0;
 
 // Delivery Status Notification checkbox default state
-// Note: This can be used only if smtp_server is non-empty
 $config['dsn_default'] = 0;
 
 // Place replies in the folder of the message being replied to
