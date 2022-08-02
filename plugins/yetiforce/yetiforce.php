@@ -654,7 +654,7 @@ class yetiforce extends rcube_plugin
 			exit('Invalid session var!');
 		}
 		$uploadid = App\Purifier::purifyByType(rcube_utils::get_input_string('_uploadid', rcube_utils::INPUT_GPC), 'Integer');
-		$ids = App\Purifier::purifyByType(rcube_utils::get_input_string('ids', rcube_utils::INPUT_GPC), 'Integer');
+		$ids = App\Purifier::purifyByType(rcube_utils::get_input_value('ids', rcube_utils::INPUT_GPC), 'Integer');
 		$index = 0;
 		foreach ($this->getAttachment($ids, false) as $attachment) {
 			++$index;
