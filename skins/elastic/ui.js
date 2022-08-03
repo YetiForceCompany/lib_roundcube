@@ -2428,28 +2428,30 @@ function rcube_elastic_ui()
                 if (popup_id && menus[popup_id] && popup.is(':visible')) {
                     menus[popup_id].transitioning = true;
                 }
-            })
-            .on('hidden.bs.popover', function() {
-                if (/-clone$/.test(popup.attr('id'))) {
-                    popup.remove();
-                }
-                else {
-                    popup.attr('aria-hidden', true)
-                        // Some menus aren't being hidden, force that
-                        .addClass('hidden')
-                        // Bootstrap will detach the popup element from
-                        // the DOM (https://github.com/twbs/bootstrap/issues/20219)
-                        // making our menus to not update buttons state.
-                        // Work around this by attaching it back to the DOM tree.
-                        .appendTo(popup.data('popup-parent') || document.body);
-                }
 
-                // close orphaned popovers, for some reason there are sometimes such dummy elements left
-                $('.popover-body:empty').each(function() { $(this).parent().remove(); });
+                // Note: We do not use hidden.bs.popover event because it is not always executed (#8602)
+                setTimeout(function () {
+                    if (/-clone$/.test(popup.attr('id'))) {
+                        popup.remove();
+                    }
+                    else {
+                        popup.attr('aria-hidden', true)
+                            // Some menus aren't being hidden, force that
+                            .addClass('hidden')
+                            // Bootstrap will detach the popup element from
+                            // the DOM (https://github.com/twbs/bootstrap/issues/20219)
+                            // making our menus to not update buttons state.
+                            // Work around this by attaching it back to the DOM tree.
+                            .appendTo(popup.data('popup-parent') || document.body);
+                    }
 
-                if (popup_id && menus[popup_id]) {
-                    delete menus[popup_id];
-                }
+                    // close orphaned popovers, for some reason there are sometimes such dummy elements left
+                    $('.popover-body:empty').each(function() { $(this).parent().remove(); });
+
+                    if (popup_id && menus[popup_id]) {
+                        delete menus[popup_id];
+                    }
+                }, 200);
             })
             // Because Bootstrap does not provide originalEvent in show/shown events
             // we have to handle that by our own using click and keydown handlers
@@ -2478,7 +2480,11 @@ function rcube_elastic_ui()
             $(item).attr('title', title);
         }
 
-        popup.attr('aria-hidden', 'true').data('button', item);
+        if (is_mobile() || !popup.is('.toolbar')) {
+            popup.attr('aria-hidden', 'true');
+        }
+
+        popup.data('button', item);
 
         // stop propagation to e.g. do not hide the popup when
         // clicking inside on form elements
@@ -2827,6 +2833,11 @@ function rcube_elastic_ui()
                     rcmail.env.search_interval = interval_select.val();
                 });
             }
+
+            $(obj).find('.proplist > li > a.dropdown').on('click', function() {
+                var list = $(this).next()
+                list[list.is('.d-none') ? 'removeClass' : 'addClass']('d-none');
+            });
         }
 
         scope_select.val(scope);
@@ -2850,11 +2861,18 @@ function rcube_elastic_ui()
                 }
             }
         }
+
+        set_searchmod_masters(obj);
     };
 
+    /**
+     * Handler for a search option state update
+     */
     function set_searchmod(menu, elem)
     {
-        var all, m, task = rcmail.env.task,
+        var all, m, masters = {},
+            list = $('input[name="s_mods[]"]', menu),
+            task = rcmail.env.task,
             mods = rcmail.env.search_mods || {},
             mbox = rcmail.env.mailbox;
 
@@ -2864,6 +2882,10 @@ function rcube_elastic_ui()
             }
             m = mods[mbox];
             all = 'text';
+            masters = {
+                sender: ['from', 'replyto', 'followupto'],
+                recipient: ['to', 'cc', 'bcc']
+            };
         }
         else {
             // addressbook
@@ -2880,7 +2902,7 @@ function rcube_elastic_ui()
 
         // mark all fields
         if (elem.value == all) {
-            $('input[name="s_mods[]"]', menu).not(elem).map(function() {
+            list.not(elem).each(function() {
                 this.checked = true;
 
                 if (elem.checked) {
@@ -2889,13 +2911,43 @@ function rcube_elastic_ui()
                 }
                 else {
                     this.disabled = false;
-                    m[this.value] = 1;
+                    if (!(this.value in masters)) {
+                        m[this.value] = 1;
+                    }
                 }
             });
+        }
+        // Handle clicks on Sender/Recipient elements
+        else if (elem.value in masters) {
+            delete m[elem.value];
+
+            list.filter(function() { return $.inArray(this.value, masters[elem.value]) != -1; }).each(function() {
+                if (elem.checked) {
+                    this.checked = true;
+                    m[this.value] = 1;
+                }
+                else {
+                    this.checked = false;
+                    delete m[this.value];
+                }
+            });
+        }
+        else if (masters.sender) {
+            set_searchmod_masters(menu);
         }
 
         rcmail.set_searchmods(m);
     };
+
+    /*
+     * Set state of the Sender/Recipient checkbox depending on whether any of the sub-items are checked
+     */
+    function set_searchmod_masters(obj)
+    {
+        $(obj).find('.proplist > li.with-sublist').each(function() {
+            $(this).find(':not(.proplist) input')[0].checked = $(this).children('.proplist').find('input:checked').length > 0;
+        });
+    }
 
     /**
      * Spellcheck languages list
@@ -3784,11 +3836,11 @@ function rcube_elastic_ui()
     };
 
     /**
-     * HTML editor textarea wrapper with nice looking tabs-like switch
+     * HTML editor textarea wrapper with plain-to-html switch button
      */
     function html_editor_init(obj)
     {
-        // Here we support two structures
+        // Here we support two kinds of structure:
         // 1. <div><textarea></textarea><select class="hidden"></div>
         // 2. <tr><td><td><td><textarea></textarea></td></tr>
         //    <tr><td><td><td><input type="checkbox"></td></tr>
@@ -3796,10 +3848,11 @@ function rcube_elastic_ui()
         var sw, is_table = false,
             editor = $(obj),
             parent = editor.parent(),
+            readonly = editor.is('[readonly],[disabled]'),
             plain_btn = $('<a class="mce-i-html" href="#" tabindex="-1"></a>')
-                .attr('title', rcmail.gettext('htmltoggle'))
+                .attr({title: rcmail.gettext('htmltoggle'), disabled: readonly})
                 .on('click', function(e) {
-                    if (rcmail.command('toggle-editor', {id: editor.attr('id'), html: true}, '', e.originalEvent)) {
+                    if (!readonly && rcmail.command('toggle-editor', {id: editor.attr('id'), html: true}, '', e.originalEvent)) {
                         parent.addClass('ishtml');
                     }
                 })
