@@ -64,11 +64,11 @@ $(function () {
 	}
 	labels_for_message = tb_labels_for_message;
 	if (labels_for_message) {
-		labelbox_parent = $('div.message-headers');
+		labelbox_parent = $('div.message-headers, #message-header');
 		if (!labelbox_parent.length) {
-			labelbox_parent = $('.header-links');
+			labelbox_parent = $('table.headers-table');
 		}
-		labelbox_parent.append('<div id="labelbox"></div>');
+		labelbox_parent.append('<div id="labelbox" class="' + rcmail.env.tb_label_style + '"></div>');
 		labels_for_message.sort(function (a, b) {
 			return a - b;
 		});
@@ -213,15 +213,17 @@ rcm_tb_label_css = (function () {
 			colors = ref[label_name];
 			escaped_label_name = 'tb_label_' + label_name;
 			css += 'table.{0}\n{\n  background-color: {1};\n}'.format(escaped_label_name, colors.bg);
-			css += '#messagelist tr.{0} td,\n#messagelist tr.{0} td a,\nspan.{0},\n.records-table tr.selected td span.{0}\n{\n  color: {1} !important;\n}\n\n.toolbarmenu li.{0},\n.toolbarmenu li.{0} a.active\n{\n  color: {2};\n}'.format(
-				escaped_label_name,
-				colors.fg,
-				colors.light
-			);
-			css += '#messagelist tr.selected.{0} td,\n#messagelist tr.selected.{0} td a\n{\n  color: #FFFFFF;\n  background-color: {1};\n}'.format(
-				escaped_label_name,
-				colors.bg
-			);
+			css +=
+				'#messagelist tr.{0} td,\n#messagelist tr.{0} td a,\nspan.{0},\n.records-table tr.selected td span.{0}\n{\n  color: {1} !important;\n}\n\n.toolbarmenu li.{0},\n.toolbarmenu li.{0} a.active\n{\n  color: {2};\n}'.format(
+					escaped_label_name,
+					colors.fg,
+					colors.light
+				);
+			css +=
+				'#messagelist tr.selected.{0} td,\n#messagelist tr.selected.{0} td a\n{\n  color: #FFFFFF;\n  background-color: {1};\n}'.format(
+					escaped_label_name,
+					colors.bg
+				);
 			css += 'div#labelbox span.box_{0}\n{\n  background-color: {1};\n}'.format(escaped_label_name, colors.box);
 		}
 		return css;
@@ -235,13 +237,13 @@ rcm_tb_label_css = (function () {
 })();
 
 rcm_tb_label_insert = function (uid, row) {
-	var i, label_name, len, message, ref, rowobj, spanobj;
+	var i, j, label_name, len, len1, message, ref, ref1, rowobj, spanobj;
 	if (typeof rcmail.env === 'undefined' || typeof rcmail.env.messages === 'undefined') {
 		return;
 	}
 	message = rcmail.env.messages[uid];
 	rowobj = $(row.obj);
-	rowobj.find('td.subject').append('<span class="tb_label_dots"></span>');
+	rowobj.find('td.subject').append('<span class="tb_label_dots ' + rcmail.env.tb_label_style + '"></span>');
 	if (message.flags && message.flags.tb_labels) {
 		if (message.flags.tb_labels.length) {
 			spanobj = rowobj.find('td.subject span.tb_label_dots');
@@ -270,8 +272,8 @@ rcm_tb_label_insert = function (uid, row) {
 					}
 				}
 			} else {
-				for (i = 0, len = ref.length; i < len; i++) {
-					label_name = ref[i];
+				for (j = 0, len1 = ref.length; j < len1; j++) {
+					label_name = ref[j];
 					rowobj.addClass('tb_label_' + label_name);
 				}
 			}
@@ -343,10 +345,10 @@ rcm_tb_label_flag_toggle = function (flag_uids, toggle_label_no, onoff) {
 	preview_frame = $('#messagecontframe');
 	labels_for_message = rcm_tb_label_global('tb_labels_for_message');
 	if (preview_frame.length) {
-		headers_table = preview_frame.contents().find('table.headers-table');
+		headers_table = preview_frame.contents().find('table.headers-table,#message-header');
 		label_box = preview_frame.contents().find('#labelbox');
 	} else {
-		headers_table = $('table.headers-table');
+		headers_table = $('table.headers-table,#message-header');
 		label_box = $('#labelbox');
 	}
 	if (!rcmail.message_list && !headers_table.length) {
@@ -357,7 +359,7 @@ rcm_tb_label_flag_toggle = function (flag_uids, toggle_label_no, onoff) {
 			if (rcmail.env.tb_label_style === 'bullets' || rcmail.env.tb_label_style === 'badges') {
 				label_box.find('span.box_tb_label_' + escape_jquery_selector(toggle_label_no)).remove();
 				label_box.append(
-					'<span class="badge box_tb_label_' + toggle_label_no + '">' + i18n_label(toggle_label_no) + '</span>'
+					'<span class="box_tb_label_' + toggle_label_no + '">' + i18n_label(toggle_label_no) + '</span>'
 				);
 			} else {
 				headers_table.removeClass('tb_label_' + toggle_label_no);

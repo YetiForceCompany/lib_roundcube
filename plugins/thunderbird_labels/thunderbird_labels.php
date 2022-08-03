@@ -29,10 +29,12 @@ class thunderbird_labels extends rcube_plugin
 			if ('print' == $this->rc->action) {
 				return;
 			}
+
 			if (!$this->rc->config->get('tb_label_enable')) {
 				// disable plugin according to prefs
 				return;
 			}
+
 			// pass 'tb_label_enable_shortcuts' and 'tb_label_style' prefs to JS
 			$this->rc->output->set_env('tb_label_enable_shortcuts', $this->rc->config->get('tb_label_enable_shortcuts'));
 			$this->rc->output->set_env('tb_label_style', $this->rc->config->get('tb_label_style'));
@@ -115,6 +117,7 @@ class thunderbird_labels extends rcube_plugin
 		if ('thunderbird_labels' != $args['section']) {
 			return $args;
 		}
+
 		$this->load_config();
 		$dont_override = (array) $this->rc->config->get('dont_override', []);
 
@@ -192,6 +195,7 @@ class thunderbird_labels extends rcube_plugin
 		if ('thunderbird_labels' != $args['section']) {
 			return $args;
 		}
+
 		$this->load_config();
 		$dont_override = (array) $this->rc->config->get('dont_override', []);
 
@@ -326,6 +330,7 @@ class thunderbird_labels extends rcube_plugin
 			|| !\is_array($flag_uids)) {
 			return false;
 		}
+
 		// FIXME: there is no reliable way to know if roundcube mangled a label of different client
 		//        here is just a workaround for the known Thunderbird labels
 		if (preg_match('/^LABEL[1-5]$/', $toggle_label)) { // only for Thunderbird labels
@@ -380,6 +385,7 @@ class thunderbird_labels extends rcube_plugin
 		if (\array_key_exists('write', $args) && !$args['write']) {
 			return;
 		}
+
 		$html = $this->template_file2html($this->rc->task);
 		if ($html) {
 			$this->rc->output->add_footer($html);

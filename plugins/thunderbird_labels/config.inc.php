@@ -7,8 +7,8 @@
   $config['tb_label_enable_shortcuts'] = true;
   // users can modify labels
   $config['tb_label_modify_labels'] = true;
-  // style for UI: 'bullets' or 'thunderbird'
-  $config['tb_label_style'] = "bullets";
+  // style for UI: 'bullets' or 'thunderbird' or 'badges'
+  $config['tb_label_style'] = "badges";
   // custom hidden flags
   $config['tb_label_hidden_flags'] = array();
 
