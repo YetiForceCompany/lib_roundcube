@@ -142,7 +142,7 @@ class rcube_ldap extends rcube_addressbook
 
         // use fieldmap to advertise supported coltypes to the application
         foreach ($this->fieldmap as $colv => $lfv) {
-            list($col, $type) = explode(':', $colv);
+            list($col, $type) = rcube_utils::explode(':', $colv);
             $params           = explode(':', $lfv);
 
             $lf    = array_shift($params);
@@ -164,7 +164,7 @@ class rcube_ldap extends rcube_addressbook
                 }
             }
 
-            if (!is_array($this->coltypes[$col])) {
+            if (!isset($this->coltypes[$col]) || !is_array($this->coltypes[$col])) {
                 $subtypes = $type ? [$type] : null;
                 $this->coltypes[$col] = ['limit' => $limit, 'subtypes' => $subtypes, 'attributes' => [$lf]];
             }
@@ -180,16 +180,22 @@ class rcube_ldap extends rcube_addressbook
         // support for composite address
         if (!empty($this->coltypes['street']) && !empty($this->coltypes['locality'])) {
             $this->coltypes['address'] = [
-               'limit'    => max(1, $this->coltypes['locality']['limit'] + $this->coltypes['address']['limit']),
-               'subtypes' => array_merge((array)$this->coltypes['address']['subtypes'], (array)$this->coltypes['locality']['subtypes']),
-               'childs'   => [],
-               'attributes' => [],
-               ] + (array)$this->coltypes['address'];
+                'childs'     => [],
+                'attributes' => [],
+                'limit'      => max(1, ($this->coltypes['locality']['limit'] ?? 0) + ($this->coltypes['address']['limit'] ?? 0)),
+                'subtypes'   => array_merge(
+                    (array) ($this->coltypes['address']['subtypes'] ?? null),
+                    (array) ($this->coltypes['locality']['subtypes'] ?? null)
+                ),
+            ] + (array) $this->coltypes['address'];
 
             foreach (['street','locality','zipcode','region','country'] as $childcol) {
-                if ($this->coltypes[$childcol]) {
+                if (!empty($this->coltypes[$childcol])) {
                     $this->coltypes['address']['childs'][$childcol] = ['type' => 'text'];
-                    $this->coltypes['address']['attributes'] = array_merge($this->coltypes['address']['attributes'], $this->coltypes[$childcol]['attributes']);
+                    $this->coltypes['address']['attributes'] = array_merge(
+                        $this->coltypes['address']['attributes'],
+                        (array) ($this->coltypes[$childcol]['attributes'] ?? null)
+                    );
                     unset($this->coltypes[$childcol]);  // remove address child col from global coltypes list
                 }
             }
@@ -300,6 +306,13 @@ class rcube_ldap extends rcube_addressbook
         // with OpenLDAP 2.x ldap_connect() always succeeds but ldap_bind will fail if host isn't reachable
         // see http://www.php.net/manual/en/function.ldap-connect.php
         foreach ((array) $this->prop['hosts'] as $host) {
+            // Parse host specification into the format expected by Net_LDAP3 (ldap_connect)
+            list($host, $scheme, $port) = rcube_utils::parse_host_uri($host, 389, 636);
+
+            $host = sprintf('%s://%s:%d', $scheme === 'ldaps' ? 'ldaps' : 'ldap', $host, $port);
+
+            $this->ldap->config_set('use_tls', $scheme === 'tls');
+
             // skip host if connection failed
             if (!$this->ldap->connect($host)) {
                 continue;
@@ -314,13 +327,15 @@ class rcube_ldap extends rcube_addressbook
             $rcube = rcube::get_instance();
             $conf  = $rcube->plugins->exec_hook('ldap_connected', $this->prop + ['host' => $host]);
 
-            $bind_pass   = $conf['bind_pass'];
-            $bind_user   = $conf['bind_user'];
-            $bind_dn     = $conf['bind_dn'];
-            $auth_method = $conf['auth_method'];
+            $bind_pass   = $conf['bind_pass'] ?? null;
+            $bind_user   = $conf['bind_user'] ?? null;
+            $bind_dn     = $conf['bind_dn'] ?? null;
+            $auth_method = $conf['auth_method'] ?? null;
 
-            $this->base_dn        = $conf['base_dn'];
-            $this->groups_base_dn = $conf['groups']['base_dn'] ?: $this->base_dn;
+            $this->base_dn = $this->groups_base_dn = $conf['base_dn'] ?? null;
+            if (!empty($conf['groups']['base_dn'])) {
+                $this->groups_base_dn = $conf['groups']['base_dn'];
+            }
 
             // User specific access, generate the proper values to use.
             if (!empty($conf['user_specific'])) {
@@ -488,7 +503,7 @@ class rcube_ldap extends rcube_addressbook
 
         }  // end foreach hosts
 
-        if (!is_resource($this->ldap->conn)) {
+        if (empty($this->ldap->conn)) {
             rcube::raise_error([
                     'code' => 100, 'type' => 'ldap',
                     'file' => __FILE__, 'line' => __LINE__,
@@ -641,7 +656,7 @@ class rcube_ldap extends rcube_addressbook
         $last_row = $subset != 0 ? $start_row + abs($subset) : $last_row;
 
         // filter entries for this page
-        for ($i = $start_row; $i < min($entries['count'], $last_row); $i++) {
+        for ($i = $start_row; $i < min($entries['count'] ?? 0, $last_row); $i++) {
             if (!empty($entries[$i])) {
                 $this->result->add($this->_ldap2result($entries[$i]));
             }
@@ -1459,7 +1474,7 @@ class rcube_ldap extends rcube_addressbook
             }
         }
 
-        return isset($newdn) ? $newdn : true;
+        return $newdn ?? true;
     }
 
     /**
@@ -1618,8 +1633,13 @@ class rcube_ldap extends rcube_addressbook
         }
 
         foreach ($fieldmap as $rf => $lf) {
-            // we might be dealing with normalized and non-normalized data
+            if (!isset($rec[$lf])) {
+                continue;
+            }
+
             $entry = $rec[$lf];
+
+            // we might be dealing with normalized and non-normalized data
             if (!is_array($entry) || !isset($entry['count'])) {
                 $entry = (array) $entry;
                 $entry['count'] = count($entry);
@@ -1630,7 +1650,7 @@ class rcube_ldap extends rcube_addressbook
                     continue;
                 }
 
-                list($col, $subtype) = explode(':', $rf);
+                list($col, $subtype) = rcube_utils::explode(':', $rf);
                 $out['_raw_attrib'][$lf][$i] = $value;
 
                 if ($col == 'email' && $this->mail_domain && !strpos($value, '@')) {
@@ -1652,7 +1672,7 @@ class rcube_ldap extends rcube_addressbook
             }
 
             // Make sure name fields aren't arrays (#1488108)
-            if (is_array($out[$rf]) && in_array($rf, ['name', 'surname', 'firstname', 'middlename', 'nickname'])) {
+            if (!empty($out[$rf]) && is_array($out[$rf]) && in_array($rf, ['name', 'surname', 'firstname', 'middlename', 'nickname'])) {
                 $out[$rf] = $out['_raw_attrib'][$lf] = $out[$rf][0];
             }
         }
@@ -1707,7 +1727,7 @@ class rcube_ldap extends rcube_addressbook
             $val = $save_cols[$rf];
 
             // check for value in base field (e.g. email instead of email:foo)
-            list($col, $subtype) = explode(':', $rf);
+            list($col, $subtype) = rcube_utils::explode(':', $rf);
             if (!$val && !empty($save_cols[$col])) {
                 $val = $save_cols[$col];
                 unset($save_cols[$col]);  // use this value only once
@@ -1747,7 +1767,7 @@ class rcube_ldap extends rcube_addressbook
     /**
      * Returns unified attribute name (resolving aliases)
      */
-    private static function _attr_name($namev)
+    private static function _attr_name($name)
     {
         // list of known attribute aliases
         static $aliases = [
@@ -1758,11 +1778,16 @@ class rcube_ldap extends rcube_addressbook
             'pkcs9email'    => 'email',
         ];
 
-        list($name, $limit) = explode(':', $namev, 2);
-        $suffix = $limit ? ':'.$limit : '';
-        $name   = strtolower($name);
+        $suffix = '';
 
-        return (isset($aliases[$name]) ? $aliases[$name] : $name) . $suffix;
+        if (strpos($name, ':')) {
+            list($name, $limit) = explode(':', $name, 2);
+            $suffix = $limit ? ":$limit" : '';
+        }
+
+        $name = strtolower($name);
+
+        return ($aliases[$name] ?? $name) . $suffix;
     }
 
     /**

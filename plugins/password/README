@@ -51,6 +51,7 @@
  2.1.25. Mail-in-a-Box (miab)
  2.1.26. HTTP-API (httpapi)
  2.1.27. dovecot_passwdfile
+ 2.1.28. Mailcow
  2.2.    Password Strength Drivers
  2.2.1.  Zxcvbn
  2.2.2.  Have I been pwned? (pwned)
@@ -409,6 +410,12 @@
  Set 'password_dovecot_passwdfile_path' to your dovecot passwd-file location and
  'password_algorithm' (and related options) to the algorithm you want the passwords
  stored in the file to be using.
+
+
+ 2.1.28 Mailcow
+ ---------------------------
+ Driver to change the password on Mailcow servers.
+ See config.inc.php.dist file for configuration description.
 
 
  2.2. Password Strength Drivers

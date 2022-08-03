@@ -65,8 +65,8 @@ class rcmail_action_mail_index extends rcmail_action
         }
 
         // remove mbox part from _uid
-        $uid = rcube_utils::get_input_value('_uid', rcube_utils::INPUT_GPC);
-        if ($uid && !is_array($uid) && preg_match('/^\d+-.+/', $uid)) {
+        $uid = rcube_utils::get_input_string('_uid', rcube_utils::INPUT_GPC);
+        if ($uid && preg_match('/^\d+-.+/', $uid)) {
             list($uid, $mbox) = explode('-', $uid, 2);
             if (isset($_GET['_uid'])) {
                 $_GET['_uid'] = $uid;
@@ -116,7 +116,7 @@ class rcmail_action_mail_index extends rcmail_action
             // set current mailbox and some other vars in client environment
             $rcmail->output->set_env('mailbox', $mbox_name);
             $rcmail->output->set_env('pagesize', $rcmail->storage->get_pagesize());
-            $rcmail->output->set_env('current_page', isset($_SESSION['page']) ? max(1, (int) $_SESSION['page']) : 1);
+            $rcmail->output->set_env('current_page', max(1, $_SESSION['page'] ?? 1));
             $rcmail->output->set_env('delimiter', $delimiter);
             $rcmail->output->set_env('threading', $threading);
             $rcmail->output->set_env('threads', $threading || $rcmail->storage->get_capability('THREAD'));
@@ -177,8 +177,10 @@ class rcmail_action_mail_index extends rcmail_action
         $message_sort_col   = $rcmail->config->get('message_sort_col');
         $message_sort_order = $rcmail->config->get('message_sort_order');
 
+        $mbox = rcube_utils::get_input_string('_mbox', rcube_utils::INPUT_GPC, true);
+
         // set imap properties and session vars
-        if (!strlen($mbox = rcube_utils::get_input_value('_mbox', rcube_utils::INPUT_GPC, true))) {
+        if (!strlen($mbox)) {
             $mbox = isset($_SESSION['mbox']) && strlen($_SESSION['mbox']) ? $_SESSION['mbox'] : 'INBOX';
         }
 
@@ -195,7 +197,7 @@ class rcmail_action_mail_index extends rcmail_action
         }
 
         $rcmail->storage->set_folder($_SESSION['mbox'] = $mbox);
-        $rcmail->storage->set_page(isset($_SESSION['page']) ? $_SESSION['page'] : 1);
+        $rcmail->storage->set_page($_SESSION['page'] ?? 1);
 
         // set default sort col/order to session
         if (!isset($_SESSION['sort_col'])) {
@@ -209,7 +211,7 @@ class rcmail_action_mail_index extends rcmail_action
         if (isset($_GET['_threads'])) {
             if ($_GET['_threads']) {
                 // re-set current page number when listing mode changes
-                if (!$a_threading[$_SESSION['mbox']]) {
+                if (empty($a_threading[$_SESSION['mbox']])) {
                     $rcmail->storage->set_page($_SESSION['page'] = 1);
                 }
 
@@ -217,7 +219,7 @@ class rcmail_action_mail_index extends rcmail_action
             }
             else {
                 // re-set current page number when listing mode changes
-                if ($a_threading[$_SESSION['mbox']]) {
+                if (!empty($a_threading[$_SESSION['mbox']])) {
                     $rcmail->storage->set_page($_SESSION['page'] = 1);
                 }
 
@@ -227,7 +229,7 @@ class rcmail_action_mail_index extends rcmail_action
             $rcmail->user->save_prefs(['message_threading' => $a_threading]);
         }
 
-        $threading = isset($a_threading[$_SESSION['mbox']]) ? $a_threading[$_SESSION['mbox']] : $default_threading;
+        $threading = $a_threading[$_SESSION['mbox']] ?? $default_threading;
 
         $rcmail->storage->set_threading($threading);
     }
@@ -520,7 +522,7 @@ class rcmail_action_mail_index extends rcmail_action
                 $col_name = $col == 'fromto' ? $smart_col : $col;
 
                 if (in_array($col_name, ['from', 'to', 'cc', 'replyto'])) {
-                    $cont = self::address_string($header->$col_name, 3, false, null, $header->charset);
+                    $cont = self::address_string($header->$col_name, 3, false, null, $header->charset, null, false);
                     if (empty($cont)) {
                         $cont = '&nbsp;'; // for widescreen mode
                     }
@@ -728,8 +730,8 @@ class rcmail_action_mail_index extends rcmail_action
         return html::a([
                 'href'     => '#list-options',
                 'onclick'  => $onclick,
-                'class'    => isset($attrib['class']) ? $attrib['class'] : 'listmenu',
-                'id'       => isset($attrib['id']) ? $attrib['id'] : 'listmenulink',
+                'class'    => $attrib['class'] ?? 'listmenu',
+                'id'       => $attrib['id'] ?? 'listmenulink',
                 'title'    => $title,
                 'tabindex' => '0',
             ], $inner
@@ -1064,7 +1066,6 @@ class rcmail_action_mail_index extends rcmail_action
     {
         $options = [
             'flowed'   => $flowed,
-            'wrap'     => !$flowed,
             'replacer' => 'rcmail_string_replacer',
             'delsp'    => $delsp
         ];
@@ -1112,6 +1113,13 @@ class rcmail_action_mail_index extends rcmail_action
         return $out;
     }
 
+    /**
+     * Detect if a message attachment is an image (that can be displayed in the browser).
+     *
+     * @param rcube_message_part $part Message part - attachment
+     *
+     * @return string|null Image MIME type
+     */
     public static function part_image_type($part)
     {
         $mimetype = strtolower($part->mimetype);
@@ -1170,7 +1178,7 @@ class rcmail_action_mail_index extends rcmail_action
     {
         $last_pos = 0;
         $is_safe  = !empty($args['safe']);
-        $prefix   = isset($args['css_prefix']) ? $args['css_prefix'] : null;
+        $prefix   = $args['css_prefix'] ?? null;
         $cont_id  = trim(
             (!empty($args['container_id']) ? $args['container_id'] : '')
             . (!empty($args['body_class']) ? ' div.' . $args['body_class'] : '')
@@ -1302,7 +1310,7 @@ class rcmail_action_mail_index extends rcmail_action
             else if (preg_match('/^mailto:(.+)/i', $attrib['href'], $mailto)) {
                 $url_parts = explode('?', html_entity_decode($mailto[1], ENT_QUOTES, 'UTF-8'), 2);
                 $mailto    = $url_parts[0];
-                $url       = isset($url_parts[1]) ? $url_parts[1] : '';
+                $url       = $url_parts[1] ?? '';
 
                 // #6020: use raw encoding for correct "+" character handling as specified in RFC6068
                 $url       = rawurldecode($url);
@@ -1353,7 +1361,8 @@ class rcmail_action_mail_index extends rcmail_action
     /**
      * Decode address string and re-format it as HTML links
      */
-    public static function address_string($input, $max = null, $linked = false, $addicon = null, $default_charset = null, $title = null)
+    public static function address_string($input, $max = null, $linked = false, $addicon = null,
+        $default_charset = null, $title = null, $spoofcheck = true)
     {
         $a_parts = rcube_mime::decode_address_list($input, null, true, $default_charset);
 
@@ -1396,7 +1405,7 @@ class rcmail_action_mail_index extends rcmail_action
             $mailto = rcube_utils::idn_to_utf8($mailto);
 
             // Homograph attack detection (#6891)
-            if (!self::$SUSPICIOUS_EMAIL) {
+            if ($spoofcheck && !self::$SUSPICIOUS_EMAIL) {
                 self::$SUSPICIOUS_EMAIL = rcube_spoofchecker::check($mailto);
             }
 
@@ -1499,61 +1508,6 @@ class rcmail_action_mail_index extends rcmail_action
 
         return $out;
     }
-
-    /**
-     * Wrap text to a given number of characters per line
-     * but respect the mail quotation of replies messages (>).
-     * Finally add another quotation level by prepending the lines
-     * with >
-     *
-     * @param string $text   Text to wrap
-     * @param int    $length The line width
-     * @param bool   $quote  Enable quote indentation
-     *
-     * @return string The wrapped text
-     */
-    public static function wrap_and_quote($text, $length = 72, $quote = true)
-    {
-        // Rebuild the message body with a maximum of $max chars, while keeping quoted message.
-        $max   = max(75, $length + 8);
-        $lines = preg_split('/\r?\n/', trim($text));
-        $out   = '';
-
-        foreach ($lines as $line) {
-            // don't wrap already quoted lines
-            if (isset($line[0]) && $line[0] == '>') {
-                $line = rtrim($line);
-                if ($quote) {
-                    $line = '>' . $line;
-                }
-            }
-            // wrap lines above the length limit, but skip these
-            // special lines with links list created by rcube_html2text
-            else if (mb_strlen($line) > $max && !preg_match('|^\[[0-9]+\] https?://\S+$|', $line)) {
-                $newline = '';
-
-                foreach (explode("\n", rcube_mime::wordwrap($line, $length - 2)) as $l) {
-                    if ($quote) {
-                        $newline .= strlen($l) ? "> $l\n" : ">\n";
-                    }
-                    else {
-                        $newline .= "$l\n";
-                    }
-                }
-
-                $line = rtrim($newline);
-            }
-            else if ($quote) {
-                $line = '> ' . $line;
-            }
-
-            // Append the line
-            $out .= $line . "\n";
-        }
-
-        return rtrim($out, "\n");
-    }
-
     /**
      * Return attachment filename, handle empty filename case
      *
@@ -1632,7 +1586,7 @@ class rcmail_action_mail_index extends rcmail_action
 
         $rcmail->output->add_gui_object('search_filter', $attrib['id']);
 
-        $selected = rcube_utils::get_input_value('_filter', rcube_utils::INPUT_GET);
+        $selected = rcube_utils::get_input_string('_filter', rcube_utils::INPUT_GET);
 
         if (!$selected && !empty($_REQUEST['_search'])) {
             $selected = $_SESSION['search_filter'];

@@ -334,9 +334,11 @@ class rcube_plugin_api
         }
 
         // fall back to composer.json file
-        if (!$info) {
+        if (empty($info)) {
+            $info = [];
             $composer = INSTALL_PATH . "/plugins/$plugin_name/composer.json";
-            if (is_readable($composer) && ($json = @json_decode(file_get_contents($composer), true))) {
+
+            if (is_readable($composer) && ($json = json_decode(file_get_contents($composer), true))) {
                 // Build list of plugins required
                 $require = [];
                 foreach (array_keys((array) $json['require']) as $dname) {
@@ -355,9 +357,12 @@ class rcube_plugin_api
                     }
                 }
 
-                list($info['vendor'], $info['name']) = explode('/', $json['name']);
-                $info['version'] = $json['version'];
-                $info['license'] = $json['license'];
+                if (!empty($json['name']) && is_string($json['name']) && strpos($json['name'], '/') !== false) {
+                    list($info['vendor'], $info['name']) = explode('/', $json['name'], 2);
+                }
+
+                $info['version'] = isset($json['version']) ? $json['version'] : null;
+                $info['license'] = isset($json['license']) ? $json['license'] : null;
                 $info['require'] = $require;
 
                 if (!empty($json['homepage'])) {
@@ -381,13 +386,13 @@ class rcube_plugin_api
             ) {
                 $lock            = $composer_lock['installed'][$json['name']];
                 $info['version'] = $lock['version'];
-                $info['uri']     = $lock['homepage'] ?: $lock['source']['uri'];
-                $info['src_uri'] = $lock['dist']['uri'] ?: $lock['source']['uri'];
+                $info['uri']     = !empty($lock['homepage']) ? $lock['homepage'] : $lock['source']['url'];
+                $info['src_uri'] = !empty($lock['dist']['url']) ? $lock['dist']['url'] : $lock['source']['url'];
             }
         }
 
         // fall back to package.xml file
-        if (!$info) {
+        if (empty($info)) {
             $package = INSTALL_PATH . "/plugins/$plugin_name/package.xml";
             if (is_readable($package) && ($file = file_get_contents($package))) {
                 $doc = new DOMDocument();
@@ -773,7 +778,7 @@ class rcube_plugin_api
     protected function template_container_hook($attrib)
     {
         $container     = $attrib['name'];
-        $content       = isset($attrib['content']) ? $attrib['content'] : '';
+        $content       = $attrib['content'] ?? '';
 
         if (isset($this->template_contents[$container])) {
             $content .= $this->template_contents[$container];
