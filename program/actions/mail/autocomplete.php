@@ -1,7 +1,7 @@
 <?php
 
 // {[The file is published on the basis of YetiForce Public License that can be found in the following directory: licenses/License.html]}
-// <--------   YetiForce Sp. z o.o.   -------->
+// <--------   YetiForce S.A.   -------->
 
 class rcmail_action_mail_autocomplete extends rcmail_action
 {
@@ -41,4 +41,4 @@ class rcmail_action_mail_autocomplete extends rcmail_action
 		$rcmail->output->send();
 	}
 }
-// <--------   YetiForce Sp. z o.o.   -------->
+// <--------   YetiForce S.A.   -------->

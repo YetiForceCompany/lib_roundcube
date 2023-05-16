@@ -812,7 +812,7 @@ class yetiforce extends rcube_plugin
 			} else {
 				$signatures['all'][$value['id']] = [
 					'name' => $value['name'],
-					'body' => '<div class="pre global">' . $result . '</div>',
+					'body' => '--<br><div class="pre global">' . $result . '</div>',
 				];
 			}
 		}
