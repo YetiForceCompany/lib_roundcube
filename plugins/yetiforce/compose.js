@@ -29,6 +29,31 @@ if (window.rcmail) {
 				true
 			);
 		}
+
+		if (rcmail.env.yetiForceSignatures) {
+			let i,
+				link,
+				li,
+				list = [],
+				obj = $('#yatiforce-insert-sig'),
+				ul = $('ul', obj);
+			ul = $('<ul class="selectable listing" role="menu">');
+
+			for (i in rcmail.env.yetiForceSignatures) {
+				let row = rcmail.env.yetiForceSignatures[i];
+				li = $('<li role="menuitem">');
+				link = $('<a href="#' + i + '" tabindex="0"></a>')
+					.text(row['name'])
+					.data('id', i)
+					.on('click keypress', function (e) {
+						rcmail.setSignature(row);
+					});
+
+				link.appendTo(li);
+				list.push(li);
+			}
+			ul.append(list).appendTo(obj);
+		}
 	});
 }
 //Document selection
@@ -200,4 +225,15 @@ rcube_webmail.prototype.getCrmWindow = function () {
 		return opener.crm;
 	}
 	return false;
+};
+// Set signature
+rcube_webmail.prototype.setSignature = function (sig) {
+	if (rcmail.editor.editor && sig.body) {
+		let id = $("[name='_from']").val(),
+			old = Object.assign({}, rcmail.env.signatures[id]);
+
+		rcmail.env.signatures[id]['html'] = sig.body;
+		rcmail.editor.change_signature(id, true);
+		rcmail.env.signatures[id] = old;
+	}
 };

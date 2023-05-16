@@ -110,6 +110,7 @@ class yetiforce extends rcube_plugin
 					'LBL_ALERT_FAKE_MAIL' => \App\Language::translate('LBL_ALERT_FAKE_MAIL', 'OSSMail'),
 					'BTN_ANALYSIS_DETAILS' => \App\Language::translate('BTN_ANALYSIS_DETAILS', 'OSSMail', false, false),
 					'LBL_ALERT_FAKE_SENDER' => \App\Language::translate('LBL_ALERT_FAKE_SENDER', 'OSSMail'),
+					'LBL_SIGNATURES' => \App\Language::translate('LBL_SIGNATURES', 'OSSMail'),
 				]);
 
 				if ('preview' === $this->rc->action || 'show' === $this->rc->action || '' == $this->rc->action) {
@@ -747,44 +748,29 @@ class yetiforce extends rcube_plugin
 			}
 			$this->rc->output->set_env('signatures', $signatures);
 		}
-		if ($this->checkAddSignature()) {
+		if (!$this->checkAddSignature()) {
 			return;
 		}
-		$gS = $this->getGlobalSignature();
-		if (empty($gS['html'])) {
+		$globalSignatures = $this->getGlobalSignature();
+		$this->rc->output->set_env('yetiForceSignatures', $globalSignatures['all']);
+		if (empty($globalSignatures['global'])) {
 			return;
 		}
 		$signatures = [];
 		foreach (($this->rc->output->get_env('signatures') ?? []) as $identityId => $signature) {
-			$signatures[$identityId]['text'] = $signature['text'] . PHP_EOL . $gS['text'];
-			$signatures[$identityId]['html'] = $signature['html'] . '<div class="pre global">' . $gS['html'] . '</div>';
+			$signatures[$identityId]['text'] = $globalSignatures['text'];
+			$signatures[$identityId]['html'] = '<div class="pre global">' . $globalSignatures['global'] . '</div>';
 		}
 		if (isset($this->identitySelect['message']) && $this->identitySelect['message']->identities) {
 			foreach ($this->identitySelect['message']->identities as $identity) {
 				$identityId = $identity['identity_id'];
 				if (!isset($signatures[$identityId])) {
-					$signatures[$identityId]['text'] = "--\n" . $gS['text'];
-					$signatures[$identityId]['html'] = '--<br><div class="pre global">' . $gS['html'] . '</div>';
+					$signatures[$identityId]['text'] = "--\n" . $globalSignatures['global'];
+					$signatures[$identityId]['html'] = '--<br><div class="pre global">' . $globalSignatures['global'] . '</div>';
 				}
 			}
 		}
 		$this->rc->output->set_env('signatures', $signatures);
-	}
-
-	/**
-	 * Get global signature.
-	 *
-	 * @return array
-	 */
-	public function getGlobalSignature(): array
-	{
-		$currentPath = getcwd();
-		chdir($this->rc->config->get('root_directory'));
-		$signature = \App\Mail::getConfig('signature', 'signature');
-		$parser = App\TextParser::getInstanceById($this->currentUser->getId(), 'Users');
-		$result = $parser->setContent($signature)->parse()->getContent();
-		chdir($currentPath);
-		return ['text' => $result, 'html' => $result];
 	}
 
 	/**
@@ -796,9 +782,42 @@ class yetiforce extends rcube_plugin
 	{
 		$currentPath = getcwd();
 		chdir($this->rc->config->get('root_directory'));
-		$signatureActive = \App\Mail::getConfig('signature', 'addSignature');
+		$isDefault = false;
+		foreach (\App\Mail::getSignatures() as $value) {
+			if ($value['default']) {
+				$isDefault = true;
+				break;
+			}
+		}
 		chdir($currentPath);
-		return empty($signatureActive);
+		return $isDefault;
+	}
+
+	/**
+	 * Get global signature.
+	 *
+	 * @return array
+	 */
+	public function getGlobalSignature(): array
+	{
+		$currentPath = getcwd();
+		chdir($this->rc->config->get('root_directory'));
+
+		$parser = App\TextParser::getInstanceById($this->currentUser->getId(), 'Users');
+		$signatures = ['global' => '', 'all' => []];
+		foreach (\App\Mail::getSignatures() as $value) {
+			$result = $parser->setContent($value['body'])->parse()->getContent();
+			if ($value['default']) {
+				$signatures['global'] = $result;
+			} else {
+				$signatures['all'][$value['id']] = [
+					'name' => $value['name'],
+					'body' => '<div class="pre global">' . $result . '</div>',
+				];
+			}
+		}
+		chdir($currentPath);
+		return $signatures;
 	}
 
 	/**
