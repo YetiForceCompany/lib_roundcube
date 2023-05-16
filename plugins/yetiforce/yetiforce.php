@@ -748,9 +748,6 @@ class yetiforce extends rcube_plugin
 			}
 			$this->rc->output->set_env('signatures', $signatures);
 		}
-		if (!$this->checkAddSignature()) {
-			return;
-		}
 		$globalSignatures = $this->getGlobalSignature();
 		$this->rc->output->set_env('yetiForceSignatures', $globalSignatures['all']);
 		if (empty($globalSignatures['global'])) {
@@ -771,26 +768,6 @@ class yetiforce extends rcube_plugin
 			}
 		}
 		$this->rc->output->set_env('signatures', $signatures);
-	}
-
-	/**
-	 * Check add signature.
-	 *
-	 * @return bool
-	 */
-	public function checkAddSignature(): bool
-	{
-		$currentPath = getcwd();
-		chdir($this->rc->config->get('root_directory'));
-		$isDefault = false;
-		foreach (\App\Mail::getSignatures() as $value) {
-			if ($value['default']) {
-				$isDefault = true;
-				break;
-			}
-		}
-		chdir($currentPath);
-		return $isDefault;
 	}
 
 	/**

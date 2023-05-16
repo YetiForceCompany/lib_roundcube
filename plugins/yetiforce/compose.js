@@ -52,6 +52,13 @@ if (window.rcmail) {
 				link.appendTo(li);
 				list.push(li);
 			}
+			if (list) {
+				let sig = $('#yatiforce-insert-sig-list');
+				setTimeout(function () {
+					sig.removeClass('disabled');
+					sig.closest('.dropbutton').removeClass('disabled');
+				}, 500);
+			}
 			ul.append(list).appendTo(obj);
 		}
 	});
