@@ -756,7 +756,7 @@ class yetiforce extends rcube_plugin
 		$signatures = [];
 		foreach (($this->rc->output->get_env('signatures') ?? []) as $identityId => $signature) {
 			$signatures[$identityId]['text'] = $globalSignatures['text'];
-			$signatures[$identityId]['html'] = '<div class="pre global">' . $globalSignatures['global'] . '</div>';
+			$signatures[$identityId]['html'] = '--<br><div class="pre global">' . $globalSignatures['global'] . '</div>';
 		}
 		if (isset($this->identitySelect['message']) && $this->identitySelect['message']->identities) {
 			foreach ($this->identitySelect['message']->identities as $identity) {
