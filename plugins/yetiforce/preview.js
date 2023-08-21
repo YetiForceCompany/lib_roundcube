@@ -126,6 +126,7 @@ rcube_webmail.prototype.registerEvents = function () {
 	this.registerSelectRecord();
 	this.registerRemoveRecord();
 	this.registerImportMail();
+	this.registerAddAttachments();
 	rcmail.crm.app.registerPopover(this.crmContent.closest('body'));
 	rcmail.crm.app.registerIframeAndMoreContent(this.crmContent.closest('body'));
 	var block = this.crmContent.find('.ytHeader .js-data');
@@ -281,6 +282,54 @@ rcube_webmail.prototype.removeRecord = function (crmid) {
 		}
 		rcmail.crm.app.showNotify(notifyParams);
 		rcmail.loadActionBar();
+	});
+};
+rcube_webmail.prototype.registerAddAttachments = function () {
+	rcmail.crmContent.find('button.addAttachments').click(function (e) {
+		let row = $(e.currentTarget).closest('.rowRelatedRecord');
+		let relatedModule = row.data('module');
+		let relatedRecordId = row.data('id');
+		rcmail.crm.app.showRecordsList(
+			{
+				module: 'Documents',
+				related_parent_module: 'OSSMailView',
+				related_parent_id: this.mailId,
+				multi_select: true,
+				record_selected: false
+			},
+			(_modal, instance) => {
+				instance.setSelectEvent((responseData, _e) => {
+					responseData.module = relatedModule;
+					responseData.src_record = $(e.currentTarget).closest('.rowRelatedRecord').data('id');
+					rcmail.crm.AppConnector.request({
+						async: false,
+						dataType: 'json',
+						data: $.extend(
+							{
+								module: relatedModule,
+								action: 'RelationAjax',
+								mode: 'addRelation',
+								related_module: 'Documents',
+								src_record: relatedRecordId
+							},
+							responseData
+						)
+					}).done(function (data) {
+						let notifyParams = {
+							text: rcmail.crm.app.vtranslate('JS_DOCUMENTS_ADDED'),
+							type: 'success',
+							animation: 'show'
+						};
+						if (!data['success']) {
+							notifyParams.type = 'error';
+							notifyParams.text = rcmail.crm.app.vtranslate('JS_ERROR');
+						}
+						rcmail.crm.app.showNotify(notifyParams);
+						rcmail.loadActionBar();
+					});
+				});
+			}
+		);
 	});
 };
 rcube_webmail.prototype.showPopup = function (params, actionsParams) {
