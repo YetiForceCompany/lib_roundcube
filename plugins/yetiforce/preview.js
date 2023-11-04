@@ -161,12 +161,19 @@ rcube_webmail.prototype.registerImportMail = function () {
 			folder: rcmail.env.mailbox,
 			rcId: rcmail.env.user_id
 		})
-			.done(function () {
+			.done(function (data) {
 				rcmail.loadActionBar();
-				rcmail.crm.app.showNotify({
-					text: rcmail.crm.app.vtranslate('AddFindEmailInRecord'),
-					type: 'success'
-				});
+				if (data['result']) {
+					rcmail.crm.app.showNotify({
+						text: rcmail.crm.app.vtranslate('AddFindEmailInRecord'),
+						type: 'success'
+					});
+				} else {
+					rcmail.crm.app.showNotify({
+						text: rcmail.crm.app.vtranslate('JS_UNEXPECTED_ERROR'),
+						type: 'error'
+					});
+				}
 			})
 			.fail(function () {
 				clicked = false;
