@@ -387,7 +387,6 @@ class yetiforce extends rcube_plugin
 				$args['param'][$key] = $value;
 			}
 			if ((isset($params['crmmodule']) && 'Documents' == $params['crmmodule']) || (isset($params['filePath']) && $params['filePath'])) {
-				[$usec, $sec] = explode(' ', microtime());
 				foreach ($this->getAttachment($params['crmrecord'], $params['filePath']) as $attachment) {
 					$args['attachments'][] = $attachment;
 				}
@@ -405,8 +404,6 @@ class yetiforce extends rcube_plugin
 			if ($loadCurrentUser) {
 				self::$COMPOSE = &$_SESSION['compose_data_' . $args['id']];
 				$content = $row['content'];
-				[$usec, $sec] = explode(' ', microtime());
-				$dId = preg_replace('/[^0-9]/', '', $this->rc->user->ID . $sec . $usec);
 				foreach ($this->decodeCustomTag($content, $args) as $attachment) {
 					$_SESSION['plugins']['filesystem_attachments'][$args['id']][$attachment['id']] = realpath($attachment['path']);
 					self::$COMPOSE['attachments'][$attachment['id']] = $attachment;
@@ -458,8 +455,8 @@ class yetiforce extends rcube_plugin
 			if (!empty($subject)) {
 				$args['param']['subject'] = $subject;
 			}
+			chdir($currentPath);
 		}
-		chdir($currentPath);
 		return $args;
 	}
 
@@ -685,7 +682,7 @@ class yetiforce extends rcube_plugin
 		if (empty($ids) && empty($files)) {
 			return $attachments;
 		}
-		if (!\is_array($ids)) {
+		if (\is_array($ids)) {
 			$ids = implode(',', $ids);
 		}
 		$userid = $this->rc->user->ID;
