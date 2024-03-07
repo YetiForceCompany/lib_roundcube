@@ -249,13 +249,13 @@ class rcube_sieve_script
                     $tests[$i] = '';
                     switch ($test['test']) {
                     case 'size':
-                        $tests[$i] .= ($test['not'] ? 'not ' : '');
+                        $tests[$i] .= (!empty($test['not']) ? 'not ' : '');
                         $tests[$i] .= 'size :' . ($test['type'] == 'under' ? 'under ' : 'over ') . $test['arg'];
                         break;
 
                     case 'spamtest':
                         array_push($exts, 'spamtest');
-                        $tests[$i] .= ($test['not'] ? 'not ' : '');
+                        $tests[$i] .= (!empty($test['not']) ? 'not ' : '');
                         $tests[$i] .= $test['test'];
 
                         $this->add_operator($test, $tests[$i], $exts);
@@ -281,7 +281,7 @@ class rcube_sieve_script
                             array_push($exts, 'variables');
                         }
 
-                        $tests[$i] .= ($test['not'] ? 'not ' : '');
+                        $tests[$i] .= (!empty($test['not']) ? 'not ' : '');
                         $tests[$i] .= $test['test'];
 
                         if ($test['test'] == 'header') {
@@ -301,7 +301,7 @@ class rcube_sieve_script
                             array_push($exts, 'envelope');
                         }
 
-                        $tests[$i] .= ($test['not'] ? 'not ' : '');
+                        $tests[$i] .= (!empty($test['not']) ? 'not ' : '');
                         $tests[$i] .= $test['test'];
 
                         if ($test['test'] == 'address') {
@@ -326,7 +326,7 @@ class rcube_sieve_script
                     case 'body':
                         array_push($exts, 'body');
 
-                        $tests[$i] .= ($test['not'] ? 'not ' : '') . 'body';
+                        $tests[$i] .= (!empty($test['not']) ? 'not ' : '') . 'body';
 
                         if (!empty($test['part'])) {
                             $tests[$i] .= ' :' . $test['part'];
@@ -345,7 +345,7 @@ class rcube_sieve_script
                     case 'currentdate':
                         array_push($exts, 'date');
 
-                        $tests[$i] .= ($test['not'] ? 'not ' : '') . $test['test'];
+                        $tests[$i] .= (!empty($test['not']) ? 'not ' : '') . $test['test'];
 
                         $this->add_index($test, $tests[$i], $exts);
 
@@ -636,7 +636,7 @@ class rcube_sieve_script
     /**
      * Converts text script to rules array
      *
-     * @param string Text script
+     * @param string $script Text script
      */
     private function _parse_text($script)
     {
@@ -652,7 +652,12 @@ class rcube_sieve_script
 
             // Comments
             while (isset($script[$position]) && $script[$position] === '#') {
-                $endl = strpos($script, "\n", $position) ?: $length;
+                $endl = strpos($script, "\n", $position);
+                if ($endl === false) {
+                    $endl = $length;
+                } elseif ($script[$endl - 1] === "\r") {
+                    --$endl;
+                }
                 $line = substr($script, $position, $endl - $position);
 
                 // Roundcube format

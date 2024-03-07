@@ -4,11 +4,10 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit0131bc14b0a109838f32424aaf95fbe4
+class ComposerStaticInitd30534b7ccef70d5be1f4ba9bc89dbe4
 {
     public static $files = array (
         '7b11c4dc42b3b3023073cb14e519683c' => __DIR__ . '/..' . '/ralouphie/getallheaders/src/getallheaders.php',
-        'c964ee0ededf28c96ebd9db5099ef910' => __DIR__ . '/..' . '/guzzlehttp/promises/src/functions_include.php',
         '6e3fae29631ef280660b3cdad06f25a8' => __DIR__ . '/..' . '/symfony/deprecation-contracts/function.php',
         '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
     );
@@ -166,17 +165,16 @@ class ComposerStaticInit0131bc14b0a109838f32424aaf95fbe4
         'Net_LDAP3_Result' => __DIR__ . '/..' . '/kolab/net_ldap3/lib/Net/LDAP3/Result.php',
         'Net_Sieve' => __DIR__ . '/..' . '/pear/net_sieve/Sieve.php',
         'PEAR_Exception' => __DIR__ . '/..' . '/pear/pear_exception/PEAR/Exception.php',
-        'SieveTest' => __DIR__ . '/..' . '/pear/net_sieve/tests/SieveTest.php',
     );
 
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit0131bc14b0a109838f32424aaf95fbe4::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit0131bc14b0a109838f32424aaf95fbe4::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInit0131bc14b0a109838f32424aaf95fbe4::$prefixesPsr0;
-            $loader->fallbackDirsPsr0 = ComposerStaticInit0131bc14b0a109838f32424aaf95fbe4::$fallbackDirsPsr0;
-            $loader->classMap = ComposerStaticInit0131bc14b0a109838f32424aaf95fbe4::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInitd30534b7ccef70d5be1f4ba9bc89dbe4::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInitd30534b7ccef70d5be1f4ba9bc89dbe4::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInitd30534b7ccef70d5be1f4ba9bc89dbe4::$prefixesPsr0;
+            $loader->fallbackDirsPsr0 = ComposerStaticInitd30534b7ccef70d5be1f4ba9bc89dbe4::$fallbackDirsPsr0;
+            $loader->classMap = ComposerStaticInitd30534b7ccef70d5be1f4ba9bc89dbe4::$classMap;
 
         }, null, ClassLoader::class);
     }

@@ -48,11 +48,18 @@ class rcmail extends rcube
      * @var string
      */
     public $action    = '';
+
     public $comm_path = './';
     public $filename  = '';
     public $default_skin;
     public $login_error;
     public $oauth;
+
+    /** @var ?string Temporary user email (set on user creation only) */
+    public $user_email;
+
+    /** @var ?string Temporary user password (set on user creation only) */
+    public $password;
 
     private $address_books = [];
     private $action_map    = [];
@@ -68,8 +75,8 @@ class rcmail extends rcube
     /**
      * This implements the 'singleton' design pattern
      *
-     * @param integer $mode Ignored rcube::get_instance() argument
-     * @param string  $env  Environment name to run (e.g. live, dev, test)
+     * @param int    $mode Ignored rcube::get_instance() argument
+     * @param string $env  Environment name to run (e.g. live, dev, test)
      *
      * @return rcmail The one and only instance
      */
@@ -300,25 +307,26 @@ class rcmail extends rcube
      *                          - rcube_addressbook::TYPE_CONTACT (or 'sql') for the SQL addressbook
      *                          - rcube_addressbook::TYPE_DEFAULT for the default addressbook
      * @param bool   $writeable True if the address book needs to be writeable
+     * @param bool   $fallback  Fallback to the first existing source, if the configured default wasn't found
      *
      * @return rcube_contacts|null Address book object
      */
-    public function get_address_book($id, $writeable = false)
+    public function get_address_book($id, $writeable = false, $fallback = true)
     {
         $contacts    = null;
         $ldap_config = (array) $this->config->get('ldap_public');
         $default     = false;
 
+        $id = (string) $id;
+
         // 'sql' is the alias for '0' used by autocomplete
         if ($id == 'sql') {
-            $id = rcube_addressbook::TYPE_CONTACT;
+            $id = (string) rcube_addressbook::TYPE_CONTACT;
         }
-        else if ($id == rcube_addressbook::TYPE_DEFAULT || $id == -1) { // -1 for BC
+        else if ($id === strval(rcube_addressbook::TYPE_DEFAULT) || $id === '-1') { // -1 for BC
             $id = $this->config->get('default_addressbook');
             $default = true;
         }
-
-        $id = (string) $id;
 
         // use existing instance
         if (isset($this->address_books[$id]) && ($this->address_books[$id] instanceof rcube_addressbook)) {
@@ -352,12 +360,13 @@ class rcmail extends rcube
 
         // Get first addressbook from the list if configured default doesn't exist
         // This can happen when user deleted the addressbook (e.g. Kolab folder)
-        if (!$contacts && (!$id || $default)) {
+        if ($fallback && !$contacts && (!$id || $default)) {
             $source = $this->get_address_sources($writeable, !$default);
             $source = reset($source);
 
             if (!empty($source)) {
-                $contacts = $this->get_address_book($source['id']);
+                // Note: No fallback here to prevent from an infinite loop
+                $contacts = $this->get_address_book($source['id'], false, false);
                 if ($contacts) {
                     $id = $source['id'];
                 }
@@ -959,7 +968,7 @@ class rcmail extends rcube
             list(, $domain) = rcube_utils::explode('@', $post_user);
 
             // direct match in default_host array
-            if ($default_host[$post_host] || in_array($post_host, array_values($default_host))) {
+            if (!empty($default_host[$post_host]) || in_array($post_host, array_values($default_host))) {
                 $host = $post_host;
             }
             // try to select host by mail domain
@@ -1034,7 +1043,7 @@ class rcmail extends rcube
 
             // Trash subfolders
             $delimiter  = $storage->get_hierarchy_delimiter();
-            $subfolders = array_reverse($storage->list_folders('', $trash_mbox . $delimiter . '*'));
+            $subfolders = array_reverse($storage->list_folders($trash_mbox . $delimiter, '*'));
             $last       = '';
 
             foreach ($subfolders as $folder) {
@@ -1109,14 +1118,7 @@ class rcmail extends rcube
             }
         }
 
-        $base_path = '';
-        if (!empty($_SERVER['REDIRECT_SCRIPT_URL'])) {
-            $base_path = $_SERVER['REDIRECT_SCRIPT_URL'];
-        }
-        else if (!empty($_SERVER['SCRIPT_NAME'])) {
-            $base_path = $_SERVER['SCRIPT_NAME'];
-        }
-        $base_path = preg_replace('![^/]+$!', '', $base_path);
+        $base_path = $this->get_request_path();
 
         if ($secure && ($token = $this->get_secure_url_token(true))) {
             // add token to the url
@@ -1145,15 +1147,44 @@ class rcmail extends rcube
             $prefix = rtrim($prefix, '/') . '/';
         }
         else {
-            if (isset($_SERVER['REQUEST_URI'])) {
-                $prefix = preg_replace('/[?&].*$/', '', $_SERVER['REQUEST_URI']) ?: './';
-            }
-            else {
-                $prefix = './';
-            }
+            $prefix = $base_path ?: './';
         }
 
         return $prefix . $url;
+    }
+
+    /**
+     * Get the the request path
+     */
+    protected function get_request_path()
+    {
+        $path = $this->config->get('request_path');
+
+        if ($path && isset($_SERVER[$path])) {
+            // HTTP headers need to come from a trusted proxy host
+            if (strpos($path, 'HTTP_') === 0 && !rcube_utils::check_proxy_whitelist_ip()) {
+                return '/';
+            }
+
+            $path = $_SERVER[$path];
+        }
+        else if (empty($path)) {
+            foreach (['REQUEST_URI', 'REDIRECT_SCRIPT_URL', 'SCRIPT_NAME'] as $name) {
+                if (!empty($_SERVER[$name])) {
+                    $path = $_SERVER[$name];
+                    break;
+                }
+            }
+        }
+        else {
+            return rtrim($path, '/') . '/';
+        }
+
+        $path = preg_replace('/index\.php.*$/', '', (string) $path);
+        $path = preg_replace('/[?&].*$/', '', $path);
+        $path = preg_replace('![^/]+$!', '', $path);
+
+        return rtrim($path, '/') . '/';
     }
 
     /**
@@ -1575,7 +1606,7 @@ class rcmail extends rcube
      * Convert the given date to a human readable form
      * This uses the date formatting properties from config
      *
-     * @param mixed  $date    Date representation (string, timestamp or DateTime object)
+     * @param mixed  $date    Date representation (string, timestamp or DateTimeInterface)
      * @param string $format  Date format to use
      * @param bool   $convert Enables date conversion according to user timezone
      *
@@ -1583,7 +1614,7 @@ class rcmail extends rcube
      */
     public function format_date($date, $format = null, $convert = true)
     {
-        if (is_object($date) && is_a($date, 'DateTime')) {
+        if ($date instanceof DateTimeInterface) {
             $timestamp = $date->format('U');
         }
         else {

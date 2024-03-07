@@ -270,12 +270,12 @@ $config['messages_cache_threshold'] = 50;
 // of IMAP host (no prefix or port) and SMTP server e.g. ['imap.example.com' => 'smtp.example.net']
 $config['smtp_host'] = 'localhost:587';
 
-// SMTP username (if required) if you use %u as the username Roundcube
-// will use the current username for login
+// SMTP username (if required)
+// Note: %u variable will be replaced with current user's username
 $config['smtp_user'] = '%u';
 
-// SMTP password (if required) if you use %p as the password Roundcube
-// will use the current user's password for login
+// SMTP password (if required)
+// Note: When set to '%p' current user's password will be used
 $config['smtp_pass'] = '%p';
 
 // SMTP AUTH type (DIGEST-MD5, CRAM-MD5, LOGIN, PLAIN or empty to use
@@ -311,11 +311,11 @@ $config['smtp_timeout'] = 0;
 // The example below enables server certificate validation, and
 // requires 'smtp_timeout' to be non zero.
 // $config['smtp_conn_options'] = [
-//   'ssl'         => [
-//     'verify_peer'  => true,
-//     'verify_depth' => 3,
-//     'cafile'       => '/etc/openssl/certs/ca.crt',
-//   ],
+//     'ssl' => [
+//         'verify_peer'  => true,
+//         'verify_depth' => 3,
+//         'cafile'       => '/etc/openssl/certs/ca.crt',
+//     ],
 // ];
 // Note: These can be also specified as an array of options indexed by hostname
 $config['smtp_conn_options'] = null;
@@ -799,8 +799,19 @@ $config['no_save_sent_messages'] = false;
 // Warning: This requires http server configuration. Sample:
 //    RewriteRule ^/roundcubemail/[a-zA-Z0-9]{16}/(.*) /roundcubemail/$1 [PT]
 //    Alias /roundcubemail /var/www/roundcubemail/
+// Warning: This feature does NOT work with request_path = 'SCRIPT_NAME'
 // Note: Use assets_path to not prevent the browser from caching assets
 $config['use_secure_urls'] = false;
+
+// Specifies the full path of the original HTTP request, either as a real path or
+// $_SERVER field name. This might be useful when Roundcube runs behind a reverse
+// proxy using a subpath. This is a path part of the URL, not the full URL!
+// The reverse proxy config can specify a custom header (e.g. X-Forwarded-Path) containing
+// the path under which Roundcube is exposed to the outside world (e.g. /rcube/).
+// This header value is then available in PHP with $_SERVER['HTTP_X_FORWARDED_PATH'].
+// By default the path comes from  'REDIRECT_SCRIPT_URL', 'SCRIPT_NAME' or 'REQUEST_URI',
+// whichever is set (in this order).
+$config['request_path'] = null;
 
 // Allows to define separate server/path for image/js/css files
 // Warning: If the domain is different cross-domain access to some
@@ -1087,10 +1098,12 @@ $config['ldap_public']['Verisign'] = [
   // to be one of the search_fields, the base of base_dn is appended
   // to the RDN to insert into the LDAP directory.
   'LDAP_rdn'       => 'cn',
-  // The required fields needed to build a new contact as required by
+  // The required attributes needed to build a new contact as required by
   // the object classes (can include additional fields not required by the object classes).
   'required_fields' => ['cn', 'sn', 'mail'],
-  'search_fields'   => ['mail', 'cn'],  // fields to search in
+  // The attributes used when searching with "All fields" option
+  // If empty, attributes for name, surname, firstname and email fields will be used
+  'search_fields'   => ['mail', 'cn'],
   // mapping of contact fields to directory attributes
   //   1. for every attribute one can specify the number of values (limit) allowed.
   //      default is 1, a wildcard * means unlimited
@@ -1232,12 +1245,12 @@ $config['contact_form_mode'] = 'private';
 // The addressbook source to store automatically collected recipients in.
 // Default: true (the built-in "Collected recipients" addressbook, source id = '1')
 // Note: It can be set to any writeable addressbook, e.g. 'sql'
-$config['collected_recipients'] = false;
+$config['collected_recipients'] = true;
 
 // The addressbook source to store trusted senders in.
 // Default: true (the built-in "Trusted senders" addressbook, source id = '2')
 // Note: It can be set to any writeable addressbook, e.g. 'sql'
-$config['collected_senders'] = false;
+$config['collected_senders'] = true;
 
 
 // ----------------------------------

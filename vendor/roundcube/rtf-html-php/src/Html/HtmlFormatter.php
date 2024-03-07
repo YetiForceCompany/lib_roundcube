@@ -6,10 +6,15 @@ use RtfHtmlPhp\Document;
 
 class HtmlFormatter
 {
-    protected $output = '';
     protected $encoding;
     protected $defaultFont;
     protected $fromhtml = false;
+    protected $openedTags = [];
+    protected $output = '';
+    protected $previousState;
+    protected $rtfEncoding;
+    protected $state;
+    protected $states = [];
 
     /**
      * Object constructor.
@@ -65,8 +70,8 @@ class HtmlFormatter
         $this->processGroup($document->root);
 
         // Instead of removing opened tags, we close them
-        $this->output .= $this->openedTags['span'] ? '</span>' : '';
-        $this->output .= $this->openedTags['p'] ? '</p>' : '';
+        $this->output .= $this->openedTags['span'] ? '</span>' : ''; // @phpstan-ignore-line
+        $this->output .= $this->openedTags['p'] ? '</p>' : ''; // @phpstan-ignore-line
 
         // Remove extra empty paragraph at the end
         // TODO: Find the real reason it's there and fix it
@@ -490,7 +495,7 @@ class HtmlFormatter
             return;
         }
 
-        if ($this->openedTags['p'] === null) {
+        if (!isset($this->openedTags['p'])) {
             // Create the first paragraph
             $this->openTag('p');
         }
@@ -499,9 +504,7 @@ class HtmlFormatter
         // 1st case: style change occured
         // 2nd case: there is no change in style but the already created 'span'
         // element is somehow closed (ex. because of an end of paragraph)
-        if (!$this->state->equals($this->previousState)
-            || ($this->state->equals($this->previousState) && !$this->openedTags['span'])
-        ) {
+        if (!$this->state->equals($this->previousState) || empty($this->openedTags['span'])) {
             // If applicable close previously opened 'span' tag
             $this->closeTag('span');
 
@@ -535,7 +538,7 @@ class HtmlFormatter
             return;
         }
 
-        if ($this->openedTags[$tag]) {
+        if (!empty($this->openedTags[$tag])) {
             // Check for empty html elements
             if (substr($this->output, -strlen("<{$tag}>")) == "<{$tag}>") {
                 switch ($tag) {
@@ -649,6 +652,8 @@ class HtmlFormatter
         if (isset($map[$charset])) {
             return $map[$charset];
         }
+
+        return null;
     }
 
     /**
@@ -702,12 +707,14 @@ class HtmlFormatter
         if (isset($map[$cpg])) {
             return $map[$cpg];
         }
+
+        return null;
     }
 
     protected function ordUtf8($chr)
     {
         $ord0 = ord($chr);
-        if ($ord0 >= 0 && $ord0 <= 127) {
+        if ($ord0 <= 127) {
             return $ord0;
         }
 

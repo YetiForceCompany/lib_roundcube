@@ -77,6 +77,7 @@ class rcube_db
      */
     public static function factory($db_dsnw, $db_dsnr = '', $pconn = false)
     {
+        $db_dsnw    = (string) $db_dsnw;
         $driver     = strtolower(substr($db_dsnw, 0, strpos($db_dsnw, ':')));
         $driver_map = [
             'sqlite2' => 'sqlite',
@@ -294,9 +295,11 @@ class rcube_db
                 }
                 else if ($mode == 'r') {
                     // connected to db with the same or "higher" mode for this table
-                    $db_mode = $this->table_connections[$table];
-                    if ($db_mode == 'w' && empty($this->options['dsnw_noread'])) {
-                        $mode = $db_mode;
+                    if (isset($this->table_connections[$table])) {
+                        $db_mode = $this->table_connections[$table];
+                        if ($db_mode == 'w' && empty($this->options['dsnw_noread'])) {
+                            $mode = $db_mode;
+                        }
                     }
                 }
             }
@@ -335,6 +338,16 @@ class rcube_db
 
             rcube::write_log('sql', '[' . (++$this->db_index) . '] ' . $query . ';');
         }
+    }
+
+    /**
+     * Getter for an information about the last error.
+     *
+     * @return ?array [SQLSTATE error code, driver specific error code, driver specific error message]
+     */
+    public function error_info()
+    {
+        return $this->dbh ? $this->dbh->errorInfo() : null;
     }
 
     /**
@@ -1212,7 +1225,7 @@ class rcube_db
     /**
      * MDB2 DSN string parser
      *
-     * @param string $sequence Sequence name
+     * @param string $dsn DSN string
      *
      * @return array DSN parameters
      */
@@ -1413,7 +1426,7 @@ class rcube_db
      *
      * @param string $sql SQL queries to execute
      *
-     * @return boolean True on success, False on error
+     * @return bool True on success, False on error
      */
     public function exec_script($sql)
     {

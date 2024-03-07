@@ -4,16 +4,20 @@ namespace RtfHtmlPhp;
 
 class Document
 {
+    /** @var ?string Current character in an RTF stream */
+    protected $char;
     /** @var string RTF string being parsed */
     protected $rtf;
     /** @var int Current position in RTF string */
     protected $pos;
     /** @var int Length of RTF string */
     protected $len;
-    /** @var Group Current RTF group */
+    /** @var ?Group Current RTF group */
     protected $group;
+    /** @var array */
+    protected $uc = [];
 
-    /** @var Group Root group */
+    /** @var ?Group Root group */
     public $root = null;
 
     /**
@@ -27,10 +31,10 @@ class Document
     }
 
     /**
-     * Get the next character from the RTF stream.
+     * Position on the next character from the RTF stream.
      * Parsing is aborted when reading beyond end of input string.
      *
-     * @return string
+     * @return void
      */
     protected function getChar()
     {
@@ -110,7 +114,7 @@ class Document
     {
         $group = new Group();
 
-        if ($this->group != null) {
+        if ($this->group) {
             // Make the new group a child of the current group
             $group->parent = $this->group;
 
@@ -170,7 +174,7 @@ class Document
             if ($parameter === null) {
                 $parameter = 0;
             }
-            $parameter = $parameter * 10 + $this->char;
+            $parameter = $parameter * 10 + (int) $this->char;
             $this->getChar();
         }
 
@@ -349,7 +353,7 @@ class Document
 
         // If there is no current group, then this is not a valid RTF file.
         // Throw an exception.
-        if ($this->group == null) {
+        if (!$this->group) {
             throw new \Exception("Parse error: RTF text outside of group.");
         }
 

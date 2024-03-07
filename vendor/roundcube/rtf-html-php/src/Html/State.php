@@ -6,6 +6,17 @@ class State
 {
     public static $fonttbl = [];
     public static $colortbl = [];
+    public $bold;
+    public $italic;
+    public $underline;
+    public $strike;
+    public $hidden;
+    public $fontsize;
+    public $fontcolor;
+    public $background;
+    public $hcolor;
+    public $font;
+    public $htmlrtf;
 
     protected static $highlight = [
         1  => 'Black',
@@ -25,6 +36,7 @@ class State
         15 => 'DarkGray',
         16 => 'LightGray'
     ];
+
 
     /**
      * Object constructor
@@ -94,11 +106,11 @@ class State
         // a dedicated state->end_underline variable
         // if($this->state->end_underline) {$span .= "text-decoration:none";}
         if ($this->strike) {
-            $style .= "text-decoration:line-through";
+            $style[] = "text-decoration:line-through";
         }
 
         if ($this->hidden) {
-            $style .= "display:none";
+            $style[] = "display:none";
         }
 
         if (isset($this->font)) {

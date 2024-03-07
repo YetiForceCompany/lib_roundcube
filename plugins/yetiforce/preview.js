@@ -18,13 +18,6 @@ if (window.rcmail) {
 			true
 		);
 		rcmail.register_command(
-			'plugin.yetiforce.addSenderToList',
-			function (props) {
-				rcmail.addSenderToList(props);
-			},
-			rcmail.env.uid
-		);
-		rcmail.register_command(
 			'plugin.yetiforce.loadMailAnalysis',
 			function (props) {
 				rcmail.loadMailAnalysis(props);
@@ -36,61 +29,11 @@ if (window.rcmail) {
 		});
 		if (rcmail.message_list) {
 			rcmail.message_list.addEventListener('select', function (list) {
-				rcmail.enable_command('plugin.yetiforce.addSenderToList', list.get_selection(false).length > 0);
 				rcmail.enable_command('plugin.yetiforce.loadMailAnalysis', list.get_selection(false).length > 0);
-			});
-			rcmail.addEventListener('listupdate', function () {
-				let btns = $('#toolbar-menu .js-white-list-btn');
-				if (rcmail.env.mailbox === rcmail.env.junk_mailbox) {
-					btns.hide();
-				} else {
-					btns.show();
-				}
-			});
-		}
-		if (rcmail.env.layout == 'widescreen') {
-			if (rcmail.gui_objects.messagelist) {
-				rcmail.addEventListener('insertrow', function (evt) {
-					if (typeof rcmail.env.yf_rblList !== 'undefined' && typeof rcmail.env.yf_senderList !== 'undefined') {
-						if (typeof rcmail.env.yf_rblList[evt.uid] !== 'undefined') {
-							evt.row.obj.style.backgroundColor = rcmail.env.yf_rblList[evt.uid];
-						} else {
-							evt.row.obj.style.backgroundColor = '#eaeaea';
-						}
-						if (typeof rcmail.env.yf_senderList[evt.uid] !== 'undefined') {
-							$('.fromto', evt.row.obj).prepend(
-								$('<span class="sender-alert-icon"/>').html(rcmail.env.yf_senderList[evt.uid])
-							);
-						}
-					}
-				});
-			}
-		}
-		if (rcmail.env.action == 'preview') {
-			$('#moreAlertBtn').on('click', function () {
-				let alert = $('#moreAlert');
-				if (alert.hasClass('d-none')) {
-					alert.removeClass('d-none');
-				} else {
-					alert.addClass('d-none');
-				}
 			});
 		}
 	});
 }
-// Add sender to list action
-rcube_webmail.prototype.addSenderToList = function (props) {
-	this.http_post(
-		'plugin.yetiforce-addSenderToList',
-		this.selection_post_data({
-			_props: props
-		}),
-		this.set_busy(true, 'loading')
-	);
-};
-rcube_webmail.prototype.addSenderToListMove = function (mbox) {
-	this.move_messages(mbox);
-};
 // import ICS file action
 rcube_webmail.prototype.importICS = function (part, type) {
 	this.http_post(

@@ -932,6 +932,16 @@ class rcube_message
                         $mail_part->content_location .= $mail_part->headers['content-location'];
                     }
 
+                    // application/smil message's are known to use inline images that aren't really inline (#8870)
+                    // TODO: This code probably does not belong here. I.e. we should not default to
+                    // disposition=inline in rcube_imap::structure_part().
+                    if ($primary_type === 'image'
+                        && !empty($structure->ctype_parameters['type'])
+                        && $structure->ctype_parameters['type'] === 'application/smil'
+                    ) {
+                        $mail_part->disposition = 'attachment';
+                    }
+
                     // part belongs to a related message and is linked
                     // Note: mixed is not supposed to contain inline images, but we've found such examples (#5905)
                     if (
@@ -1112,7 +1122,7 @@ class rcube_message
             $tpart->ctype_secondary = trim(strtolower($winatt['subtype']));
             $tpart->mimetype        = $tpart->ctype_primary . '/' . $tpart->ctype_secondary;
             $tpart->mime_id         = 'winmail.' . $part->mime_id . '.' . $pid;
-            $tpart->size            = $winatt['size'];
+            $tpart->size            = $winatt['size'] ?? 0;
             $tpart->body            = $winatt['stream'];
 
             if (!empty($winatt['content-id'])) {

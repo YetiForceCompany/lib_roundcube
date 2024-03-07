@@ -84,6 +84,11 @@ class rcube_ldap extends rcube_addressbook
 
         $fetch_attributes = ['objectClass'];
 
+        // Disable VLV by default
+        if (!isset($this->prop['vlv'])) {
+            $this->prop['vlv'] = false;
+        }
+
         // check if groups are configured
         if (!empty($p['groups']) && is_array($p['groups'])) {
             $this->groups = true;
@@ -187,7 +192,7 @@ class rcube_ldap extends rcube_addressbook
                     (array) ($this->coltypes['address']['subtypes'] ?? null),
                     (array) ($this->coltypes['locality']['subtypes'] ?? null)
                 ),
-            ] + (array) $this->coltypes['address'];
+            ] + (array) ($this->coltypes['address'] ?? []);
 
             foreach (['street','locality','zipcode','region','country'] as $childcol) {
                 if (!empty($this->coltypes[$childcol])) {
@@ -221,19 +226,15 @@ class rcube_ldap extends rcube_addressbook
             }
         }
 
-        // make sure 'required_fields' is an array
-        if (!isset($this->prop['required_fields'])) {
-            $this->prop['required_fields'] = [];
-        }
-        else if (!is_array($this->prop['required_fields'])) {
-            $this->prop['required_fields'] = (array) $this->prop['required_fields'];
-        }
+        // make sure 'required_fields' and 'autovalues' are an array
+        $this->prop['required_fields'] = (array) ($this->prop['required_fields'] ?? []);
+        $this->prop['autovalues'] = (array) ($this->prop['autovalues'] ?? []);
 
         // make sure LDAP_rdn field is required
         if (
             !empty($this->prop['LDAP_rdn'])
             && !in_array($this->prop['LDAP_rdn'], $this->prop['required_fields'])
-            && !in_array($this->prop['LDAP_rdn'], array_keys((array)$this->prop['autovalues']))
+            && !array_key_exists($this->prop['LDAP_rdn'], $this->prop['autovalues'])
         ) {
             $this->prop['required_fields'][] = $this->prop['LDAP_rdn'];
         }
@@ -328,9 +329,9 @@ class rcube_ldap extends rcube_addressbook
             $conf  = $rcube->plugins->exec_hook('ldap_connected', $this->prop + ['host' => $host]);
 
             $bind_pass   = $conf['bind_pass'] ?? null;
-            $bind_user   = $conf['bind_user'] ?? null;
-            $bind_dn     = $conf['bind_dn'] ?? null;
-            $auth_method = $conf['auth_method'] ?? null;
+            $bind_user   = $conf['bind_user'] ?? '';
+            $bind_dn     = $conf['bind_dn'] ?? '';
+            $auth_method = $conf['auth_method'] ?? '';
 
             $this->base_dn = $this->groups_base_dn = $conf['base_dn'] ?? null;
             if (!empty($conf['groups']['base_dn'])) {
@@ -540,7 +541,7 @@ class rcube_ldap extends rcube_addressbook
     /**
      * Set internal list page
      *
-     * @param  number  Page number to list
+     * @param number $page Page number to list
      */
     function set_page($page)
     {
@@ -551,7 +552,7 @@ class rcube_ldap extends rcube_addressbook
     /**
      * Set internal page size
      *
-     * @param  number  Number of records to display on one page
+     * @param number $size Number of records to display on one page
      */
     function set_pagesize($size)
     {
@@ -803,7 +804,7 @@ class rcube_ldap extends rcube_addressbook
      */
     function _entry_sort_cmp($a, $b)
     {
-        return strcmp($a[$this->sort_col][0], $b[$this->sort_col][0]);
+        return strcmp($a[$this->sort_col][0] ?? '', $b[$this->sort_col][0] ?? '');
     }
 
     /**
@@ -860,11 +861,13 @@ class rcube_ldap extends rcube_addressbook
             foreach ($ldap_data as $entry) {
                 $rec = $this->_ldap2result($entry);
                 foreach ($fields as $f) {
-                    foreach ((array)$rec[$f] as $val) {
-                        if ($this->compare_search_value($f, $val, $search, $mode)) {
-                            $this->result->add($rec);
-                            $this->result->count++;
-                            break 2;
+                    if (!empty($rec[$f])) {
+                        foreach ((array)$rec[$f] as $val) {
+                            if ($this->compare_search_value($f, $val, $search, $mode)) {
+                                $this->result->add($rec);
+                                $this->result->count++;
+                                break 2;
+                            }
                         }
                     }
                 }
@@ -908,22 +911,21 @@ class rcube_ldap extends rcube_addressbook
             $filter .= ')';
         }
         else {
+            $attributes = [];
+
             if ($fields == '*') {
-                // search_fields are required for fulltext search
-                if (empty($this->prop['search_fields'])) {
-                    $this->set_error(self::ERROR_SEARCH, 'nofulltextsearch');
-                    $this->result = new rcube_result_set();
-                    return $this->result;
+                $fields = (array) ($this->prop['search_fields'] ?? []);
+
+                // If search fields aren't configured use some common fields
+                if (empty($fields)) {
+                    $fields = ['name', 'surname', 'firstname', 'email'];
                 }
-                $attributes = (array) $this->prop['search_fields'];
             }
-            else {
-                // map address book fields into ldap attributes
-                $attributes = [];
-                foreach ((array) $fields as $field) {
-                    if (!empty($this->coltypes[$field]) && !empty($this->coltypes[$field]['attributes'])) {
-                        $attributes = array_merge($attributes, (array) $this->coltypes[$field]['attributes']);
-                    }
+
+            // map address book fields into ldap attributes
+            foreach ((array) $fields as $field) {
+                if (!empty($this->coltypes[$field]) && !empty($this->coltypes[$field]['attributes'])) {
+                    $attributes = array_merge($attributes, (array) $this->coltypes[$field]['attributes']);
                 }
             }
 
@@ -1026,11 +1028,14 @@ class rcube_ldap extends rcube_addressbook
 
             // add general filter to query
             if (!empty($this->prop['filter'])) {
-                $prop['filter'] = '(&(' . preg_replace('/^\(|\)$/', '', $this->prop['filter']) . ')' . $prop['filter'] . ')';
+                $prop['filter'] = '(&(' . preg_replace('/^\(|\)$/', '', $this->prop['filter']) . ')' . $filter . ')';
             }
         }
 
-        $result = $this->ldap->search($base_dn, $prop['filter'], $prop['scope'], $attrs, $prop, $count);
+        $search_scope  = $prop['scope'] ?? 'sub';
+        $search_filter = $prop['filter'] ?? '(objectclass=*)';
+
+        $result = $this->ldap->search($base_dn, $search_filter, $search_scope, $attrs, $prop, $count);
         $result_count = 0;
 
         // we have a search result resource, get all entries
@@ -1046,18 +1051,19 @@ class rcube_ldap extends rcube_addressbook
             && is_array($this->prop['group_filters'])
             && !empty($this->prop['groups']['filter'])
         ) {
-            $filter = '(&(' . preg_replace('/^\(|\)$/', '', $this->prop['groups']['filter']) . ')' . $filter . ')';
-
-            // for groups we may use cn instead of displayname...
-            if ($this->prop['fieldmap']['name'] != $this->prop['groups']['name_attr']) {
-                $filter = str_replace(strtolower($this->prop['fieldmap']['name']) . '=', $this->prop['groups']['name_attr'] . '=', $filter);
-            }
-
             $name_attr  = $this->prop['groups']['name_attr'];
             $email_attr = $this->prop['groups']['email_attr'] ?: 'mail';
             $attrs      = array_unique(['dn', 'objectClass', $name_attr, $email_attr]);
 
-            $res = $this->ldap->search($this->groups_base_dn, $filter, $this->prop['groups']['scope'], $attrs, $prop, $count);
+            $search_scope  = $this->prop['groups']['scope'] ?? 'sub';
+            $search_filter = '(&(' . preg_replace('/^\(|\)$/', '', $this->prop['groups']['filter']) . ')' . $filter . ')';
+
+            // for groups we may use cn instead of displayname...
+            if ($this->prop['fieldmap']['name'] != $name_attr) {
+                $search_filter = str_replace(strtolower($this->prop['fieldmap']['name']) . '=', $name_attr . '=', $search_filter);
+            }
+
+            $res = $this->ldap->search($this->groups_base_dn, $search_filter, $search_scope, $attrs, $prop, $count);
 
             if ($count && $res) {
                 $result += $res;
@@ -1571,7 +1577,7 @@ class rcube_ldap extends rcube_addressbook
             $attrvals['{'.$k.'}'] = is_array($v) ? $v[0] : $v;
         }
 
-        foreach ((array) $this->prop['autovalues'] as $lf => $templ) {
+        foreach ($this->prop['autovalues'] as $lf => $templ) {
             if (empty($attrs[$lf])) {
                 if (strpos($templ, '(') !== false) {
                     // replace {attr} placeholders with (escaped!) attribute values to be safely eval'd
@@ -1617,9 +1623,15 @@ class rcube_ldap extends rcube_addressbook
 
         // determine record type
         if ($this->is_group_entry($rec)) {
-            $out['_type']     = 'group';
-            $out['readonly']  = true;
-            $fieldmap['name'] = $this->group_data['name_attr'] ?: $this->prop['groups']['name_attr'];
+            $out['_type']    = 'group';
+            $out['readonly'] = true;
+
+            if (!empty($this->group_data['name_attr'])) {
+                $fieldmap['name'] = $this->group_data['name_attr'];
+            }
+            else if (!empty($this->prop['groups']['name_attr'])) {
+                $fieldmap['name'] = $this->prop['groups']['name_attr'];
+            }
         }
 
         // assign object type from object class mapping
@@ -1795,6 +1807,10 @@ class rcube_ldap extends rcube_addressbook
      */
     private function is_group_entry($entry)
     {
+        if (empty($entry['objectclass'])) {
+            return false;
+        }
+
         $classes = array_map('strtolower', (array)$entry['objectclass']);
 
         return count(array_intersect(array_keys($this->group_types), $classes)) > 0;
@@ -1899,12 +1915,12 @@ class rcube_ldap extends rcube_addressbook
         }
 
         $base_dn    = $this->groups_base_dn;
-        $filter     = $this->prop['groups']['filter'];
-        $scope      = $this->prop['groups']['scope'];
-        $name_attr  = $this->prop['groups']['name_attr'];
-        $email_attr = $this->prop['groups']['email_attr'] ?: 'mail';
-        $sort_attrs = (array) ($this->prop['groups']['sort'] ? $this->prop['groups']['sort'] : $name_attr);
-        $sort_attr  = $sort_attrs[0];
+        $filter     = $this->prop['groups']['filter'] ?? null;
+        $scope      = $this->prop['groups']['scope'] ?? 'sub';
+        $name_attr  = !empty($this->prop['groups']['name_attr']) ? $this->prop['groups']['name_attr'] : 'cn';
+        $email_attr = !empty($this->prop['groups']['email_attr']) ? $this->prop['groups']['email_attr'] : 'mail';
+        $sort_attrs = (array) (!empty($this->prop['groups']['sort']) ? $this->prop['groups']['sort'] : $name_attr);
+        $sort_attr  = array_first($sort_attrs) ?: $name_attr;
         $page_size  = 200;
 
         $ldap = $this->ldap;
@@ -1920,7 +1936,7 @@ class rcube_ldap extends rcube_addressbook
             $ldap->set_vlv_page($vlv_page+1, $page_size);
         }
 
-        $props = ['sort' => $this->prop['groups']['sort']];
+        $props = ['sort' => $this->prop['groups']['sort'] ?? null];
         $attrs = array_unique(['dn', 'objectClass', $name_attr, $email_attr, $sort_attr]);
 
         // add search filter
@@ -1959,15 +1975,15 @@ class rcube_ldap extends rcube_addressbook
             $groups[$group_id]['ID'] = $group_id;
             $groups[$group_id]['dn'] = $entry['dn'];
             $groups[$group_id]['name'] = $group_name;
-            $groups[$group_id]['member_attr'] = $this->get_group_member_attr($entry['objectclass']);
+            $groups[$group_id]['member_attr'] = $this->get_group_member_attr($entry['objectclass'] ?? null);
 
             // list email attributes of a group
-            for ($j=0; $entry[$email_attr] && $j < $entry[$email_attr]['count']; $j++) {
+            for ($j=0; !empty($entry[$email_attr]) && $j < $entry[$email_attr]['count']; $j++) {
                 if (strpos($entry[$email_attr][$j], '@') > 0)
                     $groups[$group_id]['email'][] = $entry[$email_attr][$j];
             }
 
-            $group_sortnames[] = mb_strtolower($entry[$sort_attr][0]);
+            $group_sortnames[] = mb_strtolower($entry[$sort_attr][0] ?? '');
         }
 
         // recursive call can exit here
@@ -2015,11 +2031,12 @@ class rcube_ldap extends rcube_addressbook
             if ($list = $this->ldap->read_entries($dn, '(objectClass=*)', $attrs)) {
                 $entry      = $list[0];
                 $group_name = is_array($entry[$name_attr]) ? $entry[$name_attr][0] : $entry[$name_attr];
+                $classes    = !empty($entry['objectclass']) ? $entry['objectclass'] : [];
 
                 $group_cache[$group_id]['ID'] = $group_id;
                 $group_cache[$group_id]['dn'] = $dn;
                 $group_cache[$group_id]['name'] = $group_name;
-                $group_cache[$group_id]['member_attr'] = $this->get_group_member_attr($entry['objectclass']);
+                $group_cache[$group_id]['member_attr'] = $this->get_group_member_attr($classes);
             }
             else {
                 $group_cache[$group_id] = false;
@@ -2253,7 +2270,7 @@ class rcube_ldap extends rcube_addressbook
      */
     private function get_group_member_attr($object_classes = [], $default = 'member')
     {
-        if (empty($object_classes)) {
+        if (empty($object_classes) && !empty($this->prop['groups']['object_classes'])) {
             $object_classes = $this->prop['groups']['object_classes'];
         }
 

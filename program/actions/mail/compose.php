@@ -231,7 +231,7 @@ class rcmail_action_mail_compose extends rcmail_action_mail_index
                     self::$COMPOSE['reply_uid'] = self::$MESSAGE->context === null ? $msg_uid : null;
 
                     if (!empty(self::$COMPOSE['param']['all'])) {
-                        self::$MESSAGE->reply_all = self::$COMPOSE['param']['all'];
+                        self::$COMPOSE['reply_all'] = self::$COMPOSE['param']['all'];
                     }
                 }
                 else {
@@ -269,12 +269,12 @@ class rcmail_action_mail_compose extends rcmail_action_mail_index
                             $options['dsn_enabled'] = true;
                         }
 
-                        self::$COMPOSE['mailbox'] = $info['folder'];
+                        self::$COMPOSE['mailbox'] = $info['folder'] ?? null;
 
                         // Save the sent message in the same folder of the message being replied to
                         if (
                             $rcmail->config->get('reply_same_folder')
-                            && ($sent_folder = $info['folder'])
+                            && ($sent_folder = self::$COMPOSE['mailbox'])
                             && rcmail_sendmail::check_sent_folder($sent_folder, false)
                         ) {
                             self::$COMPOSE['param']['sent_mbox'] = $sent_folder;
@@ -822,7 +822,7 @@ class rcmail_action_mail_compose extends rcmail_action_mail_index
 
         // We're adding a hidden textarea with the HTML content to workaround browsers' performance
         // issues with rendering/loading long content. It will be copied to the main editor (#8108)
-        if (strlen(self::$MESSAGE_BODY) > 50 * 1024) {
+        if (self::$HTML_MODE && strlen(self::$MESSAGE_BODY) > 50 * 1024) {
             $contentArea = new html_textarea(['style' => 'display:none', 'id' => $attrib['id'] . '-content']);
             $content .= $contentArea->show(self::$MESSAGE_BODY) . "\n" . $textarea->show();
         }
@@ -1102,7 +1102,7 @@ class rcmail_action_mail_compose extends rcmail_action_mail_index
                         continue;
                     }
 
-                    $idx = $part->content_id ? ('cid:' . $part->content_id) : $part->content_location;
+                    $idx = $part->content_id ? ('cid:' . $part->content_id) : $part->content_location ?? null;
 
                     if ($idx && isset(self::$CID_MAP[$idx]) && strpos($message_body, self::$CID_MAP[$idx]) !== false) {
                         $replace = self::$CID_MAP[$idx];
@@ -1615,7 +1615,7 @@ class rcmail_action_mail_compose extends rcmail_action_mail_index
                     'onclick'      => sprintf(
                         "return %s.command('insert-response', '%s', this, event)",
                         rcmail_output::JS_OBJECT_NAME,
-                        rcube::JQ($response['id']),
+                        rcube::JQ($response['id'])
                     ),
                 ],
                 rcube::Q($response['name'])

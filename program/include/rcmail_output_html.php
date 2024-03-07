@@ -182,7 +182,7 @@ EOF;
      * Parse and set assets path
      *
      * @param string $path   Assets path URL (relative or absolute)
-     * @param string $fs_dif Assets path in filesystem
+     * @param string $fs_dir Assets path in filesystem
      */
     public function set_assets_path($path, $fs_dir = null)
     {
@@ -1533,11 +1533,11 @@ EOF;
                 else if ($object == 'version') {
                     $ver = (string) RCMAIL_VERSION;
                     if (is_file(RCUBE_INSTALL_PATH . '.svn/entries')) {
-                        if (preg_match('/Revision:\s(\d+)/', @shell_exec('svn info'), $regs))
+                        if (preg_match('/Revision:\s(\d+)/', (string) @shell_exec('svn info'), $regs))
                           $ver .= ' [SVN r'.$regs[1].']';
                     }
                     else if (is_file(RCUBE_INSTALL_PATH . '.git/index')) {
-                        if (preg_match('/Date:\s+([^\n]+)/', @shell_exec('git log -1'), $regs)) {
+                        if (preg_match('/Date:\s+([^\n]+)/', (string) @shell_exec('git log -1'), $regs)) {
                             if ($date = date('Ymd.Hi', strtotime($regs[1]))) {
                                 $ver .= ' [GIT '.$date.']';
                             }
@@ -1581,10 +1581,10 @@ EOF;
                     foreach ($this->$source as $name => $vars) {
                         // $vars can be in many forms:
                         // - string
-                        // - array('key' => 'val')
-                        // - array(string, string)
-                        // - array(array(), string)
-                        // - array(array('key' => 'val'), array('key' => 'val'))
+                        // - ['key' => 'val']
+                        // - [string, string]
+                        // - [[], string]
+                        // - [['key' => 'val'], ['key' => 'val']]
                         // normalise this for processing by checking for string array keys
                         $vars = is_array($vars) ? (count(array_filter(array_keys($vars), 'is_string')) > 0 ? [$vars] : $vars) : [$vars];
 
@@ -2182,7 +2182,7 @@ EOF;
         }
 
         $attrib['name'] = $attrib['id'];
-        $attrib['src']  = !empty($attrib['src']) ? $this->abs_url($attrib['src'], true) : 'about:blank';
+        $attrib['src']  = !empty($attrib['src']) ? $this->abs_url($attrib['src'], true) : 'javascript:false;';
 
         // register as 'contentframe' object
         if ($is_contentframe || !empty($attrib['contentframe'])) {
@@ -2604,7 +2604,7 @@ EOF;
     /**
      * Builder for GUI object 'message'
      *
-     * @param array Named tag parameters
+     * @param array $attrib Named tag parameters
      * @return string HTML code for the gui object
      */
     protected function message_container($attrib)
@@ -2772,7 +2772,7 @@ EOF;
                     }
                 }
             }
-            else {
+            else if ($type != 'link') {
                 $template_logo = $logo;
             }
         }

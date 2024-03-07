@@ -37,14 +37,7 @@ class rcmail_install
     public $legacy_config     = false;
     public $email_pattern     = '([a-z0-9][a-z0-9\-\.\+\_]*@[a-z0-9]([a-z0-9\-][.]?)*[a-z0-9])';
 
-    public $bool_config_props = [
-        'ip_check'          => 1,
-        'enable_spellcheck' => 1,
-        'auto_create_user'  => 1,
-        'smtp_log'          => 1,
-        'prefer_html'       => 1,
-    ];
-
+    public $bool_config_props = ['ip_check', 'enable_spellcheck', 'auto_create_user', 'smtp_log', 'prefer_html'];
     public $local_config    = ['db_dsnw', 'imap_host', 'support_url', 'des_key', 'plugins'];
     public $obsolete_config = ['db_backend', 'db_max_length', 'double_auth', 'preview_pane', 'debug_level', 'referer_check'];
     public $replaced_config = [
@@ -117,6 +110,10 @@ class rcmail_install
      */
     public function load_config()
     {
+        if ($this->configured) {
+            return;
+        }
+
         // defaults
         if ($config = $this->load_config_file(RCUBE_CONFIG_DIR . 'defaults.inc.php')) {
             $this->config   = (array) $config;
@@ -209,15 +206,23 @@ class rcmail_install
      * Create configuration file that contains parameters
      * that differ from default values.
      *
+     * @param bool $use_post Use POSTed configuration values (of supported options)
+     *
      * @return string The complete config file content
      */
-    public function create_config()
+    public function create_config($use_post = true)
     {
         $config = [];
 
         foreach ($this->config as $prop => $default) {
-            $is_default = !isset($_POST["_$prop"]) || empty($this->supported_config[$prop]);
-            $value      = !$is_default || $this->bool_config_props[$prop] ? $_POST["_$prop"] : $default;
+            $post_value = $_POST["_$prop"] ?? null;
+            $value      = $default;
+
+            if ($use_post && in_array($prop, $this->supported_config)
+                && ($post_value !== null || in_array($prop, $this->bool_config_props))
+            ) {
+                $value = $post_value;
+            }
 
             // always disable installer
             if ($prop == 'enable_installer') {
@@ -271,7 +276,7 @@ class rcmail_install
             }
 
             // skip this property
-            if ($value == $this->defaults[$prop]
+            if ($value == ($this->defaults[$prop] ?? null)
                 && (!in_array($prop, $this->local_config)
                     || in_array($prop, array_merge($this->obsolete_config, array_keys($this->replaced_config)))
                     || preg_match('/^db_(table|sequence)_/', $prop)
@@ -290,7 +295,7 @@ class rcmail_install
 
         foreach ($config as $prop => $value) {
             // copy option descriptions from existing config or defaults.inc.php
-            $out .= $this->comments[$prop];
+            $out .= $this->comments[$prop] ?? '';
             $out .= "\$config['$prop'] = " . self::_dump_var($value, $prop) . ";\n\n";
         }
 
@@ -300,7 +305,7 @@ class rcmail_install
     /**
      * save generated config file in RCUBE_CONFIG_DIR
      *
-     * @return boolean True if the file was saved successfully, false if not
+     * @return bool True if the file was saved successfully, false if not
      */
     public function save_configfile($config)
     {
@@ -327,7 +332,8 @@ class rcmail_install
             return;
         }
 
-        $out = $seen = [];
+        $seen = [];
+        $out = ['defaults' => [], 'obsolete' => [], 'replaced' => [], 'dependencies' => [], 'missing' => []];
 
         // iterate over the current configuration
         foreach (array_keys($this->config) as $prop) {
@@ -400,8 +406,6 @@ class rcmail_install
         }
 
         if ($version) {
-            $out['defaults'] = [];
-
             foreach ($this->defaults_changes as $v => $opts) {
                 if (version_compare($v, $version, '>')) {
                     $out['defaults'] = array_merge($out['defaults'], $opts);
@@ -434,9 +438,24 @@ class rcmail_install
                 else {
                     $this->config[$replacement] = $current[$prop];
                 }
+
+                unset($current[$prop]);
+                unset($current[$replacement]);
+            }
+        }
+
+        // Merge old *_port options into the new *_host options, where possible
+        foreach (['default' => 'imap', 'smtp' => 'smtp'] as $prop => $type) {
+            $old_prop = "{$prop}_port";
+            $new_prop = "{$type}_host";
+            if (!empty($current[$old_prop]) && !empty($this->config[$new_prop])
+                && is_string($this->config[$new_prop])
+                && !preg_match('/:[0-9]+$/', $this->config[$new_prop])
+            ) {
+                $this->config[$new_prop] .= ':' . $current[$old_prop];
             }
 
-            unset($current[$prop]);
+            unset($current[$old_prop]);
         }
 
         foreach ($this->obsolete_config as $prop) {
@@ -444,9 +463,9 @@ class rcmail_install
         }
 
         // add all ldap_public sources having global_search enabled to autocomplete_addressbooks
-        if (is_array($current['ldap_public'])) {
+        if (!empty($current['ldap_public']) && is_array($current['ldap_public'])) {
             foreach ($current['ldap_public'] as $key => $ldap_public) {
-                if ($ldap_public['global_search']) {
+                if (!empty($ldap_public['global_search'])) {
                     $this->config['autocomplete_addressbooks'][] = $key;
                     unset($current['ldap_public'][$key]['global_search']);
                 }
@@ -454,10 +473,6 @@ class rcmail_install
         }
 
         $this->config = array_merge($this->config, $current);
-
-        foreach (array_keys((array) $current['ldap_public']) as $key) {
-            $this->config['ldap_public'][$key] = $current['ldap_public'][$key];
-        }
     }
 
     /**
@@ -900,5 +915,17 @@ class rcmail_install
     public function raise_error($p)
     {
         $this->last_error = $p;
+    }
+
+    /**
+     * Check if vendor/autoload.php was created by Roundcube and left untouched
+     *
+     * @param string $target_dir The target installation dir
+     * @return string
+     */
+    public static function vendor_dir_untouched($target_dir)
+    {
+        system('grep -q "generated by Roundcube" ' . escapeshellarg($target_dir . '/vendor/autoload.php') . ' 2>/dev/null', $exit_code);
+        return $exit_code === 0;
     }
 }

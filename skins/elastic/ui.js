@@ -870,8 +870,8 @@ function rcube_elastic_ui()
 
                 $('.popup', context).addClass('formcontent').append(
                     $('<div class="form-group row">')
-                        .append(label.attr('for', id).addClass('col-sm-2 col-form-label'))
-                        .append($('<div class="col-sm-10">').append(input))
+                        .append(label.attr('for', id).addClass('col-sm-4 col-form-label text-break'))
+                        .append($('<div class="col-sm-8">').append(input))
                 );
 
                 input.focus();
@@ -2710,7 +2710,7 @@ function rcube_elastic_ui()
             return true;
         };
 
-        dialog = rcmail.simple_dialog(dialog, rcmail.gettext('listoptionstitle'), save_func, {
+        dialog = rcmail.simple_dialog(dialog, 'listoptionstitle', save_func, {
             closeOnEscape: true,
             minWidth: 400
         });
@@ -2768,7 +2768,7 @@ function rcube_elastic_ui()
         var props = {_uid: rcmail.env.uid, _mbox: rcmail.env.mailbox, _framed: 1},
             dialog = $('<iframe>').attr({id: 'headersframe', src: rcmail.url('headers', props)});
 
-        rcmail.simple_dialog(dialog, rcmail.gettext('arialabelmessageheaders'), null, {
+        rcmail.simple_dialog(dialog, 'arialabelmessageheaders', null, {
             cancel_button: 'close',
             height: 400
         });
@@ -2781,7 +2781,7 @@ function rcube_elastic_ui()
     {
         var dialog = $('#properties-menu').clone();
 
-        rcmail.simple_dialog(dialog, rcmail.gettext('properties'), null, {
+        rcmail.simple_dialog(dialog, 'properties', null, {
             cancel_button: 'close',
             height: 400
         });
@@ -2803,7 +2803,7 @@ function rcube_elastic_ui()
             return rcmail.command('import-messages', $(dialog.find('form')[0]));
         };
 
-        rcmail.simple_dialog(dialog, rcmail.gettext('importmessages'), save_func, {
+        rcmail.simple_dialog(dialog, 'importmessages', save_func, {
             button: 'import',
             closeOnEscape: true,
             minWidth: 400
@@ -3158,7 +3158,7 @@ function rcube_elastic_ui()
     {
         if (!opts) opts = {};
 
-        var title = rcmail.gettext(opts.title || 'insertcontact'),
+        var title = opts.title || 'insertcontact',
             dialog = $('#recipient-dialog'),
             parent = dialog.parent(),
             close_func = function() {
@@ -3413,7 +3413,7 @@ function rcube_elastic_ui()
                     recipients.push({
                         name: '',
                         email: email.replace(/(^<|>$)/g, '') // trim < and > characters
-                            .replace(/[^a-z]$/gi, '') // remove trailing comma or any non-letter character at the end (#7899)
+                            .replace(/[^\p{L}]$/giu, '') // remove trailing comma or any non-letter character at the end (#7899, #9257)
                     });
 
                     str = str.replace(email, '').trim();

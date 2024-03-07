@@ -44,5 +44,4 @@ return array(
     'Net_LDAP3_Result' => $vendorDir . '/kolab/net_ldap3/lib/Net/LDAP3/Result.php',
     'Net_Sieve' => $vendorDir . '/pear/net_sieve/Sieve.php',
     'PEAR_Exception' => $vendorDir . '/pear/pear_exception/PEAR/Exception.php',
-    'SieveTest' => $vendorDir . '/pear/net_sieve/tests/SieveTest.php',
 );
