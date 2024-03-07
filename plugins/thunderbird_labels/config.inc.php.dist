@@ -11,7 +11,7 @@
   // - 'bullets' shows coloured bullets for each label (shows all labels)
   // - 'thunderbird' colors subject like thunderbird does (shows only most important label)
   // - 'badges' shows text of label inside coloured badges (shows all labels)
-  $config['tb_label_style'] = "badges";
+  $config['tb_label_style'] = "bullets";
   // custom hidden flags
   $config['tb_label_hidden_flags'] = array();
 

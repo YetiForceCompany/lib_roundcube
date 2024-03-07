@@ -6,7 +6,7 @@
 * Label of a message can be changed/set exactly like in Thunderbird
 * Keyboard shortcuts on keys 0-5 work like in Thunderbird
 * Integrates into contextmenu plugin when available
-* Works for skins *classic*, *larry* and *elastic*
+* Works for skins *classic*, *larry* and *elastic* (highest priority for *elastic*)
 * currently available translations:
   * English
   * French (Français)
@@ -27,6 +27,7 @@
   * Dutch (Nederlands)
   * Greek (ελληνικά)
   * Japanese (日本語)
+  * Swedish (svenska)
 * [screenshot](http://mike-kfed.github.io/roundcube-thunderbird_labels/)
 
 ### INSTALL
@@ -46,13 +47,13 @@
 
 ### CONFIGURE
 
-See `config.inc.php`
+See `config.inc.php` for more details
 
 - `tb_label_enable = true/false` (can be changed by user in prefs UI)
 - `tb_label_modify_labels = true/false`
 - `tb_label_enable_contextmenu = true/false`
 - `tb_label_enable_shortcuts = true/false` (can be changed by user in prefs UI)
-- `tb_label_style = 'bullets'` or `'thunderbird'`
+- `tb_label_style = 'bullets'`, `'thunderbird'` or `'badges'`
 
 ### Author
 Michael Kefeder

@@ -7,14 +7,19 @@
  * @version 1.2.0
  *
  * @author Michael Kefeder
+ *
  * @url https://github.com/mike-kfed/roundcube-thunderbird_labels
  */
 class thunderbird_labels extends rcube_plugin
 {
+	const LABEL_STYLES = ['thunderbird', 'bullets', 'badges'];
 	public $task = 'mail|settings';
 	private $rc;
 	private $map;
 	private $_custom_flags_allowed;
+	private $name;
+	private $add_tb_flags;
+	private $message_tb_labels;
 
 	public function init()
 	{
@@ -46,7 +51,7 @@ class thunderbird_labels extends rcube_plugin
 			$this->add_hook('render_page', [$this, 'tb_label_popup']);
 			$this->add_hook('check_recent', [$this, 'check_recent_flags']);
 			$this->include_stylesheet($this->local_skin_path() . '/tb_label.css');
-			//$this->include_stylesheet($this->local_skin_path() . '/tb_label.php');
+			// $this->include_stylesheet($this->local_skin_path() . '/tb_label.php');
 
 			$this->name = static::class;
 			// -- additional TB flags
@@ -80,24 +85,6 @@ class thunderbird_labels extends rcube_plugin
 			$this->add_hook('preferences_sections_list', [$this, 'prefs_section']);
 			$this->add_hook('preferences_save', [$this, 'prefs_save']);
 		}
-	}
-
-	private function setCustomLabels()
-	{
-		$c = $this->rc->config->get('tb_label_custom_labels');
-		if (empty($c) || isset($c[3])) {
-			// if no user specific labels, use localized strings by default
-			$this->rc->config->set('tb_label_custom_labels', [
-				'LABEL0' => $this->getText('label0'),
-				'LABEL1' => $this->getText('label1'),
-				'LABEL2' => $this->getText('label2'),
-				'LABEL3' => $this->getText('label3'),
-				'LABEL4' => $this->getText('label4'),
-				'LABEL5' => $this->getText('label5')
-			]);
-		}
-		// pass label strings to JS
-		$this->rc->output->set_env('tb_label_custom_labels', $this->rc->config->get('tb_label_custom_labels'));
 	}
 
 	// create a section for the tb-labels Settings
@@ -158,7 +145,7 @@ class thunderbird_labels extends rcube_plugin
 				'name' => $key,
 				'id' => $key
 			]);
-			$select->add([$this->gettext('thunderbird'), $this->gettext('bullets'), $this->gettext('badges')], ['thunderbird', 'bullets', 'badges']);
+			$select->add([$this->gettext('thunderbird'), $this->gettext('bullets'), $this->gettext('badges')], self::LABEL_STYLES);
 			$content = $select->show($this->rc->config->get($key));
 
 			$args['blocks']['tb_label']['options'][$key] = [
@@ -208,7 +195,10 @@ class thunderbird_labels extends rcube_plugin
 		}
 
 		if (!\in_array('tb_label_style', $dont_override)) {
-			$args['prefs']['tb_label_style'] = rcube_utils::get_input_value('tb_label_style', rcube_utils::INPUT_POST);
+			$tb_label_style = rcube_utils::get_input_value('tb_label_style', rcube_utils::INPUT_POST);
+			if (\in_array($tb_label_style, self::LABEL_STYLES)) {
+				$args['prefs']['tb_label_style'] = $tb_label_style;
+			}
 		}
 
 		if (!\in_array('tb_label_custom_labels', $dont_override)
@@ -229,38 +219,13 @@ class thunderbird_labels extends rcube_plugin
 	public function show_tb_label_contextmenu($args)
 	{
 		// no longer needed
-		//$this->include_script('tb_label_contextmenu.js');
+		// $this->include_script('tb_label_contextmenu.js');
 		return null;
-	}
-
-	private function _gen_label_submenu($args, $id)
-	{
-		$out = '';
-		$custom_labels = $this->rc->config->get('tb_label_custom_labels');
-		for ($i = 0; $i < 6; ++$i) {
-			$separator = (0 == $i) ? ' separator_below' : '';
-			$out .= html::tag('li',
-				null,
-				$this->api->output->button([
-					'label' => rcube::Q($i . ' ' . $custom_labels["LABEL$i"]),
-					'command' => 'test.comm.and',
-					'type' => 'link',
-					'class' => 'label' . $i . $separator,
-					'aria-disabled' => 'true'
-				]
-				)
-			);
-			/*$out .= '<li class="label'.$i.$separator.
-			  ' ctxm_tb_label"><a href="#ctxm_tb_label" class="active" onclick="rcmail_ctxm_label_set('.$i.')"><span>'.
-			  $i.' '.$custom_labels[$i].
-			  '</span></a></li>';*/
-		}
-		return html::tag('ul', ['id' => $id, 'role' => 'menu'], $out);
 	}
 
 	public function read_single_flags($args)
 	{
-		//rcube::write_log($this->name, print_r(($args['object']), true));
+		// rcube::write_log($this->name, print_r(($args['object']), true));
 		if (!isset($args['object'])) {
 			return;
 		}
@@ -279,7 +244,7 @@ class thunderbird_labels extends rcube_plugin
 	 */
 	public function color_headers($p)
 	{
-		//rcube::write_log($this->name, print_r($p, true));
+		// rcube::write_log($this->name, print_r($p, true));
 		// -- always write array, even when empty
 		$p['content'] .= '<script type="text/javascript">
 		var tb_labels_for_message = ' . json_encode($this->message_tb_labels) . ';
@@ -289,7 +254,7 @@ class thunderbird_labels extends rcube_plugin
 
 	public function read_flags($args)
 	{
-		//rcube::write_log($this->name, print_r($args, true));
+		// rcube::write_log($this->name, print_r($args, true));
 		// add color information for all messages
 		// dont loop over all messages if we dont have any highlights or no msgs
 		if (!isset($args['messages']) || !\is_array($args['messages'])) {
@@ -298,7 +263,7 @@ class thunderbird_labels extends rcube_plugin
 
 		// loop over all messages and add $LabelX info to the extra_flags
 		foreach ($args['messages'] as $message) {
-			//rcube::write_log($this->name, print_r($message->flags, true));
+			// rcube::write_log($this->name, print_r($message->flags, true));
 			$message->list_flags['extra_flags']['tb_labels'] = []; // always set extra_flags, needed for javascript later!
 			if (\is_array($message->flags)) {
 				$message->list_flags['extra_flags']['tb_labels'] = $this->custom_flags(array_keys($message->flags));
@@ -310,9 +275,9 @@ class thunderbird_labels extends rcube_plugin
 	// set flags in IMAP server
 	public function set_flags()
 	{
-		//rcube::write_log($this->name, print_r($_GET, true));
+		// rcube::write_log($this->name, print_r($_GET, true));
 
-		$imap = $this->rc->imap;
+		$imap = $this->rc->storage;
 		$cbox = rcube_utils::get_input_value('_cur', rcube_utils::INPUT_GET);
 		$mbox = rcube_utils::get_input_value('_mbox', rcube_utils::INPUT_GET);
 		$toggle_label = rcube_utils::get_input_value('_toggle_label', rcube_utils::INPUT_GET);
@@ -323,8 +288,8 @@ class thunderbird_labels extends rcube_plugin
 
 		$imap->conn->flags = array_merge($imap->conn->flags, $this->add_tb_flags);
 
-		//rcube::write_log($this->name, print_r($flag_uids, true));
-		//rcube::write_log($this->name, print_r($unflag_uids, true));
+		// rcube::write_log($this->name, print_r($flag_uids, true));
+		// rcube::write_log($this->name, print_r($unflag_uids, true));
 
 		if (!\is_array($unflag_uids)
 			|| !\is_array($flag_uids)) {
@@ -401,7 +366,7 @@ class thunderbird_labels extends rcube_plugin
 		$custom_labels = $this->rc->config->get('tb_label_custom_labels');
 		$i = 0;
 		foreach ($custom_labels as $label_name => $human_readable) {
-			$tpl_menu .= '<roundcube:button type="link-menuitem" command="plugin.thunderbird_labels.rcm_tb_label_menuclick" content="' . "$i $human_readable" . '" prop="LABEL' . $i . '" classAct="tb-label label' . $i . ' inline active" class="tb-label label' . $i . '" data-labelname="LABEL' . $i . '" />';
+			$tpl_menu .= '<roundcube:button type="link-menuitem" command="plugin.thunderbird_labels.rcm_tb_label_menuclick" content="' . rcube::Q("$i $human_readable") . '" prop="LABEL' . $i . '" classAct="tb-label label' . $i . ' inline active" class="tb-label label' . $i . '" data-labelname="LABEL' . $i . '" />';
 			++$i;
 		}
 		$html = $this->template2html($tpl . $tpl_menu . $tpl_end);
@@ -424,7 +389,7 @@ class thunderbird_labels extends rcube_plugin
 			$data = $RCMAIL->storage->folder_data($mbox_name);
 
 			if (empty($_SESSION['list_mod_seq']) || $_SESSION['list_mod_seq'] != $data['HIGHESTMODSEQ']) {
-				$flags = $RCMAIL->storage->list_flags($mbox_name, explode(',', $uids), $_SESSION['list_mod_seq']);
+				$flags = $RCMAIL->storage->list_flags($mbox_name, explode(',', $uids), !empty($_SESSION['list_mod_seq']) ? $_SESSION['list_mod_seq'] : null);
 				foreach ($flags as $idx => $row) {
 					$flags[$idx] = array_change_key_case(array_map('intval', $row));
 				}
@@ -437,7 +402,7 @@ class thunderbird_labels extends rcube_plugin
 			}
 			// -- end of code copy from check_recent.inc
 			if (isset($data['PERMANENTFLAGS'])) {
-				//rcube::write_log($this->name, "data:".print_r($data['PERMANENTFLAGS'], true));
+				// rcube::write_log($this->name, "data:".print_r($data['PERMANENTFLAGS'], true));
 				$RCMAIL->output->set_env('custom_flags', $this->custom_flags($data['PERMANENTFLAGS']));
 			}
 		}
@@ -511,5 +476,50 @@ class thunderbird_labels extends rcube_plugin
 	public function roundcube_flag($flag)
 	{
 		return ltrim(strtoupper($flag), '$\\');
+	}
+
+	private function setCustomLabels()
+	{
+		$c = $this->rc->config->get('tb_label_custom_labels');
+		if (empty($c) || isset($c[3])) {
+			// if no user specific labels, use localized strings by default
+			$this->rc->config->set('tb_label_custom_labels', [
+				'LABEL0' => $this->getText('label0'),
+				'LABEL1' => $this->getText('label1'),
+				'LABEL2' => $this->getText('label2'),
+				'LABEL3' => $this->getText('label3'),
+				'LABEL4' => $this->getText('label4'),
+				'LABEL5' => $this->getText('label5')
+			]);
+		}
+		// pass label strings to JS
+		$this->rc->output->set_env('tb_label_custom_labels', $this->rc->config->get('tb_label_custom_labels'));
+	}
+
+	private function _gen_label_submenu($args, $id)
+	{
+		$out = '';
+		$custom_labels = $this->rc->config->get('tb_label_custom_labels');
+		for ($i = 0; $i < 6; ++$i) {
+			$separator = (0 == $i) ? ' separator_below' : '';
+			$out .= html::tag(
+				'li',
+				null,
+				$this->api->output->button(
+					[
+						'label' => rcube::Q($i . ' ' . $custom_labels["LABEL$i"]),
+						'command' => 'test.comm.and',
+						'type' => 'link',
+						'class' => 'label' . $i . $separator,
+						'aria-disabled' => 'true'
+					]
+				)
+			);
+			/*$out .= '<li class="label'.$i.$separator.
+			  ' ctxm_tb_label"><a href="#ctxm_tb_label" class="active" onclick="rcmail_ctxm_label_set('.$i.')"><span>'.
+			  $i.' '.$custom_labels[$i].
+			  '</span></a></li>';*/
+		}
+		return html::tag('ul', ['id' => $id, 'role' => 'menu'], $out);
 	}
 }
