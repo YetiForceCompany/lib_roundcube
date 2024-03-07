@@ -5,6 +5,7 @@ namespace RtfHtmlPhp\Html;
 class Font
 {
     public $family;
+    public $fprq;
     public $name;
     public $charset;
     public $codepage;

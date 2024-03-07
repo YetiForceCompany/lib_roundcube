@@ -4,6 +4,17 @@ namespace RtfHtmlPhp\Html;
 
 class Image
 {
+    public $format;
+    public $width;
+    public $height;
+    public $goalWidth;
+    public $goalHeight;
+    public $pcScaleX;
+    public $pcScaleY;
+    public $binarySize;
+    public $imageData;
+
+
     /**
      * Object constructor.
      */
@@ -33,7 +44,7 @@ class Image
     /**
      * Generate a HTML content for the image
      *
-     * @return string <img> tag content, An empty string for unsupported/empty image
+     * @return string Image tag content, An empty string for unsupported/empty image
      */
     public function printImage()
     {

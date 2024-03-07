@@ -3,6 +3,7 @@
 if (window.rcmail) {
 	rcmail.addEventListener('init', function () {
 		rcmail.crm = rcmail.yetiGetCrmWindow();
+		console.log(rcmail.env);
 		if (rcmail.crm != false) {
 			rcmail.env.compose_commands.push('yetiforce.addFilesFromCRM');
 			rcmail.env.compose_commands.push('yetiforce.selectTemplate');

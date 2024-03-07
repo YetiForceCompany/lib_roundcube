@@ -528,14 +528,14 @@ class rcmail_action_mail_index extends rcmail_action
                     }
                 }
                 else if ($col == 'subject') {
-                    $cont = trim(rcube_mime::decode_header($header->$col, $header->charset));
+                    $cont = trim(rcube_mime::decode_header($header->subject, $header->charset));
                     if (!$cont) {
                         $cont = $rcmail->gettext('nosubject');
                     }
                     $cont = rcube::SQ($cont);
                 }
                 else if ($col == 'size') {
-                    $cont = self::show_bytes($header->$col);
+                    $cont = self::show_bytes($header->size);
                 }
                 else if ($col == 'date') {
                     $cont = $rcmail->format_date($sort_col == 'arrival' ? $header->internaldate : $header->date);
@@ -549,8 +549,11 @@ class rcmail_action_mail_index extends rcmail_action
 
                     $cont = rcube::SQ($last_folder_name);
                 }
-                else {
+                else if (isset($header->$col)) {
                     $cont = rcube::SQ($header->$col);
+                }
+                else {
+                    $cont = '';
                 }
 
                 $a_msg_cols[$col] = $cont;

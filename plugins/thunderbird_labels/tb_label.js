@@ -27,18 +27,23 @@ $(function () {
 	var css, labelbox_parent, labels_for_message;
 	css = new rcm_tb_label_css();
 	css.inject();
+	// superglobal variable set? if not set it
 	if (rcm_tb_label_global('tb_labels_for_message') == null) {
 		rcm_tb_label_global_set('tb_labels_for_message', []);
 	}
+	// add keyboard shortcuts for keyboard and keypad if pref tb_label_enable_shortcuts=true
 	if (rcmail.env.tb_label_enable_shortcuts) {
 		$(document).keyup(function (e) {
 			var cur_a, k, label_no;
+			// ignore IME composition
 			if (e.isComposing || e.keyCode === 229) {
 				return;
 			}
+			// ignore modifier keys when pressed with blah
 			if (e.shiftKey || e.altKey || e.ctrlKey || e.metaKey) {
 				return;
 			}
+			// quickhack issue #60 ignore when typing in search input
 			if (e.target.nodeName === 'INPUT') {
 				return;
 			}
@@ -52,22 +57,19 @@ $(function () {
 			}
 		});
 	}
+	// if exists add contextmenu entries
 	if (window.rcm_contextmenu_register_command) {
-		rcm_contextmenu_register_command(
-			'ctxm_tb_label',
-			rcmail_ctxm_label,
-			$('#tb_label_ctxm_mainmenu'),
-			'moreacts',
-			'after',
-			true
-		);
+		rcm_contextmenu_register_command('ctxm_tb_label', rcmail_ctxm_label, $('#tb_label_ctxm_mainmenu'), 'moreacts', 'after', true);
 	}
+	// single message displayed?
 	labels_for_message = tb_labels_for_message;
 	if (labels_for_message) {
 		labelbox_parent = $('div.message-headers, #message-header');
+		// larry skin
 		if (!labelbox_parent.length) {
 			labelbox_parent = $('table.headers-table');
 		}
+		// classic skin
 		labelbox_parent.append('<div id="labelbox" class="' + rcmail.env.tb_label_style + '"></div>');
 		labels_for_message.sort(function (a, b) {
 			return a - b;
@@ -77,9 +79,12 @@ $(function () {
 		});
 		rcm_tb_label_global_set('tb_labels_for_message', labels_for_message);
 	}
+	// This hook is triggered after a new row was added to the message message_list
+	// or the contacts list respectively.
 	rcmail.addEventListener('insertrow', function (event) {
 		rcm_tb_label_insert(event.uid, event.row);
 	});
+	// This is the place where plugins can add their UI elements and register custom commands.
 	rcmail.addEventListener('init', function (evt) {
 		rcmail.register_command('plugin.thunderbird_labels.rcm_tb_label_submenu', rcm_tb_label_submenu, rcmail.env.uid);
 		rcmail.register_command('plugin.thunderbird_labels.rcm_tb_label_menuclick', rcm_tb_label_menuclick, rcmail.env.uid);
@@ -90,8 +95,11 @@ $(function () {
 			});
 		}
 	});
+	// handle response after refresh (try to update flags set by another
+	// email-client while being logged into roundcube)
 	rcmail.addEventListener('responsebeforerefresh', function (p) {
 		var default_flags;
+		// recent_flags env is set in php thunderbird_labels::check_recent_flags()
 		if (p.response.env.recent_flags != null) {
 			default_flags = ['SEEN', 'UNSEEN', 'ANSWERED', 'FLAGGED', 'DELETED', 'DRAFT', 'RECENT', 'NONJUNK', 'JUNK'];
 			$.each(p.response.env.recent_flags, function (uid, flags) {
@@ -120,6 +128,7 @@ $(function () {
 			});
 		}
 	});
+	// add my submenu to roundcubes UI (for roundcube classic only?)
 	if (window.rcube_mail_ui) {
 		rcube_mail_ui.prototype.tb_label_popup_add = function () {
 			var add, obj;
@@ -139,6 +148,7 @@ $(function () {
 	}
 	if (window.rcube_mail_ui) {
 		rcube_mail_ui.prototype.check_tb_popup = function () {
+			// larry skin doesn't have that variable, popup works automagically, return true
 			if (typeof this.popups === 'undefined') {
 				return true;
 			}
@@ -150,7 +160,7 @@ $(function () {
 		};
 	}
 });
-
+// prototype for string formatting
 String.prototype.format = function () {
 	var args;
 	args = 1 <= arguments.length ? slice.call(arguments, 0) : [];
@@ -211,19 +221,21 @@ rcm_tb_label_css = (function () {
 		ref = this.label_colors;
 		for (label_name in ref) {
 			colors = ref[label_name];
+			// TODO escape label_name
 			escaped_label_name = 'tb_label_' + label_name;
 			css += 'table.{0}\n{\n  background-color: {1};\n}'.format(escaped_label_name, colors.bg);
+			// Unselected (unfocused) message
 			css +=
 				'#messagelist tr.{0} td,\n#messagelist tr.{0} td a,\nspan.{0},\n.records-table tr.selected td span.{0}\n{\n  color: {1} !important;\n}\n\n.toolbarmenu li.{0},\n.toolbarmenu li.{0} a.active\n{\n  color: {2};\n}'.format(
 					escaped_label_name,
 					colors.fg,
 					colors.light
 				);
-			css +=
-				'#messagelist tr.selected.{0} td,\n#messagelist tr.selected.{0} td a\n{\n  color: #FFFFFF;\n  background-color: {1};\n}'.format(
-					escaped_label_name,
-					colors.bg
-				);
+			// Selected messages
+			css += '#messagelist tr.selected.{0} td,\n#messagelist tr.selected.{0} td a\n{\n  color: #FFFFFF;\n  background-color: {1};\n}'.format(
+				escaped_label_name,
+				colors.bg
+			);
 			css += 'div#labelbox span.box_{0}\n{\n  background-color: {1};\n}'.format(escaped_label_name, colors.box);
 		}
 		return css;
@@ -236,6 +248,9 @@ rcm_tb_label_css = (function () {
 	return rcm_tb_label_css;
 })();
 
+// Shows the colors based on flag info like in Thunderbird
+// (called when a new message in inserted in list of messages)
+// maybe slow ? called for each message in mailbox at init
 rcm_tb_label_insert = function (uid, row) {
 	var i, j, label_name, len, len1, message, ref, ref1, rowobj, spanobj;
 	if (typeof rcmail.env === 'undefined' || typeof rcmail.env.messages === 'undefined') {
@@ -243,6 +258,7 @@ rcm_tb_label_insert = function (uid, row) {
 	}
 	message = rcmail.env.messages[uid];
 	rowobj = $(row.obj);
+	// add span container for little colored bullets
 	rowobj.find('td.subject').append('<span class="tb_label_dots ' + rcmail.env.tb_label_style + '"></span>');
 	if (message.flags && message.flags.tb_labels) {
 		if (message.flags.tb_labels.length) {
@@ -252,26 +268,21 @@ rcm_tb_label_insert = function (uid, row) {
 			});
 			ref = message.flags.tb_labels;
 			if (rcmail.env.tb_label_style === 'bullets') {
+				// bullets UI style
 				for (i = 0, len = ref.length; i < len; i++) {
 					label_name = ref[i];
-					spanobj.append(
-						'<span class="tb_label_' + label_name + '" title="' + i18n_label(label_name) + '">&#8226;</span>'
-					);
+					spanobj.append('<span class="tb_label_' + label_name + '" title="' + i18n_label(label_name) + '">&#8226;</span>');
 				}
 			} else if (rcmail.env.tb_label_style === 'badges') {
+				// badges UI style
 				for (i = 0, len = ref.length; i < len; i++) {
 					label_name = ref[i];
 					if (rcmail.env.tb_label_custom_labels[label_name]) {
-						spanobj.append(
-							'<span class="tb_label_badges badge ' +
-								label_name.toLowerCase() +
-								'">' +
-								i18n_label(label_name) +
-								'</span>'
-						);
+						spanobj.append('<span class="tb_label_badges badge ' + label_name.toLowerCase() + '">' + i18n_label(label_name) + '</span>');
 					}
 				}
 			} else {
+				// thunderbird UI style
 				for (j = 0, len1 = ref.length; j < len1; j++) {
 					label_name = ref[j];
 					rowobj.addClass('tb_label_' + label_name);
@@ -281,6 +292,9 @@ rcm_tb_label_insert = function (uid, row) {
 	}
 };
 
+// Problem: mail-preview-pane is an iframe, so referencing global variables does
+// not work as intended. So here I try to find out where this javascript is run
+// and when needed adjust the pointer to the main window object.
 rcm_tb_label_find_main_window = function () {
 	var elastic_popup_window, login_form, ms, popup_window, preview_frame, w;
 	ms = $('#mainscreen');
@@ -288,23 +302,40 @@ rcm_tb_label_find_main_window = function () {
 	preview_frame = $('#messagecontframe');
 	popup_window = $('body.extwin');
 	elastic_popup_window = $('body.action-show');
+	// login form means no mainscreen current window is okay
 	if (login_form.length) {
 		return window;
 	}
+	// by default use current window
 	w = window;
+	// i have a mainscreen and preview_frame
+	// this means i run in the main window
 	if (ms.length && preview_frame.length) {
 		w = window;
 	}
+	// if have no mainscreen and body has class iframe
+	// this means i run in the iframe of the preview, better get my parent
 	if (!ms.length && !preview_frame.length) {
+		// TODO check for $('body.iframe') might make it more reliable
 		w = window.parent;
 	}
 	if (popup_window.length || elastic_popup_window.length) {
+		/*
+		 * i run in a popup window (message to be shown in popup can be configured
+		 * by the user)
+		 * theoretically we should point at window.opener, but this is unreliable,
+		 * reload of the page in popup window makes the relation between parent+popup
+		 * potentially go away.
+		 * php injects the needed global variables into the popup window html code
+		 * Problem: changes of labels are not known to the main window.
+		 * */
 		w = window;
 	}
 	ms = w.document.getElementById('mainscreen');
 	if (!ms) {
 		ms = w.document.getElementById('messagelist-content');
 		if (!ms) {
+			// likely roundcube elastic skin
 			if (elastic_popup_window.length) {
 				return w;
 			}
@@ -344,6 +375,7 @@ rcm_tb_label_flag_toggle = function (flag_uids, toggle_label_no, onoff) {
 	}
 	preview_frame = $('#messagecontframe');
 	labels_for_message = rcm_tb_label_global('tb_labels_for_message');
+	// preview frame exists, try to find elements in preview iframe
 	if (preview_frame.length) {
 		headers_table = preview_frame.contents().find('table.headers-table,#message-header');
 		label_box = preview_frame.contents().find('#labelbox');
@@ -354,17 +386,17 @@ rcm_tb_label_flag_toggle = function (flag_uids, toggle_label_no, onoff) {
 	if (!rcmail.message_list && !headers_table.length) {
 		return;
 	}
+	// for message preview, or single message view
 	if (headers_table.length) {
 		if (onoff === true) {
 			if (rcmail.env.tb_label_style === 'bullets' || rcmail.env.tb_label_style === 'badges') {
 				label_box.find('span.box_tb_label_' + escape_jquery_selector(toggle_label_no)).remove();
-				label_box.append(
-					'<span class="box_tb_label_' + toggle_label_no + '">' + i18n_label(toggle_label_no) + '</span>'
-				);
+				label_box.append('<span class="box_tb_label_' + toggle_label_no + '">' + i18n_label(toggle_label_no) + '</span>');
 			} else {
 				headers_table.removeClass('tb_label_' + toggle_label_no);
 				headers_table.addClass('tb_label_' + toggle_label_no);
 			}
+			// add to flag list
 			labels_for_message.push(toggle_label_no);
 		} else {
 			if (rcmail.env.tb_label_style === 'bullets' || rcmail.env.tb_label_style === 'badges') {
@@ -377,12 +409,14 @@ rcm_tb_label_flag_toggle = function (flag_uids, toggle_label_no, onoff) {
 				labels_for_message.splice(pos, 1);
 			}
 		}
+		// make list unique
 		labels_for_message = jQuery.grep(labels_for_message, function (v, k) {
 			return jQuery.inArray(v, labels_for_message) === k;
 		});
 		rcm_tb_label_global_set('tb_labels_for_message', labels_for_message);
 	}
 	if (!rcmail.env.messages) {
+		// exit function when in detail mode. when preview is active keep going
 		return;
 	}
 	jQuery.each(flag_uids, function (idx, uid) {
@@ -390,28 +424,24 @@ rcm_tb_label_flag_toggle = function (flag_uids, toggle_label_no, onoff) {
 		message = rcmail.env.messages[uid];
 		row = rcmail.message_list.rows[uid];
 		if (onoff === true) {
+			// check if label is already set
 			if (jQuery.inArray(toggle_label_no, message.flags.tb_labels) > -1) {
 				return;
 			}
+			// add colors
 			rowobj = $(row.obj);
 			spanobj = rowobj.find('td.subject span.tb_label_dots');
 			if (rcmail.env.tb_label_style === 'bullets') {
-				spanobj.append(
-					'<span class="tb_label_' + toggle_label_no + '" title="' + i18n_label(toggle_label_no) + '">&#8226;</span>'
-				);
+				spanobj.append('<span class="tb_label_' + toggle_label_no + '" title="' + i18n_label(toggle_label_no) + '">&#8226;</span>');
 			} else if (rcmail.env.tb_label_style === 'badges') {
-				spanobj.append(
-					'<span class="tb_label_badges badge ' +
-						toggle_label_no.toLowerCase() +
-						'">' +
-						i18n_label(toggle_label_no) +
-						'</span>'
-				);
+				spanobj.append('<span class="tb_label_badges badge ' + toggle_label_no.toLowerCase() + '">' + i18n_label(toggle_label_no) + '</span>');
 			} else {
 				rowobj.addClass('tb_label_' + toggle_label_no);
 			}
+			// add to flags list
 			message.flags.tb_labels.push(toggle_label_no);
 		} else {
+			// remove colors
 			rowobj = $(row.obj);
 			if (rcmail.env.tb_label_style === 'bullets') {
 				rowobj.find('td.subject span.tb_label_dots span.tb_label_' + toggle_label_no).remove();
@@ -420,6 +450,7 @@ rcm_tb_label_flag_toggle = function (flag_uids, toggle_label_no, onoff) {
 			} else {
 				rowobj.removeClass('tb_label_' + toggle_label_no);
 			}
+			// remove from flag list
 			pos = jQuery.inArray(toggle_label_no, message.flags.tb_labels);
 			if (pos > -1) {
 				message.flags.tb_labels.splice(pos, 1);
@@ -436,6 +467,7 @@ rcm_tb_label_unflag_msgs = function (unflag_uids, toggle_label_no) {
 	rcm_tb_label_flag_toggle(unflag_uids, toggle_label_no, false);
 };
 
+// helper function to get selected/active messages
 rcm_tb_label_get_selection = function () {
 	var selection;
 	selection = rcmail.message_list ? rcmail.message_list.get_selection() : [];
@@ -445,16 +477,19 @@ rcm_tb_label_get_selection = function () {
 	return selection;
 };
 
+// maps signature of RC hooks
 rcm_tb_label_menuclick = function (labelname, obj, ev) {
 	return rcm_tb_label_toggle(labelname);
 };
 
+// actually toggle the label for the selected messages
 rcm_tb_label_toggle = function (toggle_label) {
 	var selection, toggle_labels, unset_all;
 	selection = rcm_tb_label_get_selection();
 	if (!selection.length) {
 		return;
 	}
+	// special case flag 0 means remove all flags
 	if (toggle_label === 'LABEL0') {
 		toggle_labels = ['LABEL1', 'LABEL2', 'LABEL3', 'LABEL4', 'LABEL5'];
 		unset_all = true;
@@ -466,6 +501,11 @@ rcm_tb_label_toggle = function (toggle_label) {
 		var first_message, first_toggle_mode, flag_uids, lock, str_flag_uids, str_unflag_uids, toggle_label_no, unflag_uids;
 		toggle_label = v;
 		toggle_label_no = toggle_label;
+		/* compile list of unflag and flag msgs and then send command
+       Thunderbird modifies multiple message flags like it did the first in the selection
+       e.g. first message has flag1, you click flag1, every message select loses flag1,
+            the ones not having flag1 don't get it!
+    */
 		first_toggle_mode = 'on';
 		if (rcmail.env.messages) {
 			first_message = rcmail.env.messages[selection[0]];
@@ -475,6 +515,7 @@ rcm_tb_label_toggle = function (toggle_label) {
 				first_toggle_mode = 'on';
 			}
 		} else {
+			// flag already set?
 			if (jQuery.inArray(toggle_label_no, rcm_tb_label_global('tb_labels_for_message')) >= 0) {
 				first_toggle_mode = 'off';
 			}
@@ -508,12 +549,14 @@ rcm_tb_label_toggle = function (toggle_label) {
 		if (unset_all) {
 			flag_uids = [];
 		}
+		// skip sending flags to backend that are not set anywhere
 		if (flag_uids.length === 0 && unflag_uids.length === 0) {
 			return;
 		}
 		str_flag_uids = flag_uids.join(',');
 		str_unflag_uids = unflag_uids.join(',');
 		lock = rcmail.set_busy(true, 'loading');
+		// call PHP set_flags to set the flags in IMAP server
 		rcmail.http_request(
 			'plugin.thunderbird_labels.set_flags',
 			'_flag_uids=' +
@@ -526,12 +569,15 @@ rcm_tb_label_toggle = function (toggle_label) {
 				toggle_label,
 			lock
 		);
+		// remove/add classes and tb labels from messages in JS
 		rcm_tb_label_flag_msgs(flag_uids, toggle_label_no);
 		rcm_tb_label_unflag_msgs(unflag_uids, toggle_label_no);
 	});
 };
 
 rcmail_ctxm_label = function (command, el, pos) {
+	// my code works only on selected rows, contextmenu also on unselected
+	// so if no selection is available, use the uid set by contextmenu plugin
 	var cur_a, selection;
 	selection = rcmail.message_list ? rcmail.message_list.get_selection() : [];
 	if (!selection.length && !rcmail.env.uid) {
@@ -547,23 +593,28 @@ rcmail_ctxm_label = function (command, el, pos) {
 };
 
 rcmail_ctxm_label_set = function (which) {
+	// hack for my contextmenu submenu to propagate the selected label-no
 	rcmail.tb_label_no = which;
 };
 
+// -- Shows the roundcube UI submenu of thunderbird labels
 rcm_tb_label_submenu = function (p, obj, ev) {
 	if (typeof rcmail_ui === 'undefined') {
 		window.rcmail_ui = UI;
 	}
+	// elastic skin does not have show_popup
 	if (!rcmail_ui.show_popup) {
 		return;
 	}
+	// create sensible popup, using roundcubes internals
 	if (!rcmail_ui.check_tb_popup()) {
 		rcmail_ui.tb_label_popup_add();
 	}
+	// skin larry vs classic
 	if (typeof rcmail_ui.show_popupmenu === 'undefined') {
 		return;
 	} else {
-		rcmail_ui.show_popupmenu('tb-label-menu', ev);
+		rcmail_ui.show_popupmenu('tb-label-menu', ev); // classic
 	}
 	return false;
 };

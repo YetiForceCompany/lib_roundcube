@@ -217,7 +217,7 @@ function rcube_webmail()
     this.task = this.env.task;
 
     if (!this.env.blankpage)
-      this.env.blankpage = 'about:blank';
+      this.env.blankpage = 'javascript:false;';
 
     // find all registered gui containers
     for (n in this.gui_containers)
@@ -1098,7 +1098,7 @@ function rcube_webmail()
         if (command != 'download-attachment' && mimetype && this.env.mimetypes && $.inArray(mimetype, this.env.mimetypes) >= 0) {
           // Note: We disable _framed for proper X-Frame-Options:deny support (#6688)
           if (this.open_window(this.url('get', $.extend({_frame: 1, _framed: 0}, params))))
-            break;
+            return true;
         }
 
         params._download = 1;
@@ -1108,7 +1108,7 @@ function rcube_webmail()
         this.goto_url('get', params, false, true);
         this.compose_skip_unsavedcheck = 0;
 
-        break;
+        return true;
 
       case 'select-all':
         this.select_all_mode = props ? false : true;
@@ -1341,11 +1341,8 @@ function rcube_webmail()
           this.list_mailbox(this.env.mailbox, 1);
         }
         else if (s && this.task == 'addressbook') {
-          if (this.env.source == '') {
-            for (n in this.env.address_sources) break;
-            this.env.source = n;
-            this.env.group = '';
-          }
+          this.env.source = this.env.last_source || '';
+          this.env.group = this.env.last_group || '';
           this.list_contacts(this.env.source, this.env.group, 1);
         }
         break;
@@ -1432,7 +1429,7 @@ function rcube_webmail()
           };
 
         this.import_state = null;
-        this.import_dialog = this.simple_dialog(dialog, this.gettext('importcontacts'), import_func, {
+        this.import_dialog = this.simple_dialog(dialog, 'importcontacts', import_func, {
           close: close_func,
           button: 'import',
           width: 500,
@@ -2650,11 +2647,13 @@ function rcube_webmail()
     if (!rc.env.frame_lock)
       rc.env.frame_lock = rc.set_busy(true, 'loading');
 
-    if (target.frameElement)
-      $(target.frameElement).on('load.lock', function(e) {
-        rc.unlock_frame();
-        $(this).off('load.lock');
-      });
+    try {
+      if (target.frameElement)
+        $(target.frameElement).on('load.lock', function(e) {
+          rc.unlock_frame();
+          $(this).off('load.lock');
+        });
+    } catch(e) { /* Ignore permission denied error */ };
   };
 
   this.unlock_frame = function()
@@ -3682,7 +3681,6 @@ function rcube_webmail()
 
         // display page selector
         ref.show_menu('pagejump-selector', true, e);
-        $(this).keydown();
       })
       // keyboard navigation
       .on('keydown keyup click', function(e) {
@@ -4196,7 +4194,7 @@ function rcube_webmail()
       $('<div>')
         .append($('<p>').html(ref.get_label('encryptpubkeysfound')))
         .append(ul),
-      ref.get_label('importpubkeys'),
+      'importpubkeys',
       null,
       {cancel_label: 'close', cancel_button: 'close'}
     );
@@ -4245,7 +4243,7 @@ function rcube_webmail()
     var container = $(this.gui_objects.editform).find('.identity-encryption').first();
     var identity_email = $(this.gui_objects.editform).find('.ff_email').val().trim();
 
-    if (!container.length || !identity_email || !this.mailvelope_keyring.createKeyGenContainer)
+    if (!container.length || !identity_email || !this.mailvelope_keyring.createKeyGenContainer)
       return;
 
     var key_fingerprint;
@@ -4480,7 +4478,7 @@ function rcube_webmail()
         content = $('<ul class="proplist">').append(nodes);
         $('input:not([disabled])', content).first().attr('checked', true);
 
-        this.simple_dialog(content, this.get_label('markallread'),
+        this.simple_dialog(content, 'markallread',
           function() {
             ref.mark_all_read(folder, $('input:checked', content).val());
             return true;
@@ -4569,7 +4567,7 @@ function rcube_webmail()
 
     this.hide_menu('forwardmenu', event);
 
-    dialog = this.simple_dialog(dialog, this.gettext('bouncemsg'), submit_func, {
+    dialog = this.simple_dialog(dialog, 'bouncemsg', submit_func, {
       button: 'bounce',
       width: 400,
       height: 300
@@ -5121,7 +5119,7 @@ function rcube_webmail()
   this.get_save_target = function(unlock)
   {
     // Removing the frame on load/error to workaround issues with window history
-    this.dummy_iframe('savetarget', 'about:blank')
+    this.dummy_iframe('savetarget', 'javascript:false;')
       .on('load error', function() {
         // catch invalid/error response from server and unlock the UI (#7494, #7488, #7522)
         if (unlock && $(this).contents().find('meta[name="generator"][content="Roundcube"]').length == 0) {
@@ -6258,8 +6256,8 @@ function rcube_webmail()
     else if (!this.env.search_request)
       folder = group ? 'G'+src+group : src;
 
-    this.env.source = src;
-    this.env.group = group;
+    this.env.source = this.env.last_source = src;
+    this.env.group = this.env.last_group = group;
 
     // truncate groups listing stack
     $.each(this.env.address_group_stack, function(i, v) {
@@ -7105,7 +7103,7 @@ function rcube_webmail()
         }
       };
 
-    this.simple_dialog(dialog, this.gettext('advsearch'), search_func, {
+    this.simple_dialog(dialog, 'advsearch', search_func, {
       button: 'search',
       width: 600,
       height: 500
@@ -7203,13 +7201,16 @@ function rcube_webmail()
   // display a dialog with QR code image
   this.qrcode = function()
   {
-    var title = this.get_label('qrcode'),
-      options = {button: false, cancel_button: 'close', width: 300, height: 300},
-      img = new Image(300, 300);
+    var img = new Image(300, 300);
 
     img.src = this.url('addressbook/qrcode', {_source: this.env.source, _cid: this.get_single_cid()});
 
-    return this.simple_dialog(img, title, null, options);
+    return this.simple_dialog(img, 'qrcode', null, {
+        button: false,
+        cancel_button: 'close',
+        width: 300,
+        height: 300
+    });
   };
 
 
@@ -8228,6 +8229,9 @@ function rcube_webmail()
 
     popup.dialog(options);
 
+    // Remember the jQuery instance (window), useful when closing the dialog
+    popup[0].jqref = $;
+
     if (options.width)
       popup.width(options.width);
     if (options.height)
@@ -8280,7 +8284,12 @@ function rcube_webmail()
       cancel_label = options.cancel_button || 'cancel',
       cancel_class = options.cancel_class || cancel_label.replace(/^[^\.]+\./i, ''),
       close_func = function(e, ui, dialog) {
-        (ref.is_framed() ? parent.$ : $)(dialog || this).dialog('close');
+        if (!dialog)
+          dialog = this;
+
+        // The dialog might got open in the current window, but also any of its parents (#8627)
+        // We have to use the jQuery object that did invoke the dialog, set in show_popup_dialog()
+        dialog.jqref(dialog).dialog('close');
         if (options.cancel_func) options.cancel_func(e, ref);
       },
       buttons = [{

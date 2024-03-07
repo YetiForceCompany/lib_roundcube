@@ -392,7 +392,7 @@ class rcube_utils
      * @param string $str    String input
      * @param bool   $encode Use base64 encoding
      *
-     * @param string Valid HTML identifier
+     * @return string Valid HTML identifier
      */
     public static function html_identifier($str, $encode = false)
     {
@@ -673,7 +673,7 @@ class rcube_utils
 
         if (!empty($_SERVER['HTTP_X_FORWARDED_PROTO'])
             && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) == 'https'
-            && in_array($_SERVER['REMOTE_ADDR'], (array) rcube::get_instance()->config->get('proxy_whitelist', []))
+            && self::check_proxy_whitelist_ip()
         ) {
             return true;
         }
@@ -687,6 +687,13 @@ class rcube_utils
         }
 
         return false;
+    }
+
+    /**
+     * Check if the reported REMOTE_ADDR is in the 'proxy_whitelist' config option
+     */
+    public static function check_proxy_whitelist_ip() {
+        return in_array($_SERVER['REMOTE_ADDR'], (array) rcube::get_instance()->config->get('proxy_whitelist', []));
     }
 
     /**
@@ -737,12 +744,12 @@ class rcube_utils
      * @param int    $plain_port Plain port number
      * @param int    $ssl_port   SSL port number
      *
-     * @return An array with three elements (hostname, scheme, port)
+     * @return array An array with three elements (hostname, scheme, port)
      */
     public static function parse_host_uri($host, $plain_port = null, $ssl_port = null)
     {
-        if (strpos($host, 'unix://') === 0) {
-            return [$host, 'unix', -1];
+        if (preg_match('#^(unix|ldapi)://#i', $host, $matches)) {
+            return [$host, $matches[1], -1];
         }
 
         $url    = parse_url($host);
@@ -1125,8 +1132,8 @@ class rcube_utils
     /**
      * Convert a string to ascii or utf8 (using IDNA standard)
      *
-     * @param string  $input  Decoded e-mail address
-     * @param boolean $is_utf Convert by idn_to_ascii if true and idn_to_utf8 if false
+     * @param string $input  Decoded e-mail address
+     * @param bool   $is_utf Convert by idn_to_ascii if true and idn_to_utf8 if false
      *
      * @return string Encoded e-mail address
      */
@@ -1305,7 +1312,7 @@ class rcube_utils
             $value = true;
             $key   = null;
 
-            if ($arg[0] == '-') {
+            if (strlen($arg) && $arg[0] == '-') {
                 $key = preg_replace('/^-+/', '', $arg);
                 $sp  = strpos($arg, '=');
 
@@ -1502,11 +1509,16 @@ class rcube_utils
         }
 
         if (strpos($format, 'u') !== false) {
-            $dt  = number_format(microtime(true), 6, '.', '');
-            $dt .=  '.' . date_default_timezone_get();
+            $dt = number_format(microtime(true), 6, '.', '');
 
-            if ($date = date_create_from_format('U.u.e', $dt)) {
+            try {
+                $date = date_create_from_format('U.u', $dt);
+                $date->setTimeZone(new DateTimeZone(date_default_timezone_get()));
+
                 return $date->format($format);
+            }
+            catch (Exception $e) {
+                // ignore, fallback to date()
             }
         }
 

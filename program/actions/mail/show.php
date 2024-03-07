@@ -226,7 +226,7 @@ class rcmail_action_mail_show extends rcmail_action_mail_index
             if (!self::$PRINT_MODE) {
                 $link_attrs = [
                     'href'        => self::$MESSAGE->get_part_url($attach_prop->mime_id, false),
-                    'onclick'     => sprintf('return %s.command(\'load-attachment\',\'%s\',this)',
+                    'onclick'     => sprintf('%s.command(\'load-attachment\',\'%s\',this); return false',
                         rcmail_output::JS_OBJECT_NAME, $attach_prop->mime_id),
                     'onmouseover' => $title ? '' : 'rcube_webmail.long_subject_title_ex(this, 0)',
                     'title'       => $title,
@@ -320,8 +320,11 @@ class rcmail_action_mail_show extends rcmail_action_mail_index
         $dbox   = $rcmail->config->get('drafts_mbox');
 
         // the message is not a draft
-        if (self::$MESSAGE->context
-            || (self::$MESSAGE->folder != $dbox && strpos(self::$MESSAGE->folder, $dbox.$delim) !== 0)
+        if (!empty(self::$MESSAGE->context)
+            || (
+                !empty(self::$MESSAGE->folder)
+                && (self::$MESSAGE->folder != $dbox && strpos(self::$MESSAGE->folder, $dbox.$delim) !== 0)
+            )
         ) {
             return '';
         }
@@ -392,7 +395,7 @@ class rcmail_action_mail_show extends rcmail_action_mail_index
             $attrib['onerror'] = "this.onerror = null; this.src = '$placeholder';";
         }
 
-        if (self::$MESSAGE->sender) {
+        if (!empty(self::$MESSAGE->sender)) {
             $photo_img = $rcmail->url([
                     '_task'   => 'addressbook',
                     '_action' => 'photo',
@@ -470,48 +473,32 @@ class rcmail_action_mail_show extends rcmail_action_mail_index
 
             $ishtml       = false;
             $header_title = $rcmail->gettext(preg_replace('/(^mail-|-)/', '', $hkey));
+            $header_value = null;
 
             if ($hkey == 'date') {
                 $header_value = $rcmail->format_date($value,
                     self::$PRINT_MODE ? $rcmail->config->get('date_long', 'x') : null);
             }
             else if ($hkey == 'priority') {
-                if ($value) {
-                    $header_value = html::span('prio' . $value, rcube::Q(self::localized_priority($value)));
-                    $ishtml       = true;
-                }
-                else {
-                    continue;
-                }
+                $header_value = html::span('prio' . $value, rcube::Q(self::localized_priority($value)));
+                $ishtml       = true;
             }
             else if ($hkey == 'replyto') {
-                if ($headers['replyto'] != $headers['from']) {
+                if ($value != $headers['from']) {
                     $header_value = self::address_string($value, $attr_max, true, $attr_addicon, $charset, $header_title);
                     $ishtml = true;
-                }
-                else {
-                    continue;
                 }
             }
             else if ($hkey == 'mail-reply-to') {
-                if ($value
-                    && (!isset($headers['mail-replyto']) || $headers['mail-replyto'] != $headers['replyto'])
-                    && $headers['replyto'] != $headers['from']
-                ) {
+                if ((!isset($headers['replyto']) || $value != $headers['replyto']) && $value != $headers['from']) {
                     $header_value = self::address_string($value, $attr_max, true, $attr_addicon, $charset, $header_title);
                     $ishtml = true;
-                }
-                else {
-                    continue;
                 }
             }
             else if ($hkey == 'sender') {
-                if ($value && (!isset($headers['sender']) || $headers['sender'] != $headers['from'])) {
+                if ($value != $headers['from']) {
                     $header_value = self::address_string($value, $attr_max, true, $attr_addicon, $charset, $header_title);
                     $ishtml = true;
-                }
-                else {
-                    continue;
                 }
             }
             else if ($hkey == 'mail-followup-to') {
@@ -658,7 +645,10 @@ class rcmail_action_mail_show extends rcmail_action_mail_index
      */
     public static function message_body($attrib)
     {
-        if (!is_array(self::$MESSAGE->parts) && empty(self::$MESSAGE->body)) {
+        if (
+            empty(self::$MESSAGE)
+            || (!is_array(self::$MESSAGE->parts) && empty(self::$MESSAGE->body))
+        ) {
             return '';
         }
 
@@ -795,7 +785,7 @@ class rcmail_action_mail_show extends rcmail_action_mail_index
                         $show_link_attr = [
                             'href'    => self::$MESSAGE->get_part_url($attach_prop->mime_id, false),
                             'onclick' => sprintf(
-                                'return %s.command(\'load-attachment\',\'%s\',this)',
+                                '%s.command(\'load-attachment\',\'%s\',this); return false',
                                 rcmail_output::JS_OBJECT_NAME,
                                 $attach_prop->mime_id
                             )

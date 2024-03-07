@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.2
+
+- Fix "Creation of dynamic property" warnings
+- Fix a couple of code errors found in static code analisys
+- Enable testing on PHP 8.2 and 8.3
+
 ## 2.0
 
 - Fork, various code style fixes, camel-case use

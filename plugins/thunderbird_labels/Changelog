@@ -1,3 +1,33 @@
+v1.6.2
+---
+- added swedish translation (PR 72 by Daniel Johansson - LANTECH)
+- avoid dynamic property deprecation warnings of PHP 8.2 (PR 75 by Nik Soggia)
+- Fix issue #69 needless space use in classic skin (PR 77 by buttercookie42)
+
+v1.6.1
+---
+- Fix compatibility with roundcube 1.6.1 (PR 71 by tsalakoping)
+
+v1.6.0
+---
+- Fix label position on skin larry (PR 68 by Alexander Moisseev)
+- added comments from ancient coffeescript source to javascript
+
+v1.4.13
+---
+- [Security Advisory](https://github.com/mike-kfed/roundcube-thunderbird_labels/security/advisories/GHSA-wp6h-wgxq-v949) identified and fixed by Bartosz Kwitniewski
+- limit label-style config options (PR 67 by Zerg2000)
+
+v1.4.12
+---
+- new feature "Badges" showing label text in message list (PR 65 by Mariusz
+  Krzaczkowski)
+- removed coffeescript source
+
+v1.4.11
+---
+- don't use `$rcmail_config` (Issue 64)
+
 v1.4.10
 ---
 - icons and colors in contextmenu (PR 61 by gianlucagiacometti)

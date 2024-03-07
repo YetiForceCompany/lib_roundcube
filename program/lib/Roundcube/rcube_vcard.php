@@ -130,17 +130,17 @@ class rcube_vcard
                 $charset = self::detect_encoding(self::vcard_encode($this->raw));
             }
             if ($charset != RCUBE_CHARSET) {
-                $this->raw = self::charset_convert($this->raw, $detected_charset);
+                $this->raw = self::charset_convert($this->raw, $charset);
             }
         }
 
         // find well-known address fields
-        $this->displayname  = $this->raw['FN'][0][0] ?? null;
-        $this->surname      = $this->raw['N'][0][0] ?? null;
-        $this->firstname    = $this->raw['N'][0][1] ?? null;
-        $this->middlename   = $this->raw['N'][0][2] ?? null;
-        $this->nickname     = $this->raw['NICKNAME'][0][0] ?? null;
-        $this->organization = $this->raw['ORG'][0][0] ?? null;
+        $this->displayname  = $this->raw['FN'][0][0] ?? '';
+        $this->surname      = $this->raw['N'][0][0] ?? '';
+        $this->firstname    = $this->raw['N'][0][1] ?? '';
+        $this->middlename   = $this->raw['N'][0][2] ?? '';
+        $this->nickname     = $this->raw['NICKNAME'][0][0] ?? '';
+        $this->organization = $this->raw['ORG'][0][0] ?? '';
         $this->business     = (isset($this->raw['X-ABSHOWAS'][0][0]) && $this->raw['X-ABSHOWAS'][0][0] == 'COMPANY')
             || (!empty($this->organization) && isset($this->raw['N'][0]) && @implode('', (array) $this->raw['N'][0]) === '');
 
@@ -201,7 +201,7 @@ class rcube_vcard
                     $key     = $col;
                     $subtype = '';
 
-                    if (!empty($raw['type'])) {
+                    if (!empty($raw['type']) && is_array($raw['type'])) {
                         $raw['type'] = array_map('strtolower', $raw['type']);
 
                         $combined = implode(',', array_diff($raw['type'], ['internet', 'pref']));
@@ -305,7 +305,7 @@ class rcube_vcard
     /**
      * Convert the data structure into a vcard 3.0 string
      *
-     * @param bool $folder Use RFC2425 folding
+     * @param bool $folded Use RFC2425 folding
      *
      * @return string vCard output
      */
@@ -318,7 +318,7 @@ class rcube_vcard
     /**
      * Clear the given fields in the loaded vcard data
      *
-     * @param array List of field names to be reset
+     * @param array $fields List of field names to be reset
      */
     public function reset($fields = [])
     {
@@ -836,17 +836,22 @@ class rcube_vcard
     {
         $vcard = '';
 
+        // Make sure FN is not empty (required by RFC2426)
+        if (empty($data['FN'])) {
+            $data['FN'] = !empty($data['EMAIL'][0][0]) ? $data['EMAIL'][0][0] : '';
+        }
+
+        // Make sure N is not empty (required by RFC2426)
+        if (empty($data['N'])) {
+            $data['N'] = [['', '', '', '', '']];
+        }
+
+        // Valid N has 5 properties
+        while (isset($data['N'][0]) && is_array($data['N'][0]) && count($data['N'][0]) < 5) {
+            $data['N'][0][] = '';
+        }
+
         foreach ((array)$data as $type => $entries) {
-            // valid N has 5 properties
-            while ($type == "N" && is_array($entries[0]) && count($entries[0]) < 5) {
-                $entries[0][] = "";
-            }
-
-            // make sure FN is not empty (required by RFC2426)
-            if ($type == "FN" && empty($entries) && !empty($data['EMAIL'][0][0])) {
-                $entries[0] = $data['EMAIL'][0][0];
-            }
-
             foreach ((array)$entries as $entry) {
                 $attr = '';
                 if (is_array($entry)) {
@@ -872,7 +877,17 @@ class rcube_vcard
                         }
                         else {
                             foreach ((array)$attrvalues as $attrvalue) {
-                                $attr .= strtoupper(";$attrname=") . self::vcard_quote($attrvalue, ',');
+                                $attrname = strtoupper($attrname);
+                                // TYPE=OTHER is non-standard, TYPE=INTERNET is redundant, remove these
+                                if ($attrname == 'TYPE') {
+                                    $attrvalue = array_map('strtolower', (array) $attrvalue);
+                                    $attrvalue = array_diff($attrvalue, ['other', 'internet']);
+                                    if (empty($attrvalue)) {
+                                        continue;
+                                    }
+                                }
+
+                                $attr .= ';' . $attrname . '=' . self::vcard_quote($attrvalue, ',');
                             }
                         }
                     }
@@ -881,8 +896,8 @@ class rcube_vcard
                     $value = $entry;
                 }
 
-                // skip empty entries
-                if (self::is_empty($value)) {
+                // Skip empty entries that aren't required by vCard v3 format
+                if (!in_array($type, ['N', 'FN']) && self::is_empty($value)) {
                     continue;
                 }
 

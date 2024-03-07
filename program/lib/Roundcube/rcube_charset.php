@@ -66,6 +66,7 @@ class rcube_charset
         '222'           => 'WINDOWS-874',
         '238'           => 'WINDOWS-1250',
         'MS950'         => 'CP950',
+        'WINDOWS31J'    => 'CP932',
         'WINDOWS949'    => 'UHC',
         'WINDOWS1257'   => 'ISO-8859-13',
         'ISO2022JP'     => 'ISO-2022-JP-MS',
@@ -176,6 +177,18 @@ class rcube_charset
         65000 => 'UTF-7',
         65001 => 'UTF-8',
     ];
+
+    /**
+     * Validate character set identifier.
+     *
+     * @param string $input Character set identifier
+     *
+     * @return bool True if valid, False if not valid
+     */
+    public static function is_valid($input)
+    {
+        return is_string($input) && preg_match('|^[a-zA-Z0-9_./:#-]{2,32}$|', $input) > 0;
+    }
 
     /**
      * Parse and validate charset name string.
@@ -352,8 +365,8 @@ class rcube_charset
      * Check if the specified input string matches one of the provided charsets.
      * This includes UTF-32, UTF-16, RCUBE_CHARSET and default_charset.
      *
-     * @param string $str  Input string
-     * @param array  $from Suspected charsets of the input string
+     * @param string $str      Input string
+     * @param array  $charsets Suspected charsets of the input string
      *
      * @return string|null First matching charset
      */

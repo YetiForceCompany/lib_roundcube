@@ -274,7 +274,7 @@ class rcube
     /**
      * Create SMTP object and connect to server
      *
-     * @param boolean $connect True if connection should be established
+     * @param bool $connect True if connection should be established
      */
     public function smtp_init($connect = false)
     {
@@ -324,9 +324,6 @@ class rcube
 
         // Initialize storage object
         $this->storage = new $driver_class;
-
-        // for backward compat. (deprecated, will be removed)
-        $this->imap = $this->storage;
 
         // set class options
         $options = [
@@ -961,7 +958,7 @@ class rcube
         $iv_size = openssl_cipher_iv_length($method);
         $tag     = null;
 
-        if (preg_match('/^##(.{16})##/', $cipher, $matches)) {
+        if (preg_match('/^##(.{16})##/s', $cipher, $matches)) {
             $tag    = $matches[1];
             $cipher = substr($cipher, strlen($matches[0]));
         }
@@ -999,7 +996,9 @@ class rcube
                 $_SESSION['secure_token'] = $plugin['value'];
             }
 
-            return $_SESSION['secure_token'];
+            if (!empty($_SESSION['secure_token'])) {
+                return $_SESSION['secure_token'];
+            }
         }
 
         return false;
@@ -1124,7 +1123,7 @@ class rcube
      * The functions will be executed before destroying any
      * objects like smtp, imap, session, etc.
      *
-     * @param callback $function Function callback
+     * @param callable $function Function callback
      */
     public function add_shutdown_function($function)
     {
@@ -1404,7 +1403,7 @@ class rcube
                 'message' => $arg->getMessage(),
             ];
         }
-        else if ($arg instanceof PEAR_Error) {
+        else if (is_object($arg) && is_a($arg, 'PEAR_Error')) {
             $info = $arg->getUserInfo();
             $arg  = [
                 'code'    => $arg->getCode(),
@@ -1567,7 +1566,7 @@ class rcube
     /**
      * Setter for system user object
      *
-     * @param rcube_user Current user instance
+     * @param rcube_user $user Current user instance
      */
     public function set_user($user)
     {
@@ -1858,6 +1857,10 @@ class rcube_dummy_plugin_api
      */
     public function exec_hook($hook, $args = [])
     {
-        return $args;
+        if (!is_array($args)) {
+            $args = ['arg' => $args];
+        }
+
+        return $args += ['abort' => false];
     }
 }

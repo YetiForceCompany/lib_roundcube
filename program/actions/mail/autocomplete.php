@@ -1,6 +1,8 @@
 <?php
-
-// {[The file is published on the basis of YetiForce Public License that can be found in the following directory: licenses/License.html]}
+/**
+ * @license MIT
+ * @author  Mariusz Krzaczkowski <m.krzaczkowski@yetiforce.com>
+ */
 // <--------   YetiForce S.A.   -------->
 
 class rcmail_action_mail_autocomplete extends rcmail_action

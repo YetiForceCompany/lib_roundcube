@@ -2,17 +2,17 @@
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
-            "version": "2.0.7",
-            "version_normalized": "2.0.7.0",
+            "version": "2.0.8",
+            "version_normalized": "2.0.8.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Bacon/BaconQrCode.git",
-                "reference": "d70c840f68657ce49094b8d91f9ee0cc07fbf66c"
+                "reference": "8674e51bb65af933a5ffaf1c308a660387c35c22"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Bacon/BaconQrCode/zipball/d70c840f68657ce49094b8d91f9ee0cc07fbf66c",
-                "reference": "d70c840f68657ce49094b8d91f9ee0cc07fbf66c",
+                "url": "https://api.github.com/repos/Bacon/BaconQrCode/zipball/8674e51bb65af933a5ffaf1c308a660387c35c22",
+                "reference": "8674e51bb65af933a5ffaf1c308a660387c35c22",
                 "shasum": ""
             },
             "require": {
@@ -29,7 +29,7 @@
             "suggest": {
                 "ext-imagick": "to generate QR code images"
             },
-            "time": "2022-03-14T02:02:36+00:00",
+            "time": "2022-12-07T17:46:57+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -53,30 +53,33 @@
             "homepage": "https://github.com/Bacon/BaconQrCode",
             "support": {
                 "issues": "https://github.com/Bacon/BaconQrCode/issues",
-                "source": "https://github.com/Bacon/BaconQrCode/tree/2.0.7"
+                "source": "https://github.com/Bacon/BaconQrCode/tree/2.0.8"
             },
             "install-path": "../bacon/bacon-qr-code"
         },
         {
             "name": "dasprid/enum",
-            "version": "1.0.3",
-            "version_normalized": "1.0.3.0",
+            "version": "1.0.5",
+            "version_normalized": "1.0.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/DASPRiD/Enum.git",
-                "reference": "5abf82f213618696dda8e3bf6f64dd042d8542b2"
+                "reference": "6faf451159fb8ba4126b925ed2d78acfce0dc016"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DASPRiD/Enum/zipball/5abf82f213618696dda8e3bf6f64dd042d8542b2",
-                "reference": "5abf82f213618696dda8e3bf6f64dd042d8542b2",
+                "url": "https://api.github.com/repos/DASPRiD/Enum/zipball/6faf451159fb8ba4126b925ed2d78acfce0dc016",
+                "reference": "6faf451159fb8ba4126b925ed2d78acfce0dc016",
                 "shasum": ""
+            },
+            "require": {
+                "php": ">=7.1 <9.0"
             },
             "require-dev": {
                 "phpunit/phpunit": "^7 | ^8 | ^9",
-                "squizlabs/php_codesniffer": "^3.4"
+                "squizlabs/php_codesniffer": "*"
             },
-            "time": "2020-10-02T16:03:48+00:00",
+            "time": "2023-08-25T16:18:39+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -103,29 +106,29 @@
             ],
             "support": {
                 "issues": "https://github.com/DASPRiD/Enum/issues",
-                "source": "https://github.com/DASPRiD/Enum/tree/1.0.3"
+                "source": "https://github.com/DASPRiD/Enum/tree/1.0.5"
             },
             "install-path": "../dasprid/enum"
         },
         {
             "name": "guzzlehttp/guzzle",
-            "version": "7.4.5",
-            "version_normalized": "7.4.5.0",
+            "version": "7.8.1",
+            "version_normalized": "7.8.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/guzzle.git",
-                "reference": "1dd98b0564cb3f6bd16ce683cb755f94c10fbd82"
+                "reference": "41042bc7ab002487b876a0683fc8dce04ddce104"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/1dd98b0564cb3f6bd16ce683cb755f94c10fbd82",
-                "reference": "1dd98b0564cb3f6bd16ce683cb755f94c10fbd82",
+                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/41042bc7ab002487b876a0683fc8dce04ddce104",
+                "reference": "41042bc7ab002487b876a0683fc8dce04ddce104",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
-                "guzzlehttp/promises": "^1.5",
-                "guzzlehttp/psr7": "^1.9 || ^2.4",
+                "guzzlehttp/promises": "^1.5.3 || ^2.0.1",
+                "guzzlehttp/psr7": "^1.9.1 || ^2.5.1",
                 "php": "^7.2.5 || ^8.0",
                 "psr/http-client": "^1.0",
                 "symfony/deprecation-contracts": "^2.2 || ^3.0"
@@ -134,10 +137,11 @@
                 "psr/http-client-implementation": "1.0"
             },
             "require-dev": {
-                "bamarni/composer-bin-plugin": "^1.4.1",
+                "bamarni/composer-bin-plugin": "^1.8.2",
                 "ext-curl": "*",
-                "php-http/client-integration-tests": "^3.0",
-                "phpunit/phpunit": "^8.5.5 || ^9.3.5",
+                "php-http/client-integration-tests": "dev-master#2c025848417c1135031fdf9c728ee53d0a7ceaee as 3.0.999",
+                "php-http/message-factory": "^1.1",
+                "phpunit/phpunit": "^8.5.36 || ^9.6.15",
                 "psr/log": "^1.1 || ^2.0 || ^3.0"
             },
             "suggest": {
@@ -145,11 +149,12 @@
                 "ext-intl": "Required for Internationalized Domain Name (IDN) support",
                 "psr/log": "Required for using the Log middleware"
             },
-            "time": "2022-06-20T22:16:13+00:00",
+            "time": "2023-12-03T20:35:24+00:00",
             "type": "library",
             "extra": {
-                "branch-alias": {
-                    "dev-master": "7.4-dev"
+                "bamarni-bin": {
+                    "bin-links": true,
+                    "forward-command": false
                 }
             },
             "installation-source": "dist",
@@ -216,7 +221,7 @@
             ],
             "support": {
                 "issues": "https://github.com/guzzle/guzzle/issues",
-                "source": "https://github.com/guzzle/guzzle/tree/7.4.5"
+                "source": "https://github.com/guzzle/guzzle/tree/7.8.1"
             },
             "funding": [
                 {
@@ -236,37 +241,36 @@
         },
         {
             "name": "guzzlehttp/promises",
-            "version": "1.5.1",
-            "version_normalized": "1.5.1.0",
+            "version": "2.0.2",
+            "version_normalized": "2.0.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/promises.git",
-                "reference": "fe752aedc9fd8fcca3fe7ad05d419d32998a06da"
+                "reference": "bbff78d96034045e58e13dedd6ad91b5d1253223"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/promises/zipball/fe752aedc9fd8fcca3fe7ad05d419d32998a06da",
-                "reference": "fe752aedc9fd8fcca3fe7ad05d419d32998a06da",
+                "url": "https://api.github.com/repos/guzzle/promises/zipball/bbff78d96034045e58e13dedd6ad91b5d1253223",
+                "reference": "bbff78d96034045e58e13dedd6ad91b5d1253223",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.5"
+                "php": "^7.2.5 || ^8.0"
             },
             "require-dev": {
-                "symfony/phpunit-bridge": "^4.4 || ^5.1"
+                "bamarni/composer-bin-plugin": "^1.8.2",
+                "phpunit/phpunit": "^8.5.36 || ^9.6.15"
             },
-            "time": "2021-10-22T20:56:57+00:00",
+            "time": "2023-12-03T20:19:20+00:00",
             "type": "library",
             "extra": {
-                "branch-alias": {
-                    "dev-master": "1.5-dev"
+                "bamarni-bin": {
+                    "bin-links": true,
+                    "forward-command": false
                 }
             },
             "installation-source": "dist",
             "autoload": {
-                "files": [
-                    "src/functions_include.php"
-                ],
                 "psr-4": {
                     "GuzzleHttp\\Promise\\": "src/"
                 }
@@ -303,7 +307,7 @@
             ],
             "support": {
                 "issues": "https://github.com/guzzle/promises/issues",
-                "source": "https://github.com/guzzle/promises/tree/1.5.1"
+                "source": "https://github.com/guzzle/promises/tree/2.0.2"
             },
             "funding": [
                 {
@@ -323,23 +327,23 @@
         },
         {
             "name": "guzzlehttp/psr7",
-            "version": "2.4.0",
-            "version_normalized": "2.4.0.0",
+            "version": "2.6.2",
+            "version_normalized": "2.6.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/psr7.git",
-                "reference": "13388f00956b1503577598873fffb5ae994b5737"
+                "reference": "45b30f99ac27b5ca93cb4831afe16285f57b8221"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/psr7/zipball/13388f00956b1503577598873fffb5ae994b5737",
-                "reference": "13388f00956b1503577598873fffb5ae994b5737",
+                "url": "https://api.github.com/repos/guzzle/psr7/zipball/45b30f99ac27b5ca93cb4831afe16285f57b8221",
+                "reference": "45b30f99ac27b5ca93cb4831afe16285f57b8221",
                 "shasum": ""
             },
             "require": {
                 "php": "^7.2.5 || ^8.0",
                 "psr/http-factory": "^1.0",
-                "psr/http-message": "^1.0",
+                "psr/http-message": "^1.1 || ^2.0",
                 "ralouphie/getallheaders": "^3.0"
             },
             "provide": {
@@ -347,18 +351,19 @@
                 "psr/http-message-implementation": "1.0"
             },
             "require-dev": {
-                "bamarni/composer-bin-plugin": "^1.4.1",
+                "bamarni/composer-bin-plugin": "^1.8.2",
                 "http-interop/http-factory-tests": "^0.9",
-                "phpunit/phpunit": "^8.5.8 || ^9.3.10"
+                "phpunit/phpunit": "^8.5.36 || ^9.6.15"
             },
             "suggest": {
                 "laminas/laminas-httphandlerrunner": "Emit PSR-7 responses"
             },
-            "time": "2022-06-20T21:43:11+00:00",
+            "time": "2023-12-03T20:05:35+00:00",
             "type": "library",
             "extra": {
-                "branch-alias": {
-                    "dev-master": "2.4-dev"
+                "bamarni-bin": {
+                    "bin-links": true,
+                    "forward-command": false
                 }
             },
             "installation-source": "dist",
@@ -421,7 +426,7 @@
             ],
             "support": {
                 "issues": "https://github.com/guzzle/psr7/issues",
-                "source": "https://github.com/guzzle/psr7/tree/2.4.0"
+                "source": "https://github.com/guzzle/psr7/tree/2.6.2"
             },
             "funding": [
                 {
@@ -441,26 +446,20 @@
         },
         {
             "name": "kolab/net_ldap3",
-            "version": "v1.1.4",
-            "version_normalized": "1.1.4.0",
+            "version": "v1.1.5",
+            "version_normalized": "1.1.5.0",
             "source": {
                 "type": "git",
-                "url": "git@gitlab.com:roundcube/net_ldap3.git",
-                "reference": "ec4f0d6918aa4b5364e99e1132e0a5a9b3ab23ab"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://gitlab.com/api/v4/projects/roundcube%2Fnet_ldap3/repository/archive.zip?sha=ec4f0d6918aa4b5364e99e1132e0a5a9b3ab23ab",
-                "reference": "ec4f0d6918aa4b5364e99e1132e0a5a9b3ab23ab",
-                "shasum": ""
+                "url": "https://git.kolab.org/diffusion/PNL/php-net_ldap3.git",
+                "reference": "5a319cf437d75aad564ce7fd076cc5423722868b"
             },
             "require": {
                 "pear/net_ldap2": ">=2.0.12",
                 "php": ">=5.3.3"
             },
-            "time": "2021-11-11T09:02:56+00:00",
+            "time": "2023-06-07T08:32:15+00:00",
             "type": "library",
-            "installation-source": "dist",
+            "installation-source": "source",
             "autoload": {
                 "classmap": [
                     "lib/"
@@ -498,17 +497,17 @@
         },
         {
             "name": "masterminds/html5",
-            "version": "2.7.5",
-            "version_normalized": "2.7.5.0",
+            "version": "2.7.6",
+            "version_normalized": "2.7.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Masterminds/html5-php.git",
-                "reference": "f640ac1bdddff06ea333a920c95bbad8872429ab"
+                "reference": "897eb517a343a2281f11bc5556d6548db7d93947"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Masterminds/html5-php/zipball/f640ac1bdddff06ea333a920c95bbad8872429ab",
-                "reference": "f640ac1bdddff06ea333a920c95bbad8872429ab",
+                "url": "https://api.github.com/repos/Masterminds/html5-php/zipball/897eb517a343a2281f11bc5556d6548db7d93947",
+                "reference": "897eb517a343a2281f11bc5556d6548db7d93947",
                 "shasum": ""
             },
             "require": {
@@ -520,7 +519,7 @@
             "require-dev": {
                 "phpunit/phpunit": "^4.8.35 || ^5.7.21 || ^6 || ^7"
             },
-            "time": "2021-07-01T14:25:37+00:00",
+            "time": "2022-08-18T16:18:26+00:00",
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -564,7 +563,7 @@
             ],
             "support": {
                 "issues": "https://github.com/Masterminds/html5-php/issues",
-                "source": "https://github.com/Masterminds/html5-php/tree/2.7.5"
+                "source": "https://github.com/Masterminds/html5-php/tree/2.7.6"
             },
             "install-path": "../masterminds/html5"
         },
@@ -630,17 +629,17 @@
         },
         {
             "name": "pear/console_commandline",
-            "version": "v1.2.4",
-            "version_normalized": "1.2.4.0",
+            "version": "v1.2.6",
+            "version_normalized": "1.2.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pear/Console_CommandLine.git",
-                "reference": "cce06166765c5da31f3e8c1acf42512c64344cdb"
+                "reference": "611c5bff2e47ec5a184748cb5fedc2869098ff28"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pear/Console_CommandLine/zipball/cce06166765c5da31f3e8c1acf42512c64344cdb",
-                "reference": "cce06166765c5da31f3e8c1acf42512c64344cdb",
+                "url": "https://api.github.com/repos/pear/Console_CommandLine/zipball/611c5bff2e47ec5a184748cb5fedc2869098ff28",
+                "reference": "611c5bff2e47ec5a184748cb5fedc2869098ff28",
                 "shasum": ""
             },
             "require": {
@@ -652,7 +651,7 @@
             "require-dev": {
                 "phpunit/phpunit": "*"
             },
-            "time": "2021-11-15T19:53:25+00:00",
+            "time": "2023-04-02T18:49:53+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -747,17 +746,17 @@
         },
         {
             "name": "pear/crypt_gpg",
-            "version": "v1.6.7",
-            "version_normalized": "1.6.7.0",
+            "version": "v1.6.8",
+            "version_normalized": "1.6.8.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pear/Crypt_GPG.git",
-                "reference": "29c0fbe96d0d4063ecd5c9a4644cb65a7fb7cc4e"
+                "reference": "89c661fbd7027f7745c25efd4053552972278bc1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pear/Crypt_GPG/zipball/29c0fbe96d0d4063ecd5c9a4644cb65a7fb7cc4e",
-                "reference": "29c0fbe96d0d4063ecd5c9a4644cb65a7fb7cc4e",
+                "url": "https://api.github.com/repos/pear/Crypt_GPG/zipball/89c661fbd7027f7745c25efd4053552972278bc1",
+                "reference": "89c661fbd7027f7745c25efd4053552972278bc1",
                 "shasum": ""
             },
             "require": {
@@ -772,7 +771,7 @@
             "suggest": {
                 "ext-posix": "May require the posix PHP extension"
             },
-            "time": "2022-02-16T17:39:00+00:00",
+            "time": "2023-11-23T09:15:05+00:00",
             "bin": [
                 "scripts/crypt-gpg-pinentry"
             ],
@@ -874,24 +873,27 @@
         },
         {
             "name": "pear/net_ldap2",
-            "version": "v2.2.0",
-            "version_normalized": "2.2.0.0",
+            "version": "v2.3.0",
+            "version_normalized": "2.3.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pear/Net_LDAP2.git",
-                "reference": "38f1b22a96dfbd7ec53852f0e1e7ec1a9a5eb0e8"
+                "reference": "6eae6d20533469ffe1c01684923cd09f0fae3b77"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pear/Net_LDAP2/zipball/38f1b22a96dfbd7ec53852f0e1e7ec1a9a5eb0e8",
-                "reference": "38f1b22a96dfbd7ec53852f0e1e7ec1a9a5eb0e8",
+                "url": "https://api.github.com/repos/pear/Net_LDAP2/zipball/6eae6d20533469ffe1c01684923cd09f0fae3b77",
+                "reference": "6eae6d20533469ffe1c01684923cd09f0fae3b77",
                 "shasum": ""
             },
             "require": {
                 "ext-ldap": "*",
                 "pear/pear-core-minimal": "^1.10.1"
             },
-            "time": "2015-10-30T20:34:22+00:00",
+            "require-dev": {
+                "phpunit/phpunit": "^9 || ^10.3"
+            },
+            "time": "2023-10-12T20:00:01+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -920,17 +922,17 @@
         },
         {
             "name": "pear/net_sieve",
-            "version": "1.4.5",
-            "version_normalized": "1.4.5.0",
+            "version": "1.4.6",
+            "version_normalized": "1.4.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pear/Net_Sieve.git",
-                "reference": "94763e0fc6f39a9ebcd01e5e7a8250292804a50e"
+                "reference": "ea79747d73e6d4017716d9bab2e760f7df3249d7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pear/Net_Sieve/zipball/94763e0fc6f39a9ebcd01e5e7a8250292804a50e",
-                "reference": "94763e0fc6f39a9ebcd01e5e7a8250292804a50e",
+                "url": "https://api.github.com/repos/pear/Net_Sieve/zipball/ea79747d73e6d4017716d9bab2e760f7df3249d7",
+                "reference": "ea79747d73e6d4017716d9bab2e760f7df3249d7",
                 "shasum": ""
             },
             "require": {
@@ -943,7 +945,7 @@
             "suggest": {
                 "pear/auth_sasl": "Install optionally via your project's composer.json"
             },
-            "time": "2021-04-24T13:15:04+00:00",
+            "time": "2022-12-02T17:19:07+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -991,17 +993,17 @@
         },
         {
             "name": "pear/net_smtp",
-            "version": "1.10.0",
-            "version_normalized": "1.10.0.0",
+            "version": "1.10.1",
+            "version_normalized": "1.10.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pear/Net_SMTP.git",
-                "reference": "51e5997b711fbd1e5a9a075634d4d682168537fa"
+                "reference": "cfd963dc5cc73b4d64c7769e47dfa0f439dec536"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pear/Net_SMTP/zipball/51e5997b711fbd1e5a9a075634d4d682168537fa",
-                "reference": "51e5997b711fbd1e5a9a075634d4d682168537fa",
+                "url": "https://api.github.com/repos/pear/Net_SMTP/zipball/cfd963dc5cc73b4d64c7769e47dfa0f439dec536",
+                "reference": "cfd963dc5cc73b4d64c7769e47dfa0f439dec536",
                 "shasum": ""
             },
             "require": {
@@ -1015,7 +1017,7 @@
             "suggest": {
                 "pear/auth_sasl": "Install optionally via your project's composer.json"
             },
-            "time": "2021-03-19T18:39:42+00:00",
+            "time": "2022-09-23T21:48:50+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -1040,6 +1042,11 @@
                 {
                     "name": "Chuck Hagenbuch",
                     "email": "chuck@horde.org",
+                    "role": "Lead"
+                },
+                {
+                    "name": "Armin Graefe",
+                    "email": "schengawegga@gmail.com",
                     "role": "Lead"
                 }
             ],
@@ -1118,27 +1125,28 @@
         },
         {
             "name": "pear/pear-core-minimal",
-            "version": "v1.10.11",
-            "version_normalized": "1.10.11.0",
+            "version": "v1.10.14",
+            "version_normalized": "1.10.14.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pear/pear-core-minimal.git",
-                "reference": "68d0d32ada737153b7e93b8d3c710ebe70ac867d"
+                "reference": "a86fc145edb5caedbf96527214ce3cadc9de4a32"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pear/pear-core-minimal/zipball/68d0d32ada737153b7e93b8d3c710ebe70ac867d",
-                "reference": "68d0d32ada737153b7e93b8d3c710ebe70ac867d",
+                "url": "https://api.github.com/repos/pear/pear-core-minimal/zipball/a86fc145edb5caedbf96527214ce3cadc9de4a32",
+                "reference": "a86fc145edb5caedbf96527214ce3cadc9de4a32",
                 "shasum": ""
             },
             "require": {
                 "pear/console_getopt": "~1.4",
-                "pear/pear_exception": "~1.0"
+                "pear/pear_exception": "~1.0",
+                "php": ">=5.4"
             },
             "replace": {
                 "rsky/pear-core-min": "self.version"
             },
-            "time": "2021-08-10T22:31:03+00:00",
+            "time": "2023-11-26T16:15:38+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -1231,24 +1239,24 @@
         },
         {
             "name": "psr/http-client",
-            "version": "1.0.1",
-            "version_normalized": "1.0.1.0",
+            "version": "1.0.3",
+            "version_normalized": "1.0.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-fig/http-client.git",
-                "reference": "2dfb5f6c5eff0e91e20e913f8c5452ed95b86621"
+                "reference": "bb5906edc1c324c9a05aa0873d40117941e5fa90"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-fig/http-client/zipball/2dfb5f6c5eff0e91e20e913f8c5452ed95b86621",
-                "reference": "2dfb5f6c5eff0e91e20e913f8c5452ed95b86621",
+                "url": "https://api.github.com/repos/php-fig/http-client/zipball/bb5906edc1c324c9a05aa0873d40117941e5fa90",
+                "reference": "bb5906edc1c324c9a05aa0873d40117941e5fa90",
                 "shasum": ""
             },
             "require": {
                 "php": "^7.0 || ^8.0",
-                "psr/http-message": "^1.0"
+                "psr/http-message": "^1.0 || ^2.0"
             },
-            "time": "2020-06-29T06:28:15+00:00",
+            "time": "2023-09-23T14:17:50+00:00",
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -1268,7 +1276,7 @@
             "authors": [
                 {
                     "name": "PHP-FIG",
-                    "homepage": "http://www.php-fig.org/"
+                    "homepage": "https://www.php-fig.org/"
                 }
             ],
             "description": "Common interface for HTTP clients",
@@ -1280,30 +1288,30 @@
                 "psr-18"
             ],
             "support": {
-                "source": "https://github.com/php-fig/http-client/tree/master"
+                "source": "https://github.com/php-fig/http-client"
             },
             "install-path": "../psr/http-client"
         },
         {
             "name": "psr/http-factory",
-            "version": "1.0.1",
-            "version_normalized": "1.0.1.0",
+            "version": "1.0.2",
+            "version_normalized": "1.0.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-fig/http-factory.git",
-                "reference": "12ac7fcd07e5b077433f5f2bee95b3a771bf61be"
+                "reference": "e616d01114759c4c489f93b099585439f795fe35"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-fig/http-factory/zipball/12ac7fcd07e5b077433f5f2bee95b3a771bf61be",
-                "reference": "12ac7fcd07e5b077433f5f2bee95b3a771bf61be",
+                "url": "https://api.github.com/repos/php-fig/http-factory/zipball/e616d01114759c4c489f93b099585439f795fe35",
+                "reference": "e616d01114759c4c489f93b099585439f795fe35",
                 "shasum": ""
             },
             "require": {
                 "php": ">=7.0.0",
-                "psr/http-message": "^1.0"
+                "psr/http-message": "^1.0 || ^2.0"
             },
-            "time": "2019-04-30T12:38:16+00:00",
+            "time": "2023-04-10T20:10:41+00:00",
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -1323,7 +1331,7 @@
             "authors": [
                 {
                     "name": "PHP-FIG",
-                    "homepage": "http://www.php-fig.org/"
+                    "homepage": "https://www.php-fig.org/"
                 }
             ],
             "description": "Common interfaces for PSR-7 HTTP message factories",
@@ -1338,33 +1346,33 @@
                 "response"
             ],
             "support": {
-                "source": "https://github.com/php-fig/http-factory/tree/master"
+                "source": "https://github.com/php-fig/http-factory/tree/1.0.2"
             },
             "install-path": "../psr/http-factory"
         },
         {
             "name": "psr/http-message",
-            "version": "1.0.1",
-            "version_normalized": "1.0.1.0",
+            "version": "2.0",
+            "version_normalized": "2.0.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-fig/http-message.git",
-                "reference": "f6561bf28d520154e4b0ec72be95418abe6d9363"
+                "reference": "402d35bcb92c70c026d1a6a9883f06b2ead23d71"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-fig/http-message/zipball/f6561bf28d520154e4b0ec72be95418abe6d9363",
-                "reference": "f6561bf28d520154e4b0ec72be95418abe6d9363",
+                "url": "https://api.github.com/repos/php-fig/http-message/zipball/402d35bcb92c70c026d1a6a9883f06b2ead23d71",
+                "reference": "402d35bcb92c70c026d1a6a9883f06b2ead23d71",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.0"
+                "php": "^7.2 || ^8.0"
             },
-            "time": "2016-08-06T14:39:51+00:00",
+            "time": "2023-04-04T09:54:51+00:00",
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.0.x-dev"
+                    "dev-master": "2.0.x-dev"
                 }
             },
             "installation-source": "dist",
@@ -1380,7 +1388,7 @@
             "authors": [
                 {
                     "name": "PHP-FIG",
-                    "homepage": "http://www.php-fig.org/"
+                    "homepage": "https://www.php-fig.org/"
                 }
             ],
             "description": "Common interface for HTTP messages",
@@ -1394,7 +1402,7 @@
                 "response"
             ],
             "support": {
-                "source": "https://github.com/php-fig/http-message/tree/master"
+                "source": "https://github.com/php-fig/http-message/tree/2.0"
             },
             "install-path": "../psr/http-message"
         },
@@ -1506,17 +1514,17 @@
         },
         {
             "name": "roundcube/rtf-html-php",
-            "version": "v2.1",
-            "version_normalized": "2.1.0.0",
+            "version": "v2.2",
+            "version_normalized": "2.2.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/roundcube/rtf-html-php.git",
-                "reference": "7b488113e6fe2fccd84643e5121070fe7f335cb2"
+                "reference": "a3432ca249b73bf24fec50114191a63ad8b1478c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/roundcube/rtf-html-php/zipball/7b488113e6fe2fccd84643e5121070fe7f335cb2",
-                "reference": "7b488113e6fe2fccd84643e5121070fe7f335cb2",
+                "url": "https://api.github.com/repos/roundcube/rtf-html-php/zipball/a3432ca249b73bf24fec50114191a63ad8b1478c",
+                "reference": "a3432ca249b73bf24fec50114191a63ad8b1478c",
                 "shasum": ""
             },
             "require": {
@@ -1525,9 +1533,10 @@
                 "php": ">=5.4"
             },
             "require-dev": {
-                "phpunit/phpunit": "^4.8.36 || ^5.7.21 || ^6 || ^7"
+                "phpstan/phpstan": "^1.2",
+                "phpunit/phpunit": "^4.8.36 || ^5.7.21 || ^6 || ^7 | ^9.6"
             },
-            "time": "2021-07-11T06:43:46+00:00",
+            "time": "2023-12-31T14:01:02+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -1556,33 +1565,33 @@
             ],
             "support": {
                 "issues": "https://github.com/roundcube/rtf-html-php/issues",
-                "source": "https://github.com/roundcube/rtf-html-php/tree/v2.1"
+                "source": "https://github.com/roundcube/rtf-html-php/tree/v2.2"
             },
             "install-path": "../roundcube/rtf-html-php"
         },
         {
             "name": "symfony/deprecation-contracts",
-            "version": "v2.2.0",
-            "version_normalized": "2.2.0.0",
+            "version": "v2.5.2",
+            "version_normalized": "2.5.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/deprecation-contracts.git",
-                "reference": "5fa56b4074d1ae755beb55617ddafe6f5d78f665"
+                "reference": "e8b495ea28c1d97b5e0c121748d6f9b53d075c66"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/deprecation-contracts/zipball/5fa56b4074d1ae755beb55617ddafe6f5d78f665",
-                "reference": "5fa56b4074d1ae755beb55617ddafe6f5d78f665",
+                "url": "https://api.github.com/repos/symfony/deprecation-contracts/zipball/e8b495ea28c1d97b5e0c121748d6f9b53d075c66",
+                "reference": "e8b495ea28c1d97b5e0c121748d6f9b53d075c66",
                 "shasum": ""
             },
             "require": {
                 "php": ">=7.1"
             },
-            "time": "2020-09-07T11:33:47+00:00",
+            "time": "2022-01-02T09:53:40+00:00",
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.2-dev"
+                    "dev-main": "2.5-dev"
                 },
                 "thanks": {
                     "name": "symfony/contracts",
@@ -1612,7 +1621,7 @@
             "description": "A generic function and convention to trigger deprecation notices",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/deprecation-contracts/tree/master"
+                "source": "https://github.com/symfony/deprecation-contracts/tree/v2.5.2"
             },
             "funding": [
                 {

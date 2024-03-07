@@ -236,7 +236,7 @@ class rcube_washtml
      * Register a callback function for a certain tag
      *
      * @param string   $tag      HTML tag name
-     * @param callback $callback Callback function
+     * @param callable $callback Callback function
      */
     public function add_callback($tag, $callback)
     {
@@ -359,7 +359,9 @@ class rcube_washtml
                         $out = $value;
                     }
                 }
-                else if ($this->_css_prefix !== null && in_array($key, ['id', 'class', 'for'])) {
+                else if ($this->_css_prefix !== null
+                    && (in_array($key, ['id', 'class', 'for']) || ($key == 'name' && $node->nodeName == 'a'))
+                ) {
                     $out = preg_replace('/(\S+)/', $this->_css_prefix . '\1', $value);
                 }
                 else if ($key) {
@@ -367,7 +369,8 @@ class rcube_washtml
                 }
 
                 if ($out !== null && $out !== '') {
-                    $result .= ' ' . $attr->nodeName . '="' . htmlspecialchars($out, ENT_QUOTES | ENT_SUBSTITUTE, $this->config['charset']) . '"';
+                    $v = htmlspecialchars($out, ENT_QUOTES | ENT_SUBSTITUTE, $this->config['charset']);
+                    $result .= " {$attr->nodeName}=\"{$v}\"";
                 }
                 else if ($value) {
                     $washed[] = htmlspecialchars($attr->nodeName, ENT_QUOTES, $this->config['charset']);
@@ -424,17 +427,18 @@ class rcube_washtml
                 return $this->config['blocked_src'];
             }
         }
-        else if ($is_image && preg_match('/^data:image\/([^,]+),(.+)$/i', $uri, $matches)) { // RFC2397
+        else if ($is_image && preg_match('/^data:image\/([^,]+),(.+)$/is', $uri, $matches)) { // RFC2397
+            $type = preg_replace('/\s/', '', $matches[1]);
+
             // svg images can be insecure, we'll sanitize them
-            if (stripos($matches[1], 'svg') !== false) {
+            if (stripos($type, 'svg') !== false) {
                 $svg = $matches[2];
 
-                if (stripos($matches[1], ';base64') !== false) {
-                    $svg  = base64_decode($svg);
-                    $type = $matches[1];
+                if (stripos($type, ';base64') !== false) {
+                    $svg = base64_decode($svg);
                 }
                 else {
-                    $type = $matches[1] . ';base64';
+                    $type .= ';base64';
                 }
 
                 $washer = new self($this->config);
@@ -741,7 +745,7 @@ class rcube_washtml
             // space(s) between <NOBR>
             '/(<\/nobr>)(\s+)(<nobr>)/i',
             // PHP bug #32547 workaround: remove title tag
-            '/<title[^>]*>.*<\/title>/i',
+            '/<title[^>]*>.*<\/title>/iU',
             // remove <!doctype> before BOM (#1490291)
             '/<\!doctype[^>]+>[^<]*/im',
             // byte-order mark (only outlook?)
