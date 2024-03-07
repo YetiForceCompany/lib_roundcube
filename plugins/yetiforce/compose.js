@@ -2,7 +2,8 @@
 /* {[The file is published on the basis of MIT License]} */
 if (window.rcmail) {
 	rcmail.addEventListener('init', function () {
-		rcmail.crm = rcmail.getCrmWindow();
+		rcmail.crm = rcmail.yetiGetCrmWindow();
+		console.log(rcmail.env);
 		if (rcmail.crm != false) {
 			rcmail.env.compose_commands.push('yetiforce.addFilesFromCRM');
 			rcmail.env.compose_commands.push('yetiforce.selectTemplate');
@@ -10,29 +11,35 @@ if (window.rcmail) {
 			rcmail.register_command(
 				'yetiforce.addFilesFromCRM',
 				function () {
-					rcmail.addFilesFromCRM();
+					rcmail.yetiAddFilesFromCRM();
 				},
 				true
 			);
 			rcmail.register_command(
 				'yetiforce.selectTemplate',
 				function () {
-					rcmail.selectTemplate();
+					rcmail.yetiSelectTemplate();
 				},
 				true
 			);
 			rcmail.register_command(
 				'yetiforce.selectAdress',
 				function (module, part) {
-					rcmail.selectAdress(module, part);
+					rcmail.yetiSelectAdress(module, part);
 				},
 				true
 			);
 		}
+		if (rcmail.env.yetiForceSignatures) {
+			rcmail.yetiInitSignature();
+		}
+	});
+	rcmail.addEventListener('change_identity', function () {
+		rcmail.yetiInitSignature();
 	});
 }
 //Document selection
-rcube_webmail.prototype.addFilesFromCRM = function () {
+rcube_webmail.prototype.yetiAddFilesFromCRM = function () {
 	rcmail.crm.app.showRecordsList(
 		{
 			module: 'Documents',
@@ -43,7 +50,7 @@ rcube_webmail.prototype.addFilesFromCRM = function () {
 		},
 		(modal, instance) => {
 			instance.setSelectEvent((responseData) => {
-				rcmail.addFilesToMail({
+				rcmail.yetiAddFilesToMail({
 					ids: Object.keys(responseData)
 				});
 			});
@@ -51,13 +58,13 @@ rcube_webmail.prototype.addFilesFromCRM = function () {
 	);
 };
 //Add files to mail
-rcube_webmail.prototype.addFilesToMail = function (data) {
+rcube_webmail.prototype.yetiAddFilesToMail = function (data) {
 	data._id = rcmail.env.compose_id;
 	data._uploadid = new Date().getTime();
 	this.http_post('plugin.yetiforce-addFilesToMail', data, this.set_busy(true, 'loading'));
 };
 // Select template
-rcube_webmail.prototype.selectTemplate = function () {
+rcube_webmail.prototype.yetiSelectTemplate = function () {
 	rcmail.crm.app.showRecordsList(
 		{
 			module: 'EmailTemplates',
@@ -95,7 +102,7 @@ rcube_webmail.prototype.selectTemplate = function () {
 							jQuery('#composebody').val(html + oldBody);
 						}
 						if (typeof data.attachments !== 'undefined' && data.attachments !== null) {
-							rcmail.addFilesToMail(data.attachments);
+							rcmail.yetiAddFilesToMail(data.attachments);
 						}
 					}
 				});
@@ -103,7 +110,7 @@ rcube_webmail.prototype.selectTemplate = function () {
 		}
 	);
 };
-rcube_webmail.prototype.selectAdress = function (module, part) {
+rcube_webmail.prototype.yetiSelectAdress = function (module, part) {
 	rcmail.crm.app.showRecordsList(
 		{
 			module: module,
@@ -113,7 +120,7 @@ rcube_webmail.prototype.selectAdress = function (module, part) {
 		},
 		(modal, instance) => {
 			instance.setSelectEvent((responseData, e) => {
-				rcmail.getEmailAddresses(responseData, e, module).done((emails) => {
+				rcmail.yetiGetEmailAddresses(responseData, e, module).done((emails) => {
 					if (emails.length) {
 						let paetElement = $('#' + part);
 						let value = paetElement.val();
@@ -133,7 +140,7 @@ rcube_webmail.prototype.selectAdress = function (module, part) {
 		}
 	);
 };
-rcube_webmail.prototype.getEmailAddresses = function (responseData, e, module) {
+rcube_webmail.prototype.yetiGetEmailAddresses = function (responseData, e, module) {
 	let aDeferred = $.Deferred(),
 		emails = [],
 		label = '',
@@ -155,7 +162,7 @@ rcube_webmail.prototype.getEmailAddresses = function (responseData, e, module) {
 				})
 				.done((data) => {
 					i++;
-					label = email = rcmail.getFirstEmailAddress(data.result.data);
+					label = email = rcmail.yetiGetFirstEmailAddress(data.result.data);
 					if (responseData[id]) {
 						label = responseData[id];
 					}
@@ -169,7 +176,7 @@ rcube_webmail.prototype.getEmailAddresses = function (responseData, e, module) {
 	}
 	return aDeferred.promise();
 };
-rcube_webmail.prototype.getFirstEmailAddress = function (data) {
+rcube_webmail.prototype.yetiGetFirstEmailAddress = function (data) {
 	let emails = [];
 	for (let key in data) {
 		if (data[key]) {
@@ -187,7 +194,7 @@ rcube_webmail.prototype.getFirstEmailAddress = function (data) {
 	}
 	return emails;
 };
-rcube_webmail.prototype.getCrmWindow = function () {
+rcube_webmail.prototype.yetiGetCrmWindow = function () {
 	if (opener !== null && typeof opener.parent.CONFIG == 'object') {
 		return opener.parent;
 	} else if (typeof parent.CONFIG == 'object') {
@@ -200,4 +207,52 @@ rcube_webmail.prototype.getCrmWindow = function () {
 		return opener.crm;
 	}
 	return false;
+};
+// Init signature
+rcube_webmail.prototype.yetiInitSignature = function () {
+	let i,
+		link,
+		li,
+		list = [],
+		obj = $('#yatiforce-insert-sig'),
+		ul = $('ul', obj);
+	ul = $('<ul class="selectable listing" role="menu">');
+	for (i in rcmail.env.yetiForceSignatures) {
+		let row = rcmail.env.yetiForceSignatures[i];
+		li = $('<li role="menuitem">');
+		link = $('<a href="#' + i + '" tabindex="0"></a>')
+			.text(row['name'])
+			.data('id', i)
+			.on('click keypress', function (e) {
+				rcmail.yetiSetSignature(row);
+			});
+
+		link.appendTo(li);
+		list.push(li);
+	}
+	if (list) {
+		const sig = $('#yatiforce-insert-sig-list');
+		setTimeout(function () {
+			sig.removeClass('disabled');
+			sig.closest('.dropbutton').removeClass('disabled');
+		}, 700);
+	}
+	if (obj.find('.selectable').length) {
+		obj.find('.selectable').html(list);
+	} else {
+		ul.append(list).appendTo(obj);
+	}
+};
+// Set signature
+rcube_webmail.prototype.yetiSetSignature = function (sig) {
+	if (rcmail.editor.editor && sig.body) {
+		let id = $("[name='_from']").val(),
+			old = Object.assign({}, rcmail.env.signatures[id]);
+		if (!rcmail.env.signatures[id]) {
+			rcmail.env.signatures[id] = {};
+		}
+		rcmail.env.signatures[id]['html'] = sig.body;
+		rcmail.editor.change_signature(id, true);
+		rcmail.env.signatures[id] = old;
+	}
 };
