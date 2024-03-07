@@ -94,16 +94,7 @@ class yetiforce extends rcube_plugin
 					'LBL_FILE_FROM_CRM' => \App\Language::translate('LBL_FILE_FROM_CRM', 'OSSMail', false, false),
 					'LBL_MAIL_TEMPLATES' => \App\Language::translate('LBL_MAIL_TEMPLATES', 'OSSMail', false, false),
 					'LBL_TEMPLATES' => \App\Language::translate('LBL_TEMPLATES', 'OSSMail', false, false),
-					'BTN_BLACK_LIST' => \App\Language::translate('LBL_BLACK_LIST', 'OSSMail', false, false),
-					'LBL_BLACK_LIST_DESC' => \App\Language::translate('LBL_BLACK_LIST_DESC', 'OSSMail', false, false),
-					'BTN_WHITE_LIST' => \App\Language::translate('LBL_WHITE_LIST', 'OSSMail', false, false),
-					'LBL_WHITE_LIST_DESC' => \App\Language::translate('LBL_WHITE_LIST_DESC', 'OSSMail', false, false),
-					'LBL_ALERT_NEUTRAL_LIST' => \App\Language::translate('LBL_ALERT_NEUTRAL_LIST', 'OSSMail', false, false),
-					'LBL_ALERT_BLACK_LIST' => \App\Language::translate('LBL_BLACK_LIST_ALERT', 'OSSMail', false, false),
-					'LBL_ALERT_WHITE_LIST' => \App\Language::translate('LBL_WHITE_LIST_ALERT', 'OSSMail', false, false),
-					'LBL_ALERT_FAKE_MAIL' => \App\Language::translate('LBL_ALERT_FAKE_MAIL', 'OSSMail'),
 					'BTN_ANALYSIS_DETAILS' => \App\Language::translate('BTN_ANALYSIS_DETAILS', 'OSSMail', false, false),
-					'LBL_ALERT_FAKE_SENDER' => \App\Language::translate('LBL_ALERT_FAKE_SENDER', 'OSSMail'),
 					'LBL_SIGNATURES' => \App\Language::translate('LBL_SIGNATURES', 'OSSMail'),
 				]);
 
@@ -521,7 +512,6 @@ class yetiforce extends rcube_plugin
 				$args['param'][$key] = $value;
 			}
 			if ((isset($params['crmmodule']) && 'Documents' == $params['crmmodule']) || (isset($params['filePath']) && $params['filePath'])) {
-				[$usec, $sec] = explode(' ', microtime());
 				foreach ($this->getAttachment($params['crmrecord'], $params['filePath']) as $attachment) {
 					$args['attachments'][] = $attachment;
 				}
@@ -539,8 +529,6 @@ class yetiforce extends rcube_plugin
 			if ($loadCurrentUser) {
 				self::$COMPOSE = &$_SESSION['compose_data_' . $args['id']];
 				$content = $row['content'];
-				[$usec, $sec] = explode(' ', microtime());
-				$dId = preg_replace('/[^0-9]/', '', $this->rc->user->ID . $sec . $usec);
 				foreach ($this->decodeCustomTag($content, $args) as $attachment) {
 					$_SESSION['plugins']['filesystem_attachments'][$args['id']][$attachment['id']] = realpath($attachment['path']);
 					self::$COMPOSE['attachments'][$attachment['id']] = $attachment;
@@ -592,8 +580,8 @@ class yetiforce extends rcube_plugin
 			if (!empty($subject)) {
 				$args['param']['subject'] = $subject;
 			}
+			chdir($currentPath);
 		}
-		chdir($currentPath);
 		return $args;
 	}
 
@@ -821,7 +809,7 @@ class yetiforce extends rcube_plugin
 		if (empty($ids) && empty($files)) {
 			return $attachments;
 		}
-		if (!\is_array($ids)) {
+		if (\is_array($ids)) {
 			$ids = implode(',', $ids);
 		}
 		$userid = $this->rc->user->ID;
