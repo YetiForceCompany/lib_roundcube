@@ -211,14 +211,13 @@ class yetiforce extends rcube_plugin
 					$args['valid'] = true;
 
 					$_SESSION['smtp_host'] = $smtp;
-					$_SESSION['crm']['id'] = $args['cuid'];
+					$_SESSION['crm']['id'] = $args['cuid']??0;
 					if ($mailAccount->getServer()->isOAuth()) {
 						$token = $mailAccount->getAccessToken();
 						$args['pass'] = $oauthToken = "Bearer {$token}";
 						$oauthData = [
 							'token_type' => 'Bearer',
 							'expires_in' => \App\Fields\DateTime::getDiff(date('Y-m-d H:i:s'), $mailAccount->getExpireTime(), 'seconds'),
-							'scope' => implode(' ', $mailAccount->getOAuthProvider()->getScopesByAction('MailAccount')),
 							'expires' => strtotime($mailAccount->getExpireTime()) - 10,
 							'refresh_token' => $this->rc->encrypt($mailAccount->getRefreshToken()),
 							'mailAccountId' => $mailAccount->getSource()->getId()
@@ -251,7 +250,7 @@ class yetiforce extends rcube_plugin
 	{
 		if (isset($_SESSION['oauth_token']) && 'imap' === $options['driver']) {
 			if ($this->check_token_validity($_SESSION['oauth_token'])) {
-				$options['password'] = $this->rcmail->decrypt($_SESSION['password']);
+				$options['password'] = $this->rc->decrypt($_SESSION['password']);
 			}
 			$options['auth_type'] = 'XOAUTH2';
 		}
@@ -273,7 +272,7 @@ class yetiforce extends rcube_plugin
 	 */
 	protected function check_token_validity($token)
 	{
-		if ($token['expires'] < time() && !empty($token['refresh_token']) && !empty($token['mailAccountId'])) {
+		if ((empty($token['expires']) || $token['expires'] < (time() - 600) || empty($token['refresh_token'])) && empty($token['mailAccountId'])) {
 			return false !== $this->refresh_access_token($token);
 		}
 		return false;
@@ -296,20 +295,21 @@ class yetiforce extends rcube_plugin
 		$currentPath = getcwd();
 		chdir($this->rc->config->get('root_directory'));
 		require_once 'include/main/WebUI.php';
-		if ($mailAccount = \App\Mail\Account::getInstanceById($mailAccoountId)) {
-			try {
-				$token = $mailAccount->getAccessToken();
-				$oauthToken = "Bearer {$token}";
+		try {
+			if ($mailAccount = \App\Mail\Account::getInstanceById($mailAccoountId)) {
+				$tokenData = $mailAccount->getAccessToken();
+				$oauthToken = "Bearer {$tokenData}";
 				$_SESSION['password'] = $this->rc->encrypt($oauthToken);
 				$token['expires'] = strtotime($mailAccount->getExpireTime()) - 10;
 				$_SESSION['oauth_token'] = $token;
+
 				$response = [
-					'token' => $token,
+					'token' => $tokenData,
 					'authorization' => $oauthToken,
 				];
-			} catch (\Throwable $e) {
-				$response = false;
 			}
+		} catch (\Throwable $e) {
+			$response = false;
 		}
 		chdir($currentPath);
 
@@ -331,10 +331,10 @@ class yetiforce extends rcube_plugin
 		if (isset($_SESSION['oauth_token'])) {
 			$this->check_token_validity($_SESSION['oauth_token']);
 			// enforce XOAUTH2 authorization type
-			$options['smtp_user'] = $_SESSION['username'] ?? '%u';
-			$options['smtp_pass'] = isset($_SESSION['password']) ? $this->rc->decrypt($_SESSION['password']) : '%p';
 			$options['smtp_auth_type'] = 'XOAUTH2';
 		}
+		$options['smtp_user'] = $_SESSION['username'] ?? '%u';
+		$options['smtp_pass'] = isset($_SESSION['password']) ? $this->rc->decrypt($_SESSION['password']) : '%p';
 
 		return $options;
 	}
@@ -717,7 +717,7 @@ class yetiforce extends rcube_plugin
 			}
 		}else{
 			foreach (($this->rc->output->get_env('identities') ?? []) as $identityId => $identity) {
-				$signatures[$identityId]['text'] = $globalSignatures['text'];
+				$signatures[$identityId]['text'] = $globalSignatures['text']??'';
 				$signatures[$identityId]['html'] = '--<br><div class="pre global">' . $globalSignatures['global'] . '</div>';
 			}
 		}
