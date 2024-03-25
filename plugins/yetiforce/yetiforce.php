@@ -77,6 +77,7 @@ class yetiforce extends rcube_plugin
 		$this->add_hook('message_headers_output', [$this, 'message_headers_output']);
 		$this->add_hook('message_before_send', [$this, 'message_before_send']);
 		$this->add_hook('message_sent', [$this, 'message_sent']);
+		$this->add_hook('smtp_connect', [$this, 'smtp_connect']);
 
 		$this->register_action('plugin.yetiforce-importIcs', [$this, 'importIcs']);
 		$this->register_action('plugin.yetiforce-addFilesToMail', [$this, 'addFilesToMail']);
@@ -197,8 +198,7 @@ class yetiforce extends rcube_plugin
 			$currentPath = getcwd();
 			chdir($this->rc->config->get('root_directory'));
 			require_once 'include/main/WebUI.php';
-			if (\App\Record::isExists($row['ruid'], 'MailAccount')) {
-				$mailAccount = \App\Mail\Account::getInstanceById($row['ruid']);
+			if ($mailAccount = \App\Mail\Account::getInstanceById($row['ruid'])) {
 				if ($mailAccount->isActive()) {
 					$imap = $mailAccount->getServer()->getImapHost();
 					$smtp = $mailAccount->getServer()->getSmtpHost();
@@ -212,7 +212,6 @@ class yetiforce extends rcube_plugin
 
 					$_SESSION['smtp_host'] = $smtp;
 					$_SESSION['crm']['id'] = $args['cuid'];
-					$this->add_hook('smtp_connect', [$this, 'smtp_connect']);
 					if ($mailAccount->getServer()->isOAuth()) {
 						$token = $mailAccount->getAccessToken();
 						$args['pass'] = $oauthToken = "Bearer {$token}";
@@ -235,6 +234,7 @@ class yetiforce extends rcube_plugin
 			}
 			chdir($currentPath);
 		}
+
 		return $args;
 	}
 
@@ -296,9 +296,8 @@ class yetiforce extends rcube_plugin
 		$currentPath = getcwd();
 		chdir($this->rc->config->get('root_directory'));
 		require_once 'include/main/WebUI.php';
-		if (\App\Record::isExists($mailAccoountId, 'MailAccount')) {
+		if ($mailAccount = \App\Mail\Account::getInstanceById($mailAccoountId)) {
 			try {
-				$mailAccount = \App\Mail\Account::getInstanceById($mailAccoountId);
 				$token = $mailAccount->getAccessToken();
 				$oauthToken = "Bearer {$token}";
 				$_SESSION['password'] = $this->rc->encrypt($oauthToken);
@@ -450,6 +449,7 @@ class yetiforce extends rcube_plugin
 			$autologin = $row;
 			$autologin['params'] = json_decode($autologin['params'], true);
 		}
+
 		$this->autologin = $autologin;
 		return $autologin;
 	}
