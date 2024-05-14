@@ -66,6 +66,7 @@ rcube_webmail.prototype.registerEvents = function () {
 	this.mailId = this.crmContent.find('#mailActionBarID').val();
 	this.registerAddRecord();
 	this.registerAddReletedRecord();
+	this.registerAddAttachments();
 	this.registerSelectRecord();
 	this.registerRemoveRecord();
 	this.registerImportMail();
@@ -121,6 +122,49 @@ rcube_webmail.prototype.registerImportMail = function () {
 			.fail(function () {
 				clicked = false;
 			});
+	});
+};
+rcube_webmail.prototype.registerAddAttachments = function () {
+	rcmail.crmContent.find('button.addAttachments').click(function (e) {
+		const row = $(e.currentTarget).closest('.rowRelatedRecord');
+		const relatedModule = row.data('module');
+		const relatedRecordId = row.data('id');
+		rcmail.crm.app.showRecordsList(
+			{
+				module: 'Documents',
+				related_parent_module: 'OSSMailView',
+				related_parent_id: rcmail.mailId,
+				multi_select: true,
+				record_selected: true
+			},
+			(modal, instance) => {
+				instance.setSelectEvent((responseData, e) => {
+					rcmail.crm.AppConnector.request({
+						async: false,
+						dataType: 'json',
+						data: {
+							module: relatedModule,
+							action: 'RelationAjax',
+							mode: 'addRelation',
+							related_module: 'Documents',
+							src_record: relatedRecordId,
+							related_record_list: JSON.stringify(Object.keys(responseData))
+						}
+					}).done(function (data) {
+						let notifyParams = {
+							text: rcmail.crm.app.vtranslate('JS_DOCUMENTS_ADDED'),
+							type: 'success',
+							animation: 'show'
+						};
+						if (!data['success']) {
+							notifyParams.type = 'error';
+							notifyParams.text = rcmail.crm.app.vtranslate('JS_ERROR');
+						}
+						rcmail.crm.app.showNotify(notifyParams);
+					});
+				});
+			}
+		);
 	});
 };
 rcube_webmail.prototype.registerRemoveRecord = function () {
