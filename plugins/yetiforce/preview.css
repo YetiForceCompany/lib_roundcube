@@ -1,240 +1,232 @@
 .pull-right {
-	float: right !important;
+    float: right !important;
 }
 
 #ytActionBarContent select {
-	padding: 0;
+    padding: 0;
 }
 
 #ytActionBarContent .row:before {
-	display: table;
-	content: ' ';
+    display: table;
+    content: " ";
 }
 
 #ytActionBarContent .row:after {
-	clear: both;
-	display: table;
-	content: ' ';
+    clear: both;
+    display: table;
+    content: " ";
 }
 
 #ytActionBarContent .rowReletedRecord .rowActions {
-	display: none;
+    display: none;
 }
 
 #ytActionBarContent .rowReletedRecord:hover .rowActions {
-	display: block;
+    display: block;
 }
 
 #ytActionBarContent .noRecords {
-	text-align: center;
-}
-
-#ytActionBarContent .noRecords a.importMail {
-	cursor: pointer;
-	font-weight: 800;
-}
-
-#ytActionBarContent .noRecords a.importMail:hover {
-	color: white;
+    text-align: center;
 }
 
 #ytActionBarContent .rowReletedRecord {
-	margin: 3px 0 6px 0;
+    margin: 3px 0 6px 0;
 }
 
 #ytActionBarContent .rowReletedRecord {
-	margin: 3px 0 6px 0;
+    margin: 3px 0 6px 0;
 }
 
 #ytActionBarContent .pull-right button {
-	line-height: 10px;
-	margin-left: 3px;
-	padding: 0 6px;
-	height: 14px;
+    line-height: 10px;
+    margin-left: 3px;
+    padding: 0 6px;
+    height: 14px;
 }
 
 #ytActionBarContent .relatedModuleIcon {
-	margin-right: 5px;
+    margin-right: 5px;
 }
 
 #messageheader.previewheader {
-	padding: 0 0 3px 30px;
+    padding: 0 0 3px 30px;
 }
 
 .rcmaddcontact {
-	display: none;
+    display: none;
 }
 
 .d-none {
-	display: none;
+    display: none;
 }
 
 .mr-5px {
-	margin-right: 5px;
+    margin-right: 5px;
 }
 
 .mr-3px {
-	margin-right: 3px;
+    margin-right: 3px;
 }
 
 .ml-5px {
-	margin-left: 5px;
+    margin-left: 5px;
 }
 
 .w-100 {
-	width: 100%;
+    width: 100%;
 }
 
 .flex-wrap {
-	display: flex;
-	flex-wrap: wrap;
+    display: flex;
+    flex-wrap: wrap;
 }
 
 .flex-nowrap {
-	display: flex;
-	flex-wrap: nowrap;
+    display: flex;
+    flex-wrap: nowrap;
 }
 
 .rowRelatedRecord {
-	background-color: #4a5364;
-	color: #fff;
-	margin-right: 5px;
+    background-color: #4a5364;
+    color: #fff;
+    margin-right: 5px;
 }
 
 .action-bar__head__container {
-	display: flex;
-	flex-wrap: nowrap;
-	width: fit-content;
-	margin-right: 5px;
-	background-color: #406a95;
+    display: flex;
+    flex-wrap: nowrap;
+    width: fit-content;
+    margin-right: 5px;
+    background-color: #406a95;
 }
 
 .ytHeader {
-	padding-bottom: 6px;
+    padding-bottom: 6px;
 }
 .action-bar__head a {
-	text-decoration: none;
-	color: #fff;
+    text-decoration: none;
+    color: #fff;
 }
 
 .action-bar__head {
-	display: flex;
-	flex-wrap: wrap;
+    display: flex;
+    flex-wrap: wrap;
 }
 
 .action-bar__col {
-	width: 100%;
+    width: 100%;
 }
 
 .action-bar__select {
-	margin-left: 3px;
+    margin-left: 3px;
 }
 
 .action-bar__select:required:invalid {
-	color: gray;
+    color: gray;
 }
 
 .action-bar__select optgroup {
-	color: black;
+    color: black;
 }
 
 button,
 select,
 .rowRelatedRecord {
-	border-radius: 0.25rem;
-	padding: 0.2rem 0.2rem 0.1rem 0.4rem;
+    border-radius: 0.25rem;
+    padding: 0.2rem 0.2rem 0.1rem 0.4rem;
 }
 
 button,
 select {
-	cursor: pointer;
+    cursor: pointer;
 }
 
 .rowActions {
-	display: inline-flex;
-	align-items: center;
+    display: inline-flex;
+    align-items: center;
 }
 
 .rowActions button {
-	padding: 0.005rem 0.2rem;
-	margin-left: 5px;
+    padding: 0.005rem 0.2rem;
+    margin-left: 5px;
 }
 
 button {
-	display: inline-block;
-	background-color: #f8f9fa;
-	border-color: #f8f9fa;
-	font-weight: 400;
-	text-align: center;
-	white-space: nowrap;
-	vertical-align: middle;
-	user-select: none;
-	border: 1px solid transparent;
-	padding: 0.2rem 0.3rem;
-	border-radius: 0.25rem;
-	transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    display: inline-block;
+    background-color: #f8f9fa;
+    border-color: #f8f9fa;
+    font-weight: 400;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    user-select: none;
+    border: 1px solid transparent;
+    padding: 0.2rem 0.3rem;
+    border-radius: 0.25rem;
+    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+        border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
 button:hover {
-	color: #212529;
-	background-color: #e2e6ea;
-	border-color: #dae0e5;
+    color: #212529;
+    background-color: #e2e6ea;
+    border-color: #dae0e5;
 }
 
 .c-ical__event {
-	background: #fffdfd;
-	border: 1px solid #dedede;
-	border-radius: 6px;
+    background: #fffdfd;
+    border: 1px solid #dedede;
+    border-radius: 6px;
 }
 
 .c-ical__card {
-	width: fit-content;
-	height: fit-content;
-	background: #fff;
-	border: 1px solid #d0d0d0;
-	border-radius: 6px;
-	color: #c51818;
-	padding: 0 2px 2px;
-	margin: 2px;
-	text-align: center;
+    width: fit-content;
+    height: fit-content;
+    background: #fff;
+    border: 1px solid #d0d0d0;
+    border-radius: 6px;
+    color: #c51818;
+    padding: 0 2px 2px;
+    margin: 2px;
+    text-align: center;
 }
 
 .c-ical__card__day {
-	font-size: 15px;
-	margin: 0 auto;
-	width: fit-content;
-	color: black;
+    font-size: 15px;
+    margin: 0 auto;
+    width: fit-content;
+    color: black;
 }
 
 .c-ical__card__year {
-	font-size: 9px;
-	color: #888888;
+    font-size: 9px;
+    color: #888888;
 }
 
 .c-ical__card__time {
-	font-size: 18px;
-	margin: auto 5px;
+    font-size: 18px;
+    margin: auto 5px;
 }
 
 .c-ical__card__arrow {
-	margin: auto 5px;
+    margin: auto 5px;
 }
 .c-ical__header {
-	background: #fff;
+    background: #fff;
 }
 
 .c-ical__subject {
-	text-align: left;
-	border-top-left-radius: 6px;
-	border-top-right-radius: 6px;
-	padding-bottom: 2px;
+    text-align: left;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    padding-bottom: 2px;
 }
 
 .mr-1 {
-	margin-right: 0.25rem;
+    margin-right: 0.25rem;
 }
 
 .action-bar__head__message {
-	text-align: center !important;
-	display: block;
+    text-align: center !important;
+    display: block;
 }
