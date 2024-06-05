@@ -89,7 +89,7 @@ rcube_webmail.prototype.registerEvents = function () {
 };
 rcube_webmail.prototype.registerImportMail = function () {
 	let clicked = false;
-	let importButton = rcmail.crmContent.find('.importMail');
+	let importButton = rcmail.crmContent.find('.js-importMail');
 	importButton.click(function (e) {
 		if (clicked) return false;
 		clicked = true;
