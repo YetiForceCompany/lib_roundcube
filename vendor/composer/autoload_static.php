@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInitd30534b7ccef70d5be1f4ba9bc89dbe4
+class ComposerStaticInit1ee7bcc35032a95753d32790aa8aaecb
 {
     public static $files = array (
         '7b11c4dc42b3b3023073cb14e519683c' => __DIR__ . '/..' . '/ralouphie/getallheaders/src/getallheaders.php',
@@ -16,6 +16,7 @@ class ComposerStaticInitd30534b7ccef70d5be1f4ba9bc89dbe4
         'R' => 
         array (
             'RtfHtmlPhp\\' => 11,
+            'Roundcube\\Composer\\' => 19,
         ),
         'P' => 
         array (
@@ -46,6 +47,10 @@ class ComposerStaticInitd30534b7ccef70d5be1f4ba9bc89dbe4
         'RtfHtmlPhp\\' => 
         array (
             0 => __DIR__ . '/..' . '/roundcube/rtf-html-php/src',
+        ),
+        'Roundcube\\Composer\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/roundcube/plugin-installer/src',
         ),
         'Psr\\Http\\Message\\' => 
         array (
@@ -83,13 +88,6 @@ class ComposerStaticInitd30534b7ccef70d5be1f4ba9bc89dbe4
     );
 
     public static $prefixesPsr0 = array (
-        'R' => 
-        array (
-            'Roundcube\\Composer' => 
-            array (
-                0 => __DIR__ . '/..' . '/roundcube/plugin-installer/src',
-            ),
-        ),
         'N' => 
         array (
             'Net' => 
@@ -120,10 +118,6 @@ class ComposerStaticInitd30534b7ccef70d5be1f4ba9bc89dbe4
                 0 => __DIR__ . '/..' . '/pear/auth_sasl',
             ),
         ),
-    );
-
-    public static $fallbackDirsPsr0 = array (
-        0 => __DIR__ . '/..' . '/pear/pear-core-minimal/src',
     );
 
     public static $classMap = array (
@@ -164,17 +158,21 @@ class ComposerStaticInitd30534b7ccef70d5be1f4ba9bc89dbe4
         'Net_LDAP3' => __DIR__ . '/..' . '/kolab/net_ldap3/lib/Net/LDAP3.php',
         'Net_LDAP3_Result' => __DIR__ . '/..' . '/kolab/net_ldap3/lib/Net/LDAP3/Result.php',
         'Net_Sieve' => __DIR__ . '/..' . '/pear/net_sieve/Sieve.php',
+        'OS_Guess' => __DIR__ . '/..' . '/pear/pear-core-minimal/src/OS/Guess.php',
+        'PEAR' => __DIR__ . '/..' . '/pear/pear-core-minimal/src/PEAR.php',
+        'PEAR_Error' => __DIR__ . '/..' . '/pear/pear-core-minimal/src/PEAR.php',
+        'PEAR_ErrorStack' => __DIR__ . '/..' . '/pear/pear-core-minimal/src/PEAR/ErrorStack.php',
         'PEAR_Exception' => __DIR__ . '/..' . '/pear/pear_exception/PEAR/Exception.php',
+        'System' => __DIR__ . '/..' . '/pear/pear-core-minimal/src/System.php',
     );
 
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInitd30534b7ccef70d5be1f4ba9bc89dbe4::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInitd30534b7ccef70d5be1f4ba9bc89dbe4::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInitd30534b7ccef70d5be1f4ba9bc89dbe4::$prefixesPsr0;
-            $loader->fallbackDirsPsr0 = ComposerStaticInitd30534b7ccef70d5be1f4ba9bc89dbe4::$fallbackDirsPsr0;
-            $loader->classMap = ComposerStaticInitd30534b7ccef70d5be1f4ba9bc89dbe4::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit1ee7bcc35032a95753d32790aa8aaecb::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit1ee7bcc35032a95753d32790aa8aaecb::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInit1ee7bcc35032a95753d32790aa8aaecb::$prefixesPsr0;
+            $loader->classMap = ComposerStaticInit1ee7bcc35032a95753d32790aa8aaecb::$classMap;
 
         }, null, ClassLoader::class);
     }

@@ -346,7 +346,7 @@ class rcube_ldap extends rcube_addressbook
                 }
 
                 // Get the pieces needed for variable replacement.
-                if ($fu = ($rcube->get_user_email() ?: $conf['username'])) {
+                if ($fu = ($rcube->get_user_email() ?: ($conf['username'] ?? null))) {
                     list($u, $d) = explode('@', $fu);
                 }
                 else {
@@ -1078,7 +1078,7 @@ class rcube_ldap extends rcube_addressbook
 
         if (!$count && $result) {
             // sorting
-            if ($this->sort_col && $prop['scope'] !== 'base' && !$this->ldap->vlv_active) {
+            if ($this->sort_col && (empty($prop['scope']) || $prop['scope'] !== 'base') && !$this->ldap->vlv_active) {
                 usort($result, [$this, '_entry_sort_cmp']);
             }
 
