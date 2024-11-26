@@ -407,13 +407,11 @@ function rcube_webmail()
               var contents = $(this).contents();
 
               // do not apply styles to an error page (with no image)
-              if (contents.find('img').length)
-                contents.find('head').append(
-                  '<style type="text/css">'
-                  + 'img { max-width:100%; max-height:100%; } ' // scale
-                  + 'body { display:flex; align-items:center; justify-content:center; height:100%; margin:0; }' // align
-                  + '</style>'
-                );
+              if (contents.find('img').length) {
+                contents.find('img').css({ maxWidth: '100%', maxHeight: '100%' });
+                contents.find('body').css({ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', margin: 0 });
+                contents.find('html').css({ height: '100%' });
+              }
             });
         }
         // show printing dialog unless decryption must be done first
@@ -1765,19 +1763,18 @@ function rcube_webmail()
       clearTimeout(this.folder_collapsed_timer);
 
     var prefname = this.env.task == 'addressbook' ? 'collapsed_abooks' : 'collapsed_folders',
-      old = this.env[prefname];
+      old = this.env[prefname],
+      entry = '&' + urlencode(node.id) + '&';
+
+    this.env[prefname] = old.replace(entry, '');
 
     if (node.collapsed) {
-      this.env[prefname] = this.env[prefname] + '&'+urlencode(node.id)+'&';
+      this.env[prefname] = this.env[prefname] + entry;
 
       // select the folder if one of its children is currently selected
       // don't select if it's virtual (#1488346)
       if (!node.virtual && this.env.mailbox && this.env.mailbox.startsWith(node.id + this.env.delimiter))
         this.command('list', node.id);
-    }
-    else {
-      var reg = new RegExp('&'+urlencode(node.id)+'&');
-      this.env[prefname] = this.env[prefname].replace(reg, '');
     }
 
     if (!this.drag_active) {
@@ -2321,7 +2318,7 @@ function rcube_webmail()
         query = { _mbox: flags.mbox };
       query[uid_param] = uid;
       cols.subject = '<a href="' + this.url(action, query) + '" onclick="return rcube_event.keyboard_only(event)"' +
-        ' onmouseover="rcube_webmail.long_subject_title(this,'+(message.depth+1)+')" tabindex="-1"><span>'+cols.subject+'</span></a>';
+        ' onmouseover="rcube_webmail.long_subject_title(this)" tabindex="-1"><span>'+cols.subject+'</span></a>';
     }
 
     // add each submitted col
@@ -5713,9 +5710,7 @@ function rcube_webmail()
   this.apply_image_style = function()
   {
     var style = [],
-      head = $(this.gui_objects.messagepartframe).contents().find('head');
-
-    $('#image-style', head).remove();
+      img = $(this.gui_objects.messagepartframe).contents().find('img');
 
     $.each({scale: '', rotate: 'deg'}, function(i, v) {
       var val = ref.image_style[i];
@@ -5723,8 +5718,7 @@ function rcube_webmail()
         style.push(i + '(' + val + v + ')');
     });
 
-    if (style)
-      head.append($('<style id="image-style">').text('img { transform: ' + style.join(' ') + '}'));
+    img.css('transform', style.join(' '));
   };
 
   // Update import dialog state
@@ -10170,13 +10164,20 @@ function rcube_webmail()
 
 
 // some static methods
-rcube_webmail.long_subject_title = function(elem, indent, text_elem)
-{
-  if (!elem.title) {
-    var $elem = $(text_elem || elem);
-    if ($elem.width() + (indent || 0) * 15 > $elem.parent().width())
-      elem.title = rcube_webmail.subject_text($elem[0]);
-  }
+rcube_webmail.long_subject_title = function (elem, indent, text_elem) {
+    if (!elem.title) {
+        var siblings_width = 0, $elem = $(text_elem || elem);
+
+        $elem.siblings().each(function () {
+            // Note: width() returns 0 for elements with icons in :before (Elastic)
+            siblings_width += $(this).width() + (parseFloat(window.getComputedStyle(this, ':before').width) || 0);
+        });
+
+        // Note: 3px to be on the safe side, but also specifically for Elastic
+        if ($elem.width() + siblings_width + (indent || 0) * 15 >= $elem.parent().width() - 3) {
+            elem.title = rcube_webmail.subject_text($elem[0]);
+        }
+    }
 };
 
 rcube_webmail.long_subject_title_ex = function(elem)
