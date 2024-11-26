@@ -1,5 +1,39 @@
 # Changelog Roundcube Webmail
 
+## Release 1.6.9
+
+- Fix regression where printing/scaling/rotating image attachments was broken (#9571)
+- Fix regression where HTML messages were displayed unstyled (#9586)
+
+## Release 1.6.8
+
+- Managesieve: Protect special scripts in managesieve_kolab_master mode
+- Fix newmail_notifier notification focus in Chrome (#9467)
+- Fix fatal error when parsing some TNEF attachments (#9462)
+- Fix double scrollbar when composing a mail with many plain text lines (#7760)
+- Fix decoding mail parts with multiple base64-encoded text blocks (#9290)
+- Fix bug where some messages could get malformed in an import from a MBOX file (#9510)
+- Fix invalid line break characters in multi-line text in Sieve scripts (#9543)
+- Fix bug where "with attachment" filter could fail on some fts engines (#9514)
+- Fix bug where an unhandled exception was caused by an invalid image attachment (#9475)
+- Fix bug where a long subject title could not be displayed in some cases (#9416)
+- Fix infinite loop when parsing malformed Sieve script (#9562)
+- Fix bug where imap_conn_option's 'socket' was ignored (#9566)
+- Fix XSS vulnerability in post-processing of sanitized HTML content [CVE-2024-42009]
+- Fix XSS vulnerability in serving of attachments other than HTML or SVG [CVE-2024-42008]
+- Fix information leak (access to remote content) via insufficient CSS filtering [CVE-2024-42010]
+
+## Release 1.6.7
+
+- Makefile: Use phpDocumentor v3.4 for the Framework docs (#9313)
+- Fix bug where HTML entities in URLs were not decoded on HTML to plain text conversion (#9312)
+- Fix bug in collapsing/expanding folders with some special characters in names (#9324)
+- Fix PHP8 warnings (#9363, #9365, #9429)
+- Fix missing field labels in CSV import, for some locales (#9393)
+- Fix command injection via crafted im_convert_path/im_identify_path on Windows
+- Fix cross-site scripting (XSS) vulnerability in handling list columns from user preferences
+- Fix cross-site scripting (XSS) vulnerability in handling SVG animate attributes
+
 ## Release 1.6.6
 
 - Fix regression in handling LDAP search_fields configuration parameter (#9210)
