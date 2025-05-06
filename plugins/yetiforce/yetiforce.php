@@ -272,7 +272,7 @@ class yetiforce extends rcube_plugin
 	 */
 	protected function check_token_validity($token)
 	{
-		if ((empty($token['expires']) || $token['expires'] < (time() - 600) || empty($token['refresh_token'])) && empty($token['mailAccountId'])) {
+		if ((empty($token['expires']) || $token['expires'] < (time() + 600) || empty($token['refresh_token'])) && !empty($token['mailAccountId'])) {
 			return false !== $this->refresh_access_token($token);
 		}
 		return false;
