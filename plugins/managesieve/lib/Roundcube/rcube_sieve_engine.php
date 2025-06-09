@@ -19,7 +19,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see http://www.gnu.org/licenses/.
+ * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
 class rcube_sieve_engine
@@ -248,14 +248,14 @@ class rcube_sieve_engine
         if ($script_name === null || $script_name === '') {
             // get (first) active script
             if (!empty($this->active)) {
-               $script_name = $this->active[0];
+                $script_name = $this->active[0];
             }
-            else if ($list) {
+            else if (!empty($list)) {
                 $script_name = $list[0];
             }
             else {
                 // if script does not exist create one with default content
-                $this->create_default_script();
+                $script_name = $this->create_default_script();
             }
         }
 
@@ -3334,18 +3334,24 @@ class rcube_sieve_engine
         ]);
 
         $select_op->add(rcube::Q($this->plugin->gettext('filtercontains')), 'contains');
-        $select_op->add(rcube::Q($this->plugin->gettext('filternotcontains')), 'notcontains');
-        $select_op->add(rcube::Q($this->plugin->gettext('filteris')), 'is');
-        $select_op->add(rcube::Q($this->plugin->gettext('filterisnot')), 'notis');
         if ($mode == 'all') {
+            $select_op->add(rcube::Q($this->plugin->gettext('filternotcontains')), 'notcontains');
+        }
+        $select_op->add(rcube::Q($this->plugin->gettext('filteris')), 'is');
+        if ($mode == 'all') {
+            $select_op->add(rcube::Q($this->plugin->gettext('filterisnot')), 'notis');
             $select_op->add(rcube::Q($this->plugin->gettext('filterexists')), 'exists');
             $select_op->add(rcube::Q($this->plugin->gettext('filternotexists')), 'notexists');
         }
         $select_op->add(rcube::Q($this->plugin->gettext('filtermatches')), 'matches');
-        $select_op->add(rcube::Q($this->plugin->gettext('filternotmatches')), 'notmatches');
+        if ($mode == 'all') {
+            $select_op->add(rcube::Q($this->plugin->gettext('filternotmatches')), 'notmatches');
+        }
         if (in_array('regex', $this->exts)) {
             $select_op->add(rcube::Q($this->plugin->gettext('filterregex')), 'regex');
-            $select_op->add(rcube::Q($this->plugin->gettext('filternotregex')), 'notregex');
+            if ($mode == 'all') {
+                $select_op->add(rcube::Q($this->plugin->gettext('filternotregex')), 'notregex');
+            }
         }
         if ($mode == 'all' && in_array('relational', $this->exts)) {
             $select_op->add(rcube::Q($this->plugin->gettext('countisgreaterthan')), 'count-gt');

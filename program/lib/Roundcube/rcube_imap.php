@@ -658,8 +658,8 @@ class rcube_imap extends rcube_storage
             $ident = null;
         }
 
-        $vendor  = (string) (!empty($ident) ? $ident['name'] : '');
-        $ident   = strtolower($vendor . ' ' . $this->conn->data['GREETING']);
+        $vendor = (string) ($ident['name'] ?? $ident['NAME'] ?? '');
+        $ident = strtolower($vendor . ' ' . $this->conn->data['GREETING']);
         $vendors = ['cyrus', 'dovecot', 'uw-imap', 'gimap', 'hmail', 'greenmail'];
 
         foreach ($vendors as $v) {
@@ -1302,7 +1302,7 @@ class rcube_imap extends rcube_storage
         else {
             // fetch requested headers from server
             $headers = $this->conn->fetchHeaders(
-                $folder, $msgs, true, false, $this->get_fetch_headers());
+                $folder, $msgs, true, false, $this->get_fetch_headers(), $this->get_fetch_items());
         }
 
         if (empty($headers)) {
@@ -1892,7 +1892,7 @@ class rcube_imap extends rcube_storage
         }
         else {
             $headers = $this->conn->fetchHeader(
-                $folder, $uid, true, true, $this->get_fetch_headers());
+                $folder, $uid, true, true, $this->get_fetch_headers(), $this->get_fetch_items());
 
             if (is_object($headers)) {
                 $headers->folder = $folder;
@@ -2298,8 +2298,8 @@ class rcube_imap extends rcube_storage
     protected function is_attachment_part($part)
     {
         if (!empty($part[2]) && is_array($part[2]) && empty($part[3])) {
-            $params = array_map('strtolower', (array) $part[2]);
-            $find   = ['name', 'filename', 'name*', 'filename*', 'name*0', 'filename*0', 'name*0*', 'filename*0*'];
+            $params = array_map('strtolower', array_filter($part[2], 'is_string'));
+            $find = ['name', 'filename', 'name*', 'filename*', 'name*0', 'filename*0', 'name*0*', 'filename*0*'];
 
             // In case of malformed header check disposition. E.g. some servers for
             // "Content-Type: PDF; name=test.pdf" may return text/plain and ignore name argument
@@ -2368,8 +2368,18 @@ class rcube_imap extends rcube_storage
             return;
         }
 
-        // decode filename
-        if (isset($filename_mime)) {
+        // decode filename according to RFC 2231, Section 4
+        if (isset($filename_encoded) && preg_match("/^([^']*)'[^']*'(.*)$/", $filename_encoded, $fmatches)) {
+            $filename_charset = $fmatches[1];
+            $filename_encoded = $fmatches[2];
+
+            $part->filename = rawurldecode($filename_encoded);
+
+            if (!empty($filename_charset)) {
+                $part->filename = rcube_charset::convert($part->filename, $filename_charset);
+            }
+        }
+        else {
             if (!empty($part->charset)) {
                 $charset = $part->charset;
             }
@@ -2380,20 +2390,12 @@ class rcube_imap extends rcube_storage
                 $charset = $this->default_charset;
             }
 
+            // Note: RFC2047 can appear inside RFC2231 formatted parameters too (#9725)
+            if (isset($filename_encoded)) {
+                $filename_mime = $filename_encoded;
+            }
+
             $part->filename = rcube_mime::decode_mime_string($filename_mime, $charset);
-        }
-        else if (isset($filename_encoded)) {
-            // decode filename according to RFC 2231, Section 4
-            if (preg_match("/^([^']*)'[^']*'(.*)$/", $filename_encoded, $fmatches)) {
-                $filename_charset = $fmatches[1];
-                $filename_encoded = $fmatches[2];
-            }
-
-            $part->filename = rawurldecode($filename_encoded);
-
-            if (!empty($filename_charset)) {
-                $part->filename = rcube_charset::convert($part->filename, $filename_charset);
-            }
         }
 
         // Workaround for invalid Content-Type (#6816)
@@ -2419,7 +2421,7 @@ class rcube_imap extends rcube_storage
     protected function structure_charset($structure)
     {
         while (is_array($structure)) {
-            if (is_array($structure[2]) && $structure[2][0] == 'charset') {
+            if (isset($structure[2]) && is_array($structure[2]) && $structure[2][0] == 'charset') {
                 return $structure[2][1];
             }
             $structure = $structure[0];
@@ -2604,6 +2606,8 @@ class rcube_imap extends rcube_storage
             $this->set_search_dirty($folder);
         }
 
+        unset($this->icache['message']);
+
         return $result;
     }
 
@@ -2720,8 +2724,9 @@ class rcube_imap extends rcube_storage
             $this->set_search_dirty($from_mbox);
             $this->set_search_dirty($to_mbox);
 
-            // unset threads internal cache
+            // unset internal cache
             unset($this->icache['threads']);
+            unset($this->icache['message']);
 
             // remove message ids from search set
             if ($this->search_set && $from_mbox == $this->folder) {
@@ -2811,8 +2816,9 @@ class rcube_imap extends rcube_storage
             $this->expunge_message($uids, $folder, false);
             $this->clear_messagecount($folder);
 
-            // unset threads internal cache
+            // unset internal cache
             unset($this->icache['threads']);
+            unset($this->icache['message']);
 
             $this->set_search_dirty($folder);
 
@@ -2884,6 +2890,31 @@ class rcube_imap extends rcube_storage
         return $result;
     }
 
+    /**
+     * Annotate a message.
+     *
+     * @param array  $annotation Message annotation key-value array
+     * @param mixed  $uids       Message UIDs as array or comma-separated string, or '*'
+     * @param string $folder     Folder name
+     *
+     * @return bool True on success, False on failure
+     */
+    public function annotate_message($annotation, $uids, $folder = null)
+    {
+        [$uids] = $this->parse_uids($uids);
+
+        if (!is_string($folder) || !strlen($folder)) {
+            $folder = $this->folder;
+        }
+
+        if (!$this->check_connection()) {
+            return false;
+        }
+
+        unset($this->icache['message']);
+
+        return $this->conn->storeMessageAnnotation($folder, $uids, $annotation);
+    }
 
     /* --------------------------------
      *        folder management
@@ -3504,7 +3535,13 @@ class rcube_imap extends rcube_storage
                     $flags = $this->conn->data['LIST'][$folder];
                     foreach ($types as $type) {
                         if (in_array($type, $flags)) {
-                            $type           = strtolower(substr($type, 1));
+                            $type = strtolower(substr($type, 1));
+
+                            // Ignore all but first personal special folder per type (#9781)
+                            if (isset($special[$type]) && $this->folder_namespace($special[$type]) == 'personal') {
+                                continue;
+                            }
+
                             $special[$type] = $folder;
                         }
                     }
@@ -3922,6 +3959,15 @@ class rcube_imap extends rcube_storage
         return $headers;
     }
 
+    /**
+     * Get additional FETCH items for rcube_imap_generic::fetchHeader(s)
+     *
+     * @return array List of items
+     */
+    protected function get_fetch_items()
+    {
+        return $this->options['fetch_items'] ?? [];
+    }
 
     /* -----------------------------------------
      *   ACL and METADATA/ANNOTATEMORE methods

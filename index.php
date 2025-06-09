@@ -2,7 +2,7 @@
 /**
  +-------------------------------------------------------------------------+
  | Roundcube Webmail IMAP Client                                           |
- | Version 1.6.9                                                           |
+ | Version 1.6.11                                                           |
  |                                                                         |
  | Copyright (C) The Roundcube Dev Team                                    |
  |                                                                         |
@@ -28,7 +28,7 @@
  | GNU General Public License for more details.                            |
  |                                                                         |
  | You should have received a copy of the GNU General Public License       |
- | along with this program.  If not, see http://www.gnu.org/licenses/.     |
+ | along with this program.  If not, see https://www.gnu.org/licenses/.    |
  |                                                                         |
  +-------------------------------------------------------------------------+
  | Author: Thomas Bruederli <roundcube@gmail.com>                          |
@@ -199,7 +199,7 @@ else if ($RCMAIL->task == 'login' && $RCMAIL->action == 'oauth' && $RCMAIL->oaut
 }
 
 // end session
-else if ($RCMAIL->task == 'logout' && isset($_SESSION['user_id'])) {
+else if ($RCMAIL->task == 'logout' && !empty($_SESSION['user_id'])) {
     $RCMAIL->request_security_check(rcube_utils::INPUT_GET | rcube_utils::INPUT_POST);
 
     $userdata = array(
@@ -216,7 +216,7 @@ else if ($RCMAIL->task == 'logout' && isset($_SESSION['user_id'])) {
 }
 
 // check session and auth cookie
-else if ($RCMAIL->task != 'login' && $_SESSION['user_id']) {
+else if ($RCMAIL->task != 'login' && !empty($_SESSION['user_id'])) {
     if (!$RCMAIL->session->check_auth()) {
         $RCMAIL->kill_session();
         $session_error = 'sessionerror';
