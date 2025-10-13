@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit1ee7bcc35032a95753d32790aa8aaecb
+class ComposerStaticInitd30534b7ccef70d5be1f4ba9bc89dbe4
 {
     public static $files = array (
         '7b11c4dc42b3b3023073cb14e519683c' => __DIR__ . '/..' . '/ralouphie/getallheaders/src/getallheaders.php',
@@ -54,8 +54,8 @@ class ComposerStaticInit1ee7bcc35032a95753d32790aa8aaecb
         ),
         'Psr\\Http\\Message\\' => 
         array (
-            0 => __DIR__ . '/..' . '/psr/http-message/src',
-            1 => __DIR__ . '/..' . '/psr/http-factory/src',
+            0 => __DIR__ . '/..' . '/psr/http-factory/src',
+            1 => __DIR__ . '/..' . '/psr/http-message/src',
         ),
         'Psr\\Http\\Client\\' => 
         array (
@@ -92,8 +92,8 @@ class ComposerStaticInit1ee7bcc35032a95753d32790aa8aaecb
         array (
             'Net' => 
             array (
-                0 => __DIR__ . '/..' . '/pear/net_socket',
-                1 => __DIR__ . '/..' . '/pear/net_smtp',
+                0 => __DIR__ . '/..' . '/pear/net_smtp',
+                1 => __DIR__ . '/..' . '/pear/net_socket',
             ),
         ),
         'M' => 
@@ -107,8 +107,8 @@ class ComposerStaticInit1ee7bcc35032a95753d32790aa8aaecb
         array (
             'Console' => 
             array (
-                0 => __DIR__ . '/..' . '/pear/console_getopt',
-                1 => __DIR__ . '/..' . '/pear/console_commandline',
+                0 => __DIR__ . '/..' . '/pear/console_commandline',
+                1 => __DIR__ . '/..' . '/pear/console_getopt',
             ),
         ),
         'A' => 
@@ -169,10 +169,10 @@ class ComposerStaticInit1ee7bcc35032a95753d32790aa8aaecb
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit1ee7bcc35032a95753d32790aa8aaecb::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit1ee7bcc35032a95753d32790aa8aaecb::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInit1ee7bcc35032a95753d32790aa8aaecb::$prefixesPsr0;
-            $loader->classMap = ComposerStaticInit1ee7bcc35032a95753d32790aa8aaecb::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInitd30534b7ccef70d5be1f4ba9bc89dbe4::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInitd30534b7ccef70d5be1f4ba9bc89dbe4::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInitd30534b7ccef70d5be1f4ba9bc89dbe4::$prefixesPsr0;
+            $loader->classMap = ComposerStaticInitd30534b7ccef70d5be1f4ba9bc89dbe4::$classMap;
 
         }, null, ClassLoader::class);
     }

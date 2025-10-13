@@ -1,5 +1,40 @@
 # Changelog Roundcube Webmail
 
+## Release 1.6.11
+
+- Managesieve: Fix match-type selector (remove unsupported options) in delete header action (#9610)
+- Improve installer to fix confusion about disabling SMTP authentication (#9801)
+- Fix PHP warning in index.php (#9813)
+- OAuth: Fix/improve token refresh
+- Fix dark mode bug where wrong colors were used for blockquotes in HTML mail preview (#9820)
+- Fix HTML message preview if it contains floating tables (#9804)
+- Fix removing/expiring redis/memcache records when using a key prefix
+- Fix bug where a wrong SPECIAL-USE folder could have been detected, if there were more than one per-type (#9781)
+- Fix a default value and documentation of password_ldap_encodage option (#9658)
+- Remove mobile/floating Create button from the list in Settings > Folders (#9661)
+- Fix Delete and Empty buttons state while creating a folder (#9047)
+- Fix connecting to LDAP using ldapi:// URI (#8990)
+- Fix cursor position on "below the quote" reply in HTML mode (#8700)
+- Fix bug where attachments with content type of `application/vnd.ms-tnef` were not parsed (#7119)
+- Fix Post-Auth RCE via PHP Object Deserialization reported by firs0v
+
+## Release 1.6.10
+
+- IMAP: Partial support for ANNOTATE-EXPERIMENT-1 extension (RFC 5257)
+- OAuth: Support standard authentication with short-living password received with OIDC token (#9530)
+- Fix PHP warnings (#9616, #9611)
+- Fix whitespace handling in vCard line continuation (#9637)
+- Fix current script state after initial scripts creation in managesieve_kolab_master mode
+- Fix rcube_imap::get_vendor() result (and PHP warning) on Zimbra server (#9650)
+- Fix regression causing inline SVG images to be missing in mail preview (#9644)
+- Fix plugin "virtuser_file" to handle backward slashes in username (#9668)
+- Fix PHP fatal error when parsing some malformed BODYSTRUCTURE responses (#9689)
+- Fix insert_or_update() and reading database server config on PostgreSQL (#9710)
+- Fix Oauth issues with use_secure_urls=true (#9722)
+- Fix handling of binary mail parts (e.g. PDF) encoded with quoted-printable (#9728)
+- Fix links in comments and config to https:// where available (#9759, #9756)
+- Fix decoding of attachment names encoded using both RFC2231 and RFC2047 standards (#9725)
+
 ## Release 1.6.9
 
 - Fix regression where printing/scaling/rotating image attachments was broken (#9571)

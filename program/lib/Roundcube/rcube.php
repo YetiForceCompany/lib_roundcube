@@ -942,7 +942,8 @@ class rcube
      */
     public function decrypt($cipher, $key = 'des_key', $base64 = true)
     {
-        if (strlen($cipher) == 0) {
+        // @phpstan-ignore-next-line
+        if (!is_string($cipher) || !strlen($cipher)) {
             return false;
         }
 
@@ -1514,6 +1515,10 @@ class rcube
     public static function debug($engine, $data, $result = null)
     {
         static $debug_counter;
+
+        if (!isset($debug_counter[$engine])) {
+            $debug_counter[$engine] = 0;
+        }
 
         $line = '[' . (++$debug_counter[$engine]) . '] ' . $data;
 
