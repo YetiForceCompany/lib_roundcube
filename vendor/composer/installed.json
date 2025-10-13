@@ -112,17 +112,17 @@
         },
         {
             "name": "guzzlehttp/guzzle",
-            "version": "7.9.2",
-            "version_normalized": "7.9.2.0",
+            "version": "7.9.3",
+            "version_normalized": "7.9.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/guzzle.git",
-                "reference": "d281ed313b989f213357e3be1a179f02196ac99b"
+                "reference": "7b2f29fe81dc4da0ca0ea7d42107a0845946ea77"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/d281ed313b989f213357e3be1a179f02196ac99b",
-                "reference": "d281ed313b989f213357e3be1a179f02196ac99b",
+                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/7b2f29fe81dc4da0ca0ea7d42107a0845946ea77",
+                "reference": "7b2f29fe81dc4da0ca0ea7d42107a0845946ea77",
                 "shasum": ""
             },
             "require": {
@@ -149,7 +149,7 @@
                 "ext-intl": "Required for Internationalized Domain Name (IDN) support",
                 "psr/log": "Required for using the Log middleware"
             },
-            "time": "2024-07-24T11:22:20+00:00",
+            "time": "2025-03-27T13:37:11+00:00",
             "type": "library",
             "extra": {
                 "bamarni-bin": {
@@ -221,7 +221,7 @@
             ],
             "support": {
                 "issues": "https://github.com/guzzle/guzzle/issues",
-                "source": "https://github.com/guzzle/guzzle/tree/7.9.2"
+                "source": "https://github.com/guzzle/guzzle/tree/7.9.3"
             },
             "funding": [
                 {
@@ -241,17 +241,17 @@
         },
         {
             "name": "guzzlehttp/promises",
-            "version": "2.0.3",
-            "version_normalized": "2.0.3.0",
+            "version": "2.2.0",
+            "version_normalized": "2.2.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/promises.git",
-                "reference": "6ea8dd08867a2a42619d65c3deb2c0fcbf81c8f8"
+                "reference": "7c69f28996b0a6920945dd20b3857e499d9ca96c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/promises/zipball/6ea8dd08867a2a42619d65c3deb2c0fcbf81c8f8",
-                "reference": "6ea8dd08867a2a42619d65c3deb2c0fcbf81c8f8",
+                "url": "https://api.github.com/repos/guzzle/promises/zipball/7c69f28996b0a6920945dd20b3857e499d9ca96c",
+                "reference": "7c69f28996b0a6920945dd20b3857e499d9ca96c",
                 "shasum": ""
             },
             "require": {
@@ -261,7 +261,7 @@
                 "bamarni/composer-bin-plugin": "^1.8.2",
                 "phpunit/phpunit": "^8.5.39 || ^9.6.20"
             },
-            "time": "2024-07-18T10:29:17+00:00",
+            "time": "2025-03-27T13:27:01+00:00",
             "type": "library",
             "extra": {
                 "bamarni-bin": {
@@ -307,7 +307,7 @@
             ],
             "support": {
                 "issues": "https://github.com/guzzle/promises/issues",
-                "source": "https://github.com/guzzle/promises/tree/2.0.3"
+                "source": "https://github.com/guzzle/promises/tree/2.2.0"
             },
             "funding": [
                 {
@@ -327,17 +327,17 @@
         },
         {
             "name": "guzzlehttp/psr7",
-            "version": "2.7.0",
-            "version_normalized": "2.7.0.0",
+            "version": "2.7.1",
+            "version_normalized": "2.7.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/psr7.git",
-                "reference": "a70f5c95fb43bc83f07c9c948baa0dc1829bf201"
+                "reference": "c2270caaabe631b3b44c85f99e5a04bbb8060d16"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/psr7/zipball/a70f5c95fb43bc83f07c9c948baa0dc1829bf201",
-                "reference": "a70f5c95fb43bc83f07c9c948baa0dc1829bf201",
+                "url": "https://api.github.com/repos/guzzle/psr7/zipball/c2270caaabe631b3b44c85f99e5a04bbb8060d16",
+                "reference": "c2270caaabe631b3b44c85f99e5a04bbb8060d16",
                 "shasum": ""
             },
             "require": {
@@ -358,7 +358,7 @@
             "suggest": {
                 "laminas/laminas-httphandlerrunner": "Emit PSR-7 responses"
             },
-            "time": "2024-07-18T11:15:46+00:00",
+            "time": "2025-03-27T12:30:47+00:00",
             "type": "library",
             "extra": {
                 "bamarni-bin": {
@@ -426,7 +426,7 @@
             ],
             "support": {
                 "issues": "https://github.com/guzzle/psr7/issues",
-                "source": "https://github.com/guzzle/psr7/tree/2.7.0"
+                "source": "https://github.com/guzzle/psr7/tree/2.7.1"
             },
             "funding": [
                 {
@@ -746,17 +746,17 @@
         },
         {
             "name": "pear/crypt_gpg",
-            "version": "v1.6.9",
-            "version_normalized": "1.6.9.0",
+            "version": "v1.6.11",
+            "version_normalized": "1.6.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pear/Crypt_GPG.git",
-                "reference": "1572e126f8c8e083af6db1ebe43fcd9c7954537c"
+                "reference": "6d307aae8b38ee35d0a2297510bd2356d1452c2b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pear/Crypt_GPG/zipball/1572e126f8c8e083af6db1ebe43fcd9c7954537c",
-                "reference": "1572e126f8c8e083af6db1ebe43fcd9c7954537c",
+                "url": "https://api.github.com/repos/pear/Crypt_GPG/zipball/6d307aae8b38ee35d0a2297510bd2356d1452c2b",
+                "reference": "6d307aae8b38ee35d0a2297510bd2356d1452c2b",
                 "shasum": ""
             },
             "require": {
@@ -772,7 +772,7 @@
             "suggest": {
                 "ext-posix": "May require the posix PHP extension"
             },
-            "time": "2024-03-23T10:43:40+00:00",
+            "time": "2025-05-22T11:41:53+00:00",
             "bin": [
                 "scripts/crypt-gpg-pinentry"
             ],
@@ -1127,17 +1127,17 @@
         },
         {
             "name": "pear/pear-core-minimal",
-            "version": "v1.10.15",
-            "version_normalized": "1.10.15.0",
+            "version": "v1.10.16",
+            "version_normalized": "1.10.16.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pear/pear-core-minimal.git",
-                "reference": "ce0adade8b97561656ace07cdaac4751c271ea8c"
+                "reference": "c0f51b45f50683bf5bbf558036854ebc9b54d033"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pear/pear-core-minimal/zipball/ce0adade8b97561656ace07cdaac4751c271ea8c",
-                "reference": "ce0adade8b97561656ace07cdaac4751c271ea8c",
+                "url": "https://api.github.com/repos/pear/pear-core-minimal/zipball/c0f51b45f50683bf5bbf558036854ebc9b54d033",
+                "reference": "c0f51b45f50683bf5bbf558036854ebc9b54d033",
                 "shasum": ""
             },
             "require": {
@@ -1148,7 +1148,7 @@
             "replace": {
                 "rsky/pear-core-min": "self.version"
             },
-            "time": "2024-03-16T18:41:45+00:00",
+            "time": "2024-11-24T22:27:58+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -1457,22 +1457,22 @@
         },
         {
             "name": "roundcube/plugin-installer",
-            "version": "0.3.8",
-            "version_normalized": "0.3.8.0",
+            "version": "0.3.10",
+            "version_normalized": "0.3.10.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/roundcube/plugin-installer.git",
-                "reference": "4547fee8077db1ec4cbf6d55ef9d6c4e116f69d0"
+                "reference": "c4db5c9da438a5802925c895c90cd46db7503437"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/roundcube/plugin-installer/zipball/4547fee8077db1ec4cbf6d55ef9d6c4e116f69d0",
-                "reference": "4547fee8077db1ec4cbf6d55ef9d6c4e116f69d0",
+                "url": "https://api.github.com/repos/roundcube/plugin-installer/zipball/c4db5c9da438a5802925c895c90cd46db7503437",
+                "reference": "c4db5c9da438a5802925c895c90cd46db7503437",
                 "shasum": ""
             },
             "require": {
                 "composer-plugin-api": "^2.1",
-                "php": ">=7.3 <=8.4",
+                "php": ">=7.3 <8.5",
                 "roundcube/roundcubemail": "*"
             },
             "require-dev": {
@@ -1484,7 +1484,7 @@
                 "phpstan/phpstan-deprecation-rules": "^1.0",
                 "phpstan/phpstan-strict-rules": "^1.3"
             },
-            "time": "2024-08-21T09:25:23+00:00",
+            "time": "2025-01-22T12:23:56+00:00",
             "type": "composer-plugin",
             "extra": {
                 "class": [
@@ -1518,7 +1518,7 @@
             "description": "A composer-installer for Roundcube plugins and skins.",
             "support": {
                 "issues": "https://github.com/roundcube/plugin-installer/issues",
-                "source": "https://github.com/roundcube/plugin-installer/tree/0.3.8"
+                "source": "https://github.com/roundcube/plugin-installer/tree/0.3.10"
             },
             "install-path": "../roundcube/plugin-installer"
         },
@@ -1581,31 +1581,31 @@
         },
         {
             "name": "symfony/deprecation-contracts",
-            "version": "v2.5.3",
-            "version_normalized": "2.5.3.0",
+            "version": "v2.5.4",
+            "version_normalized": "2.5.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/deprecation-contracts.git",
-                "reference": "80d075412b557d41002320b96a096ca65aa2c98d"
+                "reference": "605389f2a7e5625f273b53960dc46aeaf9c62918"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/deprecation-contracts/zipball/80d075412b557d41002320b96a096ca65aa2c98d",
-                "reference": "80d075412b557d41002320b96a096ca65aa2c98d",
+                "url": "https://api.github.com/repos/symfony/deprecation-contracts/zipball/605389f2a7e5625f273b53960dc46aeaf9c62918",
+                "reference": "605389f2a7e5625f273b53960dc46aeaf9c62918",
                 "shasum": ""
             },
             "require": {
                 "php": ">=7.1"
             },
-            "time": "2023-01-24T14:02:46+00:00",
+            "time": "2024-09-25T14:11:13+00:00",
             "type": "library",
             "extra": {
+                "thanks": {
+                    "url": "https://github.com/symfony/contracts",
+                    "name": "symfony/contracts"
+                },
                 "branch-alias": {
                     "dev-main": "2.5-dev"
-                },
-                "thanks": {
-                    "name": "symfony/contracts",
-                    "url": "https://github.com/symfony/contracts"
                 }
             },
             "installation-source": "dist",
@@ -1631,7 +1631,7 @@
             "description": "A generic function and convention to trigger deprecation notices",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/deprecation-contracts/tree/v2.5.3"
+                "source": "https://github.com/symfony/deprecation-contracts/tree/v2.5.4"
             },
             "funding": [
                 {

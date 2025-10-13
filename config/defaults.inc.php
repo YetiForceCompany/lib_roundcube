@@ -26,7 +26,7 @@ $config = [];
 // Database connection string (DSN) for read+write operations
 // Format (compatible with PEAR MDB2): db_provider://user:password@host/database
 // Currently supported db_providers: mysql, pgsql, sqlite, mssql, sqlsrv, oracle
-// For examples see http://pear.php.net/manual/en/package.database.mdb2.intro-dsn.php
+// For examples see https://pear.php.net/manual/en/package.database.mdb2.intro-dsn.php
 // Note: for SQLite use absolute path (Linux): 'sqlite:////full/path/to/sqlite.db?mode=0646'
 //       or (Windows): 'sqlite:///C:/full/path/to/sqlite.db'
 // Note: Various drivers support various additional arguments for connection,
@@ -44,7 +44,7 @@ $config['db_dsnw_noread'] = false;
 
 // use persistent db-connections
 // beware this will not "always" work as expected
-// see: http://www.php.net/manual/en/features.persistent-connections.php
+// see: https://www.php.net/manual/en/features.persistent-connections.php
 $config['db_persistent'] = false;
 
 // you can define specific table (and sequence) names prefix
@@ -75,7 +75,7 @@ $config['db_max_allowed_packet'] = null;
 $config['log_driver'] = 'file';
 
 // date format for log entries
-// (read http://php.net/manual/en/function.date.php for all format characters)
+// (read https://php.net/manual/en/function.date.php for all format characters)
 $config['log_date_format'] = 'd-M-Y H:i:s O';
 
 // length of the session ID to prepend each log line with
@@ -89,7 +89,7 @@ $config['log_file_ext'] = '.log';
 $config['syslog_id'] = 'roundcube';
 
 // Syslog facility to use, if using the 'syslog' log driver.
-// For possible values see installer or http://php.net/manual/en/function.openlog.php
+// For possible values see installer or https://php.net/manual/en/function.openlog.php
 $config['syslog_facility'] = LOG_USER;
 
 // Activate this option if logs should be written to per-user directories.
@@ -153,7 +153,7 @@ $config['imap_host'] = 'localhost:143';
 $config['imap_auth_type'] = null;
 
 // IMAP socket context options
-// See http://php.net/manual/en/context.ssl.php
+// See https://php.net/manual/en/context.ssl.php
 // The example below enables server certificate validation
 //$config['imap_conn_options'] = [
 //  'ssl'         => [
@@ -272,10 +272,12 @@ $config['smtp_host'] = 'localhost:587';
 
 // SMTP username (if required)
 // Note: %u variable will be replaced with current user's username
+// Note: To disable user authentication set smtp_user and smtp_pass to ''.
 $config['smtp_user'] = '%u';
 
 // SMTP password (if required)
 // Note: When set to '%p' current user's password will be used
+// Note: To disable user authentication set smtp_user and smtp_pass to ''.
 $config['smtp_pass'] = '%p';
 
 // SMTP AUTH type (DIGEST-MD5, CRAM-MD5, LOGIN, PLAIN or empty to use
@@ -307,7 +309,7 @@ $config['smtp_helo_host'] = '';
 $config['smtp_timeout'] = 0;
 
 // SMTP socket context options
-// See http://php.net/manual/en/context.ssl.php
+// See https://php.net/manual/en/context.ssl.php
 // The example below enables server certificate validation, and
 // requires 'smtp_timeout' to be non zero.
 // $config['smtp_conn_options'] = [
@@ -347,7 +349,7 @@ $config['oauth_token_uri'] = null;
 $config['oauth_identity_uri'] = null;
 
 // Optional: disable SSL certificate check on HTTP requests to OAuth server
-// See http://docs.guzzlephp.org/en/stable/request-options.html#verify for possible values
+// See https://docs.guzzlephp.org/en/stable/request-options.html#verify for possible values
 $config['oauth_verify_peer'] = true;
 
 // Mandatory: OAuth scopes to request (space-separated string)
@@ -362,12 +364,19 @@ $config['oauth_identity_fields'] = null;
 // Boolean: automatically redirect to OAuth login when opening Roundcube without a valid session
 $config['oauth_login_redirect'] = false;
 
+// Optional: For backends that don't support XOAUTH2/OAUTHBEARER method we can still use
+// OpenIDC protocol to get a short-living password (claim) for the user to log into IMAP/SMTP.
+// That password have to have (at least) the same expiration time as the token, and will be
+// renewed on token refresh.
+// Note: The claim have to be added to 'oauth_scope' above.
+$config['oauth_password_claim'] = null;
+
 ///// Example config for Gmail
 
 // Register your service at https://console.developers.google.com/
 // - use https://<your-roundcube-url>/index.php/login/oauth as redirect URL
 
-// $config['default_host'] = 'ssl://imap.gmail.com';
+// $config['imap_host'] = 'ssl://imap.gmail.com';
 // $config['oauth_provider'] = 'google';
 // $config['oauth_provider_name'] = 'Google';
 // $config['oauth_client_id'] = "<your-credentials-client-id>";
@@ -419,16 +428,16 @@ $config['ldap_cache_ttl'] = '10m';
 $config['memcache_hosts'] = null;
 
 // Controls the use of a persistent connections to memcache servers
-// See http://php.net/manual/en/memcache.addserver.php
+// See https://php.net/manual/en/memcache.addserver.php
 $config['memcache_pconnect'] = true;
 
 // Value in seconds which will be used for connecting to the daemon
-// See http://php.net/manual/en/memcache.addserver.php
+// See https://php.net/manual/en/memcache.addserver.php
 $config['memcache_timeout'] = 1;
 
 // Controls how often a failed server will be retried (value in seconds).
 // Setting this parameter to -1 disables automatic retry.
-// See http://php.net/manual/en/memcache.addserver.php
+// See https://php.net/manual/en/memcache.addserver.php
 $config['memcache_retry_interval'] = 15;
 
 // Use these hosts for accessing Redis.
@@ -770,7 +779,7 @@ $config['mime_magic'] = null;
 // Absolute path to a local mime.types mapping table file.
 // This is used to derive mime-types from the filename extension or vice versa.
 // Such a file is usually part of the apache webserver. If you don't find a file named mime.types on your system,
-// download it from http://svn.apache.org/repos/asf/httpd/httpd/trunk/docs/conf/mime.types
+// download it from https://svn.apache.org/repos/asf/httpd/httpd/trunk/docs/conf/mime.types
 $config['mime_types'] = null;
 
 // path to imagemagick identify binary (if not set we'll use Imagick or GD extensions)
@@ -935,16 +944,16 @@ $config['spellcheck_dictionary'] = false;
 // - 'googie'  - the default (also used for connecting to Nox Spell Server, see 'spellcheck_uri' setting)
 // - 'pspell'  - requires the PHP Pspell module and aspell installed
 // - 'enchant' - requires the PHP Enchant module
-// - 'atd'     - install your own After the Deadline server or check with the people at http://www.afterthedeadline.com before using their API
+// - 'atd'     - install your own After the Deadline server or check with the people at https://www.afterthedeadline.com before using their API
 // Since Google shut down their public spell checking service, the default settings
-// connect to http://spell.roundcube.net which is a hosted service provided by Roundcube.
+// connect to https://spell.roundcube.net which is a hosted service provided by Roundcube.
 // You can connect to any other googie-compliant service by setting 'spellcheck_uri' accordingly.
 $config['spellcheck_engine'] = 'googie';
 
 // For locally installed Nox Spell Server or After the Deadline services,
 // please specify the URI to call it.
 // Get Nox Spell Server from http://orangoo.com/labs/?page_id=72 or
-// the After the Deadline package from http://www.afterthedeadline.com.
+// the After the Deadline package from https://www.afterthedeadline.com.
 // Leave empty to use the public API of service.afterthedeadline.com
 $config['spellcheck_uri'] = '';
 
