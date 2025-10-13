@@ -45,6 +45,9 @@ class yetiforce extends rcube_plugin
 	/** @var rcmail */
 	private $rc;
 
+	/** @var rcube_message */
+	private $message;
+
 	/** @var string|null */
 	protected static $SESSION_KEY;
 
@@ -211,7 +214,7 @@ class yetiforce extends rcube_plugin
 					$args['valid'] = true;
 
 					$_SESSION['smtp_host'] = $smtp;
-					$_SESSION['crm']['id'] = $args['cuid']??0;
+					$_SESSION['crm']['id'] = $args['cuid'] ?? 0;
 					if ($mailAccount->getServer()->isOAuth()) {
 						$token = $mailAccount->getAccessToken();
 						$args['pass'] = $oauthToken = "Bearer {$token}";
@@ -543,7 +546,7 @@ class yetiforce extends rcube_plugin
 					$cc .= ',' . $row['cc_email'];
 					$cc = str_replace($row['from_email'] . ',', '', $cc);
 					$cc = trim($cc, ',');
-				// no break
+					// no break
 				case 'reply':
 					$to = $row['reply_to_email'];
 					if (empty($to)) {
@@ -628,23 +631,28 @@ class yetiforce extends rcube_plugin
 				$body = preg_replace('/\r?\n/', "\n", $body);
 				$body = trim($body, "\n");
 			} else {
-				$prefix = sprintf(
+				$prefix = \sprintf(
 					'<p>-------- ' . $this->rc->gettext('originalmessage') . ' --------</p>' .
 					'<table border="0" cellpadding="0" cellspacing="0"><tbody>' .
 					'<tr><th align="right" nowrap="nowrap" valign="baseline">%s: </th><td>%s</td></tr>' .
 					'<tr><th align="right" nowrap="nowrap" valign="baseline">%s: </th><td>%s</td></tr>' .
 					'<tr><th align="right" nowrap="nowrap" valign="baseline">%s: </th><td>%s</td></tr>' .
 					'<tr><th align="right" nowrap="nowrap" valign="baseline">%s: </th><td>%s</td></tr>',
-					$this->rc->gettext('subject'), rcube::Q($subject),
-					$this->rc->gettext('date'), rcube::Q($date),
-					$this->rc->gettext('from'), rcube::Q($from, 'replace'),
-					$this->rc->gettext('to'), rcube::Q($to, 'replace'));
+					$this->rc->gettext('subject'),
+					rcube::Q($subject),
+					$this->rc->gettext('date'),
+					rcube::Q($date),
+					$this->rc->gettext('from'),
+					rcube::Q($from, 'replace'),
+					$this->rc->gettext('to'),
+					rcube::Q($to, 'replace')
+				);
 
 				if ($row['cc_email']) {
-					$prefix .= sprintf('<tr><th align="right" nowrap="nowrap" valign="baseline">%s: </th><td>%s</td></tr>', $this->rc->gettext('cc'), rcube::Q($row['cc_email'], 'replace'));
+					$prefix .= \sprintf('<tr><th align="right" nowrap="nowrap" valign="baseline">%s: </th><td>%s</td></tr>', $this->rc->gettext('cc'), rcube::Q($row['cc_email'], 'replace'));
 				}
 				if ($replyto !== $from) {
-					$prefix .= sprintf('<tr><th align="right" nowrap="nowrap" valign="baseline">%s: </th><td>%s</td></tr>', $this->rc->gettext('replyto'), rcube::Q($replyto, 'replace'));
+					$prefix .= \sprintf('<tr><th align="right" nowrap="nowrap" valign="baseline">%s: </th><td>%s</td></tr>', $this->rc->gettext('replyto'), rcube::Q($replyto, 'replace'));
 				}
 				$prefix .= '</tbody></table>';
 			}
@@ -663,7 +671,7 @@ class yetiforce extends rcube_plugin
 				$body = $txt->get_text();
 				$body = preg_replace('/\r?\n/', "\n", $body);
 				$body = trim($body, "\n");
-				$body = rcmail_action_mail_compose::wrap_and_quote($body, $line_length);
+				$body = rcmail_action_mail_compose::quote_text($body);
 				$prefix .= "\n";
 				$body = $prefix . $body . $suffix;
 			} else {
@@ -710,14 +718,14 @@ class yetiforce extends rcube_plugin
 			return;
 		}
 		$signatures = [];
-		if($this->rc->output->get_env('signatures')){
+		if ($this->rc->output->get_env('signatures')) {
 			foreach (($this->rc->output->get_env('signatures') ?? []) as $identityId => $signature) {
 				$signatures[$identityId]['text'] = $globalSignatures['text'];
 				$signatures[$identityId]['html'] = '--<br><div class="pre global">' . $globalSignatures['global'] . '</div>';
 			}
-		}else{
+		} else {
 			foreach (($this->rc->output->get_env('identities') ?? []) as $identityId => $identity) {
-				$signatures[$identityId]['text'] = $globalSignatures['text']??'';
+				$signatures[$identityId]['text'] = $globalSignatures['text'] ?? '';
 				$signatures[$identityId]['html'] = '--<br><div class="pre global">' . $globalSignatures['global'] . '</div>';
 			}
 		}
@@ -885,20 +893,21 @@ class yetiforce extends rcube_plugin
 			$button = '';
 		}
 
-		$link_content = sprintf(
+		$link_content = \sprintf(
 			'<span class="attachment-name">%s</span><span class="attachment-size">(%s)</span>',
-			rcube::Q($attachment['name']), rcmail_action_mail_attachment_upload::show_bytes($attachment['size'])
+			rcube::Q($attachment['name']),
+			rcmail_action_mail_attachment_upload::show_bytes($attachment['size'])
 		);
 
 		$content_link = html::a([
 			'href' => '#load',
 			'class' => 'filename',
-			'onclick' => sprintf("return %s.command('load-attachment','rcmfile%s', this, event)", rcmail_output::JS_OBJECT_NAME, $id),
+			'onclick' => \sprintf("return %s.command('load-attachment','rcmfile%s', this, event)", rcmail_output::JS_OBJECT_NAME, $id),
 		], $link_content);
 
 		$delete_link = html::a([
 			'href' => '#delete',
-			'onclick' => sprintf("return %s.command('remove-attachment','rcmfile%s', this, event)", rcmail_output::JS_OBJECT_NAME, $id),
+			'onclick' => \sprintf("return %s.command('remove-attachment','rcmfile%s', this, event)", rcmail_output::JS_OBJECT_NAME, $id),
 			'title' => $this->rc->gettext('delete'),
 			'class' => 'delete',
 			'aria-label' => $this->rc->gettext('delete') . ' ' . $attachment['name'],
@@ -997,7 +1006,7 @@ class yetiforce extends rcube_plugin
 				$textParser = \App\TextParser::getInstanceById(
 					App\Purifier::purifyByType($recordId, 'Integer'),
 					App\Purifier::purifyByType(rcube_utils::get_input_string('select_module', rcube_utils::INPUT_GPC), 'Alnum')
-					);
+				);
 				$mail['subject'] = $textParser->setContent($mail['subject'])->parse()->getContent();
 				$mail['content'] = $textParser->setContent($mail['content'])->parse()->getContent();
 			} else {
@@ -1220,7 +1229,6 @@ class yetiforce extends rcube_plugin
 		$this->rc->output->command('plugin.yetiforce.showMailAnalysis', $this->rc->storage->get_raw_body($uid));
 	}
 
-
 	/**
 	 * Hook message_before_send.
 	 *
@@ -1341,7 +1349,7 @@ class yetiforce extends rcube_plugin
 									'size' => filesize($tmpPath),
 									'mimetype' => rcube_mime::file_content_type($tmpPath, $recordModel->get('filename'), $recordModel->getFileDetails()['type']),
 								];
-								$url = sprintf('%s&_id=%s&_action=display-attachment&_file=rcmfile%s', $this->rc->comm_path, $args['id'], $attachment['id']);
+								$url = \sprintf('%s&_id=%s&_action=display-attachment&_file=rcmfile%s', $this->rc->comm_path, $args['id'], $attachment['id']);
 								$return = '<img src="' . $url . '" />';
 								$attachments[$index] = $attachment;
 								++$index;
