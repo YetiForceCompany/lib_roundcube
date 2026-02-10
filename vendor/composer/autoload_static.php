@@ -13,107 +13,107 @@ class ComposerStaticInitd30534b7ccef70d5be1f4ba9bc89dbe4
     );
 
     public static $prefixLengthsPsr4 = array (
-        'R' => 
+        'R' =>
         array (
             'RtfHtmlPhp\\' => 11,
             'Roundcube\\Composer\\' => 19,
         ),
-        'P' => 
+        'P' =>
         array (
             'Psr\\Http\\Message\\' => 17,
             'Psr\\Http\\Client\\' => 16,
         ),
-        'M' => 
+        'M' =>
         array (
             'Masterminds\\' => 12,
         ),
-        'G' => 
+        'G' =>
         array (
             'GuzzleHttp\\Psr7\\' => 16,
             'GuzzleHttp\\Promise\\' => 19,
             'GuzzleHttp\\' => 11,
         ),
-        'D' => 
+        'D' =>
         array (
             'DASPRiD\\Enum\\' => 13,
         ),
-        'B' => 
+        'B' =>
         array (
             'BaconQrCode\\' => 12,
         ),
     );
 
     public static $prefixDirsPsr4 = array (
-        'RtfHtmlPhp\\' => 
+        'RtfHtmlPhp\\' =>
         array (
             0 => __DIR__ . '/..' . '/roundcube/rtf-html-php/src',
         ),
-        'Roundcube\\Composer\\' => 
+        'Roundcube\\Composer\\' =>
         array (
             0 => __DIR__ . '/..' . '/roundcube/plugin-installer/src',
         ),
-        'Psr\\Http\\Message\\' => 
+        'Psr\\Http\\Message\\' =>
         array (
             0 => __DIR__ . '/..' . '/psr/http-factory/src',
             1 => __DIR__ . '/..' . '/psr/http-message/src',
         ),
-        'Psr\\Http\\Client\\' => 
+        'Psr\\Http\\Client\\' =>
         array (
             0 => __DIR__ . '/..' . '/psr/http-client/src',
         ),
-        'Masterminds\\' => 
+        'Masterminds\\' =>
         array (
             0 => __DIR__ . '/..' . '/masterminds/html5/src',
         ),
-        'GuzzleHttp\\Psr7\\' => 
+        'GuzzleHttp\\Psr7\\' =>
         array (
             0 => __DIR__ . '/..' . '/guzzlehttp/psr7/src',
         ),
-        'GuzzleHttp\\Promise\\' => 
+        'GuzzleHttp\\Promise\\' =>
         array (
             0 => __DIR__ . '/..' . '/guzzlehttp/promises/src',
         ),
-        'GuzzleHttp\\' => 
+        'GuzzleHttp\\' =>
         array (
             0 => __DIR__ . '/..' . '/guzzlehttp/guzzle/src',
         ),
-        'DASPRiD\\Enum\\' => 
+        'DASPRiD\\Enum\\' =>
         array (
             0 => __DIR__ . '/..' . '/dasprid/enum/src',
         ),
-        'BaconQrCode\\' => 
+        'BaconQrCode\\' =>
         array (
             0 => __DIR__ . '/..' . '/bacon/bacon-qr-code/src',
         ),
     );
 
     public static $prefixesPsr0 = array (
-        'N' => 
+        'N' =>
         array (
-            'Net' => 
+            'Net' =>
             array (
                 0 => __DIR__ . '/..' . '/pear/net_smtp',
                 1 => __DIR__ . '/..' . '/pear/net_socket',
             ),
         ),
-        'M' => 
+        'M' =>
         array (
-            'Mail' => 
+            'Mail' =>
             array (
                 0 => __DIR__ . '/..' . '/pear/mail_mime',
             ),
         ),
-        'C' => 
+        'C' =>
         array (
-            'Console' => 
+            'Console' =>
             array (
                 0 => __DIR__ . '/..' . '/pear/console_commandline',
                 1 => __DIR__ . '/..' . '/pear/console_getopt',
             ),
         ),
-        'A' => 
+        'A' =>
         array (
-            'Auth' => 
+            'Auth' =>
             array (
                 0 => __DIR__ . '/..' . '/pear/auth_sasl',
             ),
