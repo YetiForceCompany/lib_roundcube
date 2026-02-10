@@ -26,6 +26,10 @@ Authentication-Results: example.com;
 
 The text between `Authentication-Results:` and the first `;` is the authserv-id, in the example above it is `example.com`.
 
+## Translations
+
+Similar to the roundcube project itself this plugin uses Transifex for translations. Please make any translation changes here: https://app.transifex.com/roundcube/roundcube-webmail/plugin-authres_status/
+
 ## Tested
 Tested on Roundcube 1.0.0+, let me know if it works on previous version as well
 
