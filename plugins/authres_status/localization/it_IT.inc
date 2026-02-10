@@ -2,7 +2,7 @@
 
 $labels = array();
 $labels['nosignature'] = 'Nessuna firma diponibile';
-$labels['noauthresults'] = 'Alcune firme sono state trovate, ma nessu auth. header. C\'è un problema di configurazione?';
+$labels['noauthresults'] = 'Firma trovata ma nessuna intestazione dei risultati di autenticazione. C\'è un problema di configurazione del server?';
 $labels['signaturepass'] = 'Firme valide dal dominio del mittente. Verificate da';
 $labels['partialpass'] = 'Alcune firme non sono valide, ma almeno una risulta valida per il dominio del mittente. Verificato da';
 $labels['thirdparty'] = 'Firmato da terzi, la firma è presente ma per il dominio diverso da quello dell\'indirizzo. verificate per';
@@ -19,8 +19,8 @@ $labels['title_enable_column']  = 'Abilita colonna';
 $labels['label_enable_column']  = 'Abilitare la colonna risultato autenticazione nell\'elenco dei messaggi';
 $labels['label_fallback_verifier'] = 'Usa verifica interna DKIM (se la firma è stata trovata ma senza intestazione con il risultato dell\'autenticazione)';
 
-$labels['title_trusted_mtas'] = 'MTA affidabile';
-$labels['label_trusted_mtas'] = 'Elenco separato da virgole di authserv-id degli MTA fidati. Solo i risultati da questi MTA saranno mostrati';
+$labels['title_trusted_mtas'] = 'MTA attendibile';
+$labels['label_trusted_mtas'] = 'Elenco separato da virgole di authserv-id degli MTA attendibili. Solo i risultati da questi MTA saranno mostrati';
 
 $labels['title_include_status'] = 'Mostra soltanto i seguenti stati';
 $labels['label_include_status1']  = 'Nessuna firma trovata';

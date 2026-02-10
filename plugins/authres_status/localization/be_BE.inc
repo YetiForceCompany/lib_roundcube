@@ -1,23 +1,23 @@
 <?php
 
 $labels = array();
-$labels['nosignature'] = 'Няма дадзеных аб подпісе';
-$labels['noauthresults'] = 'Подпіс знойдзены, але няма загалоўка вынікаў праверкі сапраўднасці. Праблема канфігурацыі сервера?';
-$labels['signaturepass'] = 'Сапраўдны подпіс(ы) з дамена адпраўніка. праверана';
-$labels['partialpass'] = 'Некаторыя подпісы з\'яўляюцца несапраўднымі, але па меншай меры адзін сапраўдны для дамена адпраўніка. праверана';
-$labels['thirdparty'] = 'Signed by third party, signature is present but for different domain than from address. verified for ';
+$labels['nosignature'] = 'Няма звестак пра подпіс';
+$labels['noauthresults'] = 'Подпіс знойдзены, але няма загалоўка вынікаў аўтэнтыфікацыі. Праблема канфігурацыі сервера?';
+$labels['signaturepass'] = 'Прыдатны(ыя) подпіс(ы) з дамена адпраўніка. праверана';
+$labels['partialpass'] = 'Некаторыя подпісы непрыдатныя, але прынамсі адзін прыдатны для дамена адпраўніка. праверана';
+$labels['thirdparty'] = 'Падпісана іншай праграмай, подпіс прысутнічае, але для іншага дамена, адрознага ад адраса. праверана для';
 $labels['temporaryinvalid'] = 'Подпіс (часова) не дзейнічае! праверана';
-$labels['invalidsignature'] = 'Подпіс не зьяўляецца сапраўдным! праверана';
+$labels['invalidsignature'] = 'Подпіс непрыдатны! праверана';
 
 $labels['for'] = 'для';
 $labels['by'] = 'па';
 
-$labels['section_title']  = 'Статус ідэнтыфікацыі';
-$labels['column_title']  = 'Вынікі праверкі сапраўднасці';
+$labels['section_title']  = 'Статус аўтэнтыфікацыі';
+$labels['column_title']  = 'Вынікі аўтэнтыфікацыі';
 
-$labels['title_enable_column']  = 'Уключыць калонку';
-$labels['label_enable_column']  = 'Уключэнне ідэнтыфікацыі выніку калонкі ў спісе паведамленняў';
-$labels['label_fallback_verifier'] = 'Выкарыстоўвайце ўнутраную DKIM верыфікацыю (калі подпіс знойдзены, але не ідэнтыфікаваны вынік загалоўка)';
+$labels['title_enable_column']  = 'Уключыць слупок';
+$labels['label_enable_column']  = 'Уключэнне спіса вынікаў аўтэнтыфікацыі ў спісе лістоў';
+$labels['label_fallback_verifier'] = 'Выкарыстоўваць ўнутраную сістэму верыфікацыі DKIM (калі подпіс знойдзены, але не ідэнтыфікаваны загаловак вынікаў аўтэнтыфікацыі)';
 
 $labels['title_trusted_mtas'] = 'Trusted mta\'s';
 $labels['label_trusted_mtas'] = 'Comma separated authserv-id list of mta\'s you trust. Only results from these mta\'s will be shown';

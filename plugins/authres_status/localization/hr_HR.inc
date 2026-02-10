@@ -1,7 +1,7 @@
 <?php
 
 $labels = array();
-$labels['nosignature'] = 'No signature information';
+$labels['nosignature'] = 'Informacije o potpisu ne postoje';
 $labels['noauthresults'] = 'Signature found but no auth. results header. Server configuration problem?';
 $labels['signaturepass'] = 'Valid signature(s) from the sender\'s domain. verified by ';
 $labels['partialpass'] = 'Some signatures are invalid but at least one is valid for the sender\'s domain. verified by ';
@@ -9,7 +9,7 @@ $labels['thirdparty'] = 'Signed by third party, signature is present but for dif
 $labels['temporaryinvalid'] = 'Signature is (temporarily) not valid! verified by ';
 $labels['invalidsignature'] = 'Signature is not valid! verified by ';
 
-$labels['for'] = 'for';
+$labels['for'] = 'za';
 $labels['by'] = 'by';
 
 $labels['section_title']  = 'Authenticaton Status';

@@ -1,34 +1,34 @@
 <?php
 
 $labels = array();
-$labels['nosignature'] = 'No signature information';
-$labels['noauthresults'] = 'Signature found but no auth. results header. Server configuration problem?';
-$labels['signaturepass'] = 'Valid signature(s) from the sender\'s domain. verified by ';
-$labels['partialpass'] = 'Some signatures are invalid but at least one is valid for the sender\'s domain. verified by ';
-$labels['thirdparty'] = 'Signed by third party, signature is present but for different domain than from address. verified for ';
-$labels['temporaryinvalid'] = 'Signature is (temporarily) not valid! verified by ';
-$labels['invalidsignature'] = 'Signature is not valid! verified by ';
+$labels['nosignature'] = 'Geen handtekening informatie';
+$labels['noauthresults'] = 'Handtekening gevonden maar geen koptekst met authenticiteitsgegevens. Probleem met de serverconfiguratie?';
+$labels['signaturepass'] = 'Geldige handtekening(en) van het domein van de afzender. geverifieerd door ';
+$labels['partialpass'] = 'Sommige handtekeningen zijn ongeldig, maar ten minste één is geldig voor het domein van de afzender. geverifieerd door ';
+$labels['thirdparty'] = 'Ondertekend door derde partij, handtekening is aanwezig maar voor ander domein dan dit van adres. geverifieerd voor ';
+$labels['temporaryinvalid'] = 'Handtekening is (tijdelijk) niet geldig! geverifieerd door ';
+$labels['invalidsignature'] = 'Handtekening is niet geldig! geverifieerd door ';
 
-$labels['for'] = 'for';
-$labels['by'] = 'by';
+$labels['for'] = 'voor';
+$labels['by'] = 'door';
 
-$labels['section_title']  = 'Authenticaton Status';
-$labels['column_title']  = 'Auth. Result';
+$labels['section_title']  = 'Status van echtheid';
+$labels['column_title']  = 'Echth. Resultaat';
 
-$labels['title_enable_column']  = 'Enable Column';
-$labels['label_enable_column']  = 'Enable authentication result column in message list';
-$labels['label_fallback_verifier'] = 'Use internal DKIM verifier (if signature found but no auth. results header)';
+$labels['title_enable_column']  = 'Kolom Inschakelen';
+$labels['label_enable_column']  = 'Kolom echtheidsresultaat in berichtenlijst inschakelen';
+$labels['label_fallback_verifier'] = 'Gebruik interne DKIM-controle (indien handtekening gevonden maar geen kop met echth. resultaten)';
 
-$labels['title_trusted_mtas'] = 'Trusted mta\'s';
-$labels['label_trusted_mtas'] = 'Comma separated authserv-id list of mta\'s you trust. Only results from these mta\'s will be shown';
+$labels['title_trusted_mtas'] = 'Vertrouwde mta\'s';
+$labels['label_trusted_mtas'] = 'Door komma\'s gescheiden authserv-id lijst van mta\'s die u vertrouwt. Alleen resultaten van deze mta\'s worden getoond.';
 
-$labels['title_include_status'] = 'Only show the following statuses';
-$labels['label_include_status1']  = 'No signature found';
-$labels['label_include_status2']  = 'Signature found but no auth. results header';
-$labels['label_include_status4']  = 'All signatures passed validation';
-$labels['label_include_status8']  = 'At least one signature passed validation';
-$labels['label_include_status16']  = 'Third party signature';
-$labels['label_include_status32']  = 'Signature temporary failed';
-$labels['label_include_status64']  = 'Signature permanently failed';
+$labels['title_include_status'] = 'Toon alleen de volgende statuswaarden';
+$labels['label_include_status1']  = 'Geen handtekening gevonden';
+$labels['label_include_status2']  = 'Handtekening gevonden maar geen echth. resultaten hoofding';
+$labels['label_include_status4']  = 'Alle handtekeningen zijn goedgekeurd';
+$labels['label_include_status8']  = 'Ten minste een handtekening heeft de validatie doorstaan';
+$labels['label_include_status16']  = 'Handtekening van derden';
+$labels['label_include_status32']  = 'Handtekening tijdelijk mislukt';
+$labels['label_include_status64']  = 'Handtekening permanent mislukt';
 
 ?>

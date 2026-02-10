@@ -331,20 +331,25 @@ class authres_status extends rcube_plugin
 
     public function get_authentication_status($headers, $show_statuses = 0, $uid = 0)
     {
+        $dmarcFailed = false;
         /* If dkimproxy did not find a signature, stop here
         */
         if (($results = ($headers->others['x-dkim-authentication-results'] ?? '')) && strpos($results, 'none') !== false) {
             $status = self::STATUS_NOSIG;
         } else {
-            $hasAuthenticationResultHeaders = (bool)$headers->others['authentication-results'];
+            $hasAuthenticationResultHeaders = (bool) isset($headers->others['authentication-results']);
             if ($hasAuthenticationResultHeaders) {
                 $results = $this->rfc5451_extract_authresheader($headers->others['authentication-results']);
                 $status = 0;
                 $title = '';
 
                 foreach ($results as $result) {
-                    $status = $status | (isset(self::$RFC5451_authentication_results[$result['result']]) ? self::$RFC5451_authentication_results[$result['result']] : self::STATUS_FAIL);
+                    $status = $status | (self::$RFC5451_authentication_results[$result['result']] ?? self::STATUS_FAIL);
                     $title .= ($title ? '; ' : '') . $result['title'];
+
+                    if ($result['method'] === 'dmarc' && !$dmarcFailed) {
+                        $dmarcFailed = $result['result'] === 'fail';
+                    }
                 }
 
                 if ($status === self::STATUS_PASS || $status === self::STATUS_THIRD) {
@@ -368,14 +373,14 @@ class authres_status extends rcube_plugin
                         */
                         foreach ($results as $result) {
                             if (
-                                !in_array($result['method'], array('auth', 'dkim', 'dmarc', 'domainkeys'))
+                                !in_array($result['method'], ['auth', 'dkim', 'dmarc', 'domainkeys'])
                                 || !is_array($result['props'])
                             ) {
                                 continue;
                             }
 
                             if ($result['method'] === 'auth') {
-                                $method_props = $result['props']['smtp'];
+                                $method_props = $result['props']['smtp'] ?? '';
                             } else {
                                 $method_props = $result['props']['header'];
                             }
@@ -478,7 +483,7 @@ class authres_status extends rcube_plugin
                           $dkimVerify = new DKIM_Verify($rcmail->storage->get_raw_body($uid));
                           $results = $dkimVerify->validate();
                         } catch(Exception $e) {
-                          $results = array();
+                          $results = [];
 
                           $status = self::STATUS_NOSIG;
                           $title = "Exception thrown by internal verifier: " . $e->getMessage();
@@ -525,7 +530,9 @@ class authres_status extends rcube_plugin
             $alt = 'signaturepass';
         } else {
             // at least one auth method was passed, show partial pass
-            if (($status & self::STATUS_PASS)) {
+            // unless DMARC failed, then we should fail all auth
+            // (see https://github.com/pimlie/authres_status/issues/68)
+            if (($status & self::STATUS_PASS) && !$dmarcFailed) {
                 $status = self::STATUS_PARS;
                 $image = 'status_partial_pass.png';
                 $alt = 'partialpass';
@@ -542,7 +549,7 @@ class authres_status extends rcube_plugin
         }
 
         if (!$show_statuses || ($show_statuses & $status)) {
-            return '<img src="plugins/authres_status/images/' . $image . '" alt="' . $alt . '" title="' . $this->gettext($alt) . htmlentities($title) . '" class="authres-status-img" /> ';
+            return '<img src="' . $this->urlbase . 'images/' . $image . '" alt="' . $alt . '" title="' . $this->gettext($alt) . htmlentities($title ?? '') . '" class="authres-status-img" /> ';
         }
 
         return '';
