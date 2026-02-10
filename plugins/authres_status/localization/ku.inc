@@ -10,7 +10,7 @@ $labels['temporaryinvalid'] = 'Signature is (temporarily) not valid! verified by
 $labels['invalidsignature'] = 'Îmze ne derbasdar e! hat rastandin ji';
 
 $labels['for'] = 'ji bo';
-$labels['by'] = 'ji';
+$labels['by'] = 'bi riya';
 
 $labels['section_title']  = 'Authenticaton Status';
 $labels['column_title']  = 'Auth. Result';

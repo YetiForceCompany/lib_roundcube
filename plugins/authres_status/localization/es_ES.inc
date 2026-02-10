@@ -20,7 +20,7 @@ $labels['label_enable_column']  = 'Habilitar columna de resultado de autenticaci
 $labels['label_fallback_verifier'] = 'Usar verificador interno DKIM (si se encuentra una firma, pero no un encabezamiento con los resultados de autor)';
 
 $labels['title_trusted_mtas'] = 'Servidores de correo de confianza';
-$labels['label_trusted_mtas'] = 'Comma separated authserv-id list of mta\'s you trust. Only results from these mta\'s will be shown';
+$labels['label_trusted_mtas'] = 'Lista de authserv-id de los MTA de confianza, separados por comas. Solo se mostrarán los resultados de esos MTA.';
 
 $labels['title_include_status'] = 'Mostrar sólo los siguientes estados';
 $labels['label_include_status1']  = 'Firma no encontrada';

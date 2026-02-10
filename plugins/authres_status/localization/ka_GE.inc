@@ -9,13 +9,13 @@ $labels['thirdparty'] = 'Signed by third party, signature is present but for dif
 $labels['temporaryinvalid'] = 'Signature is (temporarily) not valid! verified by ';
 $labels['invalidsignature'] = 'Signature is not valid! verified by ';
 
-$labels['for'] = 'for';
-$labels['by'] = 'by';
+$labels['for'] = 'ვისთვის';
+$labels['by'] = 'ვისგან';
 
-$labels['section_title']  = 'Authenticaton Status';
-$labels['column_title']  = 'Auth. Result';
+$labels['section_title']  = 'ავთენტიკაციის სტატუსი';
+$labels['column_title']  = 'ავთ. შედეგი';
 
-$labels['title_enable_column']  = 'Enable Column';
+$labels['title_enable_column']  = 'სვეტის ჩართვა';
 $labels['label_enable_column']  = 'Enable authentication result column in message list';
 $labels['label_fallback_verifier'] = 'Use internal DKIM verifier (if signature found but no auth. results header)';
 

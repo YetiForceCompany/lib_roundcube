@@ -17,7 +17,7 @@ $labels['column_title']  = 'Tunnistautumisen tulos';
 
 $labels['title_enable_column']  = 'Näytä sarake';
 $labels['label_enable_column']  = 'Näytä tunnistautumisen tulokset -sarake viestilistauksessa.';
-$labels['label_fallback_verifier'] = 'Use internal DKIM verifier (if signature found but no auth. results header)';
+$labels['label_fallback_verifier'] = 'Käytä sisäistä DKIM-todennusta (jos allekirjoitus löytyy, mutta todennustuloksen otsake puuttuu)';
 
 $labels['title_trusted_mtas'] = 'Luotetut mta:t';
 $labels['label_trusted_mtas'] = 'Pilkulla erotettu authserv-id -lista luotetuista mta:sta. Vain tulokset näistä mta:sta näytetään';

@@ -15,7 +15,7 @@ $labels['by'] = 'por';
 $labels['section_title']  = 'Estado da autenticação';
 $labels['column_title']  = 'Resultado da autenticação';
 
-$labels['title_enable_column']  = 'Ativar Coluna';
+$labels['title_enable_column']  = 'Ativar coluna';
 $labels['label_enable_column']  = 'Ativar coluna de resultado da autenticação na lista de mensagens';
 $labels['label_fallback_verifier'] = 'Usar o verificador DKIM interno (se for encontrada uma assinatura mas, sem nenhum resultado de autenticação no cabeçalho)';
 

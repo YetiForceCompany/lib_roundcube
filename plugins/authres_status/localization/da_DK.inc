@@ -3,10 +3,10 @@
 $labels = array();
 $labels['nosignature'] = 'Ingen signatur information';
 $labels['noauthresults'] = 'Signature found but no auth. results header. Server configuration problem?';
-$labels['signaturepass'] = 'Valid signature(s) from the sender\'s domain. verified by ';
-$labels['partialpass'] = 'Some signatures are invalid but at least one is valid for the sender\'s domain. verified by ';
+$labels['signaturepass'] = 'Gyldig signatur(e) fra afsenders domain. Verificerede af ';
+$labels['partialpass'] = 'Nogle signature er ugyldige men mindst en er gyldig for afsenders domain. Verificerede af ';
 $labels['thirdparty'] = 'Signed by third party, signature is present but for different domain than from address. verified for ';
-$labels['temporaryinvalid'] = 'Signature is (temporarily) not valid! verified by ';
+$labels['temporaryinvalid'] = 'Signaturen er (midlertidigt) ugyldig! Verificerede af';
 $labels['invalidsignature'] = 'Signaturen er ikke gyldig! verificeret af';
 
 $labels['for'] = 'for';
@@ -29,6 +29,6 @@ $labels['label_include_status4']  = 'Alle signaturer bestod valideringen';
 $labels['label_include_status8']  = 'Mindst én signatur bestod validering';
 $labels['label_include_status16']  = 'Tredjepart signatur ';
 $labels['label_include_status32']  = 'Signatur fejlede midlertidigt ';
-$labels['label_include_status64']  = 'Signatur fejlede permenent';
+$labels['label_include_status64']  = 'Signatur fejlede permanent';
 
 ?>
