@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInitd30534b7ccef70d5be1f4ba9bc89dbe4
+class ComposerStaticInit93a4011a767df69f92cb20ccea9547e3
 {
     public static $files = array (
         '7b11c4dc42b3b3023073cb14e519683c' => __DIR__ . '/..' . '/ralouphie/getallheaders/src/getallheaders.php',
@@ -13,107 +13,115 @@ class ComposerStaticInitd30534b7ccef70d5be1f4ba9bc89dbe4
     );
 
     public static $prefixLengthsPsr4 = array (
-        'R' =>
+        'R' => 
         array (
             'RtfHtmlPhp\\' => 11,
             'Roundcube\\Composer\\' => 19,
         ),
-        'P' =>
+        'P' => 
         array (
             'Psr\\Http\\Message\\' => 17,
             'Psr\\Http\\Client\\' => 16,
         ),
-        'M' =>
+        'M' => 
         array (
             'Masterminds\\' => 12,
         ),
-        'G' =>
+        'I' => 
+        array (
+            'IPLib\\' => 6,
+        ),
+        'G' => 
         array (
             'GuzzleHttp\\Psr7\\' => 16,
             'GuzzleHttp\\Promise\\' => 19,
             'GuzzleHttp\\' => 11,
         ),
-        'D' =>
+        'D' => 
         array (
             'DASPRiD\\Enum\\' => 13,
         ),
-        'B' =>
+        'B' => 
         array (
             'BaconQrCode\\' => 12,
         ),
     );
 
     public static $prefixDirsPsr4 = array (
-        'RtfHtmlPhp\\' =>
+        'RtfHtmlPhp\\' => 
         array (
             0 => __DIR__ . '/..' . '/roundcube/rtf-html-php/src',
         ),
-        'Roundcube\\Composer\\' =>
+        'Roundcube\\Composer\\' => 
         array (
             0 => __DIR__ . '/..' . '/roundcube/plugin-installer/src',
         ),
-        'Psr\\Http\\Message\\' =>
+        'Psr\\Http\\Message\\' => 
         array (
-            0 => __DIR__ . '/..' . '/psr/http-factory/src',
-            1 => __DIR__ . '/..' . '/psr/http-message/src',
+            0 => __DIR__ . '/..' . '/psr/http-message/src',
+            1 => __DIR__ . '/..' . '/psr/http-factory/src',
         ),
-        'Psr\\Http\\Client\\' =>
+        'Psr\\Http\\Client\\' => 
         array (
             0 => __DIR__ . '/..' . '/psr/http-client/src',
         ),
-        'Masterminds\\' =>
+        'Masterminds\\' => 
         array (
             0 => __DIR__ . '/..' . '/masterminds/html5/src',
         ),
-        'GuzzleHttp\\Psr7\\' =>
+        'IPLib\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/mlocati/ip-lib/src',
+        ),
+        'GuzzleHttp\\Psr7\\' => 
         array (
             0 => __DIR__ . '/..' . '/guzzlehttp/psr7/src',
         ),
-        'GuzzleHttp\\Promise\\' =>
+        'GuzzleHttp\\Promise\\' => 
         array (
             0 => __DIR__ . '/..' . '/guzzlehttp/promises/src',
         ),
-        'GuzzleHttp\\' =>
+        'GuzzleHttp\\' => 
         array (
             0 => __DIR__ . '/..' . '/guzzlehttp/guzzle/src',
         ),
-        'DASPRiD\\Enum\\' =>
+        'DASPRiD\\Enum\\' => 
         array (
             0 => __DIR__ . '/..' . '/dasprid/enum/src',
         ),
-        'BaconQrCode\\' =>
+        'BaconQrCode\\' => 
         array (
             0 => __DIR__ . '/..' . '/bacon/bacon-qr-code/src',
         ),
     );
 
     public static $prefixesPsr0 = array (
-        'N' =>
+        'N' => 
         array (
-            'Net' =>
+            'Net' => 
             array (
-                0 => __DIR__ . '/..' . '/pear/net_smtp',
-                1 => __DIR__ . '/..' . '/pear/net_socket',
+                0 => __DIR__ . '/..' . '/pear/net_socket',
+                1 => __DIR__ . '/..' . '/pear/net_smtp',
             ),
         ),
-        'M' =>
+        'M' => 
         array (
-            'Mail' =>
+            'Mail' => 
             array (
                 0 => __DIR__ . '/..' . '/pear/mail_mime',
             ),
         ),
-        'C' =>
+        'C' => 
         array (
-            'Console' =>
+            'Console' => 
             array (
-                0 => __DIR__ . '/..' . '/pear/console_commandline',
-                1 => __DIR__ . '/..' . '/pear/console_getopt',
+                0 => __DIR__ . '/..' . '/pear/console_getopt',
+                1 => __DIR__ . '/..' . '/pear/console_commandline',
             ),
         ),
-        'A' =>
+        'A' => 
         array (
-            'Auth' =>
+            'Auth' => 
             array (
                 0 => __DIR__ . '/..' . '/pear/auth_sasl',
             ),
@@ -169,10 +177,10 @@ class ComposerStaticInitd30534b7ccef70d5be1f4ba9bc89dbe4
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInitd30534b7ccef70d5be1f4ba9bc89dbe4::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInitd30534b7ccef70d5be1f4ba9bc89dbe4::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInitd30534b7ccef70d5be1f4ba9bc89dbe4::$prefixesPsr0;
-            $loader->classMap = ComposerStaticInitd30534b7ccef70d5be1f4ba9bc89dbe4::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit93a4011a767df69f92cb20ccea9547e3::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit93a4011a767df69f92cb20ccea9547e3::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInit93a4011a767df69f92cb20ccea9547e3::$prefixesPsr0;
+            $loader->classMap = ComposerStaticInit93a4011a767df69f92cb20ccea9547e3::$classMap;
 
         }, null, ClassLoader::class);
     }
