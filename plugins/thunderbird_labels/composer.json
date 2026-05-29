@@ -1,0 +1,34 @@
+{
+    "name": "weird-birds/thunderbird_labels",
+    "type": "roundcube-plugin",
+    "description": "Shows thunderbird labels for messages in roundcube webmail.",
+    "keywords": ["mail","labels","tags"],
+    "license": "BSD-2-Clause",
+    "homepage": "https://github.com/mike-kfed/roundcube-thunderbird_labels",
+    "authors": [
+        {
+            "name": "Michael Kefeder",
+            "homepage": "https://github.com/mike-kfed",
+            "role": "Developer"
+        }
+    ],
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://plugins.roundcube.net"
+        },
+        {
+            "type": "vcs",
+            "url": "git://github.com/mike-kfed/roundcube-thunderbird_labels.git"
+        }
+    ],
+    "require": {
+        "roundcube/plugin-installer": ">=0.1.10",
+        "php": ">=5.6.18"
+    },
+    "extra": {
+        "roundcube": {
+            "min-version": "1.4.0"
+        }
+    }
+}
