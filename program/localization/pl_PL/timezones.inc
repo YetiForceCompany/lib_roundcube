@@ -10,8 +10,6 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/timezones/
 */
 
 $labels['tz:utc'] = 'UTC';
@@ -76,8 +74,17 @@ $labels['tz:america:antigua'] = 'Antigua';
 $labels['tz:america:araguaina'] = 'Araguaina';
 $labels['tz:america:argentina'] = 'Argentyna';
 $labels['tz:america:argentina:buenos_aires'] = 'Buenos Aires';
+$labels['tz:america:argentina:catamarca'] = 'Catamarca';
+$labels['tz:america:argentina:cordoba'] = 'Kordoba';
+$labels['tz:america:argentina:jujuy'] = 'Jujuy';
+$labels['tz:america:argentina:la_rioja'] = 'Rioja';
+$labels['tz:america:argentina:mendoza'] = 'Mendoza';
+$labels['tz:america:argentina:rio_gallegos'] = 'Rio Gallegos';
+$labels['tz:america:argentina:salta'] = 'Salta';
 $labels['tz:america:argentina:san_juan'] = 'San Juan';
 $labels['tz:america:argentina:san_luis'] = 'San Luis';
+$labels['tz:america:argentina:tucuman'] = 'Tucuman';
+$labels['tz:america:argentina:ushuaia'] = 'Ushuaia';
 $labels['tz:america:aruba'] = 'Aruba';
 $labels['tz:america:asuncion'] = 'Asuncion';
 $labels['tz:america:atikokan'] = 'Atikokan';
@@ -101,6 +108,7 @@ $labels['tz:america:chihuahua'] = 'Chihuahua';
 $labels['tz:america:costa_rica'] = 'Kostaryka';
 $labels['tz:america:creston'] = 'Creston';
 $labels['tz:america:cuiaba'] = 'Cuiaba';
+$labels['tz:america:curacao'] = 'Curaçao';
 $labels['tz:america:danmarkshavn'] = 'Danmarkshavn';
 $labels['tz:america:dawson'] = 'Dawson';
 $labels['tz:america:dawson_creek'] = 'Dawson Creek';
@@ -370,6 +378,9 @@ $labels['tz:europe:volgograd'] = 'Wołgograd';
 $labels['tz:europe:warsaw'] = 'Warszawa';
 $labels['tz:europe:zagreb'] = 'Zagrzeb';
 $labels['tz:europe:zurich'] = 'Zurych';
+$labels['tz:indian:maldives'] = 'Malediwy';
+$labels['tz:indian:mayotte'] = 'Majotta';
 $labels['tz:pacific'] = 'Pacyfik';
+$labels['tz:pacific:fiji'] = 'Fidżi';
 $labels['tz:pacific:tahiti'] = 'Tahiti';
 $labels['tz:pacific:tarawa'] = 'Tarawa';

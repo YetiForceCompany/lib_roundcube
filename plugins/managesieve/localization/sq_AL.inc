@@ -10,10 +10,7 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/plugin-managesieve/
 */
-
 
 $labels['filters'] = 'Filtra';
 $labels['managefilters'] = 'Administroni filtra për postë ardhëse';
@@ -281,3 +278,4 @@ $messages['duplicate.conflict.err'] = 'S’lejohet përdorimi i njëkohshëm i k
 $messages['disabledaction'] = 'Veprim jo i lejuar.';
 $messages['lastindexempty'] = 'Treguesi është i domosdoshëm kur numërohet nga fundi';
 $messages['noflagset'] = 'Duhet përzgjedhur të paktën një shenjë';
+$messages['saving.actionordererror'] = 'Veprim \'$previous\' duhet të jetë pas veprimit \'$current\'.';

@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  +-----------------------------------------------------------------------+
  | This file is part of the Roundcube Webmail client                     |
  |                                                                       |
@@ -25,13 +25,14 @@ class rcmail_action_contacts_upload_photo extends rcmail_action_contacts_index
      *
      * @var array
      */
-    public static $IMAGE_TYPES = ['jpeg','jpg','jp2','tiff','tif','bmp','eps','gif','png','png8','png24','png32','svg','ico'];
+    public static $IMAGE_TYPES = ['jpeg', 'jpg', 'jp2', 'tiff', 'tif', 'bmp', 'eps', 'gif', 'png', 'png8', 'png24', 'png32', 'svg', 'ico'];
 
     /**
      * Request handler.
      *
      * @param array $args Arguments from the previous step(s)
      */
+    #[\Override]
     public function run($args = [])
     {
         $rcmail = rcmail::get_instance();
@@ -43,48 +44,46 @@ class rcmail_action_contacts_upload_photo extends rcmail_action_contacts_index
             $filepath = $_FILES['_photo']['tmp_name'];
 
             // check file type and resize image
-            $image     = new rcube_image($_FILES['_photo']['tmp_name']);
+            $image = new rcube_image($_FILES['_photo']['tmp_name']);
             $imageprop = $image->props();
+            $inserted = false;
 
             if (
                 in_array(strtolower($imageprop['type']), self::$IMAGE_TYPES)
-                && $imageprop['width']
-                && $imageprop['height']
+                && !empty($imageprop['width'])
+                && !empty($imageprop['height'])
             ) {
-                $maxsize   = intval($rcmail->config->get('contact_photo_size', 160));
-                $tmpfname  = rcube_utils::temp_filename('imgconvert');
+                $maxsize = intval($rcmail->config->get('contact_photo_size', 160));
+                $tmpfname = rcube_utils::temp_filename('imgconvert');
                 $save_hook = 'attachment_upload';
 
                 // scale image to a maximum size
                 if (($imageprop['width'] > $maxsize || $imageprop['height'] > $maxsize) && $image->resize($maxsize, $tmpfname)) {
-                    $filepath  = $tmpfname;
+                    $filepath = $tmpfname;
                     $save_hook = 'attachment_save';
                 }
 
                 // save uploaded file in storage backend
-                $attachment = $rcmail->plugins->exec_hook($save_hook, [
-                        'path'     => $filepath,
-                        'size'     => $_FILES['_photo']['size'],
-                        'name'     => $_FILES['_photo']['name'],
-                        'mimetype' => 'image/' . $imageprop['type'],
-                        'group'    => 'contact',
-                ]);
-            }
-            else {
+                $attachment = [
+                    'path' => $filepath,
+                    'size' => $_FILES['_photo']['size'],
+                    'name' => $_FILES['_photo']['name'],
+                    'mimetype' => 'image/' . $imageprop['type'],
+                    'group' => 'contact',
+                ];
+
+                $inserted = $rcmail->insert_uploaded_file($attachment, $save_hook);
+            } else {
                 $attachment = ['error' => $rcmail->gettext('invalidimageformat')];
             }
 
-            if (!empty($attachment['status']) && empty($attachment['abort'])) {
-                $file_id = $attachment['id'];
-                $_SESSION['contacts']['files'][$file_id] = $attachment;
-                $rcmail->output->command('replace_contact_photo', $file_id);
-            }
-            else {
+            if ($inserted) {
+                $rcmail->output->command('replace_contact_photo', $attachment['id']);
+            } else {
                 // upload failed
                 self::upload_error($_FILES['_photo']['error'], $attachment);
             }
-        }
-        else {
+        } else {
             self::upload_failure();
         }
 

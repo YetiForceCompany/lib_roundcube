@@ -7,22 +7,25 @@
  * for contacts/addresses that do not have a photo image.
  *
  * @todo: Make it optional and configurable via user preferences
+ *
  * @todo: Make color palettes match the current skin
+ *
  * @todo: Implement optional SVG generator
  *
  * @license GNU GPLv3+
  * @author Aleksander Machniak <alec@alec.pl>
+ *
  * @website https://roundcube.net
  */
 class identicon extends rcube_plugin
 {
     public $task = 'addressbook';
 
-
     /**
      * Plugin initialization.
      */
-    function init()
+    #[\Override]
+    public function init()
     {
         $this->add_hook('contact_photo', [$this, 'contact_photo']);
     }
@@ -30,7 +33,7 @@ class identicon extends rcube_plugin
     /**
      * 'contact_photo' hook handler to inject an identicon image
      */
-    function contact_photo($args)
+    public function contact_photo($args)
     {
         // pre-conditions, exit if photo already exists or invalid input
         if (!empty($args['url']) || !empty($args['data'])
@@ -57,8 +60,7 @@ class identicon extends rcube_plugin
 
                 if (!empty($args['attrib']['bg-color'])) {
                     $bgcolor = $args['attrib']['bg-color'];
-                }
-                else {
+                } else {
                     $bgcolor = rcube_utils::get_input_string('_bgcolor', rcube_utils::INPUT_GET);
                 }
 
@@ -67,11 +69,10 @@ class identicon extends rcube_plugin
                 if ($rcmail->action == 'show') {
                     // set photo URL using data-uri
                     if (($icon = $identicon->getBinary()) && ($icon = base64_encode($icon))) {
-                        $mimetype    = $identicon->getMimetype();
+                        $mimetype = $identicon->getMimetype();
                         $args['url'] = sprintf('data:%s;base64,%s', $mimetype, $icon);
                     }
-                }
-                else {
+                } else {
                     // send the icon to the browser
                     if ($identicon->sendOutput()) {
                         exit;

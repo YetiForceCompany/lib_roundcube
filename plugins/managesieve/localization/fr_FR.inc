@@ -10,10 +10,7 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/plugin-managesieve/
 */
-
 
 $labels['filters'] = 'Filtres';
 $labels['managefilters'] = 'Gérer les filtres de courriels entrants';
@@ -43,7 +40,7 @@ $labels['filterunder'] = 'plus petit que';
 $labels['filterover'] = 'plus grand que';
 $labels['mime'] = 'MIME :';
 $labels['mimepart'] = 'Partie MIME :';
-$labels['mime-message'] = 'message';
+$labels['mime-message'] = 'courriel';
 $labels['mime-anychild'] = 'tout';
 $labels['mime-type'] = 'type';
 $labels['mime-subtype'] = 'sous-type';
@@ -234,7 +231,7 @@ $labels['ariasummaryfiltersetslist'] = 'Liste des jeux de filtrage';
 $labels['filterstitle'] = 'Modifier les filtres de courriels entrants';
 $labels['vacationtitle'] = 'Modifier la règle d’absence du bureau';
 $labels['forwardtitle'] = 'Modifier la règle de transfert des courriels';
-$labels['message'] = 'Message';
+$labels['message'] = 'Courriel';
 $labels['duplicate'] = 'est un doublon';
 $labels['notduplicate'] = 'n’est pas un doublon';
 $labels['duplicate.handle'] = 'descripteur :';
@@ -284,3 +281,4 @@ $messages['duplicate.conflict.err'] = 'L’en-tête et l’identifiant unique ne
 $messages['disabledaction'] = 'L’action n’est pas permise.';
 $messages['lastindexempty'] = 'L’index est requis en comptant de la fin';
 $messages['noflagset'] = 'Au moins un drapeau doit être sélectionné.';
+$messages['saving.actionordererror'] = 'L’action « $previous » doit suivre l’action « $current ».';

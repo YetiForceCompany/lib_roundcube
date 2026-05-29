@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  +-----------------------------------------------------------------------+
  | This file is part of the Roundcube Webmail client                     |
  |                                                                       |
@@ -22,8 +22,6 @@
 /**
  * Unified access to attachment properties and body
  * Unified for message parts as well as uploaded attachments
- *
- * @package Webmail
  */
 class rcmail_attachment_handler
 {
@@ -48,11 +46,11 @@ class rcmail_attachment_handler
     {
         ob_end_clean();
 
-        $part_id    = rcube_utils::get_input_string('_part', rcube_utils::INPUT_GET);
-        $file_id    = rcube_utils::get_input_string('_file', rcube_utils::INPUT_GET);
+        $part_id = rcube_utils::get_input_string('_part', rcube_utils::INPUT_GET);
+        $file_id = rcube_utils::get_input_string('_file', rcube_utils::INPUT_GET);
         $compose_id = rcube_utils::get_input_string('_id', rcube_utils::INPUT_GET);
-        $uid        = rcube_utils::get_input_string('_uid', rcube_utils::INPUT_GET);
-        $rcube      = rcube::get_instance();
+        $uid = rcube_utils::get_input_string('_uid', rcube_utils::INPUT_GET);
+        $rcube = rcmail::get_instance();
 
         $this->download = !empty($_GET['_download']);
 
@@ -65,18 +63,18 @@ class rcmail_attachment_handler
             if ($this->part) {
                 $this->filename = rcmail_action_mail_index::attachment_name($this->part);
                 $this->mimetype = $this->part->mimetype;
-                $this->size     = $this->part->size;
-                $this->ident    = $this->message->headers->messageID . ':' . $this->part->mime_id . ':' . $this->size . ':' . $this->mimetype;
-                $this->charset  = $this->part->charset ?: RCUBE_CHARSET;
+                $this->size = $this->part->size;
+                $this->ident = $this->message->headers->messageID . ':' . $this->part->mime_id . ':' . $this->size . ':' . $this->mimetype;
+                $this->charset = $this->part->charset ?: RCUBE_CHARSET;
 
                 if (empty($_GET['_frame'])) {
                     // allow post-processing of the attachment body
                     $plugin = $rcube->plugins->exec_hook('message_part_get', [
-                            'uid'      => $uid,
-                            'id'       => $this->part->mime_id,
-                            'mimetype' => $this->mimetype,
-                            'part'     => $this->part,
-                            'download' => $this->download,
+                        'uid' => $uid,
+                        'id' => $this->part->mime_id,
+                        'mimetype' => $this->mimetype,
+                        'part' => $this->part,
+                        'download' => $this->download,
                     ]);
 
                     if ($plugin['abort']) {
@@ -92,22 +90,22 @@ class rcmail_attachment_handler
                     }
                 }
             }
-        }
-        else if ($file_id && $compose_id) {
+        } elseif ($file_id && $compose_id) {
             $file_id = preg_replace('/^rcmfile/', '', $file_id);
-            $compose = $_SESSION['compose_data_' . $compose_id] ?? null;
 
-            if ($compose && ($this->upload = $compose['attachments'][$file_id])) {
+            $this->upload = $rcube->get_uploaded_file($file_id);
+
+            if ($this->upload) {
                 $this->filename = $this->upload['name'];
                 $this->mimetype = $this->upload['mimetype'];
-                $this->size     = $this->upload['size'];
-                $this->ident    = sprintf('%s:%s%s', $compose_id, $file_id, $this->size);
-                $this->charset  = !empty($this->upload['charset']) ? $this->upload['charset'] : RCUBE_CHARSET;
+                $this->size = $this->upload['size'];
+                $this->ident = sprintf('%s:%s%s', $compose_id, $file_id, $this->size);
+                $this->charset = !empty($this->upload['charset']) ? $this->upload['charset'] : RCUBE_CHARSET;
             }
         }
 
         if (empty($this->part) && empty($this->upload)) {
-            header('HTTP/1.1 404 Not Found');
+            http_response_code(404);
             exit;
         }
 
@@ -115,16 +113,6 @@ class rcmail_attachment_handler
         self::check_storage_status();
 
         $this->mimetype = rcube_mime::fix_mimetype($this->mimetype);
-    }
-
-    /**
-     * Remove temp files, etc.
-     */
-    public function __destruct()
-    {
-        if ($this->body_file) {
-            @unlink($this->body_file);
-        }
     }
 
     /**
@@ -183,52 +171,43 @@ class rcmail_attachment_handler
         if ($this->body !== null) {
             if ($fp == -1) {
                 echo $size ? substr($this->body, 0, $size) : $this->body;
-            }
-            else if ($fp) {
+            } elseif ($fp) {
                 $result = fwrite($fp, $size ? substr($this->body, $size) : $this->body) !== false;
-            }
-            else {
+            } else {
                 $result = $size ? substr($this->body, 0, $size) : $this->body;
             }
-        }
-        else if ($this->body_file) {
+        } elseif ($this->body_file) {
             if ($size) {
                 $result = file_get_contents($this->body_file, false, null, 0, $size);
-            }
-            else {
+            } else {
                 $result = file_get_contents($this->body_file);
             }
 
             if ($fp == -1) {
                 echo $result;
-            }
-            else if ($fp) {
+            } elseif ($fp) {
                 $result = fwrite($fp, $result) !== false;
             }
-        }
-        else if ($this->message) {
+        } elseif ($this->message) {
             $result = $this->message->get_part_body($this->part->mime_id, false, 0, $fp);
 
             // check connection status
             if (!$fp && $this->size && empty($result)) {
                 self::check_storage_status();
             }
-        }
-        else if ($this->upload) {
+        } elseif ($this->upload) {
             // This hook retrieves the attachment contents from the file storage backend
             $attachment = rcube::get_instance()->plugins->exec_hook('attachment_get', $this->upload);
 
             if ($fp && $fp != -1) {
                 if ($attachment['data']) {
                     $result = fwrite($fp, $size ? substr($attachment['data'], 0, $size) : $attachment['data']) !== false;
-                }
-                else if ($attachment['path']) {
-                    if ($fh = fopen($attachment['path'], 'rb')) {
-                        $result = stream_copy_to_stream($fh, $fp, $size ? $size : -1);
+                } elseif ($attachment['path']) {
+                    if ($fh = fopen($attachment['path'], 'r')) {
+                        $result = stream_copy_to_stream($fh, $fp, $size ?: -1);
                     }
                 }
-            }
-            else {
+            } else {
                 $data = $attachment['data'] ?? '';
                 if (!$data && $attachment['path']) {
                     $data = file_get_contents($attachment['path']);
@@ -236,8 +215,7 @@ class rcmail_attachment_handler
 
                 if ($fp == -1) {
                     echo $size ? substr($data, 0, $size) : $data;
-                }
-                else {
+                } else {
                     $result = $size ? substr($data, 0, $size) : $data;
                 }
             }
@@ -260,6 +238,7 @@ class rcmail_attachment_handler
             $this->body_file = $filename;
             fclose($fp);
             @chmod($filename, 0600);
+            rcmail::get_instance()->add_shutdown_function(static function () use ($filename) { @unlink($filename); });
 
             return true;
         }
@@ -292,7 +271,7 @@ class rcmail_attachment_handler
         }
 
         if ($this->body !== null && !$this->download) {
-            header("Content-Length: " . strlen($this->body));
+            header('Content-Length: ' . strlen($this->body));
             echo $this->body;
             return true;
         }
@@ -308,9 +287,9 @@ class rcmail_attachment_handler
      */
     public function html()
     {
-        list($type, $subtype) = explode('/', $this->mimetype);
+        [$type, $subtype] = explode('/', $this->mimetype);
         $part = (object) [
-            'charset'         => $this->charset,
+            'charset' => $this->charset,
             'ctype_secondary' => $subtype,
         ];
 
@@ -321,7 +300,13 @@ class rcmail_attachment_handler
         // show images?
         $is_safe = $this->is_safe();
 
-        return rcmail_action_mail_index::wash_html($body, ['safe' => $is_safe, 'inline_html' => false]);
+        if (isset($this->part->replaces)) {
+            $wash_replacements = $this->part->replaces;
+        } else {
+            $wash_replacements = [];
+        }
+
+        return rcmail_action_mail_index::wash_html($body, ['safe' => $is_safe, 'inline_html' => false], $wash_replacements);
     }
 
     /**
@@ -331,9 +316,9 @@ class rcmail_attachment_handler
     {
         // clean SVG with washtml
         $wash_opts = [
-            'show_washed'   => false,
-            'allow_remote'  => false,
-            'charset'       => RCUBE_CHARSET,
+            'show_washed' => false,
+            'allow_remote' => false,
+            'charset' => RCUBE_CHARSET,
             'html_elements' => ['title'],
         ];
 
@@ -367,14 +352,8 @@ class rcmail_attachment_handler
             if (!isset($_GET['_redirected'])) {
                 usleep(rand(10, 30) * 100000); // 1-3 sec.
                 header('Location: ' . $_SERVER['REQUEST_URI'] . '&_redirected=1');
-            }
-            else {
-                rcube::raise_error([
-                        'code' => 500, 'file' => __FILE__, 'line' => __LINE__,
-                        'message' => 'Unable to get/display message part. IMAP connection error'
-                    ],
-                    true, true
-                );
+            } else {
+                rcube::raise_error('Unable to get/display message part. IMAP connection error', true, true);
             }
 
             // Don't kill session, just quit (#1486995)

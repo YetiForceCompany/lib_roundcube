@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  +-----------------------------------------------------------------------+
  | This file is part of the Roundcube Webmail client                     |
  |                                                                       |
@@ -20,32 +20,29 @@
 
 /**
  * Spellchecking backend implementation to work with Pspell
- *
- * @package    Framework
- * @subpackage Utils
  */
 class rcube_spellchecker_pspell extends rcube_spellchecker_engine
 {
     private $plink;
-    private $matches = [];
 
     /**
      * Return a list of languages supported by this backend
      *
      * @see rcube_spellchecker_engine::languages()
      */
-    function languages()
+    #[\Override]
+    public function languages()
     {
         $defaults = ['en'];
-        $langs    = [];
+        $langs = [];
 
         // get aspell dictionaries
         exec('aspell dump dicts', $dicts);
         if (!empty($dicts)) {
             $seen = [];
             foreach ($dicts as $lang) {
-                $lang  = preg_replace('/-.*$/', '', $lang);
-                $langc = strlen($lang) == 2 ? $lang.'_'.strtoupper($lang) : $lang;
+                $lang = preg_replace('/-.*$/', '', $lang);
+                $langc = strlen($lang) == 2 ? $lang . '_' . strtoupper($lang) : $lang;
 
                 if (empty($seen[$langc])) {
                     $langs[] = $lang;
@@ -54,8 +51,7 @@ class rcube_spellchecker_pspell extends rcube_spellchecker_engine
             }
 
             $langs = array_unique($langs);
-        }
-        else {
+        } else {
             $langs = $defaults;
         }
 
@@ -69,15 +65,15 @@ class rcube_spellchecker_pspell extends rcube_spellchecker_engine
     {
         if (!$this->plink) {
             if (!extension_loaded('pspell')) {
-                $this->error = "Pspell extension not available";
+                $this->error = 'Pspell extension not available';
                 return;
             }
 
-            $this->plink = pspell_new($this->lang, '', '', RCUBE_CHARSET, PSPELL_FAST);
+            $this->plink = pspell_new($this->lang, '', '', RCUBE_CHARSET, \PSPELL_FAST);
         }
 
         if (!$this->plink) {
-            $this->error = "Unable to load Pspell engine for selected language";
+            $this->error = 'Unable to load Pspell engine for selected language';
         }
     }
 
@@ -86,29 +82,29 @@ class rcube_spellchecker_pspell extends rcube_spellchecker_engine
      *
      * @see rcube_spellchecker_engine::check()
      */
-    function check($text)
+    #[\Override]
+    public function check($text)
     {
         $this->init();
 
         if (!$this->plink) {
-            return [];
+            return false;
         }
 
         // tokenize
-        $text = preg_split($this->separator, $text, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_OFFSET_CAPTURE);
+        $text = preg_split($this->separator, $text, -1, \PREG_SPLIT_NO_EMPTY | \PREG_SPLIT_OFFSET_CAPTURE);
 
-        $diff    = 0;
+        $diff = 0;
         $matches = [];
 
         foreach ($text as $w) {
             $word = trim($w[0]);
-            $pos  = $w[1] - $diff;
-            $len  = mb_strlen($word);
+            $pos = $w[1] - $diff;
+            $len = mb_strlen($word);
 
             if ($this->dictionary->is_exception($word)) {
                 // skip exceptions
-            }
-            else if (!pspell_check($this->plink, $word)) {
+            } elseif (!pspell_check($this->plink, $word)) {
                 $suggestions = pspell_suggest($this->plink, $word);
 
                 if (count($suggestions) > self::MAX_SUGGESTIONS) {
@@ -121,7 +117,9 @@ class rcube_spellchecker_pspell extends rcube_spellchecker_engine
             $diff += (strlen($word) - $len);
         }
 
-        return $this->matches = $matches;
+        $this->matches = $matches;
+
+        return count($this->matches) == 0;
     }
 
     /**
@@ -129,7 +127,8 @@ class rcube_spellchecker_pspell extends rcube_spellchecker_engine
      *
      * @see rcube_spellchecker_engine::get_words()
      */
-    function get_suggestions($word)
+    #[\Override]
+    public function get_suggestions($word)
     {
         $this->init();
 
@@ -151,7 +150,8 @@ class rcube_spellchecker_pspell extends rcube_spellchecker_engine
      *
      * @see rcube_spellchecker_engine::get_suggestions()
      */
-    function get_words($text = null)
+    #[\Override]
+    public function get_words($text = null)
     {
         $result = [];
 
@@ -164,7 +164,7 @@ class rcube_spellchecker_pspell extends rcube_spellchecker_engine
             }
 
             // With PSpell we don't need to get suggestions to return misspelled words
-            $text = preg_split($this->separator, $text, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_OFFSET_CAPTURE);
+            $text = preg_split($this->separator, $text, -1, \PREG_SPLIT_NO_EMPTY | \PREG_SPLIT_OFFSET_CAPTURE);
 
             foreach ($text as $w) {
                 $word = trim($w[0]);

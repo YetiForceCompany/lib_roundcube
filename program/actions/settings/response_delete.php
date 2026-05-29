@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  +-----------------------------------------------------------------------+
  | This file is part of the Roundcube Webmail client                     |
  |                                                                       |
@@ -19,13 +19,14 @@
 
 class rcmail_action_settings_response_delete extends rcmail_action
 {
-    static $mode = self::MODE_AJAX;
+    public static $mode = self::MODE_AJAX;
 
     /**
      * Request handler.
      *
      * @param array $args Arguments from the previous step(s)
      */
+    #[\Override]
     public function run($args = [])
     {
         $rcmail = rcmail::get_instance();
@@ -38,8 +39,7 @@ class rcmail_action_settings_response_delete extends rcmail_action
             if (!empty($deleted)) {
                 $rcmail->output->command('display_message', $rcmail->gettext('deletedsuccessfully'), 'confirmation');
                 $rcmail->output->command('remove_response', $id);
-            }
-            else {
+            } else {
                 $msg = !empty($plugin['message']) ? $plugin['message'] : 'errorsaving';
                 $rcmail->output->show_message($msg, 'error');
             }

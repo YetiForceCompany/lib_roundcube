@@ -10,8 +10,6 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/messages/
 */
 
 $messages['errortitle']  = 'Virhe havaittu.';
@@ -102,7 +100,6 @@ $messages['nopagesizewarning'] = 'Anna sivukoko';
 $messages['nosenderwarning'] = 'Anna lähettäjän sähköpostiosoite.';
 $messages['recipientsadded'] = 'Vastaanottaja(t) lisätty onnistuneesti.';
 $messages['norecipientwarning'] = 'Anna ainakin yksi vastaanottaja';
-$messages['disclosedrecipwarning'] = 'Kaikki vastaanottajat tulevat näkemään muut vastaanottajat. Estääksesi tämän ja suojellaksesi heidän turvallisuutta käytä BCC-kenttää.';
 $messages['disclosedreciptitle'] = 'Liian monta julkista vastaanottajaa';
 $messages['nosubjectwarning']  = '"Aihe"-kenttä on tyhjä. Haluatko kirjoittaa viestillesi aiheen?';
 $messages['nosubjecttitle']  = 'Ei aihetta';
@@ -160,7 +157,6 @@ $messages['nogroupassignmentschanged'] = 'Ryhmämäärityksiä ei muutettu.';
 $messages['importwait'] = 'Tuodaan, odota...';
 $messages['importformaterror'] = 'Tuonti epäonnistui! Lähetetty tiedosto ei ole kelvollinen tuontitiedosto.';
 $messages['importconfirm'] = '<b>$inserted yhteystietoa tuotu onnistuneesti</b>';
-$messages['importconfirmskipped'] = '<b>Ohitettu $skipped  olemassa olevaa merkintää</b>';
 $messages['importmessagesuccess'] = '$nr viestiä tuotiin onnistuneesti';
 $messages['importmessageerror'] = 'Tuonti epäonnistui! Lähetetty tiedosto ei ole kelvollinen viesti tai mailbox-tiedosto';
 $messages['opnotpermitted'] = 'Toiminto ei ole sallittu!';

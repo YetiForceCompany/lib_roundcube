@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  +-----------------------------------------------------------------------+
  | This file is part of the Roundcube webmail client                     |
  |                                                                       |
@@ -20,28 +20,24 @@
 
 /**
  * Class for output generation
- *
- * @package    Framework
- * @subpackage View
  */
 abstract class rcube_output
 {
     public $browser;
+    public $skins = [];
+    public $charset = RCUBE_CHARSET;
 
     protected $app;
     protected $config;
-    protected $charset = RCUBE_CHARSET;
-    protected $env     = [];
-    protected $skins   = [];
-
+    protected $env = [];
 
     /**
      * Object constructor
      */
     public function __construct()
     {
-        $this->app     = rcube::get_instance();
-        $this->config  = $this->app->config;
+        $this->app = rcube::get_instance();
+        $this->config = $this->app->config;
         $this->browser = new rcube_browser();
     }
 
@@ -113,13 +109,13 @@ abstract class rcube_output
     /**
      * Invoke display_message command
      *
-     * @param string  $message  Message to display
-     * @param string  $type     Message type [notice|confirm|error]
-     * @param array   $vars     Key-value pairs to be replaced in localized text
-     * @param bool    $override Override last set message
-     * @param int     $timeout  Message displaying time in seconds
+     * @param string $message  Message to display
+     * @param string $type     Message type [notice|confirm|error]
+     * @param array  $vars     Key-value pairs to be replaced in localized text
+     * @param bool   $override Override last set message
+     * @param int    $timeout  Message displaying time in seconds
      */
-    abstract function show_message($message, $type = 'notice', $vars = null, $override = true, $timeout = 0);
+    abstract public function show_message($message, $type = 'notice', $vars = null, $override = true, $timeout = 0);
 
     /**
      * Redirect to a certain url.
@@ -127,12 +123,12 @@ abstract class rcube_output
      * @param array|string $p     Either a string with the action or url parameters as key-value pairs
      * @param int          $delay Delay in seconds
      */
-    abstract function redirect($p = [], $delay = 1);
+    abstract public function redirect($p = [], $delay = 1);
 
     /**
      * Send output to the client.
      */
-    abstract function send();
+    abstract public function send();
 
     /**
      * Send HTTP headers to prevent caching a page
@@ -143,18 +139,10 @@ abstract class rcube_output
             return;
         }
 
-        header("Expires: ".gmdate("D, d M Y H:i:s")." GMT");
-        header("Last-Modified: ".gmdate("D, d M Y H:i:s")." GMT");
-
-        // We need to set the following headers to make downloads work using IE in HTTPS mode.
-        if ($this->browser->ie && rcube_utils::https_check()) {
-            header('Pragma: private');
-            header("Cache-Control: private, must-revalidate");
-        }
-        else {
-            header("Cache-Control: private, no-cache, no-store, must-revalidate, post-check=0, pre-check=0");
-            header("Pragma: no-cache");
-        }
+        $this->header('Expires: ' . gmdate('D, d M Y H:i:s') . ' GMT');
+        $this->header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
+        $this->header('Cache-Control: private, no-cache, no-store, must-revalidate, post-check=0, pre-check=0');
+        $this->header('Pragma: no-cache');
     }
 
     /**
@@ -168,9 +156,9 @@ abstract class rcube_output
             return;
         }
 
-        header("Expires: " . gmdate("D, d M Y H:i:s", time()+$offset) . " GMT");
-        header("Cache-Control: max-age=$offset");
-        header("Pragma: ");
+        $this->header('Expires: ' . gmdate('D, d M Y H:i:s', time() + $offset) . ' GMT');
+        $this->header("Cache-Control: max-age={$offset}");
+        $this->header('Pragma: ');
     }
 
     /**
@@ -185,11 +173,6 @@ abstract class rcube_output
         }
 
         $headers = [];
-
-        // Unlock IE compatibility mode
-        if ($this->browser->ie) {
-            $headers['X-UA-Compatible'] = 'IE=edge';
-        }
 
         if ($privacy) {
             // Request browser to disable DNS prefetching (CVE-2010-0464)
@@ -207,7 +190,7 @@ abstract class rcube_output
         $plugin = $this->app->plugins->exec_hook('common_headers', ['headers' => $headers, 'privacy' => $privacy]);
 
         foreach ($plugin['headers'] as $header => $value) {
-            header("$header: $value");
+            $this->header("{$header}: {$value}");
         }
     }
 
@@ -233,7 +216,7 @@ abstract class rcube_output
             $params['disposition'] = 'attachment';
         }
 
-        $ctype       = 'application/octet-stream';
+        $ctype = 'application/octet-stream';
         $disposition = $params['disposition'];
 
         if (!empty($params['type']) && is_string($params['type']) && strlen($params['type']) < 256
@@ -248,7 +231,7 @@ abstract class rcube_output
                 $ctype = 'text/plain';
             }
 
-            if (strpos($ctype, 'text') === 0) {
+            if (str_starts_with($ctype, 'text')) {
                 $charset = $this->charset;
                 if (!empty($params['type_charset']) && rcube_charset::is_valid($params['type_charset'])) {
                     $charset = $params['type_charset'];
@@ -258,36 +241,32 @@ abstract class rcube_output
             }
         }
 
-        if (is_string($filename) && strlen($filename) > 0 && strlen($filename) <= 1024) {
+        // @phpstan-ignore-next-line
+        if (is_string($filename) && $filename !== '' && strlen($filename) <= 1024) {
             // For non-ascii characters we'll use RFC2231 syntax
-            if (!preg_match('/[^a-zA-Z0-9_.:,?;@+ -]/', $filename)) {
-                $disposition .= "; filename=\"{$filename}\"";
-            }
-            else {
+            $fallback_filename = preg_replace('/[^a-zA-Z0-9_.(),;@+ -]/', '_', $filename);
+            $disposition .= "; filename=\"{$fallback_filename}\"";
+
+            if ($fallback_filename != $filename) {
                 $filename = rawurlencode($filename);
-                $charset  = $this->charset;
+                $charset = $this->charset;
                 if (!empty($params['charset']) && rcube_charset::is_valid($params['charset'])) {
                     $charset = $params['charset'];
                 }
-
                 $disposition .= "; filename*={$charset}''{$filename}";
             }
         }
 
-        header("Content-Disposition: {$disposition}");
-        header("Content-Type: {$ctype}");
-
-        if ($params['disposition'] == 'attachment' && $this->browser->ie) {
-            header("Content-Type: application/force-download");
-        }
+        $this->header("Content-Disposition: {$disposition}");
+        $this->header("Content-Type: {$ctype}");
 
         if (isset($params['length'])) {
-            header("Content-Length: " . $params['length']);
+            $this->header('Content-Length: ' . $params['length']);
         }
 
         // Use strict security policy to make sure no javascript content is executed
         // img-src is needed to be able to print attachment preview page
-        header("Content-Security-Policy: default-src 'none'; img-src 'self'");
+        $this->header("Content-Security-Policy: default-src 'none'; img-src 'self'");
 
         // don't kill the connection if download takes more than 30 sec.
         if (!array_key_exists('time_limit', $params)) {
@@ -302,13 +281,13 @@ abstract class rcube_output
     /**
      * Show error page and terminate script execution
      *
-     * @param int    $code     Error code
-     * @param string $message  Error message
+     * @param int    $code    Error code
+     * @param string $message Error message
      */
     public function raise_error($code, $message)
     {
         // STUB: to be overloaded by specific output classes
-        fwrite(STDERR, "Error $code: $message\n");
+        fwrite(\STDERR, "Error {$code}: {$message}\n");
         exit(-1);
     }
 
@@ -326,21 +305,19 @@ abstract class rcube_output
     {
         static $colcounts = [];
 
-        $fname           = '_' . $name;
-        $attrib['name']  = $fname . (!empty($attrib['array']) ? '[]' : '');
+        $fname = '_' . $name;
+        $attrib['name'] = $fname . (!empty($attrib['array']) ? '[]' : '');
         $attrib['class'] = trim((!empty($attrib['class']) ? $attrib['class'] : '') . ' ff_' . $name);
 
         if ($type == 'checkbox') {
             $attrib['value'] = '1';
             $input = new html_checkbox($attrib);
-        }
-        else if ($type == 'textarea') {
+        } elseif ($type == 'textarea') {
             if (!empty($attrib['size'])) {
                 $attrib['cols'] = $attrib['size'];
             }
             $input = new html_textarea($attrib);
-        }
-        else if ($type == 'select') {
+        } elseif ($type == 'select') {
             $input = new html_select($attrib);
             if (empty($attrib['skip-empty'])) {
                 $input->add('---', '');
@@ -348,11 +325,9 @@ abstract class rcube_output
             if (!empty($attrib['options'])) {
                 $input->add(array_values($attrib['options']), array_keys($attrib['options']));
             }
-        }
-        else if ($type == 'password' || (isset($attrib['type']) && $attrib['type'] == 'password')) {
+        } elseif ($type == 'password' || (isset($attrib['type']) && $attrib['type'] == 'password')) {
             $input = new html_passwordfield($attrib);
-        }
-        else {
+        } else {
             if (!isset($attrib['type']) || ($attrib['type'] != 'text' && $attrib['type'] != 'hidden')) {
                 $attrib['type'] = 'text';
             }
@@ -366,10 +341,9 @@ abstract class rcube_output
                 if (!isset($colcounts[$name])) {
                     $colcounts[$name] = 0;
                 }
-                $idx   = intval($colcounts[$name]++);
+                $idx = intval($colcounts[$name]++);
                 $value = $postvalue[$idx] ?? null;
-            }
-            else {
+            } else {
                 $value = $postvalue;
             }
         }
@@ -388,18 +362,61 @@ abstract class rcube_output
      */
     public static function json_serialize($input, $pretty = false, $inline = true)
     {
-        $options = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_IGNORE;
+        $options = \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE | \JSON_INVALID_UTF8_IGNORE;
 
         // JSON_HEX_TAG is needed for inlining JSON inside of the <script> tag
         // if input contains a html tag it will cause issues (#6207)
         if ($inline) {
-            $options |= JSON_HEX_TAG;
+            $options |= \JSON_HEX_TAG;
         }
 
         if ($pretty) {
-            $options |= JSON_PRETTY_PRINT;
+            $options |= \JSON_PRETTY_PRINT;
         }
 
         return json_encode($input, $options);
+    }
+
+    /**
+     * A wrapper for header() function, so it can be replaced for automated tests
+     *
+     * @param string $header  The header string
+     * @param bool   $replace Replace previously set header?
+     */
+    public function header($header, $replace = true)
+    {
+        header($header, $replace);
+    }
+
+    /**
+     * A helper to send output to the browser and exit
+     *
+     * @param string $body    The output body
+     * @param array  $headers Headers
+     *
+     * @return never
+     */
+    public function sendExit($body = '', $headers = [])
+    {
+        foreach ($headers as $header) {
+            $this->header($header);
+        }
+
+        echo $body;
+        exit;
+    }
+
+    /**
+     * A helper to send HTTP error code and message to the browser, and exit.
+     *
+     * @param int    $code    The HTTP error code
+     * @param string $message The HTTP error message
+     *
+     * @return never
+     */
+    public function sendExitError($code, $message = '')
+    {
+        http_response_code($code);
+        exit($message);
     }
 }

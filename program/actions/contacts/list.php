@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  +-----------------------------------------------------------------------+
  | This file is part of the Roundcube Webmail client                     |
  |                                                                       |
@@ -27,30 +27,30 @@ class rcmail_action_contacts_list extends rcmail_action_contacts_index
      *
      * @param array $args Arguments from the previous step(s)
      */
+    #[\Override]
     public function run($args = [])
     {
         $rcmail = rcmail::get_instance();
 
         if (!empty($_GET['_page'])) {
             $page = intval($_GET['_page']);
-        }
-        else {
+        } else {
             $page = !empty($_SESSION['page']) ? $_SESSION['page'] : 1;
         }
 
         $_SESSION['page'] = $page;
 
-        $page_size  = $rcmail->config->get('addressbook_pagesize', $rcmail->config->get('pagesize', 50));
+        $page_size = $rcmail->config->get('addressbook_pagesize', $rcmail->config->get('pagesize', 50));
         $group_data = null;
 
         // Use search result
         if (($records = self::search_update(true)) !== false) {
             // sort the records
-            ksort($records, SORT_LOCALE_STRING);
+            ksort($records, \SORT_LOCALE_STRING);
 
             // create resultset object
-            $count  = count($records);
-            $first  = ($page-1) * $page_size;
+            $count = count($records);
+            $first = ($page - 1) * $page_size;
             $result = new rcube_result_set($count, $first);
 
             // we need only records for current page
@@ -62,7 +62,7 @@ class rcmail_action_contacts_list extends rcmail_action_contacts_index
         }
         // List selected directory
         else {
-            $afields  = $rcmail->config->get('contactlist_fields');
+            $afields = $rcmail->config->get('contactlist_fields');
             $contacts = self::contact_source(null, true);
 
             // get contacts for this user
@@ -75,7 +75,7 @@ class rcmail_action_contacts_list extends rcmail_action_contacts_index
 
             if (!empty($contacts->group_id)) {
                 $group_data = ['ID' => $contacts->group_id]
-                    + array_intersect_key((array) $contacts->get_group($contacts->group_id), ['name' => 1,'email' => 1]);
+                    + array_intersect_key((array) $contacts->get_group($contacts->group_id), ['name' => 1, 'email' => 1]);
             }
         }
 

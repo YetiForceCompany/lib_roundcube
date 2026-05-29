@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  +-----------------------------------------------------------------------+
  | This file is part of the Roundcube Webmail client                     |
  |                                                                       |
@@ -19,21 +19,18 @@
 
 /**
  * Class for output generation
- *
- * @package    Webmail
- * @subpackage View
  */
 class rcmail_output_cli extends rcmail_output
 {
     public $type = 'cli';
-
 
     /**
      * Call a client method
      *
      * @see rcube_output::command()
      */
-    function command($cmd, ...$args)
+    #[\Override]
+    public function command($cmd, ...$args)
     {
         // NOP
     }
@@ -43,7 +40,8 @@ class rcmail_output_cli extends rcmail_output
      *
      * @see rcube_output::add_label()
      */
-    function add_label(...$args)
+    #[\Override]
+    public function add_label(...$args)
     {
         // NOP
     }
@@ -53,7 +51,8 @@ class rcmail_output_cli extends rcmail_output
      *
      * @see rcube_output::show_message()
      */
-    function show_message($message, $type = 'notice', $vars = null, $override = true, $timeout = 0)
+    #[\Override]
+    public function show_message($message, $type = 'notice', $vars = null, $override = true, $timeout = 0)
     {
         if ($this->app->text_exists($message)) {
             $message = $this->app->gettext(['name' => $message, 'vars' => $vars]);
@@ -67,7 +66,8 @@ class rcmail_output_cli extends rcmail_output
      *
      * @see rcube_output::redirect()
      */
-    function redirect($p = [], $delay = 1)
+    #[\Override]
+    public function redirect($p = [], $delay = 1)
     {
         // NOP
     }
@@ -75,7 +75,8 @@ class rcmail_output_cli extends rcmail_output
     /**
      * Send output to the client.
      */
-    function send()
+    #[\Override]
+    public function send()
     {
         // NOP
     }

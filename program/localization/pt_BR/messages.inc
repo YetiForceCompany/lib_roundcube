@@ -10,15 +10,13 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/messages/
 */
 
 $messages['errortitle']  = 'Ocorreu um erro!';
 $messages['loginfailed']  = 'Falha no login';
 $messages['cookiesdisabled'] = 'Seu navegador não aceita cookies.';
 $messages['sessionerror'] = 'A sessão do seu navegador é inválida ou expirou';
-$messages['cookiesmismatch'] = 'Cookie imcompatível detectado. Por favor, limpar os cookies de seu navegador.';
+$messages['cookiesmismatch'] = 'Cookie incompatível detectado. Por favor, limpe os cookies de seu navegador.';
 $messages['storageerror'] = 'Falha na conexão com o servidor. Verifique se informou os dados corretamente.';
 $messages['servererror'] = 'Erro no Servidor!';
 $messages['servererrormsg'] = 'Erro no Servidor: $msg';
@@ -160,7 +158,6 @@ $messages['nogroupassignmentschanged'] = 'Nenhuma atribuição do grupo foi alte
 $messages['importwait'] = 'Importando, aguarde por favor...';
 $messages['importformaterror'] = 'Falha na importação! O arquivo enviado não está em um formato válido.';
 $messages['importconfirm'] = '<b>Foram importados com sucesso $inserted contatos</b>';
-$messages['importconfirmskipped'] = '<b>Ignorado(s) $skipped registro(s) já existente(s)</b>';
 $messages['importmessagesuccess'] = 'Importação de $nr mensagens com sucesso';
 $messages['importmessageerror'] = 'Falha na importação! O arquivo enviado não é uma mensagem ou caixa postal válida';
 $messages['opnotpermitted'] = 'Operação não permitida!';
@@ -221,7 +218,7 @@ $messages['clicktoresumesession'] = 'Clique aqui para continuar sua sessão ante
 $messages['errcomposesession'] = 'Erro na sessão de composição';
 $messages['errcomposesessionexplain'] = 'A sessão de composição solicitada não foi encontrada.';
 $messages['clicktocompose'] = 'Clique aqui para compor uma nova mensagem';
-$messages['nosupporterror'] = 'Esta característica não é suportada pelo seu navegador.';
+$messages['nosupporterror'] = 'Este recurso não é suportado pelo seu navegador.';
 $messages['siginserted'] = 'Assinatura inserida com sucesso.';
 $messages['responseinserted'] = 'Resposta inserida com sucesso.';
 $messages['noresponsesavailable'] = 'Sem respostas disponíveis';

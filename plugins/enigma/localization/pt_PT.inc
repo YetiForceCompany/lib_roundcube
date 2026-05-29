@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  +-----------------------------------------------------------------------+
  | Localization file of the Roundcube Webmail Enigma plugin              |
  |                                                                       |
@@ -10,8 +10,6 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/roundcube/roundcube-webmail/plugin-enigma/
 */
 
 $labels['encryption'] = 'Encriptação';
@@ -57,7 +55,7 @@ $labels['wholesession'] = 'toda a sessão';
 $labels['createkeys'] = 'Criar um novo par de chaves';
 $labels['importkeys'] = 'Importar chave(s)';
 $labels['exportkeys'] = 'Exportar chave(s)';
-$labels['keyactions'] = 'Acções das chaves...';
+$labels['keyactions'] = 'Ações das chaves...';
 $labels['keyremove'] = 'Remover';
 $labels['keydisable'] = 'Desactivar';
 $labels['keyrevoke'] = 'Revogar';

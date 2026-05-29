@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  +-----------------------------------------------------------------------+
  | This file is part of the Roundcube Webmail client                     |
  |                                                                       |
@@ -19,13 +19,14 @@
 
 class rcmail_action_settings_response_get extends rcmail_action
 {
-    static $mode = self::MODE_AJAX;
+    public static $mode = self::MODE_AJAX;
 
     /**
      * Request handler.
      *
      * @param array $args Arguments from the previous step(s)
      */
+    #[\Override]
     public function run($args = [])
     {
         $rcmail = rcmail::get_instance();
@@ -40,8 +41,7 @@ class rcmail_action_settings_response_get extends rcmail_action
 
                 $response['data'] = $converter->get_html();
                 $response['is_html'] = true;
-            }
-            else if (!$is_html && !empty($response['is_html'])) {
+            } elseif (!$is_html && !empty($response['is_html'])) {
                 $params = [
                     'width' => $rcmail->config->get('line_length', 72),
                     'links' => false,

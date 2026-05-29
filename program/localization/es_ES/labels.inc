@@ -10,10 +10,7 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/labels/
 */
-
 
 $labels['welcome'] = 'Bienvenido a $product';
 $labels['username'] = 'Nombre de usuario';
@@ -120,6 +117,7 @@ $labels['forwardmessage'] = 'Reenviar mensaje';
 $labels['bouncemsg'] = 'Volver a enviar (rebotar)';
 $labels['bounce'] = 'Reenviar';
 $labels['deletemessage'] = 'Eliminar mensaje';
+$labels['undeletemessage'] = 'Restaurar mensaje';
 $labels['movemessagetotrash'] = 'Mover mensaje a la papelera';
 $labels['printmessage'] = 'Imprimir este mensaje';
 $labels['previousmessage'] = 'Mostrar mensaje anterior';
@@ -135,6 +133,10 @@ $labels['markunread'] = 'Como no leído';
 $labels['markflagged'] = 'Como resaltado';
 $labels['markunflagged'] = 'Como no resaltado';
 $labels['markundeleted'] = 'Como no eliminado';
+$labels['markasread'] = 'Marcar como leído';
+$labels['markasunread'] = 'Marcar como no leído';
+$labels['markasflagged'] = 'Marcar como bandera';
+$labels['markasunflagged'] = 'Marcar como no bandera';
 $labels['moreactions'] = 'Más acciones…';
 $labels['markallread'] = 'Marcar todos como leídos';
 $labels['folders-cur'] = 'Sólo la carpeta seleccionada';
@@ -231,7 +233,7 @@ $labels['searchinterval-1M'] = 'más antiguo que un mes';
 $labels['searchinterval-1Y'] = 'más antiguo que un año';
 $labels['searchinterval1W'] = 'más reciente que una semana';
 $labels['searchinterval1M'] = 'más reciente que un mes';
-$labels['searchinterval1Y'] = 'más reciente que un año';
+$labels['searchinterval1Y'] = 'más reciente que un  año';
 $labels['openinextwin'] = 'Abrir en nueva ventana';
 $labels['emlsave'] = 'Descargar (.eml)';
 $labels['changeformattext'] = 'Mostrar en formato de texto simple';
@@ -263,7 +265,6 @@ $labels['keylength'] = 'Bits';
 $labels['keyexpired'] = 'Expirado';
 $labels['keyrevoked'] = 'Rechazado';
 $labels['bccinstead'] = 'Usar Cco';
-$labels['addheader'] = 'Añadir destinatario (cabecera)';
 $labels['insert'] = 'Insertar';
 $labels['insertcontact'] = 'Insertar contacto(s)';
 $labels['recipient'] = 'Destinatario';
@@ -360,6 +361,8 @@ $labels['instantmessenger'] = 'Mensajería instantánea';
 $labels['notes'] = 'Notas';
 $labels['male'] = 'masculino';
 $labels['female'] = 'femenino';
+$labels['nonbinary'] = 'no-binario';
+$labels['othergender'] = 'otro';
 $labels['manager'] = 'Director';
 $labels['assistant'] = 'Auxiliar';
 $labels['spouse'] = 'Cónyuge';
@@ -616,6 +619,7 @@ $labels['encryption'] = 'Cifrado';
 $labels['mailvelopeoptions'] = 'Opciones de Mailvelope';
 $labels['mailvelopemainkeyring'] = 'Usar el llavero de claves principal de Mailvelope';
 $labels['mailvelopenotfound'] = 'La extensión Mailvelope no está habilitada/instalada en su navegador.';
+$labels['mailvelopeenable'] = 'Habilitar';
 $labels['sortby'] = 'Ordenar por';
 $labels['sortasc'] = 'Orden ascendente';
 $labels['sortdesc'] = 'Orden descendente';
@@ -626,6 +630,7 @@ $labels['version'] = 'Versión';
 $labels['source'] = 'Origen';
 $labels['destination'] = 'Destino';
 $labels['license'] = 'Licencia';
+$labels['skinauthor'] = 'por $author';
 $labels['support'] = 'Obtener soporte';
 $labels['savedsearches'] = 'Búsquedas guardadas';
 $labels['dateformatY'] = 'AAAA';

@@ -10,8 +10,6 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/messages/
 */
 
 $messages['errortitle']  = 'Дошло је до грешке!';
@@ -98,7 +96,6 @@ $messages['nopagesizewarning'] = 'Унесите величину страниц
 $messages['nosenderwarning'] = 'Унесите е-адресу пошиљаоца.';
 $messages['recipientsadded'] = 'Примаоци успешно додати.';
 $messages['norecipientwarning'] = 'Унесите бар једног примаоца.';
-$messages['disclosedrecipwarning'] = 'Сви примаоци ће видети адресе осталих прималаца. Да бисте ово избегли и заштитили њихову приватност, користите БЦЦ поље.';
 $messages['disclosedreciptitle'] = 'Превише јавних корисика';
 $messages['nosubjectwarning']  = 'Поље „Наслов“ је празно. Желите ли да унесете наслов?';
 $messages['nosubjecttitle']  = 'Нема теме';
@@ -154,7 +151,6 @@ $messages['nogroupassignmentschanged'] = 'Нису измењена задуже
 $messages['importwait'] = 'Увозим, сачекајте...';
 $messages['importformaterror'] = 'Увоз није успео! Отпремљени фајл није исправан фајл увоза података.';
 $messages['importconfirm'] = '<b>Успешно увезено контаката: $inserted</b>';
-$messages['importconfirmskipped'] = '<b>Прескочено постојећих уноса: $skipped</b>';
 $messages['importmessagesuccess'] = 'Успешно увезено $nr порука';
 $messages['importmessageerror'] = 'Увоз није успео! Отпремљени фајл није исправан фајл поруке или сандучета';
 $messages['opnotpermitted'] = 'Радња није дозвољена!';

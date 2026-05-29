@@ -10,8 +10,6 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/messages/
 */
 
 $messages['errortitle']  = 'Произошла ошибка!';
@@ -102,7 +100,6 @@ $messages['nopagesizewarning'] = 'Пожалуйста, введите разм�
 $messages['nosenderwarning'] = 'Пожалуйста, введите адрес электронной почты отправителя.';
 $messages['recipientsadded'] = 'Получатель(и) успешно добавлен.';
 $messages['norecipientwarning'] = 'Пожалуйста, введите хотя бы одного получателя.';
-$messages['disclosedrecipwarning'] = 'Все получатели будут видеть адреса друг друга. Чтобы избежать этого и защитить свою частную жизнь, вы можете использовать поле BCC.';
 $messages['disclosedreciptitle'] = 'Слишком много внешних получателей';
 $messages['nosubjectwarning']  = 'Поле Тема не заполнено. Хотите заполнить его сейчас?';
 $messages['nosubjecttitle']  = 'Без темы';
@@ -160,7 +157,6 @@ $messages['nogroupassignmentschanged'] = 'Распределение по гру
 $messages['importwait'] = 'Импортирование, пожалуйста, подождите...';
 $messages['importformaterror'] = 'Ошибка импорта! Загруженный файл имеет неизвестный  формат данных.';
 $messages['importconfirm'] = '<b>Успешно импортировано $inserted контактов</b>';
-$messages['importconfirmskipped'] = '<b>Пропущено $skipped существующих записей</b>';
 $messages['importmessagesuccess'] = '$nr сообщений успешно импортировано.';
 $messages['importmessageerror'] = 'Сбой импорта! Загруженный файл не является файлом сообщения или почтового ящика';
 $messages['opnotpermitted'] = 'Действие запрещено!';

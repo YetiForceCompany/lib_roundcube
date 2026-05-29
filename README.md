@@ -1,4 +1,4 @@
-Roundcube Webmail 
+Roundcube Webmail
 =================
 [roundcube.net](https://roundcube.net)
 
@@ -11,21 +11,28 @@ Roundcube Webmail is a browser-based multilingual IMAP client with an
 application-like user interface. It provides full functionality you expect
 from an email client, including MIME support, address book, folder management,
 message searching and spell checking. Roundcube Webmail is written in PHP and
-requires the MySQL, PostgreSQL or SQLite database. With its plugin API it is
-easily extendable and the user interface is fully customizable using skins.
+requires the MariaDB, MySQL, PostgreSQL or SQLite database. With its plugin API it
+is easily extendable and the user interface is fully customizable using skins.
 
 The code designed to run on a webserver is mainly written in PHP and Javascript.
 It includes a custom framework with an IMAP library derived from [IlohaMail][iloha]
 and requires a set of external libraries (see composer.json and jsdeps.json files).
 
 
+RELEASES
+--------
+
+Roundcubemail follows the semantic versioning rules for releases. For more details please read
+[the RELEASE_MANAGEMENT file](docs/RELEASE_MANAGEMENT.md).
+
+
 INSTALLATION
 ------------
 For detailed instructions on how to install Roundcube webmail on your server,
-please refer to the INSTALL document in the same directory as this document.
+please refer to the [INSTALL.md](docs/INSTALL.md) document in the same directory as this document.
 
 If you're updating an older version of Roundcube please follow the steps
-described in the UPGRADING file.
+described in the [UPGRADING.md](docs/UPGRADING.md) file.
 
 
 BROWSER SUPPORT
@@ -36,7 +43,6 @@ inherits the browser support from there. This currently includes:
 - Chrome: (Current - 1) and Current
 - Edge: (Current - 1) and Current
 - Firefox: (Current - 1) and Current, ESR
-- Internet Explorer: 11+
 - Safari: (Current - 1) and Current
 - Opera: Current
 

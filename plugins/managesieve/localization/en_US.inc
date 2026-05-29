@@ -10,10 +10,7 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/plugin-managesieve/
 */
-
 
 $labels['filters'] = 'Filters';
 $labels['managefilters'] = 'Manage incoming mail filters';
@@ -134,6 +131,7 @@ $labels['varlowerfirst'] = 'first character lower-case';
 $labels['varupperfirst'] = 'first character upper-case';
 $labels['varquotewildcard'] = 'quote special characters';
 $labels['varlength'] = 'length';
+$labels['varencodeurl'] = 'percent-encoded (for URLs)';
 $labels['notify'] = 'Send notification';
 $labels['notifytarget'] = 'Notification target:';
 $labels['notifymessage'] = 'Notification message (optional):';
@@ -285,3 +283,4 @@ $messages['duplicate.conflict.err'] = 'Both header and unique identifier are not
 $messages['disabledaction'] = 'Action not permitted.';
 $messages['lastindexempty'] = 'Index is required when counting from end';
 $messages['noflagset'] = 'At least one flag must be selected.';
+$messages['saving.actionordererror'] = 'The \'$previous\' action must be after the \'$current\' action.';

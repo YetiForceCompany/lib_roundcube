@@ -10,8 +10,6 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/plugin-password/
 */
 
 $labels['changepasswd']  = 'Broyt loyniorð';
@@ -30,3 +28,4 @@ $messages['passwordweak'] = 'Loyniorði má innihalda minst eitt nummar og eitt 
 $messages['passwordforbidden'] = 'Loyniorð inniheldur ólóglig tekin.';
 $messages['firstloginchange'] = 'Hetta er tín fyrsta innriting. Vinarliga broyt títt loyniorð.';
 $messages['disablednotice'] = 'Skipanin er í verandi stunduni dagførd. Av tí sama, er ikki loyvt at broyta loyniorði í løtuni. Alt skuldi verið aftur til tað vanliga skjótt. Tað muga tygum orsaka. ';
+$messages['passwinhistory'] = 'Loyniorðið er nýtt áður.';

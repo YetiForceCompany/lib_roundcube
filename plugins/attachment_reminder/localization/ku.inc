@@ -9,10 +9,9 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/plugin-attachment_reminder/
 */
 
-$messages['forgotattachment'] = "Te ji bîr kir da pelekê pêve bikî?";
+$messages['missingattachment'] = "Pêvek kêm e?";
+$messages['forgotattachment'] = "Te jibîr kir da pelekê pêve bikî?";
 $messages['reminderoption'] = "Pêvekên jibîrkirî bi bîr bixe";
-$messages['keywords'] = "pêvek, pel, pêve bike, pêvekirî, pêve dike, rapêçandî, CV, tîpa bergê";
+$messages['keywords'] = "pêvek, pel, pêve bike, pêvekirî, pêve dike, girtî, CV, peyama bergê";

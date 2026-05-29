@@ -10,13 +10,11 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/plugin-zipdownload/
 */
 
 $labels['downloadall'] = 'Descargar todos los adjuntos';
-$labels['download'] = 'Descargar...';
 $labels['downloadmbox'] = 'Formato mbox (.zip)';
 $labels['downloadmaildir'] = 'Formato maildir (.zip)';
 $labels['downloademl'] = 'Fuente (.eml)';
 $labels['sizelimiterror'] = 'El tamaño total de los mensajes seleccionados supera el límite ($size)';
+$labels['download'] = 'Descargar...';

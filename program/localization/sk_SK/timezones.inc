@@ -10,8 +10,6 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/timezones/
 */
 
 $labels['tz:utc'] = 'UTC';
@@ -73,7 +71,7 @@ $labels['tz:america:adak'] = 'Adak';
 $labels['tz:america:anchorage'] = 'Anchorage';
 $labels['tz:america:anguilla'] = 'Anguilla';
 $labels['tz:america:antigua'] = 'Antigua';
-$labels['tz:america:araguaina'] = 'Araguaina';
+$labels['tz:america:araguaina'] = 'Araguaína';
 $labels['tz:america:argentina'] = 'Argentína';
 $labels['tz:america:argentina:buenos_aires'] = 'Buenos Aires';
 $labels['tz:america:argentina:catamarca'] = 'Catamarca';

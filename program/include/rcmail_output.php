@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  +-----------------------------------------------------------------------+
  | This file is part of the Roundcube Webmail client                     |
  |                                                                       |
@@ -20,23 +20,19 @@
 
 /**
  * Class for output generation
- *
- * @package    Webmail
- * @subpackage View
  */
 abstract class rcmail_output extends rcube_output
 {
-    const JS_OBJECT_NAME = 'rcmail';
-    const BLANK_GIF      = 'R0lGODlhDwAPAIAAAMDAwAAAACH5BAEAAAAALAAAAAAPAA8AQAINhI+py+0Po5y02otnAQA7';
+    public const JS_OBJECT_NAME = 'rcmail';
+    public const BLANK_GIF = 'R0lGODlhDwAPAIAAAMDAwAAAACH5BAEAAAAALAAAAAAPAA8AQAINhI+py+0Po5y02otnAQA7';
 
-    public $type      = 'html';
+    public $type = 'html';
     public $ajax_call = false;
-    public $framed    = false;
+    public $framed = false;
 
-    protected $pagetitle       = '';
+    protected $pagetitle = '';
     protected $object_handlers = [];
-    protected $devel_mode      = false;
-
+    protected $devel_mode = false;
 
     /**
      * Object constructor
@@ -67,8 +63,36 @@ abstract class rcmail_output extends rcube_output
     }
 
     /**
+     * Getter for the current skin meta data
+     */
+    public function get_skin_info($name = null)
+    {
+        $skin = $name ?? $this->config->get('skin');
+        $data = ['name' => ucfirst($skin)];
+
+        $meta = INSTALL_PATH . "skins/{$skin}/meta.json";
+        if (is_readable($meta) && ($json = json_decode(file_get_contents($meta), true))) {
+            $data = $json;
+            $data['author_link'] = !empty($json['url']) ? html::a(['href' => $json['url'], 'target' => '_blank', 'rel' => 'noopener'], rcube::Q($json['author'])) : rcube::Q($json['author']);
+            $data['license_link'] = !empty($json['license-url']) ? html::a(['href' => $json['license-url'], 'target' => '_blank', 'rel' => 'noopener', 'tabindex' => '-1'], rcube::Q($json['license'])) : rcube::Q($json['license']);
+        }
+
+        $composer = INSTALL_PATH . "/skins/{$skin}/composer.json";
+        if (is_readable($composer) && ($json = json_decode(file_get_contents($composer), true))) {
+            $data['version'] = $json['version'] ?? null;
+
+            if (!empty($json['homepage'])) {
+                $data['uri'] = $json['homepage'];
+            }
+        }
+
+        return $data;
+    }
+
+    /**
      * Delete all stored env variables and commands
      */
+    #[\Override]
     public function reset()
     {
         parent::reset();
@@ -83,22 +107,20 @@ abstract class rcmail_output extends rcube_output
      * @param string $cmd     Method to call
      * @param mixed  ...$args Method arguments
      */
-    abstract function command($cmd, ...$args);
+    abstract public function command($cmd, ...$args);
 
     /**
      * Add a localized label(s) to the client environment
      *
      * @param mixed ...$args Labels (an array of strings, or many string arguments)
      */
-    abstract function add_label(...$args);
+    abstract public function add_label(...$args);
 
     /**
      * Register a template object handler
      *
-     * @param string $name Object name
+     * @param string   $name Object name
      * @param callable $func Function name to call
-     *
-     * @return void
      */
     public function add_handler($name, $func)
     {
@@ -109,8 +131,6 @@ abstract class rcmail_output extends rcube_output
      * Register a list of template object handlers
      *
      * @param array $handlers Hash array with object=>handler pairs
-     *
-     * @return void
      */
     public function add_handlers($handlers)
     {
@@ -118,47 +138,21 @@ abstract class rcmail_output extends rcube_output
     }
 
     /**
-     * A wrapper for header() function, so it can be replaced for automated tests
+     * Return request path info
      *
-     * @param string $header  The header string
-     * @param bool   $replace Replace previously set header?
-     *
-     * @return void
+     * @return string
      */
-    public function header($header, $replace = true)
+    public static function path_info()
     {
-        header($header, $replace);
-    }
+        $path = $_SERVER['PATH_INFO']
+            ?? explode('index.php/', $_SERVER['REQUEST_URI'] ?? '')[1]
+            ?? '';
 
-    /**
-     * A helper to send output to the browser and exit
-     *
-     * @param string $body    The output body
-     * @param array  $headers Headers
-     *
-     * @return void
-     */
-    public function sendExit($body = '', $headers = [])
-    {
-        foreach ($headers as $header) {
-            header($header);
-        }
+        // Remove query params from the path
+        $path = preg_replace('/[?&].*$/', '', $path);
 
-        print $body;
-        exit;
-    }
+        $path = trim($path, "/ \t\r\n");
 
-    /**
-     * A helper to send HTTP error code and message to the browser, and exit.
-     *
-     * @param int    $code    The HTTP error code
-     * @param string $message The HTTP error message
-     *
-     * @return void
-     */
-    public function sendExitError($code, $message = '')
-    {
-        http_response_code($code);
-        exit($message);
+        return $path;
     }
 }

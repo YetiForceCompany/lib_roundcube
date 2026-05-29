@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  +-----------------------------------------------------------------------+
  | This file is part of the Roundcube Webmail client                     |
  |                                                                       |
@@ -22,9 +22,6 @@
 
 /**
  * Class to provide database session storage
- *
- * @package    Framework
- * @subpackage Core
  */
 class rcube_session_db extends rcube_session
 {
@@ -33,7 +30,6 @@ class rcube_session_db extends rcube_session
 
     /** @var string Session table name (quoted) */
     private $table_name;
-
 
     /**
      * Object constructor
@@ -65,6 +61,7 @@ class rcube_session_db extends rcube_session
      *
      * @return bool True on success, False on failure
      */
+    #[\Override]
     public function open($save_path, $session_name)
     {
         return true;
@@ -75,6 +72,7 @@ class rcube_session_db extends rcube_session
      *
      * @return bool True on success, False on failure
      */
+    #[\Override]
     public function close()
     {
         return true;
@@ -87,6 +85,7 @@ class rcube_session_db extends rcube_session
      *
      * @return bool True on success, False on failure
      */
+    #[\Override]
     public function destroy($key)
     {
         if ($key) {
@@ -103,16 +102,17 @@ class rcube_session_db extends rcube_session
      *
      * @return string Session vars (serialized string)
      */
+    #[\Override]
     public function read($key)
     {
         if ($this->lifetime) {
-            $expire_time  = $this->db->now(-$this->lifetime);
-            $expire_check = "CASE WHEN `changed` < $expire_time THEN 1 ELSE 0 END AS expired";
+            $expire_time = $this->db->now();
+            $expire_check = "CASE WHEN `expires_at` < {$expire_time} THEN 1 ELSE 0 END AS expired";
         }
 
         $sql_result = $this->db->query(
-            "SELECT `vars`, `ip`, `changed`, " . $this->db->now() . " AS ts"
-            . (isset($expire_check) ? ", $expire_check" : '')
+            'SELECT `vars`, `ip`, `expires_at`, ' . $this->db->now() . ' AS ts'
+            . (isset($expire_check) ? ", {$expire_check}" : '')
             . " FROM {$this->table_name} WHERE `sess_id` = ?", $key
         );
 
@@ -125,10 +125,10 @@ class rcube_session_db extends rcube_session
 
             $time_diff = time() - strtotime($sql_arr['ts']);
 
-            $this->changed   = strtotime($sql_arr['changed']) + $time_diff; // local (PHP) time
-            $this->ip        = $sql_arr['ip'];
-            $this->vars      = base64_decode($sql_arr['vars']);
-            $this->key       = $key;
+            $this->expires_at = strtotime($sql_arr['expires_at']) + $time_diff; // local (PHP) time
+            $this->ip = $sql_arr['ip'];
+            $this->vars = base64_decode($sql_arr['vars']);
+            $this->key = $key;
 
             $this->db->reset();
 
@@ -146,18 +146,19 @@ class rcube_session_db extends rcube_session
      *
      * @return bool True on success, False on failure
      */
-    public function write($key, $vars)
+    #[\Override]
+    protected function save($key, $vars)
     {
         if ($this->ignore_write) {
             return true;
         }
 
-        $now = $this->db->now();
+        $expires_at_str = $this->db->now($this->lifetime);
 
         $this->db->query("INSERT INTO {$this->table_name}"
-            . " (`sess_id`, `vars`, `ip`, `changed`)"
-            . " VALUES (?, ?, ?, $now)",
-            $key, base64_encode($vars), (string)$this->ip
+            . ' (`sess_id`, `vars`, `ip`, `expires_at`)'
+            . " VALUES (?, ?, ?, {$expires_at_str})",
+            $key, base64_encode($vars), (string) $this->ip
         );
 
         return true;
@@ -172,21 +173,21 @@ class rcube_session_db extends rcube_session
      *
      * @return bool True on success, False on failure
      */
-    public function update($key, $newvars, $oldvars)
+    #[\Override]
+    protected function update($key, $newvars, $oldvars)
     {
-        $now = $this->db->now();
-        $ts  = microtime(true);
+        $expires_at_str = $this->db->now($this->lifetime);
+        $ts = microtime(true);
 
         // if new and old data are not the same, update data
         // else update expire timestamp only when certain conditions are met
         if ($newvars !== $oldvars) {
             $this->db->query("UPDATE {$this->table_name} "
-                . "SET `changed` = $now, `vars` = ? WHERE `sess_id` = ?",
+                . "SET `expires_at` = {$expires_at_str}, `vars` = ? WHERE `sess_id` = ?",
                 base64_encode($newvars), $key);
-        }
-        else if ($ts - $this->changed > $this->lifetime / 2) {
-            $this->db->query("UPDATE {$this->table_name} SET `changed` = $now"
-                . " WHERE `sess_id` = ?", $key);
+        } elseif ($this->expires_at - $ts < $this->lifetime / 2) {
+            $this->db->query("UPDATE {$this->table_name} SET `expires_at` = {$expires_at_str}"
+                . ' WHERE `sess_id` = ?', $key);
         }
 
         return true;
@@ -198,11 +199,10 @@ class rcube_session_db extends rcube_session
     public function gc_db()
     {
         // just clean all old sessions when this GC is called
-        $this->db->query("DELETE FROM " . $this->db->table_name('session')
-            . " WHERE `changed` < " . $this->db->now(-$this->gc_enabled));
+        $this->db->query('DELETE FROM ' . $this->db->table_name('session')
+            . ' WHERE `expires_at` < ' . $this->db->now());
 
-        $this->log("Session GC (DB): remove records < "
-            . date('Y-m-d H:i:s', time() - $this->gc_enabled)
-            . '; rows = ' . intval($this->db->affected_rows()));
+        $this->log('Session GC (DB): removed expired records; rows = '
+            . intval($this->db->affected_rows()));
     }
 }

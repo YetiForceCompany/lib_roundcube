@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  +-----------------------------------------------------------------------+
  | This file is part of the Roundcube Webmail client                     |
  |                                                                       |
@@ -28,6 +28,7 @@ class rcmail_action_settings_prefs_edit extends rcmail_action_settings_index
      *
      * @param array $args Arguments from the previous step(s)
      */
+    #[\Override]
     public function run($args = [])
     {
         $rcmail = rcmail::get_instance();
@@ -35,12 +36,12 @@ class rcmail_action_settings_prefs_edit extends rcmail_action_settings_index
         $rcmail->output->set_pagetitle($rcmail->gettext('preferences'));
 
         self::$section = rcube_utils::get_input_string('_section', rcube_utils::INPUT_GPC);
-        list(self::$sections,) = self::user_prefs(self::$section);
+        [self::$sections] = self::user_prefs(self::$section);
 
         // register UI objects
         $rcmail->output->add_handlers([
-                'userprefs'   => [$this, 'user_prefs_form'],
-                'sectionname' => [$this, 'prefs_section_name'],
+            'userprefs' => [$this, 'user_prefs_form'],
+            'sectionname' => [$this, 'prefs_section_name'],
         ]);
 
         $rcmail->output->send('settingsedit');
@@ -56,12 +57,12 @@ class rcmail_action_settings_prefs_edit extends rcmail_action_settings_index
         unset($attrib['form']);
 
         $hidden = ['name' => '_section', 'value' => self::$section];
-        list($form_start, $form_end) = self::get_form_tags($attrib, 'save-prefs', null, $hidden);
+        [$form_start, $form_end] = self::get_form_tags($attrib, 'save-prefs', null, $hidden);
 
         $out = $form_start;
 
         if (!empty(self::$sections[self::$section]['header'])) {
-            $div_attr = ['id' => 'preferences-header', 'class' =>'boxcontent'];
+            $div_attr = ['id' => 'preferences-header', 'class' => 'boxcontent'];
             $out .= html::div($div_attr, self::$sections[self::$section]['header']);
         }
 
@@ -73,15 +74,13 @@ class rcmail_action_settings_prefs_edit extends rcmail_action_settings_index
                     if (isset($option['title'])) {
                         $table->add('title', $option['title']);
                         $table->add(null, $option['content']);
-                    }
-                    else {
+                    } else {
                         $table->add(['colspan' => 2], $option['content']);
                     }
                 }
 
                 $out .= html::tag('fieldset', $class, html::tag('legend', null, $block['name']) . $table->show($attrib));
-            }
-            else if (!empty($block['content'])) {
+            } elseif (!empty($block['content'])) {
                 $out .= html::tag('fieldset', null, html::tag('legend', null, $block['name']) . $block['content']);
             }
         }

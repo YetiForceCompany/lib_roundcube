@@ -10,10 +10,7 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/plugin-managesieve/
 */
-
 
 $labels['filters'] = 'Filtur';
 $labels['managefilters'] = 'Umsit mótakandi teldupost filtur';
@@ -54,12 +51,12 @@ $labels['messagesrules'] = 'Fyri móttiknan post:';
 $labels['messagesactions'] = '...koyr fylgjandi gerðir';
 $labels['add'] = 'Legg aftrat';
 $labels['del'] = 'Strika';
-$labels['sender'] = 'Avsendari';
+$labels['sender'] = 'Sendari';
 $labels['recipient'] = 'Móttakari';
 $labels['vacationaddr'] = 'Mínir teldupost bústaðir:';
 $labels['vacationdays'] = 'Hvussu ofta skal sendast (í døgum):';
 $labels['vacationinterval'] = 'Hvussu ofta skulu boðini sendast:';
-$labels['vacationreason'] = 'Boð innihald (feriu orsøk):';
+$labels['vacationreason'] = 'Breyðtekstur (feriu orsøk):';
 $labels['vacationfrom'] = 'Svara sendara bústaði:';
 $labels['vacationsubject'] = 'Evni á boðum:';
 $labels['days'] = 'dagar';
@@ -93,7 +90,7 @@ $labels['flagdeleted'] = 'Strika';
 $labels['flaganswered'] = 'Svara';
 $labels['flagflagged'] = 'Markera';
 $labels['flagdraft'] = 'Kladda';
-$labels['setvariable'] = 'Set variabu';
+$labels['setvariable'] = 'Set variabul';
 $labels['setvarname'] = 'Navn á variabli';
 $labels['setvarvalue'] = 'Virði á variabli';
 $labels['setvarmodifiers'] = 'Avmarkari:';
@@ -136,7 +133,7 @@ $labels['std11'] = 'dato (RFC2822)';
 $labels['zone'] = 'tíðarøki';
 $labels['weekday'] = 'vikudagur (0-6)';
 $labels['advancedopts'] = 'Víðkaðir valmøguleikar';
-$labels['body'] = 'Innihald';
+$labels['body'] = 'Breyðtekstur';
 $labels['address'] = 'Bústaður';
 $labels['envelope'] = 'brævbjálvi ';
 $labels['modifier'] = 'Broytari:';
@@ -152,7 +149,7 @@ $labels['detail'] = 'detaljur';
 $labels['comparator'] = 'Comparator:';
 $labels['default'] = 'vanligt';
 $labels['octet'] = 'strangt (octet)';
-$labels['asciicasemap'] = 'stavbundin (asciii-casemap)';
+$labels['asciicasemap'] = 'óstavbundin (asciii-casemap)';
 $labels['asciinumeric'] = 'tøl (ascii-numeric)';
 $labels['index'] = 'skrá:';
 $labels['indexlast'] = 'aftureftir';
@@ -162,7 +159,7 @@ $labels['vacation.reply'] = 'Svar innihald';
 $labels['vacation.advanced'] = 'Víðkaðir valmøguleikar';
 $labels['vacation.from'] = 'Svara sendara bústaði';
 $labels['vacation.subject'] = 'Evni';
-$labels['vacation.body'] = 'Innihald';
+$labels['vacation.body'] = 'Breyðtekstur';
 $labels['vacation.status'] = 'Støða';
 $labels['vacation.on'] = 'Tendra';
 $labels['vacation.off'] = 'Sløkt';
@@ -178,7 +175,7 @@ $labels['forward.redirect'] = 'Leið ti';
 $labels['forward.copy'] = 'Send avrit ti';
 $labels['forward.on'] = 'Tendra';
 $labels['forward.off'] = 'Sløkt';
-$labels['forward.saving'] = 'Goymur dáta...';
+$labels['forward.saving'] = 'Goymur dátur...';
 $labels['filladdresses'] = 'Fyll við øllum mínum bústaðum';
 $labels['arialabelfiltersetactions'] = 'Sílu sett gerðir';
 $labels['arialabelfilteractions'] = 'Sílu gerðir';
@@ -212,4 +209,4 @@ $messages['setexist'] = 'Sett er longu til';
 $messages['nodata'] = 'Minst eitt stað má verða valt!';
 $messages['invaliddateformat'] = 'Ógildugt dato ella formulering av dato';
 $messages['saveerror'] = 'Tað bar ikki til at goyma dáta. Ambætara feilur kom fyri.';
-$messages['emptyvacationbody'] = 'Innihaldi í feriu boðinum er kraft!';
+$messages['emptyvacationbody'] = 'Breyðtekstur er kravdur í feriuboðum!';

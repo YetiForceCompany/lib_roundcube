@@ -10,15 +10,13 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/plugin-acl/
 */
 
 $labels['sharing'] = 'Partajare';
 $labels['myrights'] = 'Drepturi de acces';
 $labels['username'] = 'Utilizator:';
 $labels['advanced'] = 'Modul avansat';
-$labels['add'] = 'Adauga';
+$labels['add'] = 'Adaugă';
 $labels['newuser'] = 'Adăugare intrare';
 $labels['editperms'] = 'Editare permisiuni';
 $labels['actions'] = 'Acțiunea drepturilor de acces...';
@@ -38,7 +36,7 @@ $labels['aclt'] = 'Ștergere mesaje';
 $labels['acle'] = 'Elimină';
 $labels['aclx'] = 'Ștergere dosar';
 $labels['acla'] = 'Administrează';
-$labels['acln'] = 'Adnotează mesajele';
+$labels['acln'] = 'Adnotează mesaje';
 $labels['aclfull'] = 'Control complet';
 $labels['aclother'] = 'Altul';
 $labels['aclread'] = 'Citeşte';

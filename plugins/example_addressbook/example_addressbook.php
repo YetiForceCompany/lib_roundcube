@@ -1,6 +1,6 @@
 <?php
 
-require_once(__DIR__ . '/example_addressbook_backend.php');
+require_once __DIR__ . '/example_addressbook_backend.php';
 
 /**
  * Sample plugin to add a new address book
@@ -14,6 +14,7 @@ class example_addressbook extends rcube_plugin
     private $abook_id = 'static';
     private $abook_name = 'Static List';
 
+    #[\Override]
     public function init()
     {
         $this->add_hook('addressbooks_list', [$this, 'address_sources']);
@@ -21,7 +22,7 @@ class example_addressbook extends rcube_plugin
 
         // use this address book for autocompletion queries
         // (maybe this should be configurable by the user?)
-        $config  = rcmail::get_instance()->config;
+        $config = rcmail::get_instance()->config;
         $sources = (array) $config->get('autocomplete_addressbooks', ['sql']);
         if (!in_array($this->abook_id, $sources)) {
             $sources[] = $this->abook_id;
@@ -34,10 +35,10 @@ class example_addressbook extends rcube_plugin
         $abook = new example_addressbook_backend($this->abook_name);
 
         $p['sources'][$this->abook_id] = [
-            'id'       => $this->abook_id,
-            'name'     => $this->abook_name,
+            'id' => $this->abook_id,
+            'name' => $this->abook_name,
             'readonly' => $abook->readonly,
-            'groups'   => $abook->groups,
+            'groups' => $abook->groups,
         ];
 
         return $p;

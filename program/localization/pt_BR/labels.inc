@@ -10,10 +10,7 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/labels/
 */
-
 
 $labels['welcome'] = 'Bem-vindo ao $product';
 $labels['username'] = 'Usuário';
@@ -120,6 +117,7 @@ $labels['forwardmessage'] = 'Encaminhar a mensagem';
 $labels['bouncemsg'] = 'Re-enviar (voltou)';
 $labels['bounce'] = 'Re-enviar';
 $labels['deletemessage'] = 'Excluir a mensagem';
+$labels['undeletemessage'] = 'Restaurar mensagem';
 $labels['movemessagetotrash'] = 'Mover a mensagem para a Lixeira';
 $labels['printmessage'] = 'Imprimir a mensagem';
 $labels['previousmessage'] = 'Mensagem Anterior';
@@ -135,6 +133,10 @@ $labels['markunread'] = 'Como não lidas';
 $labels['markflagged'] = 'Como sinalizada(s)';
 $labels['markunflagged'] = 'Como não sinalizada(s)';
 $labels['markundeleted'] = 'Como não deletado';
+$labels['markasread'] = 'Marcar como lida';
+$labels['markasunread'] = 'Marcar como não lida';
+$labels['markasflagged'] = 'Marcar como sinalizada';
+$labels['markasunflagged'] = 'Marcar como não sinalizada';
 $labels['moreactions'] = 'Mais ações...';
 $labels['markallread'] = 'Marcar tudo como lido';
 $labels['folders-cur'] = 'Somente a pasta selecionada';
@@ -263,7 +265,6 @@ $labels['keylength'] = 'Bits';
 $labels['keyexpired'] = 'Expirado';
 $labels['keyrevoked'] = 'Revogado';
 $labels['bccinstead'] = 'Usar Cco';
-$labels['addheader'] = 'Adicionar destinatário (cabeçalho)';
 $labels['insert'] = 'Inserir';
 $labels['insertcontact'] = 'Inserir contato(s)';
 $labels['recipient'] = 'Destinatário';
@@ -626,6 +627,7 @@ $labels['version'] = 'Versão';
 $labels['source'] = 'Fonte';
 $labels['destination'] = 'Destinação';
 $labels['license'] = 'Licença';
+$labels['skinauthor'] = 'por $author';
 $labels['support'] = 'Obter suporte';
 $labels['savedsearches'] = 'Pesquisas salvas';
 $labels['dateformatY'] = 'AAAA';

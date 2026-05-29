@@ -10,8 +10,6 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/messages/
 */
 
 $messages['errortitle']  = 'Xəta baş verdi!';
@@ -121,7 +119,6 @@ $messages['nogroupassignmentschanged'] = 'Qruplar arası bölgü dəyişməyib.'
 $messages['importwait'] = 'İdxal gedir, lütfən gözləyin...';
 $messages['importformaterror'] = 'İdxal xətası. Yüklənilən fayl naməlum məlumat formatına malikdir.';
 $messages['importconfirm'] = '<b>$inserted ünvanlar müvəffəqiyyətlə idxal edildi, mövcud $skipped buraxılıb</b>:<p><em>$names</em></p>';
-$messages['importconfirmskipped'] = '<b>Buraxılmış $skipped mövcud daxillər</b>';
 $messages['importmessagesuccess'] = '$nr məktublar uğurla idxal edildi';
 $messages['importmessageerror'] = 'İdxal alınmadı! Yüklənilmiş fayl düzgün məktub və ya poçt faylı deyil';
 $messages['opnotpermitted'] = 'Əməliyyat qadağandır!';

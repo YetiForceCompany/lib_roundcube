@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  +-----------------------------------------------------------------------+
  | This file is part of the Roundcube Webmail client                     |
  |                                                                       |
@@ -27,11 +27,12 @@ class rcmail_action_settings_folder_size extends rcmail_action
      *
      * @param array $args Arguments from the previous step(s)
      */
+    #[\Override]
     public function run($args = [])
     {
-        $rcmail  = rcmail::get_instance();
+        $rcmail = rcmail::get_instance();
         $storage = $rcmail->get_storage();
-        $name    = rcube_utils::get_input_string('_mbox', rcube_utils::INPUT_POST, true);
+        $name = rcube_utils::get_input_string('_mbox', rcube_utils::INPUT_POST, true);
 
         $size = $storage->folder_size($name);
 
@@ -39,8 +40,7 @@ class rcmail_action_settings_folder_size extends rcmail_action
 
         if ($size !== false) {
             $rcmail->output->command('folder_size_update', self::show_bytes($size));
-        }
-        else {
+        } else {
             self::display_server_error();
         }
 

@@ -10,8 +10,6 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/messages/
 */
 
 $messages['errortitle']  = '¡Ha ocurrido un error!';
@@ -102,7 +100,7 @@ $messages['nopagesizewarning'] = 'Por favor, introduzca un tamaño de página.';
 $messages['nosenderwarning'] = 'Por favor, introduzca la dirección de correo del remitente.';
 $messages['recipientsadded'] = 'Destinatario(s) añadido(s) con éxito.';
 $messages['norecipientwarning'] = 'Por favor, introduzca al menos un destinatario.';
-$messages['disclosedrecipwarning'] = 'Todos los receptores verán las direcciones de correo electrónico de cada uno. Para evitarlo y para proteger su privacidad puede utilizar el campo Cco';
+$messages['disclosedrecipwarning'] = 'Todos los destinatarios verán las direcciones de correo de cada uno. Para evitar esto y proteger su privacidad puede usar el campo CCO.';
 $messages['disclosedreciptitle'] = 'Demasiados destinatarios';
 $messages['nosubjectwarning']  = 'El campo "Asunto" está vacío. ¿Desea completarlo en este momento?';
 $messages['nosubjecttitle']  = 'Sin asunto';
@@ -161,6 +159,8 @@ $messages['importwait'] = 'Importando, por favor espere...';
 $messages['importformaterror'] = '¡La importación falló! El fichero enviado no es un fichero válido de importación de datos.';
 $messages['importconfirm'] = '<b>Se han importado $inserted contactos correctamente</b>';
 $messages['importconfirmskipped'] = '<b>Ignoradas $skipped entradas existentes</b>';
+$messages['importconfirminvalid'] = '<b>Ignorados $skipped contactos inválidos</b>';
+$messages['importconfirmerrors'] = '<b>Fallo al importar $errors contactos válidos</b>';
 $messages['importmessagesuccess'] = '$nr mensajes importados correctamente';
 $messages['importmessageerror'] = '¡La importación falló! El fichero enviado no es un fichero válido de mensaje o buzón de correo.';
 $messages['opnotpermitted'] = '¡Operación no permitida!';
@@ -230,3 +230,5 @@ $messages['listusebutton'] = 'Use el botón Crear para añadir un nuevo registro
 $messages['keypaircreatesuccess'] = 'Un nuevo par de claves ha sido creada con éxito para $identity.';
 $messages['emptyattachment'] = 'Parece que este archivo adjunto está vacío. <br>Por favor, consulta a la persona que lo envió.';
 $messages['oauthloginfailed'] = 'Ha fallado el inicio de sesión OAuth. Por favor, vuelva a intentarlo.';
+$messages['oauthinvalidrequest'] = 'La solicitud de autorización no era válida o estaba incompleta.';
+$messages['oauthaccessdenied'] = 'El servidor de autorización o el usuario denegó la solicitud.';

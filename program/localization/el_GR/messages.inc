@@ -10,8 +10,6 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/messages/
 */
 
 $messages['errortitle']  = 'Έχει προκύψει κάποιο σφάλμα!';
@@ -102,7 +100,7 @@ $messages['nopagesizewarning'] = 'Παρακαλώ εισάγετε μέγεθο
 $messages['nosenderwarning'] = 'Παρακαλώ εισάγετε τη διεύθυνση email του αποστολέα.';
 $messages['recipientsadded'] = 'Επιτυχής προσθήκη παραλήπτη(ών).';
 $messages['norecipientwarning'] = 'Παρακαλώ εισάγετε τουλάχιστο έναν παραλήπτη.';
-$messages['disclosedrecipwarning'] = 'Όλοι οι παραλήπτες θα βλέπουν τις διευθύνσεις email του καθενός. Για να προστατέψετε την ιδιωτικότητά τους μπορείτε να χρησιμοποιήσετε το πεδίο Bcc.';
+$messages['disclosedrecipwarning'] = 'Κάθε αποδέκτης μπορεί να δει τις ηλεκτρονικές διευθύνσεις των υπόλοιπων. Αν αυτό δεν είναι επιθυμητό, δηλαδή αν θέλουμε να προστατευθεί η ιδιωτικότητα των αποδεκτών, τότε πρέπει να χρησιμοποιηθεί το πεδίου της κρυφής κοινοποίησης αντί της απλής. ';
 $messages['disclosedreciptitle'] = 'Υπέρβαση μέγιστου αριθμού παραληπτών';
 $messages['nosubjectwarning']  = 'Το πεδίο "Θέμα" είναι άδειο. Θέλετε να εισάγετε ένα τώρα;';
 $messages['nosubjecttitle']  = 'Κανένα θέμα';
@@ -160,7 +158,6 @@ $messages['nogroupassignmentschanged'] = 'Δεν αλλαξαν οι αναθε�
 $messages['importwait'] = 'Εισαγωγή, παρακαλώ περιμένετε...';
 $messages['importformaterror'] = 'Η εισαγωγή απέτυχε! Το ανεβασμένο αρχείο δεν είναι έγκυρο αρχείο εισαγωγής δεδομένων.';
 $messages['importconfirm'] = '<b>Εισήχθησαν $inserted επαφές με επιτυχία</b>';
-$messages['importconfirmskipped'] = '<b>Παραλείφθηκαν $skipped υπάρχουσες καταχωρήσεις</b>';
 $messages['importmessagesuccess'] = 'Επιτυχής εισαγωγή $nr μηνυμάτων';
 $messages['importmessageerror'] = 'Η εισαγωγή απέτυχε! Το ανεβασμένο αρχείο δεν είναι έγκυρο αρχείο μηνύματος ή φακέλου μηνυμάτων.';
 $messages['opnotpermitted'] = 'Η λειτουργία δεν επιτρέπεται!';
@@ -230,3 +227,5 @@ $messages['listusebutton'] = 'Χρησιμοποιήστε το κουμπί Δ�
 $messages['keypaircreatesuccess'] = 'Ένα νέο ζεύγος κλειδιών δημιουργήθηκε επιτυχώς για την ταυτότητα $identity.';
 $messages['emptyattachment'] = 'Το συννημένο αρχείο φαίνεται να είναι κενό<br>Παρακαλούμε να επικοινωνήσετε με τον αποστολέα του.';
 $messages['oauthloginfailed'] = 'Η σύνδεση OAuth απέτυχε. Παρακαλούμε δοκιμάστε αργότερα.';
+$messages['oauthinvalidrequest'] = 'Το αίτημα εξουσιοδότησης ήταν άκυρο ή ελλιπές.';
+$messages['oauthaccessdenied'] = 'Ο διακομιστής εξουσιοδότησης ή ο χρήστης απέρριψε το αίτημα.';

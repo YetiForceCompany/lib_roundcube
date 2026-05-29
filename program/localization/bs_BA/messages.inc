@@ -10,8 +10,6 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/messages/
 */
 
 $messages['errortitle']  = 'Desila se greška!';
@@ -124,7 +122,6 @@ $messages['nogroupassignmentschanged'] = 'Grupni zadaci nisu mijenjani.';
 $messages['importwait'] = 'Uvoz u toku, molimo sačekajte...';
 $messages['importformaterror'] = 'Uvoz nije uspio! Dodana datoteka nije u ispravnom formatu za uvoz podataka.';
 $messages['importconfirm'] = '<b>Uspješno je uvezeno $inserted kontakata</b>';
-$messages['importconfirmskipped'] = '<b>Preskočeno $skipped postojećih unosa</b>';
 $messages['importmessagesuccess'] = 'Uspješno uvezeno $nr poruka';
 $messages['importmessageerror'] = 'Uvoz nije uspio! Dodana datoteke nije ispravna datoteka sa porukama';
 $messages['opnotpermitted'] = 'Operacija nije dozvoljena!';

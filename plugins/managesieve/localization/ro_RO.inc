@@ -10,10 +10,7 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/plugin-managesieve/
 */
-
 
 $labels['filters'] = 'Filtre';
 $labels['managefilters'] = 'Administreaza filtrele pentru mesaje primite.';
@@ -21,6 +18,8 @@ $labels['filtername'] = 'Nume filtru';
 $labels['newfilter'] = 'Filtru nou';
 $labels['filteradd'] = 'Adauga un filtru';
 $labels['filterdel'] = 'Sterge filtru.';
+$labels['actions'] = 'Acțiuni';
+$labels['scope'] = 'Scop';
 $labels['moveup'] = 'Muta mai sus';
 $labels['movedown'] = 'Muta mai jos';
 $labels['filterallof'] = 'se potriveste cu toate regulile urmatoare';

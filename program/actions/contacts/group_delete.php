@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  +-----------------------------------------------------------------------+
  | This file is part of the Roundcube Webmail client                     |
  |                                                                       |
@@ -27,10 +27,11 @@ class rcmail_action_contacts_group_delete extends rcmail_action_contacts_index
      *
      * @param array $args Arguments from the previous step(s)
      */
+    #[\Override]
     public function run($args = [])
     {
-        $rcmail   = rcmail::get_instance();
-        $source   = rcube_utils::get_input_string('_source', rcube_utils::INPUT_GPC);
+        $rcmail = rcmail::get_instance();
+        $source = rcube_utils::get_input_string('_source', rcube_utils::INPUT_GPC);
         $contacts = self::contact_source($source);
 
         if ($contacts->readonly || !$contacts->groups) {
@@ -40,14 +41,13 @@ class rcmail_action_contacts_group_delete extends rcmail_action_contacts_index
 
         if ($gid = rcube_utils::get_input_string('_gid', rcube_utils::INPUT_POST)) {
             $plugin = $rcmail->plugins->exec_hook('group_delete', [
-                    'group_id' => $gid,
-                    'source'   => $source,
+                'group_id' => $gid,
+                'source' => $source,
             ]);
 
             if (empty($plugin['abort'])) {
                 $deleted = $contacts->delete_group($gid);
-            }
-            else {
+            } else {
                 $deleted = $plugin['result'];
             }
         }
@@ -55,8 +55,7 @@ class rcmail_action_contacts_group_delete extends rcmail_action_contacts_index
         if (!empty($deleted)) {
             $rcmail->output->show_message('groupdeleted', 'confirmation');
             $rcmail->output->command('remove_group_item', ['source' => $source, 'id' => $gid]);
-        }
-        else {
+        } else {
             $error = !empty($plugin['message']) ? $plugin['message'] : 'errorsaving';
             $rcmail->output->show_message($error, 'error');
         }

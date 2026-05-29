@@ -10,8 +10,6 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/plugin-password/
 */
 
 $labels['changepasswd']  = 'Passwort ändern';
@@ -38,5 +36,6 @@ $messages['samepasswd'] = 'Das neue Passwort muss sich von dem Alten unterscheid
 $messages['passwdexpirewarning'] = 'Achtung! Ihr Passwort läuft am $expirationdatetime ab. Ändern Sie es rechtzeitig.';
 $messages['passwdexpired'] = 'Ihr Passwort ist abgelaufen, ändern Sie es jetzt!';
 $messages['passwdconstraintviolation'] = 'Passwortbeschränkungsverletzung. Passwort wahrscheinlich zu schwach.';
+$messages['pwned_mustnotbedisclosed'] = 'Das Passwort darf nicht <a href="$href" target="_blank">allgemein bekannt sein</a>.';
 $messages['pwned_isdisclosed'] = 'Dieses Passwort ist allgemein bekannt.';
 $messages['pwned_fetcherror'] = 'Die Überprüfung der Passwortstärke ist fehlgeschlagen.';

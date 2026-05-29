@@ -1,3 +1,0 @@
-files:
-  - source: /localization/en_US.inc
-    translation: /localization/%locale_with_underscore%.inc

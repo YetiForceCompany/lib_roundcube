@@ -18,9 +18,9 @@ tasks:
 
 REQUIREMENTS
 ------------
-PHP Version 7.3 or greater including:
+PHP Version 8.1 or greater including:
    - PCRE, DOM, JSON, Session, Sockets, OpenSSL, Mbstring, Filter, Ctype, Intl (required)
-   - PHP PDO with driver for either MySQL, PostgreSQL, SQL Server, Oracle or SQLite (required)
+   - PHP PDO with driver for either MySQL, PostgreSQL, or SQLite (required)
    - Iconv, Zip, Fileinfo, Exif (recommended)
    - LDAP for LDAP addressbook support (optional)
 
@@ -29,7 +29,7 @@ INSTALLATION
 ------------
 Copy all files of this directory to your project or install it in the default
 include_path directory of your webserver. Some classes of the framework require
-external libraries. See composer.json-dist for the list of required packages.
+external libraries. See composer.json for the list of required packages.
 
 
 USAGE

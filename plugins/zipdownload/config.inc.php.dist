@@ -1,8 +1,8 @@
 <?php
 
-/**
- * ZipDownload configuration file
- */
+$config = [];
+
+// ZipDownload configuration file
 
 // Zip attachments
 // Only show the link when there are more than this many attachments

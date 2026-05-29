@@ -10,8 +10,6 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/messages/
 */
 
 $messages['errortitle']  = '오류가 발생했습니다!';
@@ -160,7 +158,6 @@ $messages['nogroupassignmentschanged'] = '그룹 할당이 변경되지 않았�
 $messages['importwait'] = '가져오는 중, 잠시만 기다려주세요...';
 $messages['importformaterror'] = '가져오기를 실패했습니다! 업로드한 파일은 잘못된 가져오기 데이터 파일입니다.';
 $messages['importconfirm'] = '<b>$inserted개의 연락처를 성공적으로 가져옴<b>';
-$messages['importconfirmskipped'] = '<b>$skipped개의 기존 입력내용을  건너뜀</b>';
 $messages['importmessagesuccess'] = '$nr개의 메시지를 성공적으로 가져옴';
 $messages['importmessageerror'] = '가져오기를 실패했습니다! 업로드한 파일은 잘못된 메시지 또는 메일함 파일입니다.';
 $messages['opnotpermitted'] = '작업이 허용되지 않습니다!';

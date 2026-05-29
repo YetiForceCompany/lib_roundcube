@@ -10,8 +10,6 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/messages/
 */
 
 $messages['errortitle']  = 'Det oppsto en feil!';
@@ -102,7 +100,6 @@ $messages['nopagesizewarning'] = 'Angi sidestørrelsen';
 $messages['nosenderwarning'] = 'Angi avsenderadressen';
 $messages['recipientsadded'] = 'Mottake(e) har blitt lagt til';
 $messages['norecipientwarning'] = 'Skriv inn minst én mottaker';
-$messages['disclosedrecipwarning'] = 'Alle mottakere vil kunne se hverandre. For å unngå dette og for å beskytte deres privatliv, vennligst bruk Bcc-feltet.';
 $messages['disclosedreciptitle'] = 'For mange offentlige mottakere';
 $messages['nosubjectwarning']  = 'Emnefeltet er tomt. Vil du skrive det inn nå?';
 $messages['nosubjecttitle']  = 'Intet emne';
@@ -160,7 +157,6 @@ $messages['nogroupassignmentschanged'] = 'Ingen gruppetilordninger ble endret.';
 $messages['importwait'] = 'Importerer, vennligst vent...';
 $messages['importformaterror'] = 'Import feilet! Den opplastede filen er i feil format.';
 $messages['importconfirm'] = '<b>Importerte $inserted kontakter</b>';
-$messages['importconfirmskipped'] = '<b>Hoppet over $skipped eksisterende oppføringer</b>';
 $messages['importmessagesuccess'] = 'Kopierte $nr meldinger';
 $messages['importmessageerror'] = 'Importeringen var mislykket! Den opplastede filen er ikke en gyldig melding, eller er ikke kompatibel med meldingssystemet.';
 $messages['opnotpermitted'] = 'Handling ikke tillatt!';

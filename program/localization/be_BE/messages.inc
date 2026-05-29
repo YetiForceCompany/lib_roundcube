@@ -10,8 +10,6 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/messages/
 */
 
 $messages['errortitle']  = 'Адбылася памылка.';
@@ -102,7 +100,6 @@ $messages['nopagesizewarning'] = 'Увядзіце памер старонкі.'
 $messages['nosenderwarning'] = 'Увядзіце адрас электроннай пошты адпраўніка.';
 $messages['recipientsadded'] = 'Атрымальнік(і) паспяхова дададзены(ыя).';
 $messages['norecipientwarning'] = 'Увядзіце прынамсі аднаго атрымальніка.';
-$messages['disclosedrecipwarning'] = 'Усе атрымальнікі будуць бачыць адрасы электроннай пошты адзін аднаго. Каб прадухіліць гэта і абараніць іх прыватнасць, вы можаце выкарыстоўваць поле "Схаваная копія".';
 $messages['disclosedreciptitle'] = 'Занадта шмат публічных атрымальнікаў';
 $messages['nosubjectwarning']  = 'Тэма ліста пустая. Хочаце ўвесці?';
 $messages['nosubjecttitle']  = 'Няма тэмы';
@@ -160,7 +157,6 @@ $messages['nogroupassignmentschanged'] = 'Усе прызначэнні груп
 $messages['importwait'] = 'Імпартаванне...';
 $messages['importformaterror'] = 'Не атрымалася імпартаваць! Запампаваны файл не змяшчае прыдатных даных.';
 $messages['importconfirm'] = '<b>Паспяхова імпартаваны(а) $inserted кантакт(аў)</b>';
-$messages['importconfirmskipped'] = '<b>Прапушчана $skipped існых запісаў</b>';
 $messages['importmessagesuccess'] = 'Паспяхова імпартавана $nr лістоў';
 $messages['importmessageerror'] = 'Не атрымалася імпартаваць! Загружаны файл не ёсць прыдатным лістом альбо файлам паштовай скрыні';
 $messages['opnotpermitted'] = 'Аперацыя забароненая!';

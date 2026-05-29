@@ -10,10 +10,7 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/labels/
 */
-
 
 $labels['welcome'] = 'Fáilte go $product';
 $labels['username'] = 'Úsáideoir';
@@ -228,7 +225,6 @@ $labels['keylength'] = 'Bearta';
 $labels['keyexpired'] = 'Éagtha';
 $labels['keyrevoked'] = 'Aisghairmthe';
 $labels['bccinstead'] = 'Bain feidhm as Bcc';
-$labels['addheader'] = 'Cuir faighteoir leis (ceanntásc)';
 $labels['insert'] = 'Ionsáigh';
 $labels['recipient'] = 'Faighteoir';
 $labels['spellcheck'] = 'Litrigh';

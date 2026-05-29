@@ -10,9 +10,7 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/plugin-new_user_dialog/
 */
 
-$labels['identitydialogtitle'] = 'Por favor, completa os teus datos persoais';
-$labels['identitydialoghint'] = 'Este diálogo só aparecerá a primera vez que te conectes ao correo.';
+$labels['identitydialogtitle'] = 'Por favor, completa a túa identidade de remitente';
+$labels['identitydialoghint'] = 'Este cadro só aparece a primeira vez que se inicia sesión.';

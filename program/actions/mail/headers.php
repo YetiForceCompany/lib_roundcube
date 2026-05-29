@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  +-----------------------------------------------------------------------+
  | This file is part of the Roundcube Webmail client                     |
  |                                                                       |
@@ -26,10 +26,11 @@ class rcmail_action_mail_headers extends rcmail_action_mail_index
      *
      * @param array $args Arguments from the previous step(s)
      */
+    #[\Override]
     public function run($args = [])
     {
         $rcmail = rcmail::get_instance();
-        $uid    = rcube_utils::get_input_string('_uid', rcube_utils::INPUT_GP);
+        $uid = rcube_utils::get_input_string('_uid', rcube_utils::INPUT_GP);
         $inline = $rcmail->output instanceof rcmail_output_html;
 
         if (!$uid) {
@@ -38,26 +39,28 @@ class rcmail_action_mail_headers extends rcmail_action_mail_index
 
         if ($pos = strpos($uid, '.')) {
             $message = new rcube_message($uid);
-            $source  = $message->get_part_body(substr($uid, $pos + 1));
-            $source  = substr($source, 0, strpos($source, "\r\n\r\n"));
-        }
-        else {
+            $source = $message->get_part_body(substr($uid, $pos + 1));
+
+            if (is_string($source)) {
+                $source = substr($source, 0, strpos($source, "\r\n\r\n"));
+            }
+        } else {
             $source = $rcmail->storage->get_raw_headers($uid);
         }
 
         if ($source !== false) {
             $source = trim(rcube_charset::clean($source));
-            $source = htmlspecialchars($source, ENT_COMPAT | ENT_HTML401, RCUBE_CHARSET);
+            $source = htmlspecialchars($source, \ENT_COMPAT | \ENT_HTML401, RCUBE_CHARSET);
             $source = preg_replace(
                 [
                     '/\n[\t\s]+/',
                     '/^([a-z0-9_:-]+)/im',
-                    '/\r?\n/'
+                    '/\r?\n/',
                 ],
                 [
                     "\n&nbsp;&nbsp;&nbsp;&nbsp;",
                     '<font class="bold">\1</font>',
-                    '<br />'
+                    '<br />',
                 ],
                 $source
             );
@@ -68,12 +71,10 @@ class rcmail_action_mail_headers extends rcmail_action_mail_index
 
             if ($inline) {
                 $rcmail->output->set_env('dialog_class', 'text-nowrap');
-            }
-            else {
+            } else {
                 $rcmail->output->command('set_headers', $source);
             }
-        }
-        else if (!$inline) {
+        } elseif (!$inline) {
             $rcmail->output->show_message('messageopenerror', 'error');
         }
 

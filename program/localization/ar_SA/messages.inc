@@ -10,8 +10,6 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/messages/
 */
 
 $messages['errortitle']  = 'حدث خطأ!';
@@ -59,6 +57,8 @@ $messages['contactnameexists'] = 'هناك مُرسال له نفس الإسم �
 $messages['blockedimages'] = 'لحماية خصوصيتك، تم حجب الصور الغير مضمنة(البعيدة) في هذه الرسالة.';
 $messages['blockedresources'] = 'لحماية خصوصيتك تم حظر الموارد البعيدة.';
 $messages['suspiciousemail'] = 'تحتوي هذه الرسالة على عناوين بريد إلكتروني مشبوهة قد تكون احتيالية.';
+$messages['bccemail'] = 'تحتوي الرسالة (الرسائل) المعاد توجيهها على مستلمين مخفيين (نسخة مخفية).';
+$messages['bouncehint'] = 'سيتم إرسال الرسالة دون أي تعديلات، أي باستخدام النص الأصلي والمقدمات والمستلمين.';
 $messages['encryptedmessage'] = 'هذه الرسالة مشفرة ولا يمكن عرضها. عذراً!';
 $messages['externalmessagedecryption'] = 'هذه رسالة مشفرة ويمكن فك تشفيرها بملحق المتصفح الخاص بك.';
 $messages['nopubkeyfor'] = 'لم يتم العثور على مفتاح عام صالح لـ $email';
@@ -100,7 +100,7 @@ $messages['nopagesizewarning'] = 'الرجاء إدخال حجم الصفحة';
 $messages['nosenderwarning'] = 'الرجاء إدخال عنوان البريد الإلكتروني للمرسِل.';
 $messages['recipientsadded'] = 'تمت إضافة المستلم(ين) بنجاح.';
 $messages['norecipientwarning'] = 'الرجاء إدخال اسم مستقبل واحد على الأقل';
-$messages['disclosedrecipwarning'] = 'سيرى جميع المستلمين عناوين البريد الإلكتروني لبعضهم البعض. لمنع ذلك وحماية خصوصيتهم ، يمكنك استخدام حقل نسخة مخفية الوجهة.';
+$messages['disclosedrecipwarning'] = 'سيتمكن جميع المستلمين من رؤية عناوين البريد الإلكتروني لبعضهم البعض. لتجنب ذلك وحماية خصوصيتهم، يمكنك استخدام حقل "نسخة مخفية".';
 $messages['disclosedreciptitle'] = 'عدد كبير جدًا من المستلمين العامين';
 $messages['nosubjectwarning']  = 'حقل "الموضوع" فارغ. هل تريد كتابة موضوعللرسالة؟';
 $messages['nosubjecttitle']  = 'لا يوجد عنوان';
@@ -119,6 +119,8 @@ $messages['nospellerrors'] = 'لم يعثر على أية أخطاء إملائ�
 $messages['folderdeleted'] = 'تم حذف المجلد بنجاح';
 $messages['foldersubscribed'] = 'تم الإشتراك في المجلد بنجاح';
 $messages['folderunsubscribed'] = 'تم إلغاء الإشتراك في المجلد بنجاح';
+$messages['folderpurged'] = 'تم إفراغ المجلد بنجاح.';
+$messages['folderexpunged'] = 'تم ضغط المجلد بنجاح.';
 $messages['deletedsuccessfully'] = 'تم الحذف بنجاح';
 $messages['converting'] = 'إزالة التنسيق من الرسالة...';
 $messages['messageopenerror'] = 'تعذرت قراءة الرسالة من الخادم';
@@ -156,7 +158,9 @@ $messages['nogroupassignmentschanged'] = 'لم يتم تغيير مهام الم
 $messages['importwait'] = 'جاري الاستيراد، رجاء انتظر...';
 $messages['importformaterror'] = 'فشل في الاستيراد! الملف الذي تحاول رفعة ليس ملف استيراد صالح. ';
 $messages['importconfirm'] = '<b>تم استيراد $inserted مراسلين بنجاح، وتجاهل$skipped موجودين مسبقاً</b>:<p><em>$names</em></p>';
-$messages['importconfirmskipped'] = '<b>تم تجاهل $skipped عناصر موجودة</b>';
+$messages['importconfirmskipped'] = '<b>تم تخطي $skipped جهة/جهات اتصال موجودة</b>';
+$messages['importconfirminvalid'] = '<b>تم تخطي $invalid جهة/جهات اتصال غير صالحة</b>';
+$messages['importconfirmerrors'] = '<b>فشل استيراد $errors جهة/جهات اتصال صالحة</b>';
 $messages['importmessagesuccess'] = 'تم استرداد $nr رسالة بنجاح';
 $messages['importmessageerror'] = 'فشل في الاستيراد! الملف الذي تحاول رفعة ليس رسالة او صندوق بريد صالح. ';
 $messages['opnotpermitted'] = 'العملية ممنوعة!';
@@ -226,3 +230,5 @@ $messages['listusebutton'] = 'استخدم الزر "إنشاء" لإضافة س
 $messages['keypaircreatesuccess'] = 'تم إنشاء زوج مفاتيح جديد بنجاح لـ $identity .';
 $messages['emptyattachment'] = 'يبدو أن هذا المرفق فارغ. <br>من فضلك ، تحقق مع الشخص الذي أرسل هذا.';
 $messages['oauthloginfailed'] = 'فشل تسجيل الدخول إلى OAuth. حاول مرة أخرى.';
+$messages['oauthinvalidrequest'] = 'طلب التفويض غير صالح أو غير مكتمل.';
+$messages['oauthaccessdenied'] = 'رفض خادم التفويض أو المستخدم الطلب.';

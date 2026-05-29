@@ -10,10 +10,7 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/plugin-managesieve/
 */
-
 
 $labels['filters'] = 'Filtre';
 $labels['managefilters'] = 'Správa filtrov prichádzajúcej pošty';
@@ -57,7 +54,7 @@ $labels['messagecopyto'] = 'Kopírovať správu do';
 $labels['messagesendcopy'] = 'Poslať kópiu správy na adresu';
 $labels['messagereply'] = 'Odpovedať správou';
 $labels['messagedelete'] = 'Vymazať správu';
-$labels['messagediscard'] = 'Vymazať a poslať správu na';
+$labels['messagediscard'] = 'Vymazať a informovať odosielateľa';
 $labels['messagekeep'] = 'Ponechať správu v Doručenej pošte';
 $labels['messagesrules'] = 'Pre prichádzajúcu poštu:';
 $labels['messagesactions'] = '...vykonať tieto akcie:';
@@ -284,3 +281,4 @@ $messages['duplicate.conflict.err'] = 'Hlavička a aj unikátny identifikátor n
 $messages['disabledaction'] = 'Akcia nie je povolená.';
 $messages['lastindexempty'] = 'Index sa vyžaduje pri počítaní od konca';
 $messages['noflagset'] = 'Musí byť vybraný aspoň jeden príznak.';
+$messages['saving.actionordererror'] = 'Akcia \'$previous\' musí nasledovať po akcii \'$current\'.';

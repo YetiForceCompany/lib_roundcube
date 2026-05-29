@@ -10,8 +10,6 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/messages/
 */
 
 $messages['errortitle']  = '¡Hebo un fallu!';
@@ -124,7 +122,6 @@ $messages['nogroupassignmentschanged'] = 'Nun hai cambeos n\'asignación de grup
 $messages['importwait'] = 'Importando, dame un minutín...';
 $messages['importformaterror'] = '¡La importación falló! El ficheru unviáu nun ye un ficheru válidu d\'importación.';
 $messages['importconfirm'] = '<b>Importáronse correchamente $inserted contautos</b>';
-$messages['importconfirmskipped'] = '<b>Inoraes $skipped entraes esistentes</b>';
 $messages['importmessagesuccess'] = '$nr mensaxes importaos con éxitu';
 $messages['importmessageerror'] = '¡Falló la importación! El ficheru xubíu nun ye un ficheru válidu de mensaxe o buzón de corréu';
 $messages['opnotpermitted'] = '¡Nun tienes permisu pa facelo!';

@@ -10,8 +10,6 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/labels/
 */
 
 $labels = [];
@@ -143,6 +141,7 @@ $labels['forwardmessage'] = 'Forward the message';
 $labels['bouncemsg'] = 'Resend (bounce)';
 $labels['bounce'] = 'Resend';
 $labels['deletemessage'] = 'Delete message';
+$labels['undeletemessage'] = 'Undelete message';
 $labels['movemessagetotrash'] = 'Move message to trash';
 $labels['printmessage'] = 'Print this message';
 $labels['previousmessage'] = 'Show previous message';
@@ -158,6 +157,10 @@ $labels['markunread'] = 'As unread';
 $labels['markflagged'] = 'As flagged';
 $labels['markunflagged'] = 'As unflagged';
 $labels['markundeleted'] = 'As not deleted';
+$labels['markasread'] = 'Mark as read';
+$labels['markasunread'] = 'Mark as unread';
+$labels['markasflagged'] = 'Mark as flagged';
+$labels['markasunflagged'] = 'Mark as unflagged';
 $labels['moreactions'] = 'More actions...';
 $labels['markallread'] = 'Mark all as read';
 $labels['folders-cur'] = 'Selected folder only';
@@ -260,7 +263,10 @@ $labels['searchinterval-1Y'] = 'older than a year';
 $labels['searchinterval1W'] = 'younger than a week';
 $labels['searchinterval1M'] = 'younger than a month';
 $labels['searchinterval1Y'] = 'younger than a year';
+$labels['infolder'] = 'Folder: $folder';
 
+$labels['currentaddressbook'] = 'Current address book';
+$labels['alladdressbooks'] = 'All address books';
 $labels['openinextwin'] = 'Open in new window';
 $labels['emlsave'] = 'Download (.eml)';
 $labels['changeformattext'] = 'Display in plain text format';
@@ -294,7 +300,7 @@ $labels['keylength'] = 'Bits';
 $labels['keyexpired'] = 'Expired';
 $labels['keyrevoked'] = 'Revoked';
 $labels['bccinstead'] = 'Use Bcc';
-$labels['addheader'] = 'Add recipient (header)';
+$labels['addheader'] = 'Add field (Cc, Bcc, ...)';
 $labels['insert'] = 'Insert';
 $labels['insertcontact'] = 'Insert contact(s)';
 $labels['recipient'] = 'Recipient';
@@ -404,6 +410,8 @@ $labels['instantmessenger'] = 'IM';
 $labels['notes'] = 'Notes';
 $labels['male'] = 'male';
 $labels['female'] = 'female';
+$labels['nonbinary'] = 'non-binary';
+$labels['othergender'] = 'other';
 $labels['manager'] = 'Manager';
 $labels['assistant'] = 'Assistant';
 $labels['spouse'] = 'Spouse';
@@ -500,6 +508,9 @@ $labels['importmapdesc'] = 'Confirm the field mapping information below is corre
 $labels['fieldnotmapped'] = 'Field not mapped (do not import)';
 $labels['skipheader'] = 'Do not import first line (headers)';
 $labels['done'] = 'Done';
+$labels['birth_day'] = 'Birth Day';
+$labels['birth_month'] = 'Birth Month';
+$labels['birth_year'] = 'Birth Year';
 
 // settings
 $labels['settingsfor'] = 'Settings for';
@@ -606,6 +617,7 @@ $labels['automarkread'] = 'Mark messages as read';
 $labels['afternseconds'] = 'after $n seconds';
 $labels['reqmdn'] = 'Always request a return receipt';
 $labels['reqdsn'] = 'Always request a delivery status notification';
+$labels['alwayskeepformatting'] = 'Always keep original text formatting';
 $labels['replysamefolder'] = 'Place replies in the folder of the message being replied to';
 $labels['defaultabook'] = 'Default address book';
 $labels['autocompletesingle'] = 'Skip alternative email addresses in autocompletion';
@@ -624,6 +636,8 @@ $labels['spellcheckignoresyms'] = 'Ignore words with symbols';
 $labels['spellcheckignorenums'] = 'Ignore words with numbers';
 $labels['spellcheckignorecaps'] = 'Ignore words with all letters capitalized';
 $labels['addtodict'] = 'Add to dictionary';
+$labels['editoroptions'] = 'Editor Options';
+$labels['enableautolink'] = 'Automatically convert valid URLs into hyperlinks';
 $labels['mailtoprotohandler'] = 'Register protocol handler for mailto: links';
 $labels['standardwindows'] = 'Handle popups as standard windows';
 $labels['forwardmode'] = 'Messages forwarding';
@@ -674,6 +688,7 @@ $labels['encryption'] = 'Encryption';
 $labels['mailvelopeoptions'] = 'Mailvelope options';
 $labels['mailvelopemainkeyring'] = 'Use Mailvelope main keyring';
 $labels['mailvelopenotfound'] = 'Mailvelope extension is not enabled/installed in your browser.';
+$labels['mailvelopeenable'] = 'Enable';
 
 $labels['sortby'] = 'Sort by';
 $labels['sortasc'] = 'Sort ascending';
@@ -686,6 +701,7 @@ $labels['version'] = 'Version';
 $labels['source'] = 'Source';
 $labels['destination'] = 'Destination';
 $labels['license'] = 'License';
+$labels['skinauthor'] = 'by $author';
 $labels['support'] = 'Get support';
 $labels['savedsearches'] = 'Saved searches';
 

@@ -10,15 +10,13 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/plugin-acl/
 */
 
 $labels['sharing'] = 'Deiling';
 $labels['myrights'] = 'Atgongdar-rættindi';
 $labels['username'] = 'Brúkari:';
 $labels['advanced'] = 'Víðkað útgáva';
-$labels['add'] = 'Legg aftrat';
+$labels['add'] = 'Legg afturat';
 $labels['newuser'] = 'Legg inn';
 $labels['editperms'] = 'Broyt atgonguloyvi';
 $labels['actions'] = 'Stillingar til atgongu-rættindi';
@@ -27,7 +25,7 @@ $labels['anonymous'] = 'Gestir (dulnevnd)';
 $labels['identifier'] = 'dátuheiti';
 $labels['acll'] = 'Slá upp';
 $labels['aclr'] = 'Les boð';
-$labels['acls'] = 'Varveit lisna støðu';
+$labels['acls'] = 'Varðveit lisna støðu';
 $labels['aclw'] = 'Hvít Fløgg';
 $labels['acli'] = 'Set inn (Copy into)';
 $labels['aclp'] = 'Send';

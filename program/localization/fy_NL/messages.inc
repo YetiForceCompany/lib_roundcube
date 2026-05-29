@@ -10,8 +10,6 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/messages/
 */
 
 $messages['errortitle']  = 'Der is in flater bard!';
@@ -87,7 +85,6 @@ $messages['nonamewarning']  = 'Fier in namme yn.';
 $messages['nopagesizewarning'] = 'Fier in side grutte yn.';
 $messages['nosenderwarning'] = 'Fier stjoerder e-post adres yn.';
 $messages['norecipientwarning'] = 'Fier op syn minst ien ûntfanger yn.';
-$messages['disclosedrecipwarning'] = 'Alle ûntfangers sjoche de oare e-post adressen. Om dat te foarkommen en harren privacy te beskermjen kinne jo gebrûk meitsje fan it Bcc fjild.';
 $messages['disclosedreciptitle'] = 'Tefolle iepenbiere ûntfangers';
 $messages['nosubjectwarning']  = 'It "Underwerp" fjild is leech. Wolle jo no ien ynfiere?';
 $messages['nosubjecttitle']  = 'Gjin ûnderwerp';
@@ -141,7 +138,6 @@ $messages['nogroupassignmentschanged'] = 'Gjin groep opdrachten feroare.';
 $messages['importwait'] = 'Ymportearjen, in amerijke...';
 $messages['importformaterror'] = 'Ymport mislearre! It opladen bestân is net in jildich ymport data bestân.';
 $messages['importconfirm'] = '<b>Mei sukses ymportearre $inserted kontakten</b>';
-$messages['importconfirmskipped'] = '<b>Oerslein $skipped besteande weardes</b>';
 $messages['importmessagesuccess'] = 'Mei sukses $nr berjochten ymportearre';
 $messages['importmessageerror'] = 'Ymport mislearre! It opladen bestân is net in jildich berjocht of postfek bestân';
 $messages['opnotpermitted'] = 'Operaasje net tastien!';

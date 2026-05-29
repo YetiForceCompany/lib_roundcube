@@ -10,17 +10,14 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/labels/
 */
-
 
 $labels['welcome'] = 'Tervetuloa $product -käyttäjäksi';
 $labels['username'] = 'Käyttäjätunnus';
 $labels['password'] = 'Salasana';
 $labels['server'] = 'Palvelin';
 $labels['login'] = 'Kirjaudu';
-$labels['oauthlogin'] = 'Kirjaudu palveluntarjoajalla $provider';
+$labels['oauthlogin'] = 'Kirjaudu palveluntarjoajan $provider avulla';
 $labels['menu'] = 'Valikko';
 $labels['logout'] = 'Kirjaudu ulos';
 $labels['mail'] = 'Sähköposti';
@@ -120,6 +117,7 @@ $labels['forwardmessage'] = 'Välitä viesti';
 $labels['bouncemsg'] = 'Lähetä edelleen (bounce)';
 $labels['bounce'] = 'Lähetä edelleen';
 $labels['deletemessage'] = 'Poista viesti';
+$labels['undeletemessage'] = 'Kumoa viestin poisto';
 $labels['movemessagetotrash'] = 'Siirrä viesti roskakoriin';
 $labels['printmessage'] = 'Tulosta viesti';
 $labels['previousmessage'] = 'Näytä edellinen viesti';
@@ -130,13 +128,17 @@ $labels['backtolist'] = 'Takaisin viesteihin';
 $labels['viewsource'] = 'Näytä lähdekoodi';
 $labels['mark'] = 'Merkitse';
 $labels['markmessages'] = 'Merkitse viestit';
-$labels['markread'] = 'luetuiksi';
-$labels['markunread'] = 'ei-luetuiksi';
-$labels['markflagged'] = 'korostetuiksi';
-$labels['markunflagged'] = 'ei-korostetuiksi';
-$labels['markundeleted'] = 'poistamattomaksi';
+$labels['markread'] = 'Luetuksi';
+$labels['markunread'] = 'Lukemattomaksi';
+$labels['markflagged'] = 'Korostetuksi';
+$labels['markunflagged'] = 'Korostamattomaksi';
+$labels['markundeleted'] = 'Poistamattomaksi';
+$labels['markasread'] = 'Merkitse luetuksi';
+$labels['markasunread'] = 'Merkitse lukemattomaksi';
+$labels['markasflagged'] = 'Merkitse korostetuksi';
+$labels['markasunflagged'] = 'Merkitse korostamattomaksi';
 $labels['moreactions'] = 'Lisää toimintoja...';
-$labels['markallread'] = 'Merkitse kaikki luetuksi';
+$labels['markallread'] = 'Merkitse kaikki luetuiksi';
 $labels['folders-cur'] = 'Vain valittu kansio';
 $labels['folders-sub'] = 'Valittu kansio ja alikansiot';
 $labels['folders-all'] = 'Kaikki kansiot';
@@ -155,7 +157,7 @@ $labels['selection'] = 'Valinta';
 $labels['all'] = 'Kaikki';
 $labels['none'] = 'Ei mikään';
 $labels['currpage'] = 'Nykyinen sivu';
-$labels['isread'] = 'Lue';
+$labels['isread'] = 'Luettu';
 $labels['unread'] = 'Lukemattomat';
 $labels['flagged'] = 'Korostettu';
 $labels['unflagged'] = 'Ei merkitty';
@@ -263,7 +265,6 @@ $labels['keylength'] = 'Bittiä';
 $labels['keyexpired'] = 'Vanhentunut';
 $labels['keyrevoked'] = 'Kumottu';
 $labels['bccinstead'] = 'Käytä Piilokopiota';
-$labels['addheader'] = 'LIsää vastaanottaja (header)';
 $labels['insert'] = 'Lisää';
 $labels['insertcontact'] = 'Lisää yhteystieto(ja)';
 $labels['recipient'] = 'Vastaanottaja';
@@ -546,7 +547,7 @@ $labels['replyandforwardonly'] = 'vain vastauksiin ja välityksiin';
 $labels['insertsignature'] = 'Lisää allekirjoitus';
 $labels['sigbelow'] = 'Aseta allekirjoitus lainatun viestin alapuolelle';
 $labels['sigseparator'] = 'Pakota standardi erotin allekirjoituksissa';
-$labels['automarkread'] = 'Merkitse viestit luetuksi';
+$labels['automarkread'] = 'Merkitse viestit luetuiksi';
 $labels['afternseconds'] = '$n sekunnin jälkeen';
 $labels['reqmdn'] = 'Pyydä aina kuittausviestiä';
 $labels['reqdsn'] = 'Pyydä aina toimituksen tilailmoitus';
@@ -626,6 +627,7 @@ $labels['version'] = 'Versio';
 $labels['source'] = 'Lähde';
 $labels['destination'] = 'Kohde';
 $labels['license'] = 'Lisenssi';
+$labels['skinauthor'] = 'Tekijältä $author';
 $labels['support'] = 'Hanki tukea';
 $labels['savedsearches'] = 'Tallennetut haut';
 $labels['dateformatY'] = 'VVVV';

@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  +-----------------------------------------------------------------------+
  | This file is part of the Roundcube Webmail client                     |
  |                                                                       |
@@ -26,23 +26,18 @@ class rcmail_action_settings_upload_display extends rcmail_action
      *
      * @param array $args Arguments from the previous step(s)
      */
+    #[\Override]
     public function run($args = [])
     {
-        $from = rcube_utils::get_input_string('_from', rcube_utils::INPUT_GET);
-        $type = preg_replace('/(add|edit)-/', '', $from);
-
-        // Plugins in Settings may use this file for some uploads (#5694)
-        // Make sure it does not contain a dot, which is a special character
-        // when using rcube_session::append() below
-        $type = str_replace('.', '-', $type);
-
-        $id = 'undefined';
-
-        if (preg_match('/^rcmfile(\w+)$/', $_GET['_file'], $regs)) {
+        if (!empty($_GET['_file']) && preg_match('/^rcmfile(\w+)$/', $_GET['_file'], $regs)) {
             $id = $regs[1];
+        } else {
+            exit;
         }
 
-        self::display_uploaded_file($_SESSION[$type]['files'][$id]);
+        $file = rcmail::get_instance()->get_uploaded_file($id);
+
+        self::display_uploaded_file($file);
 
         exit;
     }

@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  +-----------------------------------------------------------------------+
  | This file is part of the Roundcube Webmail client                     |
  |                                                                       |
@@ -26,6 +26,7 @@ class rcmail_action_settings_identities extends rcmail_action
      *
      * @param array $args Arguments from the previous step(s)
      */
+    #[\Override]
     public function run($args = [])
     {
         $rcmail = rcmail::get_instance();
@@ -35,7 +36,7 @@ class rcmail_action_settings_identities extends rcmail_action
         $rcmail->output->set_env('identities_level', (int) $rcmail->config->get('identities_level', 0));
         $rcmail->output->add_label('deleteidentityconfirm');
         $rcmail->output->add_handlers([
-                'identitieslist' => [$this, 'identities_list'],
+            'identitieslist' => [$this, 'identities_list'],
         ]);
 
         $rcmail->output->send('identities');
@@ -58,8 +59,8 @@ class rcmail_action_settings_identities extends rcmail_action
 
         // get all identities from DB and define list of cols to be displayed
         $plugin = $rcmail->plugins->exec_hook('identities_list', [
-                'list' => $list,
-                'cols' => ['mail']
+            'list' => $list,
+            'cols' => ['mail'],
         ]);
 
         // @TODO: use <UL> instead of <TABLE> for identities list

@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  +-----------------------------------------------------------------------+
  | This file is part of the Roundcube Webmail client                     |
  |                                                                       |
@@ -21,9 +21,6 @@
 /**
  * Database independent query interface
  * This is a wrapper for the PHP PDO
- *
- * @package    Framework
- * @subpackage Database
  */
 class rcube_db_sqlite extends rcube_db
 {
@@ -32,6 +29,7 @@ class rcube_db_sqlite extends rcube_db
     /**
      * Prepare connection
      */
+    #[\Override]
     protected function conn_prepare($dsn)
     {
         // Create database file, required by PDO to exist on connection
@@ -48,6 +46,7 @@ class rcube_db_sqlite extends rcube_db
     /**
      * Configure connection, create database if not exists
      */
+    #[\Override]
     protected function conn_configure($dsn, $dbh)
     {
         // Initialize database structure in file is empty
@@ -65,21 +64,19 @@ class rcube_db_sqlite extends rcube_db
                     $this->db_error_msg = sprintf('[%s] %s', $error[1], $error[2]);
 
                     rcube::raise_error([
-                            'code' => 500, 'type' => 'db',
-                            'line' => __LINE__, 'file' => __FILE__,
-                            'message' => $this->db_error_msg
-                        ],
-                        true, false
-                    );
+                        'code' => 500,
+                        'type' => 'db',
+                        'message' => $this->db_error_msg,
+                    ], true, false);
                 }
             }
         }
 
         // Enable WAL mode to fix locking issues like #8035.
-        $dbh->query("PRAGMA journal_mode = WAL");
+        $dbh->query('PRAGMA journal_mode = WAL');
 
         // Enable foreign keys (requires sqlite 3.6.19 compiled with FK support)
-        $dbh->query("PRAGMA foreign_keys = ON");
+        $dbh->query('PRAGMA foreign_keys = ON');
     }
 
     /**
@@ -87,12 +84,14 @@ class rcube_db_sqlite extends rcube_db
      *
      * @param string $field Field name
      *
-     * @return string  SQL statement to use in query
+     * @return string SQL statement to use in query
+     *
      * @deprecated
      */
+    #[\Override]
     public function unixtimestamp($field)
     {
-        return "strftime('%s', $field)";
+        return "strftime('%s', {$field})";
     }
 
     /**
@@ -102,6 +101,7 @@ class rcube_db_sqlite extends rcube_db
      *
      * @return string SQL function to use in query
      */
+    #[\Override]
     public function now($interval = 0)
     {
         $add = '';
@@ -110,7 +110,7 @@ class rcube_db_sqlite extends rcube_db
             $add = ($interval > 0 ? '+' : '') . intval($interval) . ' seconds';
         }
 
-        return "datetime('now'" . ($add ? ", '$add'" : "") . ")";
+        return "datetime('now'" . ($add ? ", '{$add}'" : '') . ')';
     }
 
     /**
@@ -118,13 +118,14 @@ class rcube_db_sqlite extends rcube_db
      *
      * @return array List of all tables of the current database
      */
+    #[\Override]
     public function list_tables()
     {
         if ($this->tables === null) {
             $q = $this->query('SELECT name FROM sqlite_master'
-                .' WHERE type = \'table\' ORDER BY name');
+                . ' WHERE type = \'table\' ORDER BY name');
 
-            $this->tables = $q ? $q->fetchAll(PDO::FETCH_COLUMN, 0) : [];
+            $this->tables = $q ? $q->fetchAll(\PDO::FETCH_COLUMN, 0) : [];
         }
 
         return $this->tables;
@@ -137,16 +138,18 @@ class rcube_db_sqlite extends rcube_db
      *
      * @return array List of table cols
      */
+    #[\Override]
     public function list_cols($table)
     {
         $q = $this->query('PRAGMA table_info(?)', $table);
 
-        return $q ? $q->fetchAll(PDO::FETCH_COLUMN, 1) : [];
+        return $q ? $q->fetchAll(\PDO::FETCH_COLUMN, 1) : [];
     }
 
     /**
      * Build DSN string for PDO constructor
      */
+    #[\Override]
     protected function dsn_string($dsn)
     {
         return $dsn['phptype'] . ':' . $dsn['database'];
@@ -159,12 +162,13 @@ class rcube_db_sqlite extends rcube_db
      *
      * @return array Connection options
      */
+    #[\Override]
     protected function dsn_options($dsn)
     {
         $result = parent::dsn_options($dsn);
 
         // Change the default timeout (60) to a smaller value
-        $result[PDO::ATTR_TIMEOUT] = isset($dsn['timeout']) ? intval($dsn['timeout']) : 10;
+        $result[\PDO::ATTR_TIMEOUT] = isset($dsn['timeout']) ? intval($dsn['timeout']) : 10;
 
         return $result;
     }

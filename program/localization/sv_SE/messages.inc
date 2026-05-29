@@ -10,8 +10,6 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/messages/
 */
 
 $messages['errortitle']  = 'Ett fel uppstod!';
@@ -102,7 +100,7 @@ $messages['nopagesizewarning'] = 'Ange en sidstorlek.';
 $messages['nosenderwarning'] = 'Ange en avsändaradress.';
 $messages['recipientsadded'] = 'Mottagare tillagda.';
 $messages['norecipientwarning'] = 'Ange minst en mottagare.';
-$messages['disclosedrecipwarning'] = 'Alla mottagare kommer att kunna se varandras adresser. Undvik detta genom att ange adresserna i fältet Dold kopia istället.';
+$messages['disclosedrecipwarning'] = 'Alla mottagare kan se varandras adresser. Undvik detta genom att ange adresserna i fältet för dolda mottagare (Bcc) istället.';
 $messages['disclosedreciptitle'] = 'Alltför många mottagaradresser';
 $messages['nosubjectwarning']  = 'Ämnesraden är tom. Vill du ange ett ämne nu?';
 $messages['nosubjecttitle']  = 'Inget ämne';
@@ -160,7 +158,9 @@ $messages['nogroupassignmentschanged'] = 'Ingen grupptillhörighet ändrades.';
 $messages['importwait'] = 'Importerar, var god vänta...';
 $messages['importformaterror'] = 'Importen misslyckades! Filen har inte korrekt dataformat.';
 $messages['importconfirm'] = '<b>Lyckad import av $inserted kontakter</b>';
-$messages['importconfirmskipped'] = '<b>Hoppade över $skipped befintliga poster</b>';
+$messages['importconfirmskipped'] = '<b>Hoppade över $skipped befintliga kontakter</b>';
+$messages['importconfirminvalid'] = '<b>Hoppade över $invalid ogiltiga kontakter</b>';
+$messages['importconfirmerrors'] = '<b>Kunde inte läsa in $errors giltiga kontakter</b>';
 $messages['importmessagesuccess'] = '$nr meddelanden har importerats';
 $messages['importmessageerror'] = 'Importen misslyckades! Filen är inte ett giltigt meddelande eller en brevlåda';
 $messages['opnotpermitted'] = 'Otillåten operation!';
@@ -230,3 +230,5 @@ $messages['listusebutton'] = 'Använd Skapa-knappen för att lägga till informa
 $messages['keypaircreatesuccess'] = 'Ett nytt nyckelpar har skapats för $identity.';
 $messages['emptyattachment'] = 'Bilagan verkar vara tom.<br>Kontakta avsändaren.';
 $messages['oauthloginfailed'] = 'OAuth-inloggningen misslyckades. Vänligen försök igen.';
+$messages['oauthinvalidrequest'] = 'Autentiseringsbegäran var ogiltig eller inkomplett.';
+$messages['oauthaccessdenied'] = 'Autentiseringsbegäran nekades av servern eller användaren.';

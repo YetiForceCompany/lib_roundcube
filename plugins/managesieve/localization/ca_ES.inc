@@ -10,10 +10,7 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/plugin-managesieve/
 */
-
 
 $labels['filters'] = 'Filtres';
 $labels['managefilters'] = 'Gestiona els filtres dels missatges d\'entrada';
@@ -134,6 +131,7 @@ $labels['varlowerfirst'] = 'el primer caràcter en minúscula';
 $labels['varupperfirst'] = 'el primer caràcter en majúscula';
 $labels['varquotewildcard'] = 'engloba els caràcters especials amb cometes';
 $labels['varlength'] = 'llargada';
+$labels['varencodeurl'] = 'percent-codificat (per URLs)';
 $labels['notify'] = 'Envia notificació';
 $labels['notifytarget'] = 'Objectiu de la notificació:';
 $labels['notifymessage'] = 'Missatge de notificació (opcional):';

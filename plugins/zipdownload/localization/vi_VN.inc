@@ -10,12 +10,10 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/plugin-zipdownload/
 */
 
 $labels['downloadall'] = 'Tải tất cả tệp tin đính kèm';
-$labels['download'] = 'Tải xuống...';
 $labels['downloadmbox'] = 'Định dạng mbox (.zip)';
 $labels['downloadmaildir'] = 'Định dạng Maildir (.zip)';
 $labels['downloademl'] = 'Mã nguồn (.eml)';
+$labels['download'] = 'Tải xuống...';

@@ -10,8 +10,6 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/messages/
 */
 
 $messages['errortitle']  = 'Ein Fehler ist aufgetreten!';
@@ -161,6 +159,8 @@ $messages['importwait'] = 'Daten werden importiert, bitte warten …';
 $messages['importformaterror'] = 'Import fehlgeschlagen! Die hochgeladene Datei ist keine gültige Importdatei.';
 $messages['importconfirm'] = '<b>Es wurden $inserted Adressen erfolgreich importiert.</b>';
 $messages['importconfirmskipped'] = '<b>$skipped bestehende Einträge wurden übersprungen.</b>';
+$messages['importconfirminvalid'] = '<b>$invalid ungültige Einträge wurden übersprungen.</b>';
+$messages['importconfirmerrors'] = '<b>$errors gültige Kontakte wurden nicht importiert.</b>';
 $messages['importmessagesuccess'] = 'Nachrichten $nr erfolgreich importiert';
 $messages['importmessageerror'] = 'Import fehlgeschlagen! Die hochgeladene Datei ist keine gültige Importdatei.';
 $messages['opnotpermitted'] = 'Operation nicht erlaubt!';
@@ -230,3 +230,5 @@ $messages['listusebutton'] = 'Um einen neuen Datensatz hinzufügen, verwenden Si
 $messages['keypaircreatesuccess'] = 'En neues Schlüsselpaar wurde erfolgreich für $identity erstellt.';
 $messages['emptyattachment'] = 'Dieser Anhang scheint leer zu sein.<br>Bitte erkundigen Sie sich bei der Person, die diesen gesendet hat.';
 $messages['oauthloginfailed'] = 'OAuth-Anmeldung fehlgeschlagen. Bitte versuchen Sie es erneut.';
+$messages['oauthinvalidrequest'] = 'Die Autorisierungsanfrage war ungültig oder unvollständig.';
+$messages['oauthaccessdenied'] = 'Der Autorisierungsserver oder Benutzer hat die Anfrage abgelehnt. ';
