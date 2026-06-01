@@ -10,8 +10,6 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/messages/
 */
 
 $messages['errortitle']  = 'Er is een fout opgetreden!';
@@ -129,7 +127,6 @@ $messages['nogroupassignmentschanged'] = 'Geen groepslidmaatschap gewijzigd.';
 $messages['importwait'] = 'Bezig met importeren, even geduld...';
 $messages['importformaterror'] = 'Importeren mislukt! Het geüploade bestand is geen importeerbaar bestand.';
 $messages['importconfirm'] = '<b>Er zijn $inserted contactpersonen succesvol geïmporteerd</b>';
-$messages['importconfirmskipped'] = '<b>$skipped bestaande contactpersonen overgeslagen</b>';
 $messages['importmessagesuccess'] = '$nr adressen met succes geïmporteerd.';
 $messages['importmessageerror'] = 'Importeren mislukt! Het geüploade bestand is geen geldig bericht of mailbox bestand.';
 $messages['opnotpermitted'] = 'Deze actie is niet toegestaan!';

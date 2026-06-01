@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  +-----------------------------------------------------------------------+
  | This file is part of the Roundcube Webmail client                     |
  |                                                                       |
@@ -21,9 +21,6 @@
 /**
  * Database independent query interface
  * This is a wrapper for the PHP PDO
- *
- * @package    Framework
- * @subpackage Database
  */
 class rcube_db_pgsql extends rcube_db
 {
@@ -38,7 +35,7 @@ class rcube_db_pgsql extends rcube_db
         'sslrootcert',
         'sslcrl',
         'sslcompression',
-        'service'
+        'service',
     ];
 
     public function __construct($db_dsnw, $db_dsnr = '', $pconn = false)
@@ -53,16 +50,17 @@ class rcube_db_pgsql extends rcube_db
      * Driver-specific configuration of database connection
      *
      * @param array $dsn DSN for DB connections
-     * @param PDO   $dbh Connection handler
+     * @param \PDO  $dbh Connection handler
      */
+    #[\Override]
     protected function conn_configure($dsn, $dbh)
     {
         $dbh->query("SET NAMES 'utf8'");
-        $dbh->query("SET DATESTYLE TO ISO");
+        $dbh->query('SET DATESTYLE TO ISO');
 
         // if ?schema= is set in dsn, set the search_path
         if (!empty($dsn['schema'])) {
-            $dbh->query("SET search_path TO " . $this->quote($dsn['schema']));
+            $dbh->query('SET search_path TO ' . $this->quote($dsn['schema']));
         }
     }
 
@@ -73,6 +71,7 @@ class rcube_db_pgsql extends rcube_db
      *
      * @return mixed ID or false on failure
      */
+    #[\Override]
     public function insert_id($table = null)
     {
         if (!$this->db_connected || $this->db_mode == 'r') {
@@ -113,11 +112,13 @@ class rcube_db_pgsql extends rcube_db
      * @param string $field Field name
      *
      * @return string SQL statement to use in query
+     *
      * @deprecated
      */
+    #[\Override]
     public function unixtimestamp($field)
     {
-        return "EXTRACT (EPOCH FROM $field)";
+        return "EXTRACT (EPOCH FROM {$field})";
     }
 
     /**
@@ -127,6 +128,7 @@ class rcube_db_pgsql extends rcube_db
      *
      * @return string SQL function to use in query
      */
+    #[\Override]
     public function now($interval = 0)
     {
         $result = 'now()';
@@ -148,6 +150,7 @@ class rcube_db_pgsql extends rcube_db
      *
      * @return string SQL statement to use in query
      */
+    #[\Override]
     public function ilike($column, $value)
     {
         return $this->quote_identifier($column) . ' ILIKE ' . $this->quote($value);
@@ -161,6 +164,7 @@ class rcube_db_pgsql extends rcube_db
      *
      * @return mixed Variable value or default
      */
+    #[\Override]
     public function get_variable($varname, $default = null)
     {
         // There's a known case when max_allowed_packet is queried
@@ -197,9 +201,11 @@ class rcube_db_pgsql extends rcube_db
      * @param array  $values  List of values to update (number of elements
      *                        should be the same as in $columns)
      *
-     * @return PDOStatement|bool Query handle or False on error
+     * @return \PDOStatement|bool Query handle or False on error
+     *
      * @todo Multi-insert support
      */
+    #[\Override]
     public function insert_or_update($table, $keys, $columns, $values)
     {
         // Check if version >= 9.5, otherwise use fallback
@@ -208,14 +214,18 @@ class rcube_db_pgsql extends rcube_db
         }
 
         $columns = array_map([$this, 'quote_identifier'], $columns);
-        $target  = implode(', ', array_map([$this, 'quote_identifier'], array_keys($keys)));
-        $cols    = $target . ', ' . implode(', ', $columns);
-        $vals    = implode(', ', array_map(function($i) { return $this->quote($i); }, $keys));
-        $vals   .= ', ' . rtrim(str_repeat('?, ', count($columns)), ', ');
-        $update  = implode(', ', array_map(function($i) { return "$i = EXCLUDED.$i"; }, $columns));
+        $target = implode(', ', array_map([$this, 'quote_identifier'], array_keys($keys)));
+        $cols = $target . ', ' . implode(', ', $columns);
+        $vals = implode(', ', array_map(function ($i) {
+            return $this->quote($i);
+        }, $keys));
+        $vals .= ', ' . rtrim(str_repeat('?, ', count($columns)), ', ');
+        $update = implode(', ', array_map(static function ($i) {
+            return "{$i} = EXCLUDED.{$i}";
+        }, $columns));
 
-        return $this->query("INSERT INTO $table ($cols) VALUES ($vals)"
-            . " ON CONFLICT ($target) DO UPDATE SET $update", $values);
+        return $this->query("INSERT INTO {$table} ({$cols}) VALUES ({$vals})"
+            . " ON CONFLICT ({$target}) DO UPDATE SET {$update}", $values);
     }
 
     /**
@@ -223,22 +233,22 @@ class rcube_db_pgsql extends rcube_db
      *
      * @return array List of all tables of the current database
      */
+    #[\Override]
     public function list_tables()
     {
         // get tables if not cached
         if ($this->tables === null) {
-            if (($schema = $this->options['table_prefix']) && $schema[strlen($schema)-1] === '.') {
-                $add = " AND TABLE_SCHEMA = " . $this->quote(substr($schema, 0, -1));
-            }
-            else {
+            if (($schema = $this->options['table_prefix']) && $schema[strlen($schema) - 1] === '.') {
+                $add = ' AND TABLE_SCHEMA = ' . $this->quote(substr($schema, 0, -1));
+            } else {
                 $add = " AND TABLE_SCHEMA NOT IN ('pg_catalog', 'information_schema')";
             }
 
-            $q = $this->query("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES"
+            $q = $this->query('SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES'
                 . " WHERE TABLE_TYPE = 'BASE TABLE'" . $add
-                . " ORDER BY TABLE_NAME");
+                . ' ORDER BY TABLE_NAME');
 
-            $this->tables = $q ? $q->fetchAll(PDO::FETCH_COLUMN, 0) : [];
+            $this->tables = $q ? $q->fetchAll(\PDO::FETCH_COLUMN, 0) : [];
         }
 
         return $this->tables;
@@ -251,23 +261,23 @@ class rcube_db_pgsql extends rcube_db
      *
      * @return array List of table cols
      */
+    #[\Override]
     public function list_cols($table)
     {
         $args = [$table];
 
-        if (($schema = $this->options['table_prefix']) && $schema[strlen($schema)-1] === '.') {
-            $add    = " AND TABLE_SCHEMA = ?";
+        if (($schema = $this->options['table_prefix']) && $schema[strlen($schema) - 1] === '.') {
+            $add = ' AND TABLE_SCHEMA = ?';
             $args[] = substr($schema, 0, -1);
-        }
-        else {
+        } else {
             $add = " AND TABLE_SCHEMA NOT IN ('pg_catalog', 'information_schema')";
         }
 
-        $q = $this->query("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS"
-            . " WHERE TABLE_NAME = ?" . $add, $args);
+        $q = $this->query('SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS'
+            . ' WHERE TABLE_NAME = ?' . $add, $args);
 
         if ($q) {
-            return $q->fetchAll(PDO::FETCH_COLUMN, 0);
+            return $q->fetchAll(\PDO::FETCH_COLUMN, 0);
         }
 
         return [];
@@ -280,6 +290,7 @@ class rcube_db_pgsql extends rcube_db
      *
      * @return string DSN string
      */
+    #[\Override]
     protected function dsn_string($dsn)
     {
         $params = [];
@@ -287,8 +298,7 @@ class rcube_db_pgsql extends rcube_db
 
         if (isset($dsn['hostspec'])) {
             $params[] = 'host=' . $dsn['hostspec'];
-        }
-        else if (isset($dsn['socket'])) {
+        } elseif (isset($dsn['socket'])) {
             $params[] = 'host=' . $dsn['socket'];
         }
 
@@ -316,6 +326,7 @@ class rcube_db_pgsql extends rcube_db
     /**
      * Parse SQL file and fix table names according to table prefix
      */
+    #[\Override]
     protected function fix_table_names($sql)
     {
         if (!$this->options['table_prefix']) {

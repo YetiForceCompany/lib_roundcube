@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  +-----------------------------------------------------------------------+
  | This file is part of the Roundcube Webmail client                     |
  |                                                                       |
@@ -26,17 +26,18 @@ class rcmail_action_mail_delete extends rcmail_action_mail_index
      *
      * @param array $args Arguments from the previous step(s)
      */
+    #[\Override]
     public function run($args = [])
     {
         $rcmail = rcmail::get_instance();
 
         // count messages before changing anything
         $threading = (bool) $rcmail->storage->get_threading();
-        $trash     = $rcmail->config->get('trash_mbox');
-        $sources   = [];
+        $trash = $rcmail->config->get('trash_mbox');
+        $sources = [];
         $old_count = 0;
-        $deleted   = 0;
-        $count     = 0;
+        $deleted = 0;
+        $count = 0;
 
         if (empty($_POST['_from']) || $_POST['_from'] != 'show') {
             $old_count = $rcmail->storage->count(null, $threading ? 'THREADS' : 'ALL');
@@ -47,9 +48,9 @@ class rcmail_action_mail_delete extends rcmail_action_mail_index
             $rcmail->output->send();
         }
 
-        foreach (rcmail::get_uids(null, null, $multifolder, rcube_utils::INPUT_POST) as $mbox => $uids) {
-            $deleted  += (int) $rcmail->storage->delete_message($uids, $mbox);
-            $count    += is_array($uids) ? count($uids) : 1;
+        foreach (rcmail_action::get_uids(null, null, $multifolder, rcube_utils::INPUT_POST) as $mbox => $uids) {
+            $deleted += (int) $rcmail->storage->delete_message($uids, $mbox);
+            $count += is_array($uids) ? count($uids) : 1;
             $sources[] = $mbox;
         }
 
@@ -61,8 +62,7 @@ class rcmail_action_mail_delete extends rcmail_action_mail_index
 
             self::display_server_error('errordeleting');
             $rcmail->output->send();
-        }
-        else {
+        } else {
             $rcmail->output->show_message('messagedeleted', 'confirmation');
         }
 
@@ -76,27 +76,26 @@ class rcmail_action_mail_delete extends rcmail_action_mail_index
         if (!empty($_POST['_from']) && $_POST['_from'] == 'show') {
             if ($next = rcube_utils::get_input_string('_next_uid', rcube_utils::INPUT_GPC)) {
                 $rcmail->output->command('show_message', $next);
-            }
-            else {
+            } else {
                 $rcmail->output->command('command', 'list');
             }
 
             $rcmail->output->send();
         }
 
-        $mbox           = $rcmail->storage->get_folder();
-        $msg_count      = $rcmail->storage->count(null, $threading ? 'THREADS' : 'ALL');
-        $exists         = $rcmail->storage->count($mbox, 'EXISTS', true);
-        $page_size      = $rcmail->storage->get_pagesize();
-        $page           = $rcmail->storage->get_page();
-        $pages          = ceil($msg_count / $page_size);
+        $mbox = $rcmail->storage->get_folder();
+        $msg_count = $rcmail->storage->count(null, $threading ? 'THREADS' : 'ALL');
+        $exists = $rcmail->storage->count($mbox, 'EXISTS', true);
+        $page_size = $rcmail->storage->get_pagesize();
+        $page = $rcmail->storage->get_page();
+        $pages = ceil($msg_count / $page_size);
         $nextpage_count = $old_count - $page_size * $page;
-        $remaining      = $msg_count - $page_size * ($page - 1);
-        $jump_back      = false;
+        $remaining = $msg_count - $page_size * ($page - 1);
+        $jump_back = false;
 
         // jump back one page (user removed the whole last page)
         if ($page > 1 && $remaining == 0) {
-            $page -= 1;
+            $page--;
             $rcmail->storage->set_page($page);
             $_SESSION['page'] = $page;
             $jump_back = true;

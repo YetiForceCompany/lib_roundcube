@@ -10,8 +10,6 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/messages/
 */
 
 $messages['errortitle']  = 'Si è verificato un errore!';
@@ -102,7 +100,6 @@ $messages['nopagesizewarning'] = 'Per favore, immetti il numero di righe per pag
 $messages['nosenderwarning'] = 'Per favore, inserisci l\'indirizzo email del mittente.';
 $messages['recipientsadded'] = 'Destinatari/o aggiunti/o correttamente';
 $messages['norecipientwarning'] = 'Per favore, immetti almeno un destinatario';
-$messages['disclosedrecipwarning'] = 'Tutti i destinatari vedranno i rispettivi indirizzi di posta elettronica. Per evitare questo e proteggerne la riservatezza puoi usare il campo Ccn.';
 $messages['disclosedreciptitle'] = 'Troppi destinatari pubblici';
 $messages['nosubjectwarning']  = 'L\'oggetto è vuoto. Vuoi inserirlo adesso?';
 $messages['nosubjecttitle']  = 'Nessun oggetto';
@@ -160,7 +157,6 @@ $messages['nogroupassignmentschanged'] = 'Nessun assegnamento del gruppo è stat
 $messages['importwait'] = 'Importazione in corso, attendere...';
 $messages['importformaterror'] = 'Importazione non riuscita! Il file caricato non è un file valido per l\'importazione.';
 $messages['importconfirm'] = '<b>$inserted contatti importati con successo</b>';
-$messages['importconfirmskipped'] = '<b>$skipped ignorati perché esistono già</b>';
 $messages['importmessagesuccess'] = 'Importati correttamente $nr messaggi';
 $messages['importmessageerror'] = 'Importazione non riuscita! Il file caricato non è un messaggio o una casella postale valida.';
 $messages['opnotpermitted'] = 'Operazione non consentita!';

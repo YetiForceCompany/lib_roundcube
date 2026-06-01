@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  +-----------------------------------------------------------------------+
  | This file is part of the Roundcube Webmail client                     |
  |                                                                       |
@@ -27,37 +27,35 @@ class rcmail_action_contacts_photo extends rcmail_action_contacts_index
      *
      * @param array $args Arguments from the previous step(s)
      */
+    #[\Override]
     public function run($args = [])
     {
         $rcmail = rcmail::get_instance();
 
         // Get contact ID and source ID from request
-        $cids    = self::get_cids();
-        $source  = key($cids);
-        $cid     = $cids ? array_first($cids[$source]) : null;
+        $cids = self::get_cids();
+        $source = key($cids);
+        $cid = $cids ? array_first($cids[$source]) : null;
         $file_id = rcube_utils::get_input_string('_photo', rcube_utils::INPUT_GPC);
 
         // read the referenced file
-        if ($file_id && !empty($_SESSION['contacts']['files'][$file_id])) {
-            $tempfile = $_SESSION['contacts']['files'][$file_id];
+        if ($file_id && ($tempfile = $rcmail->get_uploaded_file($file_id))) {
             $tempfile = $rcmail->plugins->exec_hook('attachment_display', $tempfile);
 
             if (!empty($tempfile['status'])) {
                 if (!empty($tempfile['data'])) {
                     $data = $tempfile['data'];
-                }
-                else if ($tempfile['path']) {
+                } elseif ($tempfile['path']) {
                     $data = file_get_contents($tempfile['path']);
                 }
             }
-        }
-        else {
+        } else {
             // by email, search for contact first
             if ($email = rcube_utils::get_input_string('_email', rcube_utils::INPUT_GPC)) {
                 foreach ($rcmail->get_address_sources() as $s) {
                     $abook = $rcmail->get_address_book($s['id']);
                     $result = $abook->search(['email'], $email, 1, true, true, 'photo');
-                    while ($result && ($record = $result->iterate())) {
+                    foreach ($result as $record) {
                         if (!empty($record['photo'])) {
                             break 2;
                         }
@@ -83,9 +81,9 @@ class rcmail_action_contacts_photo extends rcmail_action_contacts_index
 
         // let plugins do fancy things with contact photos
         $plugin = $rcmail->plugins->exec_hook('contact_photo', [
-                'record' => $record ?? null,
-                'email'  => $email ?? null,
-                'data'   => $data ?? null,
+            'record' => $record ?? null,
+            'email' => $email ?? null,
+            'data' => $data ?? null,
         ]);
 
         // redirect to url provided by a plugin
@@ -96,7 +94,7 @@ class rcmail_action_contacts_photo extends rcmail_action_contacts_index
         $data = $plugin['data'];
 
         // detect if photo data is a URL
-        if ($data && strlen($data) < 1024 && filter_var($data, FILTER_VALIDATE_URL)) {
+        if ($data && strlen($data) < 1024 && filter_var($data, \FILTER_VALIDATE_URL)) {
             $rcmail->output->redirect($data);
         }
 

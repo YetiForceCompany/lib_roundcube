@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  +-----------------------------------------------------------------------+
  | This file is part of the Roundcube Webmail client                     |
  |                                                                       |
@@ -22,18 +22,14 @@
 
 /**
  * Class to provide memcache session storage
- *
- * @package    Framework
- * @subpackage Core
  */
 class rcube_session_memcache extends rcube_session
 {
-    /** @var Memcache The memcache driver */
+    /** @var \Memcache|false|null The memcache driver */
     private $memcache;
 
     /** @var bool Debug state */
     private $debug;
-
 
     /**
      * Object constructor
@@ -45,15 +41,14 @@ class rcube_session_memcache extends rcube_session
         parent::__construct($config);
 
         $this->memcache = rcube::get_instance()->get_memcache();
-        $this->debug    = $config->get('memcache_debug');
+        $this->debug = $config->get('memcache_debug');
 
         if (!$this->memcache) {
             rcube::raise_error([
-                    'code' => 604, 'type' => 'memcache',
-                    'line' => __LINE__, 'file' => __FILE__,
-                    'message' => "Failed to connect to memcached. Please check configuration"
-                ],
-                true, true);
+                'code' => 604,
+                'type' => 'memcache',
+                'message' => 'Failed to connect to memcached. Please check configuration',
+            ], true, true);
         }
 
         // register sessions handler
@@ -68,6 +63,7 @@ class rcube_session_memcache extends rcube_session
      *
      * @return bool True on success, False on failure
      */
+    #[\Override]
     public function open($save_path, $session_name)
     {
         return true;
@@ -78,6 +74,7 @@ class rcube_session_memcache extends rcube_session
      *
      * @return bool True on success, False on failure
      */
+    #[\Override]
     public function close()
     {
         return true;
@@ -90,6 +87,7 @@ class rcube_session_memcache extends rcube_session
      *
      * @return bool True on success, False on failure
      */
+    #[\Override]
     public function destroy($key)
     {
         if ($key) {
@@ -111,14 +109,16 @@ class rcube_session_memcache extends rcube_session
      *
      * @return string Serialized data string
      */
+    #[\Override]
     public function read($key)
     {
         if ($value = $this->memcache->get($key)) {
             $arr = unserialize($value);
-            $this->changed = $arr['changed'];
-            $this->ip      = $arr['ip'];
-            $this->vars    = $arr['vars'];
-            $this->key     = $key;
+            // Use a fallback to avoid errors in case expires_at is unset
+            $this->expires_at = $arr['expires_at'] ?? time();
+            $this->ip = $arr['ip'];
+            $this->vars = $arr['vars'];
+            $this->key = $key;
         }
 
         if ($this->debug) {
@@ -136,14 +136,15 @@ class rcube_session_memcache extends rcube_session
      *
      * @return bool True on success, False on failure
      */
-    public function write($key, $vars)
+    #[\Override]
+    protected function save($key, $vars)
     {
         if ($this->ignore_write) {
             return true;
         }
 
-        $data   = serialize(['changed' => time(), 'ip' => $this->ip, 'vars' => $vars]);
-        $result = $this->memcache->set($key, $data, MEMCACHE_COMPRESSED, $this->lifetime + 60);
+        $data = serialize(['expires_at' => time() + $this->lifetime, 'ip' => $this->ip, 'vars' => $vars]);
+        $result = $this->memcache->set($key, $data, \MEMCACHE_COMPRESSED, $this->lifetime + 60);
 
         if ($this->debug) {
             $this->debug('set', $key, $data, $result);
@@ -161,13 +162,14 @@ class rcube_session_memcache extends rcube_session
      *
      * @return bool True on success, False on failure
      */
-    public function update($key, $newvars, $oldvars)
+    #[\Override]
+    protected function update($key, $newvars, $oldvars)
     {
         $ts = microtime(true);
 
-        if ($newvars !== $oldvars || $ts - $this->changed > $this->lifetime / 3) {
-            $data   = serialize(['changed' => time(), 'ip' => $this->ip, 'vars' => $newvars]);
-            $result = $this->memcache->set($key, $data, MEMCACHE_COMPRESSED, $this->lifetime + 60);
+        if ($newvars !== $oldvars || $this->expires_at - $ts > $this->lifetime / 3) {
+            $data = serialize(['expires_at' => time() + $this->lifetime, 'ip' => $this->ip, 'vars' => $newvars]);
+            $result = $this->memcache->set($key, $data, \MEMCACHE_COMPRESSED, $this->lifetime + 60);
 
             if ($this->debug) {
                 $this->debug('set', $key, $data, $result);

@@ -10,8 +10,6 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/messages/
 */
 
 $messages['errortitle']  = 'طرأ هناك خطأ !';
@@ -109,7 +107,6 @@ $messages['contactaddedtogroup'] = 'تمت إضافة المراسلين إلى 
 $messages['contactremovedfromgroup'] = 'تمت إزالة المراسلين من هذه المجموعةبنجاح';
 $messages['importwait'] = 'جاري الاستيراد، رجاء انتظر...';
 $messages['importconfirm'] = '<b>تم استيراد $inserted مراسلين بنجاح، وتجاهل$skipped موجودين مسبقاً</b>:<p><em>$names</em></p>';
-$messages['importconfirmskipped'] = '<b>تم تجاهل $skipped عناصر موجودة</b>';
 $messages['opnotpermitted'] = 'العملية ممنوعة!';
 $messages['httpreceivedencrypterror'] = 'حدث خطأ جسيم في التهيئة. رجاءً اتصال بمدير الخادم حالاً. <b>لا يمكن إرسال بريدك.</b>';
 $messages['smtpconnerror'] = 'خطأ SMTP ($code): تعذر الاتصال بالخادم';

@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  +-----------------------------------------------------------------------+
  | This file is part of the Roundcube webmail client                     |
  |                                                                       |
@@ -18,46 +18,43 @@
  +-----------------------------------------------------------------------+
 */
 
-/**
- * Roundcube Framework Initialization
- *
- * @package    Framework
- * @subpackage Core
- */
-
+// Some users are not using Installer, so we'll check some critical PHP settings here
 $config = [
-    'display_errors'  => false,
-    'log_errors'      => true,
-    // Some users are not using Installer, so we'll check some
-    // critical PHP settings here. Only these, which doesn't provide
-    // an error/warning in the logs later. See (#1486307).
-    'mbstring.func_overload' => 0,
+    'display_errors' => false,
+    'log_errors' => true,
 ];
 
 // check these additional ini settings if not called via CLI
-if (php_sapi_name() != 'cli') {
+if (\PHP_SAPI != 'cli') {
     $config += [
         'suhosin.session.encrypt' => false,
-        'file_uploads'            => true,
-        'session.auto_start'      => false,
+        'file_uploads' => true,
+        'session.auto_start' => false,
         'zlib.output_compression' => false,
     ];
 }
 
 foreach ($config as $optname => $optval) {
-    $ini_optval = filter_var(ini_get($optname), is_bool($optval) ? FILTER_VALIDATE_BOOLEAN : FILTER_VALIDATE_INT);
+    // @phpstan-ignore-next-line
+    $ini_optval = filter_var(ini_get($optname), is_bool($optval) ? \FILTER_VALIDATE_BOOLEAN : \FILTER_VALIDATE_INT);
     if ($optval != $ini_optval && @ini_set($optname, $optval) === false) {
+        // @phpstan-ignore-next-line
         $optval = !is_bool($optval) ? $optval : ($optval ? 'On' : 'Off');
-        $error  = "ERROR: Wrong '$optname' option value and it wasn't possible to set it to required value ($optval).\n"
-            . "Check your PHP configuration (including php_admin_flag).";
+        $error = "ERROR: Wrong '{$optname}' option value and it wasn't possible to set it to required value ({$optval}).\n"
+            . 'Check your PHP configuration (including php_admin_flag).';
 
-        if (defined('STDERR')) fwrite(STDERR, $error); else echo $error;
+        if (defined('STDERR')) {
+            fwrite(\STDERR, $error);
+        } else {
+            echo $error;
+        }
+
         exit(1);
     }
 }
 
 // framework constants
-define('RCUBE_VERSION', '1.6.15');
+define('RCUBE_VERSION', '1.7.1');
 define('RCUBE_CHARSET', 'UTF-8');
 define('RCUBE_TEMP_FILE_PREFIX', 'RCMTEMP');
 
@@ -87,12 +84,12 @@ mb_regex_encoding(RCUBE_CHARSET);
 
 // make sure the Roundcube lib directory is in the include_path
 $rcube_path = realpath(RCUBE_LIB_DIR . '..');
-$sep        = PATH_SEPARATOR;
-$regexp     = "!(^|$sep)" . preg_quote($rcube_path, '!') . "($sep|\$)!";
-$path       = ini_get('include_path');
+$sep = \PATH_SEPARATOR;
+$regexp = "!(^|{$sep})" . preg_quote($rcube_path, '!') . "({$sep}|\$)!";
+$path = ini_get('include_path');
 
 if (!preg_match($regexp, $path)) {
-    set_include_path($path . PATH_SEPARATOR . $rcube_path);
+    set_include_path($path . \PATH_SEPARATOR . $rcube_path);
 }
 
 // Register autoloader
@@ -100,23 +97,20 @@ spl_autoload_register('rcube_autoload');
 
 // set PEAR error handling (will also load the PEAR main class)
 if (class_exists('PEAR')) {
-    PEAR::setErrorHandling(PEAR_ERROR_CALLBACK, function($err) { rcube::raise_error($err, true); });
+    // @phpstan-ignore-next-line
+    \PEAR::setErrorHandling(PEAR_ERROR_CALLBACK, static function ($err) { rcube::raise_error($err, true); });
 }
 
 /**
  * Similar function as in_array() but case-insensitive with multibyte support.
  *
  * @param string $needle   Needle value
- * @param array  $haystack Array to search in
+ * @param ?array $haystack Array to search in
  *
  * @return bool True if found, False if not
  */
 function in_array_nocase($needle, $haystack)
 {
-    if (!is_string($needle) || !is_array($haystack)) {
-        return false;
-    }
-
     // use much faster method for ascii
     if (is_ascii($needle)) {
         foreach ((array) $haystack as $value) {
@@ -124,8 +118,7 @@ function in_array_nocase($needle, $haystack)
                 return true;
             }
         }
-    }
-    else {
+    } else {
         $needle = mb_strtolower($needle);
         foreach ((array) $haystack as $value) {
             if (is_string($value) && $needle === mb_strtolower($value)) {
@@ -140,37 +133,30 @@ function in_array_nocase($needle, $haystack)
 /**
  * Parse a human readable string for a number of bytes.
  *
- * @param string $str Input string
+ * @param string|int|float $str Input string
  *
- * @return float Number of bytes
+ * @return int|false Number of bytes
  */
 function parse_bytes($str)
 {
-    if (is_numeric($str)) {
-        return floatval($str);
-    }
-
-    $bytes = 0;
-
-    if (preg_match('/([0-9\.]+)\s*([a-z]*)/i', $str, $regs)) {
+    if (preg_match('/^([0-9\.]+)\s*([KMGT]?)I?B?$/', trim(strtoupper((string) $str)), $regs)) {
         $bytes = floatval($regs[1]);
-        switch (strtolower($regs[2])) {
-        case 'g':
-        case 'gb':
-            $bytes *= 1073741824;
-            break;
-        case 'm':
-        case 'mb':
-            $bytes *= 1048576;
-            break;
-        case 'k':
-        case 'kb':
-            $bytes *= 1024;
-            break;
+        switch ($regs[2]) {
+            case 'T':
+                $bytes *= 1024;
+            case 'G':
+                $bytes *= 1024;
+            case 'M':
+                $bytes *= 1024;
+            case 'K':
+                $bytes *= 1024;
+                break;
         }
+
+        return (int) round($bytes);
     }
 
-    return floatval($bytes);
+    return false;
 }
 
 /**
@@ -200,7 +186,7 @@ function unslashify($str)
 /**
  * Returns number of seconds for a specified offset string.
  *
- * @param string $str String representation of the offset (e.g. 20min, 5h, 2days, 1week)
+ * @param string|int $str String representation of the offset (e.g. 20min, 5h, 2days, 1week)
  *
  * @return int Number of seconds
  */
@@ -208,22 +194,21 @@ function get_offset_sec($str)
 {
     if (preg_match('/^([0-9]+)\s*([smhdw])/i', $str, $regs)) {
         $amount = (int) $regs[1];
-        $unit   = strtolower($regs[2]);
-    }
-    else {
+        $unit = strtolower($regs[2]);
+    } else {
         $amount = (int) $str;
-        $unit   = 's';
+        $unit = 's';
     }
 
     switch ($unit) {
-    case 'w':
-        $amount *= 7;
-    case 'd':
-        $amount *= 24;
-    case 'h':
-        $amount *= 60;
-    case 'm':
-        $amount *= 60;
+        case 'w':
+            $amount *= 7;
+        case 'd':
+            $amount *= 24;
+        case 'h':
+            $amount *= 60;
+        case 'm':
+            $amount *= 60;
     }
 
     return $amount;
@@ -243,8 +228,8 @@ function get_offset_time($offset_str, $factor = 1)
 }
 
 /**
- * Truncate string if it is longer than the allowed length.
- * Replace the middle or the ending part of a string with a placeholder.
+ * Truncates a string if it is longer than the allowed length. Replaces
+ * the middle or the ending part of a string with a placeholder.
  *
  * @param string $str         Input string
  * @param int    $maxlength   Max. length
@@ -263,12 +248,12 @@ function abbreviate_string($str, $maxlength, $placeholder = '...', $ending = fal
         }
 
         $placeholder_length = mb_strlen($placeholder);
-        $first_part_length  = floor(($maxlength - $placeholder_length)/2);
+        $first_part_length = floor(($maxlength - $placeholder_length) / 2);
         $second_starting_location = $length - $maxlength + $first_part_length + $placeholder_length;
 
         $prefix = mb_substr($str, 0, $first_part_length);
         $suffix = mb_substr($str, $second_starting_location);
-        $str    = $prefix . $placeholder . $suffix;
+        $str = $prefix . $placeholder . $suffix;
     }
 
     return $str;
@@ -285,7 +270,8 @@ function array_keys_recursive($array)
 {
     $keys = [];
 
-    if (!empty($array) && is_array($array)) {
+    // @phpstan-ignore-next-line
+    if (is_array($array)) {
         foreach ($array as $key => $child) {
             $keys[] = $key;
             foreach (array_keys_recursive($child) as $val) {
@@ -295,25 +281,6 @@ function array_keys_recursive($array)
     }
 
     return $keys;
-}
-
-if (!function_exists('array_first')) {
-    /**
-     * Get first element from an array
-     *
-     * @param array $array Input array
-     *
-     * @return mixed First element if found, Null otherwise
-     */
-    function array_first($array)
-    {
-        if (is_array($array)) {
-            reset($array);
-            foreach ($array as $element) {
-                return $element;
-            }
-        }
-    }
 }
 
 /**
@@ -328,7 +295,7 @@ if (!function_exists('array_first')) {
 function asciiwords($str, $css_id = false, $replace_with = '')
 {
     $allowed = 'a-z0-9\_\-' . (!$css_id ? '\.' : '');
-    return preg_replace("/[^$allowed]+/i", $replace_with, (string) $str);
+    return preg_replace("/[^{$allowed}]+/i", $replace_with, (string) $str);
 }
 
 /**
@@ -360,10 +327,10 @@ function format_email_recipient($email, $name = '')
     if ($name && $name != $email) {
         // Special chars as defined by RFC 822 need to in quoted string (or escaped).
         if (preg_match('/[\(\)\<\>\\\.\[\]@,;:"]/', $name)) {
-            $name = '"'.addcslashes($name, '"').'"';
+            $name = '"' . addcslashes($name, '"') . '"';
         }
 
-        return "$name <$email>";
+        return "{$name} <{$email}>";
     }
 
     return $email;
@@ -383,7 +350,7 @@ function format_email($email)
     $count = count($parts);
 
     if ($count > 1) {
-        $parts[$count-1] = mb_strtolower($parts[$count-1]);
+        $parts[$count - 1] = mb_strtolower($parts[$count - 1]);
 
         $email = implode('@', $parts);
     }
@@ -410,40 +377,30 @@ function version_parse($version)
 /**
  * Use PHP5 autoload for dynamic class loading
  *
- * @param string $classname Class name
- *
  * @return bool True when the class file has been found
- *
- * @todo Make Zend, PEAR etc play with this
- * @todo Make our classes conform to a more straight forward CS.
  */
-function rcube_autoload($classname)
+function rcube_autoload(string $classname): bool
 {
-    if (strpos($classname, 'rcube') === 0) {
-        $classname = preg_replace('/^rcube_(cache|db|session|spellchecker)_/', '\\1/', $classname);
+    if (str_starts_with($classname, 'rcube')) {
+        $classname = preg_replace('/^rcube_(cache|db|session|spellchecker)_/', '\1/', $classname);
         $classname = 'Roundcube/' . $classname;
-    }
-    else if (strpos($classname, 'html_') === 0 || $classname === 'html') {
+    } elseif (str_starts_with($classname, 'html_') || $classname === 'html') {
         $classname = 'Roundcube/html';
-    }
-    else if (strpos($classname, 'Mail_') === 0) {
+    } elseif (str_starts_with($classname, 'Mail_')) {
         $classname = 'Mail/' . substr($classname, 5);
-    }
-    else if (strpos($classname, 'Net_') === 0) {
+    } elseif (str_starts_with($classname, 'Net_')) {
         $classname = 'Net/' . substr($classname, 4);
-    }
-    else if (strpos($classname, 'Auth_') === 0) {
+    } elseif (str_starts_with($classname, 'Auth_')) {
         $classname = 'Auth/' . substr($classname, 5);
     }
 
     // Translate PHP namespaces into directories,
-    // i.e. use \Sabre\VObject; $vcf = VObject\Reader::read(...)
-    //      -> Sabre/VObject/Reader.php
+    // i.e. 'Sabre\Reader' -> 'Sabre/Reader.php'
     $classname = str_replace('\\', '/', $classname);
 
-    if ($fp = @fopen("$classname.php", 'r', true)) {
+    if ($fp = @fopen("{$classname}.php", 'r', true)) {
         fclose($fp);
-        include_once "$classname.php";
+        include_once "{$classname}.php";
         return true;
     }
 

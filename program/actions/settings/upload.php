@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  +-----------------------------------------------------------------------+
  | This file is part of the Roundcube Webmail client                     |
  |                                                                       |
@@ -26,11 +26,13 @@ class rcmail_action_settings_upload extends rcmail_action
      *
      * @param array $args Arguments from the previous step(s)
      */
+    #[\Override]
     public function run($args = [])
     {
         $rcmail = rcmail::get_instance();
-        $from   = rcube_utils::get_input_string('_from', rcube_utils::INPUT_GET);
-        $type   = preg_replace('/(add|edit)-/', '', $from);
+        $uploadid = rcube_utils::get_input_string('_uploadid', rcube_utils::INPUT_GET);
+        $from = rcube_utils::get_input_string('_from', rcube_utils::INPUT_GET);
+        $type = preg_replace('/(add|edit)-/', '', $from);
 
         // Validate URL input.
         if (!rcube_utils::is_simple_string($type)) {
@@ -51,15 +53,13 @@ class rcmail_action_settings_upload extends rcmail_action
         $rcmail->output->reset();
 
         $max_size = $rcmail->config->get($type . '_image_size', 64) * 1024;
-        $uploadid = rcube_utils::get_input_string('_uploadid', rcube_utils::INPUT_GET);
 
         if (!empty($_FILES['_file']['tmp_name']) && is_array($_FILES['_file']['tmp_name'])) {
-            $multiple = count($_FILES['_file']['tmp_name']) > 1;
-
             foreach ($_FILES['_file']['tmp_name'] as $i => $filepath) {
-                $err        = $_FILES['_file']['error'][$i];
-                $imageprop  = null;
+                $err = $_FILES['_file']['error'][$i];
+                $imageprop = null;
                 $attachment = null;
+                $inserted = false;
 
                 // Process uploaded attachment if there is no error
                 if (!$err) {
@@ -68,7 +68,7 @@ class rcmail_action_settings_upload extends rcmail_action
                     }
                     // check image file type
                     else {
-                        $image     = new rcube_image($filepath);
+                        $image = new rcube_image($filepath);
                         $imageprop = $image->props();
 
                         if (!in_array(strtolower($imageprop['type']), $IMAGE_TYPES)) {
@@ -79,48 +79,42 @@ class rcmail_action_settings_upload extends rcmail_action
 
                 // save uploaded image in storage backend
                 if (!empty($imageprop)) {
-                    $attachment = $rcmail->plugins->exec_hook('attachment_upload', [
-                        'path'     => $filepath,
-                        'size'     => $_FILES['_file']['size'][$i],
-                        'name'     => $_FILES['_file']['name'][$i],
+                    $attachment = [
+                        'path' => $filepath,
+                        'size' => $_FILES['_file']['size'][$i],
+                        'name' => $_FILES['_file']['name'][$i],
                         'mimetype' => 'image/' . $imageprop['type'],
-                        'group'    => $type,
-                    ]);
+                        'group' => $type,
+                    ];
+
+                    $inserted = $rcmail->insert_uploaded_file($attachment);
                 }
 
-                if (!$err && !empty($attachment['status']) && empty($attachment['abort'])) {
+                if (!$err && $inserted) {
                     $id = $attachment['id'];
-
-                    // store new file in session
-                    unset($attachment['status'], $attachment['abort']);
-                    $rcmail->session->append($type . '.files', $id, $attachment);
-
                     $content = rcube::Q($attachment['name']);
 
-                    $rcmail->output->command('add2attachment_list', "rcmfile$id", [
-                            'html'      => $content,
-                            'name'      => $attachment['name'],
-                            'mimetype'  => $attachment['mimetype'],
+                    $rcmail->output->command('add2attachment_list', "rcmfile{$id}", [
+                            'html' => $content,
+                            'name' => $attachment['name'],
+                            'mimetype' => $attachment['mimetype'],
                             'classname' => rcube_utils::file2class($attachment['mimetype'], $attachment['name']),
-                            'complete'  => true
+                            'complete' => true,
                         ],
                         $uploadid
                     );
-                }
-                else {
+                } else {
                     $error_label = null;
                     if ($err == 'type_error') {
                         $error_label = 'invalidimageformat';
-                    }
-                    else if ($err == 'size_error') {
+                    } elseif ($err == 'size_error') {
                         $error_label = ['name' => 'filesizeerror', 'vars' => ['size' => self::show_bytes($max_size)]];
                     }
 
                     self::upload_error($err, $attachment, $error_label);
                 }
             }
-        }
-        else if (self::upload_failure()) {
+        } elseif (self::upload_failure()) {
             $rcmail->output->command('remove_from_attachment_list', $uploadid);
         }
 

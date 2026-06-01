@@ -10,10 +10,7 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/labels/
 */
-
 
 $labels['welcome'] = '$product غا خۇش كەلدىڭىز';
 $labels['username'] = 'ئىشلەتكۈچى نامى';
@@ -263,7 +260,6 @@ $labels['keylength'] = 'بىتلار';
 $labels['keyexpired'] = 'ۋاقتى ئۆتكەن';
 $labels['keyrevoked'] = 'قايتۇرۋالغان';
 $labels['bccinstead'] = 'ب چ چىنى ئىشلىتىش';
-$labels['addheader'] = 'تاپشۇرۋالغۇچى قېتىش (باشلانما)';
 $labels['insert'] = 'كىرگۈزۈش';
 $labels['insertcontact'] = 'تۇنۇش(لار) قېتىش';
 $labels['recipient'] = 'تاپشۇرۋالغۇچى';

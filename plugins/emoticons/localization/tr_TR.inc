@@ -10,9 +10,7 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/plugin-emoticons/
 */
 
-$labels['emoticonsdisplay'] = 'Düz metin iletilerinde duygu ifadeleri görüntülensin';
+$labels['emoticonsdisplay'] = 'Düz yazı iletilerinde duygu ifadeleri görüntülensin';
 $labels['emoticonscompose'] = 'Duygu ifadeleri kullanılsın';

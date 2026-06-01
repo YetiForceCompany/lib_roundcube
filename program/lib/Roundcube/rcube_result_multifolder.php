@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  +-----------------------------------------------------------------------+
  | This file is part of the Roundcube Webmail client                     |
  |                                                                       |
@@ -21,24 +21,20 @@
 /**
  * Class holding a set of rcube_result_index instances that together form a
  * result set of a multi-folder search
- *
- * @package    Framework
- * @subpackage Storage
  */
 class rcube_result_multifolder
 {
-    public $multi      = true;
-    public $sets       = [];
+    public $multi = true;
+    public $sets = [];
     public $incomplete = false;
     public $folder;
 
-    protected $meta    = [];
-    protected $index   = [];
+    protected $meta = [];
+    protected $index = [];
     protected $folders = [];
-    protected $sdata   = [];
-    protected $order   = 'ASC';
+    protected $sdata = [];
+    protected $order = 'ASC';
     protected $sorting;
-
 
     /**
      * Object constructor.
@@ -48,7 +44,7 @@ class rcube_result_multifolder
     public function __construct($folders = [])
     {
         $this->folders = $folders;
-        $this->meta    = ['count' => 0];
+        $this->meta = ['count' => 0];
     }
 
     /**
@@ -62,8 +58,7 @@ class rcube_result_multifolder
 
         if ($result->count()) {
             $this->append_result($result);
-        }
-        else if ($result->incomplete) {
+        } elseif ($result->incomplete) {
             $this->incomplete = true;
         }
     }
@@ -79,7 +74,9 @@ class rcube_result_multifolder
 
         // append UIDs to global index
         $folder = $result->get_parameters('MAILBOX');
-        $index  = array_map(function($uid) use ($folder) { return $uid . '-' . $folder; }, $result->get());
+        $index = array_map(static function ($uid) use ($folder) {
+            return $uid . '-' . $folder;
+        }, $result->get());
 
         $this->index = array_merge($this->index, $index);
     }
@@ -94,8 +91,8 @@ class rcube_result_multifolder
     public function set_message_index($headers, $sort_field, $sort_order)
     {
         $this->sorting = $sort_field;
-        $this->order   = $sort_order;
-        $this->index   = [];
+        $this->order = $sort_order;
+        $this->index = [];
 
         foreach ($headers as $header) {
             $this->index[] = $header->uid . '-' . $header->folder;
@@ -187,7 +184,7 @@ class rcube_result_multifolder
     /**
      * Filters data set. Removes elements listed in $ids list.
      *
-     * @param array  $ids    List of IDs to remove.
+     * @param array  $ids    list of IDs to remove
      * @param string $folder IMAP folder
      */
     public function filter($ids = [], $folder = null)
@@ -219,7 +216,7 @@ class rcube_result_multifolder
     /**
      * Filters data set. Removes elements not listed in $ids list.
      *
-     * @param array $ids List of IDs to keep.
+     * @param array $ids list of IDs to keep
      */
     public function intersect($ids = [])
     {
@@ -256,8 +253,8 @@ class rcube_result_multifolder
     public function get_element($idx)
     {
         switch ($idx) {
-            case 'FIRST': return $this->index[0];
-            case 'LAST':  return end($this->index);
+            case 'FIRST': return $this->index[0] ?? null;
+            case 'LAST':  return array_last($this->index);
             default:      return $this->index[$idx] ?? null;
         }
     }
@@ -270,11 +267,11 @@ class rcube_result_multifolder
      *
      * @return array|string Response parameters or parameter value
      */
-    public function get_parameters($param=null)
+    public function get_parameters($param = null)
     {
         $params = [
-            'SORT'    => $this->sorting,
-            'ORDER'   => $this->order,
+            'SORT' => $this->sorting,
+            'ORDER' => $this->order,
             'MAILBOX' => $this->folders,
         ];
 
@@ -314,52 +311,61 @@ class rcube_result_multifolder
     }
 
     /**
-     * Serialization __sleep handler
+     * Serialization handler
      *
-     * @return array Names of all object properties that should be serialized
+     * @return array An associative array of key/value pairs that represent the serialized form of the object
      */
-    public function __sleep()
+    public function __serialize(): array
     {
-        $this->sdata = ['incomplete' => [], 'error' => []];
+        $result = [];
+        foreach (['index', 'folders', 'sorting', 'order'] as $key) {
+            $result[$key] = $this->{$key};
+        }
+
+        $result['sdata'] = ['incomplete' => [], 'error' => []];
 
         foreach ($this->sets as $set) {
             if ($set->incomplete) {
-                $this->sdata['incomplete'][] = $set->get_parameters('MAILBOX');
-            }
-            else if ($set->is_error()) {
-                $this->sdata['error'][] = $set->get_parameters('MAILBOX');
+                $result['sdata']['incomplete'][] = $set->get_parameters('MAILBOX');
+            } elseif ($set->is_error()) {
+                $result['sdata']['error'][] = $set->get_parameters('MAILBOX');
             }
         }
 
-        return ['sdata', 'index', 'folders', 'sorting', 'order'];
+        return $result;
     }
 
     /**
-     * Serialization __wakeup handler
+     * Un-serialization handler
+     *
+     * @param array $data An associative array of key/value pairs that represent the serialized form of the object
      */
-    public function __wakeup()
+    public function __unserialize(array $data): void
     {
-        $this->meta       = ['count' => count($this->index)];
-        $this->incomplete = count($this->sdata['incomplete']) > 0;
+        foreach (['index', 'folders', 'sorting', 'order'] as $key) {
+            $this->{$key} = $data[$key];
+        }
+
+        $this->meta = ['count' => count($this->index)];
+        $this->incomplete = count($data['sdata']['incomplete']) > 0;
 
         // restore result sets from saved index
-        $data = [];
+        $folder_data = [];
         foreach ($this->index as $item) {
-            list($uid, $folder) = explode('-', $item, 2);
-            $data[$folder] = ($data[$folder] ?? '') . ' ' . $uid;
+            [$uid, $folder] = explode('-', $item, 2);
+            $folder_data[$folder] = ($folder_data[$folder] ?? '') . ' ' . $uid;
         }
 
         foreach ($this->folders as $folder) {
-            if (in_array($folder, $this->sdata['error'])) {
+            if (in_array($folder, $data['sdata']['error'])) {
                 $data_str = null;
-            }
-            else {
-                $data_str = '* SORT' . ($data[$folder] ?? '');
+            } else {
+                $data_str = '* SORT' . ($folder_data[$folder] ?? '');
             }
 
             $set = new rcube_result_index($folder, $data_str, strtoupper($this->order));
 
-            if (in_array($folder, $this->sdata['incomplete'])) {
+            if (in_array($folder, $data['sdata']['incomplete'])) {
                 $set->incomplete = true;
             }
 

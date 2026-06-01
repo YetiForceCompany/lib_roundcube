@@ -10,10 +10,7 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/plugin-managesieve/
 */
-
 
 $labels['filters'] = 'Hidlyddion';
 $labels['managefilters'] = 'Rheoli hidlyddion ebost i fewn';
@@ -134,6 +131,7 @@ $labels['varlowerfirst'] = 'llythyren gyntaf yn fach';
 $labels['varupperfirst'] = 'llythyren gyntaf yn briflythyren';
 $labels['varquotewildcard'] = 'dyfynnu nodau arbennig';
 $labels['varlength'] = 'hyd';
+$labels['varencodeurl'] = 'amgodwyd-canran (ar gyfer URLs)';
 $labels['notify'] = 'Anfon hysbysiad';
 $labels['notifytarget'] = 'Target hysbysu:';
 $labels['notifymessage'] = 'Neges hysbysu (dewisol):';
@@ -283,3 +281,4 @@ $messages['duplicate.conflict.err'] = 'Ni ganiateir defnyddio pennawd a dynodwr 
 $messages['disabledaction'] = 'Ni ganiateir y weithred.';
 $messages['lastindexempty'] = 'Mae angen mynegai wrth gyfri o\'r diwedd';
 $messages['noflagset'] = 'Rhaid dewis o leia un fflag';
+$messages['saving.actionordererror'] = 'Rhaid i\'r weithred \'$previous\' ddod ar ôl y weithred \'$current\'.';

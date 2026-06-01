@@ -10,8 +10,6 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/messages/
 */
 
 $messages['errortitle']  = 'Terjadi error!';
@@ -25,6 +23,7 @@ $messages['servererrormsg'] = 'Server Error: $msg';
 $messages['accountlocked'] = 'Terlalu banyak mencoba login yang gagal. Coba lagi nanti.';
 $messages['connerror'] = 'Kesalahan sambungan (Gagal menghubungi server)!';
 $messages['dberror'] = 'Basis data Error!';
+$messages['dbconnerror'] = 'Tidak bisa menyambung ke basis data!';
 $messages['windowopenerror'] = 'Jendela popup terblokir!';
 $messages['requesttimedout'] = 'Permintaan melewati batas waktu';
 $messages['errorreadonly'] = 'Tidak bisa melakukan operasi. Folder hanya bisa dibaca.';
@@ -57,6 +56,9 @@ $messages['contactexists'] = 'Kontak dengan alamat email yang sama sudah ada.';
 $messages['contactnameexists'] = 'Kontak dengan nama yang sama sudah ada.';
 $messages['blockedimages'] = 'Untuk melindungi privasi Anda, gambar-gambar diluar server diblok pada pesan ini.';
 $messages['blockedresources'] = 'Untuk melindungi privasi Anda, sumber daya remote telah diblokir.';
+$messages['suspiciousemail'] = 'Pesan ini mengandung alamat surel mencurigakan yang mungkin palsu.';
+$messages['bccemail'] = 'Pesan yang diteruskan memuat penerima yang konfidensial (Bcc).';
+$messages['bouncehint'] = 'Pesan akan dikirim tanpa perubahan apa pun, yaitu memakai isi, header, dan penerima asli.';
 $messages['encryptedmessage'] = 'Pesan ini terenkripsi dan tidak bisa ditampilkan. Maaf!';
 $messages['externalmessagedecryption'] = 'Ini adalah pesan terenkripsi dan dapat didekripsi dengan ekstensi browser Anda.';
 $messages['nopubkeyfor'] = 'Tak ada kunci publik yang ditemukan bagi $email';
@@ -98,7 +100,7 @@ $messages['nopagesizewarning'] = 'Tolong masukkan ukuran halaman';
 $messages['nosenderwarning'] = 'Harap masukkan alamat email pengirim.';
 $messages['recipientsadded'] = 'Penerima telah ditambahkan.';
 $messages['norecipientwarning'] = 'Tolong masukkan sedikitnya satu penerima';
-$messages['disclosedrecipwarning'] = 'Semua penerima akan saling tahu alamat surel pihak lain. Untuk mencegah hal ini dan melindungi privasi mereka Anda dapat memakai ruas Bcc.';
+$messages['disclosedrecipwarning'] = 'Semua penerima akan melihat alamat surel satu sama lain. Untuk mencegah ini dan melindungi privasi mereka Anda dapat memakai ruas Bcc.';
 $messages['disclosedreciptitle'] = 'Terlalu banyak penerima publik';
 $messages['nosubjectwarning']  = '"Judul" kosong. Isi judul sekarang?';
 $messages['nosubjecttitle']  = 'Tanpa subjek';
@@ -117,11 +119,14 @@ $messages['nospellerrors'] = 'Tidak ditemukan kesalahan ejaan';
 $messages['folderdeleted'] = 'Folder berhasil dihapus';
 $messages['foldersubscribed'] = 'Folder berhasil dilanggankan';
 $messages['folderunsubscribed'] = 'Folder berhasil berhenti dilanggankan';
+$messages['folderpurged'] = 'Folder berhasil dikosongkan';
+$messages['folderexpunged'] = 'Folder sukses dipadatkan.';
 $messages['deletedsuccessfully'] = 'Berhasil dihapus';
 $messages['converting'] = 'Mengembalikan pesan ke format awal...';
 $messages['messageopenerror'] = 'Tidak dapat mengambil pesan dari server';
 $messages['filelinkerror'] = 'Gagal melampirkan berkas.';
 $messages['fileuploaderror'] = 'Gagal mengunggah berkas';
+$messages['csvfilemismatch'] = 'Mengimpor beberapa berkas CSV dengan ruas-ruas yang berbeda tidak didukung.';
 $messages['filesizeerror'] = 'Berkas terunggah mencapai ukuran maksimal dari $size';
 $messages['filecounterror'] = 'Anda dapat mengunggah maksimum $count berkas sekaligus.';
 $messages['msgsizeerror'] = 'Gagal melampirkan sebuah berkas. Ukuran maksimum suatu pesan ($size) terlampaui.';
@@ -153,7 +158,6 @@ $messages['nogroupassignmentschanged'] = 'Tidak ada perubahan tugas grup.';
 $messages['importwait'] = 'Sedang mengimpor, harap menunggu...';
 $messages['importformaterror'] = 'Proses import gagal. File yang di upload bukan file import yang valid.';
 $messages['importconfirm'] = '<b>Berhasil mengimpor $inserted kontak</b>';
-$messages['importconfirmskipped'] = '<b>$skipped entri yang sudah ada dilewatkan</b>';
 $messages['importmessagesuccess'] = 'Berhasil mengimport $nr pesan';
 $messages['importmessageerror'] = 'Gagal mengimport! File yang di upload buka pesan yang valid atau file mailbox';
 $messages['opnotpermitted'] = 'Operasi tidak diperbolehkan!';
@@ -217,6 +221,9 @@ $messages['clicktocompose'] = 'Klik di sini untuk menulis pesan baru';
 $messages['nosupporterror'] = 'Fitur ini tidak didukung oleh peramban web Anda.';
 $messages['siginserted'] = 'Tanda tangan sukses disisipkan.';
 $messages['responseinserted'] = 'Respons sukses disisipkan.';
+$messages['noresponsesavailable'] = 'Tidak ada respon yang tersedia';
 $messages['listempty'] = 'Daftar ini kosong.';
 $messages['listusebutton'] = 'Pakai tombol Buat untuk menambahkan sebuah record baru. ';
 $messages['keypaircreatesuccess'] = 'Sebuah pasangan kunci baru telah sukses dibuat untuk $identity.';
+$messages['emptyattachment'] = 'Lampiran ini tampaknya kosong. <br>Harap periksa dengan orang yang mengirim ini.';
+$messages['oauthloginfailed'] = 'Log masuk OAuth gagal. Harap coba lagi.';

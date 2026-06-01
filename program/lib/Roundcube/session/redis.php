@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  +-----------------------------------------------------------------------+
  | This file is part of the Roundcube Webmail client                     |
  |                                                                       |
@@ -20,18 +20,14 @@
 
 /**
  * Class to provide redis session storage
- *
- * @package    Framework
- * @subpackage Core
  */
 class rcube_session_redis extends rcube_session
 {
-    /** @var Redis The redis engine */
+    /** @var \Redis The redis engine */
     private $redis;
 
     /** @var bool Debug state */
     private $debug;
-
 
     /**
      * Object constructor
@@ -47,11 +43,10 @@ class rcube_session_redis extends rcube_session
 
         if (!$this->redis) {
             rcube::raise_error([
-                    'code' => 604, 'type' => 'redis',
-                    'line' => __LINE__, 'file' => __FILE__,
-                    'message' => "Failed to connect to redis. Please check configuration"
-                ],
-                true, true);
+                'code' => 604,
+                'type' => 'redis',
+                'message' => 'Failed to connect to redis. Please check configuration',
+            ], true, true);
         }
 
         // register sessions handler
@@ -66,6 +61,7 @@ class rcube_session_redis extends rcube_session
      *
      * @return bool True on success, False on failure
      */
+    #[\Override]
     public function open($save_path, $session_name)
     {
         return true;
@@ -76,6 +72,7 @@ class rcube_session_redis extends rcube_session
      *
      * @return bool True on success, False on failure
      */
+    #[\Override]
     public function close()
     {
         return true;
@@ -88,14 +85,14 @@ class rcube_session_redis extends rcube_session
      *
      * @return bool True on success, False on failure
      */
+    #[\Override]
     public function destroy($key)
     {
         if ($key) {
             try {
-                $fname  = method_exists($this->redis, 'del') ? 'del' : 'delete';
-                $result = $this->redis->$fname($key);
-            }
-            catch (Exception $e) {
+                // @phpstan-ignore-next-line
+                $result = method_exists($this->redis, 'del') ? $this->redis->del($key) : $this->redis->delete($key);
+            } catch (\Exception $e) {
                 rcube::raise_error($e, true, true);
             }
 
@@ -114,14 +111,14 @@ class rcube_session_redis extends rcube_session
      *
      * @return string Serialized data string
      */
+    #[\Override]
     public function read($key)
     {
         $value = null;
 
         try {
             $value = $this->redis->get($key);
-        }
-        catch (Exception $e) {
+        } catch (\Exception $e) {
             rcube::raise_error($e, true, true);
         }
 
@@ -131,10 +128,11 @@ class rcube_session_redis extends rcube_session
 
         if ($value) {
             $arr = unserialize($value);
-            $this->changed = $arr['changed'];
-            $this->ip      = $arr['ip'];
-            $this->vars    = $arr['vars'];
-            $this->key     = $key;
+            // Use a fallback to avoid errors in case expires_at is unset
+            $this->expires_at = $arr['expires_at'] ?? time();
+            $this->ip = $arr['ip'];
+            $this->vars = $arr['vars'];
+            $this->key = $key;
         }
 
         return $this->vars ?: '';
@@ -149,18 +147,18 @@ class rcube_session_redis extends rcube_session
      *
      * @return bool True on success, False on failure
      */
-    public function update($key, $newvars, $oldvars)
+    #[\Override]
+    protected function update($key, $newvars, $oldvars)
     {
         $ts = microtime(true);
 
-        if ($newvars !== $oldvars || $ts - $this->changed > $this->lifetime / 3) {
-            $data   = serialize(['changed' => time(), 'ip' => $this->ip, 'vars' => $newvars]);
+        if ($newvars !== $oldvars || $this->expires_at - $ts > $this->lifetime / 3) {
+            $data = serialize(['expires_at' => time() + $this->lifetime, 'ip' => $this->ip, 'vars' => $newvars]);
             $result = false;
 
             try {
                 $result = $this->redis->setex($key, $this->lifetime + 60, $data);
-            }
-            catch (Exception $e) {
+            } catch (\Exception $e) {
                 rcube::raise_error($e, true, true);
             }
 
@@ -178,24 +176,24 @@ class rcube_session_redis extends rcube_session
      * Write data to redis store
      *
      * @param string $key  Session identifier
-     * @param array  $vars Session data
+     * @param string $vars Session data
      *
      * @return bool True on success, False on failure
      */
-    public function write($key, $vars)
+    #[\Override]
+    protected function save($key, $vars)
     {
         if ($this->ignore_write) {
             return true;
         }
 
         $result = false;
-        $data   = null;
+        $data = null;
 
         try {
-            $data   = serialize(['changed' => time(), 'ip' => $this->ip, 'vars' => $vars]);
+            $data = serialize(['expires_at' => time() + $this->lifetime, 'ip' => $this->ip, 'vars' => $vars]);
             $result = $this->redis->setex($key, $this->lifetime + 60, $data);
-        }
-        catch (Exception $e) {
+        } catch (\Exception $e) {
             rcube::raise_error($e, true, true);
         }
 

@@ -10,8 +10,6 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/messages/
 */
 
 $messages['errortitle']  = 'An error occurred.';
@@ -102,7 +100,7 @@ $messages['nopagesizewarning'] = 'Please enter a page size.';
 $messages['nosenderwarning'] = 'Please enter sender email address.';
 $messages['recipientsadded'] = 'Recipient(s) added successfully.';
 $messages['norecipientwarning'] = 'Please enter at least one recipient.';
-$messages['disclosedrecipwarning'] = 'All recipients will see each others e-mail addresses. To prevent this and protect their privacy you can use the Bcc field.';
+$messages['disclosedrecipwarning'] = 'All recipients will see each other\'s e-mail addresses. To prevent this and protect their privacy you can use the Bcc field.';
 $messages['disclosedreciptitle'] = 'Too many public recipients';
 $messages['nosubjectwarning']  = 'The "Subject" field is empty. Would you like to enter one now?';
 $messages['nosubjecttitle']  = 'No subject';
@@ -160,7 +158,9 @@ $messages['nogroupassignmentschanged'] = 'No group assignments changed.';
 $messages['importwait'] = 'Importing, please wait...';
 $messages['importformaterror'] = 'Import failed! The uploaded file is not in a valid import format.';
 $messages['importconfirm'] = '<b>Successfully imported $inserted contacts</b>';
-$messages['importconfirmskipped'] = '<b>Skipped $skipped existing entries</b>';
+$messages['importconfirmskipped'] = '<b>Skipped $skipped existing contacts</b>';
+$messages['importconfirminvalid'] = '<b>Skipped $invalid invalid contacts</b>';
+$messages['importconfirmerrors'] = '<b>Failed to import $errors valid contacts</b>';
 $messages['importmessagesuccess'] = 'Successfully imported $nr messages';
 $messages['importmessageerror'] = 'Import failed! The uploaded file is not a valid message or mailbox file';
 $messages['opnotpermitted'] = 'Operation not permitted!';
@@ -230,3 +230,5 @@ $messages['listusebutton'] = 'Use the Create button to add a new record.';
 $messages['keypaircreatesuccess'] = 'A new key pair has been successfully created for $identity.';
 $messages['emptyattachment'] = 'This attachment appears to be empty.<br>Content may have been removed by anti-virus/anti-spam services. Please check with the sender.';
 $messages['oauthloginfailed'] = 'OAuth login failed. Please try again.';
+$messages['oauthinvalidrequest'] = 'Authorisation request was invalid or incomplete.';
+$messages['oauthaccessdenied'] = 'Authorisation server or the user denied the request.';

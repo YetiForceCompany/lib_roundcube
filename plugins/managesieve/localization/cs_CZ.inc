@@ -10,10 +10,7 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/plugin-managesieve/
 */
-
 
 $labels['filters'] = 'Filtry';
 $labels['managefilters'] = 'Nastavení filtrů';
@@ -134,6 +131,7 @@ $labels['varlowerfirst'] = 'první písmeno malé';
 $labels['varupperfirst'] = 'první písmeno velké';
 $labels['varquotewildcard'] = 'uvodit speciální znaky uvozovkama';
 $labels['varlength'] = 'délka';
+$labels['varencodeurl'] = 'zakódováno pomocí procentového kódování (pro URL)';
 $labels['notify'] = 'Odeslat oznámení';
 $labels['notifytarget'] = 'Cíl oznámení:';
 $labels['notifymessage'] = 'Zpráva oznámení (nepovinné):';
@@ -283,3 +281,4 @@ $messages['duplicate.conflict.err'] = 'Hlavička a jedinečný identifikátor z�
 $messages['disabledaction'] = 'Akce není povolena';
 $messages['lastindexempty'] = 'Při počítání od zadu je vyžadován index.';
 $messages['noflagset'] = 'Alespoň jeden příznak musí být vybrán.';
+$messages['saving.actionordererror'] = 'Předchozí akce \'$previous\' musí být po akci \'$current\'.';

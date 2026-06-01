@@ -10,10 +10,8 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/plugin-hide_blockquote/
 */
 
-$labels['hide'] = 'Agochar';
-$labels['show'] = 'Amosar';
-$labels['quotelimit'] = 'Agochar mencións cando haxa demasiadas liñas';
+$labels['hide'] = 'Ocultar';
+$labels['show'] = 'Mostrar';
+$labels['quotelimit'] = 'Ocultar o texto citado cando o número de liñas sexa maior que';

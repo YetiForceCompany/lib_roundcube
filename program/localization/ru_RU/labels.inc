@@ -10,10 +10,7 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/labels/
 */
-
 
 $labels['welcome'] = 'Добро пожаловать в $product!';
 $labels['username'] = 'Имя пользователя';
@@ -263,7 +260,6 @@ $labels['keylength'] = 'Бит';
 $labels['keyexpired'] = 'С истёкщим сроком';
 $labels['keyrevoked'] = 'Отозван';
 $labels['bccinstead'] = 'Использовать BCC';
-$labels['addheader'] = 'Добавить получателя (заголовок)';
 $labels['insert'] = 'Вставить';
 $labels['insertcontact'] = 'Вставить контакт(ы)';
 $labels['recipient'] = 'Получатель';

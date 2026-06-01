@@ -10,8 +10,6 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/messages/
 */
 
 $messages['errortitle']  = 'Có lỗi xảy ra.';
@@ -68,16 +66,21 @@ $messages['deletefolderconfirm']  = 'Bạn có thực sự muốn xóa giữ li�
 $messages['purgefolderconfirm']  = 'Bạn có thực sự muốn xóa toàn bộ thư trong giữ liệu này?';
 $messages['contactdeleting'] = 'Đang xóa (các) liên lạc...';
 $messages['groupdeleting'] = 'Đang xóa nhóm...';
-$messages['folderdeleting'] = 'Đang xóa giữ liệu...';
-$messages['foldermoving'] = 'Đang chuyển giữ liệu...';
-$messages['foldersubscribing'] = 'Nhập vào giữ liệu...';
-$messages['folderunsubscribing'] = 'Không nhập giữ liệu...';
+$messages['folderdeleting'] = 'Đang xóa thư mục dữ liệu...';
+$messages['foldermoving'] = 'Đang chuyển thư mục dữ liệu..';
+$messages['foldersubscribing'] = 'Đăng ký vào thư mục...';
+$messages['folderunsubscribing'] = 'Bỏ đăng ký thư mục...';
 $messages['formincomplete'] = 'Mẫu đơn chưa được hoàn toàn điền xong.';
 $messages['noemailwarning'] = 'Xin nhập địa chỉ email hợp lệ.';
 $messages['nonamewarning']  = 'Xin nhập tên.';
 $messages['nopagesizewarning'] = 'Xin nhập kích cỡ của trang.';
-$messages['norecipientwarning'] = 'Xin nhập it nhất 1 người nhận.';
+$messages['nosenderwarning'] = 'Vui lòng nhập địa chỉ email của người gửi';
+$messages['recipientsadded'] = 'Thông tin người nhận đã được thêm thành công';
+$messages['norecipientwarning'] = 'Vui lòng nhập ít nhất 1 người nhận.';
+$messages['disclosedrecipwarning'] = 'Tất cả người nhận sẽ nhìn được địa chỉ email của người khác. Để tránh việc này, bạn có thể dùng trường địa chỉ Bcc.';
+$messages['disclosedreciptitle'] = 'Có quá nhiều người nhận';
 $messages['nosubjectwarning']  = 'Mục "Tiêu đề" vẫn còn trống. Bạn có muốn nhập tiêu đề bây giờ không?';
+$messages['nosubjecttitle']  = 'Không có tiêu đề';
 $messages['nobodywarning'] = 'Gửi thư không có nội dung?';
 $messages['restoresavedcomposedata'] = 'Tìm thấy một thư đã được soạn trước nhưng chưa gửi.\n\nTiêu đề: $subject\nLưu ngày: $date\n\nBạn có muốn khôi phục lại thư này?';
 $messages['nosearchname'] = 'Nhập liên hệ hoặc địa chỉ email.';
@@ -95,6 +98,7 @@ $messages['folderunsubscribed'] = 'Giữ liệu không nhập vào thành công.
 $messages['deletedsuccessfully'] = 'Đã xóa thành công';
 $messages['converting'] = 'Loại bỏ định dạng...';
 $messages['messageopenerror'] = 'Không thể tải thư từ máy chủ';
+$messages['filelinkerror'] = 'Đính kèm file bị lỗi.';
 $messages['fileuploaderror'] = 'Tải tập tin lên thất bại';
 $messages['filesizeerror'] = 'Tập tin được tải lên vượt quá dung lượng tối đa....';
 $messages['copysuccess'] = 'Sao chép thành công $nr địa chỉ.';
@@ -124,7 +128,6 @@ $messages['nogroupassignmentschanged'] = 'Không quy nhóm nào đả được t
 $messages['importwait'] = 'Đang nhập, xin chờ...';
 $messages['importformaterror'] = 'Nhập dữ liệu lỗi. Tệp tin vừa tải lên không phải tệp dữ liệu chính xác.';
 $messages['importconfirm'] = 'Đã nhập $inserted liên hệ đã chèn vào thành công.';
-$messages['importconfirmskipped'] = 'Đã bỏ qua được $skipped mục tồn tại.';
 $messages['importmessagesuccess'] = 'Đã nhập thành công $nr thư.';
 $messages['importmessageerror'] = 'Nhập dữ liệu bị lỗi. Tệp tin vừa tải lên không có định dạng chính xác của tệp cấu hình hòm thư hoặc một thư đơn lẻ.';
 $messages['opnotpermitted'] = 'Thao tác không được cho phép!';

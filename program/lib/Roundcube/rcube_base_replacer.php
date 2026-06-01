@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  +-----------------------------------------------------------------------+
  | This file is part of the Roundcube Webmail client                     |
  |                                                                       |
@@ -20,14 +20,10 @@
 /**
  * Helper class to turn relative urls into absolute ones
  * using a predefined base
- *
- * @package    Framework
- * @subpackage Utils
  */
 class rcube_base_replacer
 {
     private $base_url;
-
 
     /**
      * Class constructor
@@ -84,7 +80,7 @@ class rcube_base_replacer
         }
 
         // check if path is a content-id scheme
-        if (strpos($path, 'cid:') === 0) {
+        if (str_starts_with($path, 'cid:')) {
             return $path;
         }
 
@@ -100,12 +96,11 @@ class rcube_base_replacer
         // $path is absolute
         if ($path && $path[0] == '/') {
             $abs_path = $host_url . $path;
-        }
-        else {
+        } else {
             // strip './' because its the same as ''
             $path = preg_replace('/^\.\//', '', $path);
 
-            if (preg_match_all('/\.\.\//', $path, $matches, PREG_SET_ORDER)) {
+            if (preg_match_all('/\.\.\//', $path, $matches, \PREG_SET_ORDER)) {
                 $cnt = count($matches);
                 while ($cnt--) {
                     if ($pos = strrpos($base_url, '/')) {
@@ -115,7 +110,7 @@ class rcube_base_replacer
                 }
             }
 
-            $abs_path = $base_url.'/'.$path;
+            $abs_path = $base_url . '/' . $path;
         }
 
         return $abs_path;

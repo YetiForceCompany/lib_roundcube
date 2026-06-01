@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  +-----------------------------------------------------------------------+
  | This file is part of the Roundcube Webmail client                     |
  |                                                                       |
@@ -28,17 +28,18 @@ class rcmail_action_contacts_print extends rcmail_action_contacts_index
      *
      * @param array $args Arguments from the previous step(s)
      */
+    #[\Override]
     public function run($args = [])
     {
         $rcmail = rcmail::get_instance();
 
         // Get contact ID and source ID from request
-        $cids   = self::get_cids();
+        $cids = self::get_cids();
         $source = key($cids);
-        $cid    = $cids ? array_first($cids[$source]) : null;
+        $cid = $cids ? array_first($cids[$source]) : null;
 
         // Initialize addressbook source
-        self::$CONTACTS  = self::contact_source($source, true);
+        self::$CONTACTS = self::contact_source($source, true);
         self::$SOURCE_ID = $source;
 
         // read contact record
@@ -47,9 +48,9 @@ class rcmail_action_contacts_print extends rcmail_action_contacts_index
         }
 
         $rcmail->output->add_handlers([
-                'contacthead'    => [$this, 'contact_head'],
-                'contactdetails' => [$this, 'contact_details'],
-                'contactphoto'   => [$this, 'contact_photo'],
+            'contacthead' => [$this, 'contact_head'],
+            'contactdetails' => [$this, 'contact_details'],
+            'contactphoto' => [$this, 'contact_photo'],
         ]);
 
         $rcmail->output->send('contactprint');
@@ -69,12 +70,12 @@ class rcmail_action_contacts_print extends rcmail_action_contacts_index
             'head' => [  // section 'head' is magic!
                 'name' => $rcmail->gettext('contactnameandorg'),
                 'content' => [
-                    'prefix'     => [],
-                    'name'       => [],
-                    'firstname'  => [],
+                    'prefix' => [],
+                    'name' => [],
+                    'firstname' => [],
                     'middlename' => [],
-                    'surname'    => [],
-                    'suffix'     => [],
+                    'surname' => [],
+                    'suffix' => [],
                 ],
             ],
         ];
@@ -95,37 +96,37 @@ class rcmail_action_contacts_print extends rcmail_action_contacts_index
 
         $form = [
             'contact' => [
-                'name'    => $rcmail->gettext('properties'),
+                'name' => $rcmail->gettext('properties'),
                 'content' => [
                     'organization' => [],
-                    'department'   => [],
-                    'jobtitle'     => [],
-                    'email'        => [],
-                    'phone'        => [],
-                    'address'      => [],
-                    'website'      => [],
-                    'im'           => [],
-                    'groups'       => [],
+                    'department' => [],
+                    'jobtitle' => [],
+                    'email' => [],
+                    'phone' => [],
+                    'address' => [],
+                    'website' => [],
+                    'im' => [],
+                    'groups' => [],
                 ],
             ],
             'personal' => [
-                'name'    => $rcmail->gettext('personalinfo'),
+                'name' => $rcmail->gettext('personalinfo'),
                 'content' => [
-                    'nickname'    => [],
-                    'gender'      => [],
-                    'maidenname'  => [],
-                    'birthday'    => [],
+                    'nickname' => [],
+                    'gender' => [],
+                    'maidenname' => [],
+                    'birthday' => [],
                     'anniversary' => [],
-                    'manager'     => [],
-                    'assistant'   => [],
-                    'spouse'      => [],
+                    'manager' => [],
+                    'assistant' => [],
+                    'spouse' => [],
                 ],
             ],
         ];
 
         if (isset(rcmail_action_contacts_index::$CONTACT_COLTYPES['notes'])) {
             $form['notes'] = [
-                'name'    => $rcmail->gettext('notes'),
+                'name' => $rcmail->gettext('notes'),
                 'content' => [
                     'notes' => ['type' => 'textarea', 'label' => false],
                 ],
@@ -137,7 +138,7 @@ class rcmail_action_contacts_print extends rcmail_action_contacts_index
             if (!empty($groups)) {
                 $form['contact']['content']['groups'] = [
                     'value' => rcube::Q(implode(', ', $groups)),
-                    'label' => $rcmail->gettext('groups')
+                    'label' => $rcmail->gettext('groups'),
                 ];
             }
         }

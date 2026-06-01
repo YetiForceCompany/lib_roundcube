@@ -10,10 +10,7 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/labels/
 */
-
 
 $labels['welcome'] = '欢迎使用 $product';
 $labels['username'] = '用户名';
@@ -254,7 +251,6 @@ $labels['keylength'] = '位';
 $labels['keyexpired'] = '已过期';
 $labels['keyrevoked'] = '已废除';
 $labels['bccinstead'] = '使用密送';
-$labels['addheader'] = '添加收件人 (信头)';
 $labels['insert'] = '插入';
 $labels['recipient'] = '收件人';
 $labels['recipientedit'] = '编辑收件人';

@@ -10,10 +10,7 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/labels/
 */
-
 
 $labels['welcome'] = 'Welkom bij $product';
 $labels['username'] = 'Gebruikersnaam';
@@ -200,6 +197,8 @@ $labels['selectimage'] = 'Selecteer beeld';
 $labels['addimage'] = 'Voeg beeld toe';
 $labels['selectmedia'] = 'Selecteer film';
 $labels['addmedia'] = 'Voeg film toe';
+$labels['encrypt'] = 'Versleutel';
+$labels['keyid'] = 'Sleutel-ID';
 $labels['keylength'] = 'Bits';
 $labels['keyexpired'] = 'Verlopen';
 $labels['insert'] = 'Voeg in';
@@ -352,6 +351,7 @@ $labels['editpreferences'] = 'Gebruikersvoorkeuren bewerken';
 $labels['identities'] = 'Identiteiten';
 $labels['manageidentities'] = 'Identiteiten beheren';
 $labels['newidentity'] = 'Nieuwe identiteit maken';
+$labels['identityencryption'] = 'Versleuteling';
 $labels['preferhtml'] = 'Gebruik HTML-opmaak';
 $labels['defaultcharset'] = 'Standaard karakterset';
 $labels['htmlmessage'] = 'HTML-bericht';
@@ -458,6 +458,8 @@ $labels['location'] = 'Locatie';
 $labels['info'] = 'Informatie';
 $labels['getfoldersize'] = 'Klik voor de grootte van de map';
 $labels['changesubscription'] = 'Klik voor abonnement te wijzigen';
+$labels['encryptioncreatekey'] = 'Maak een nieuw sleutelpaar aan';
+$labels['encryption'] = 'Versleuteling';
 $labels['sortby'] = 'Sorteren op';
 $labels['sortasc'] = 'Oplopend sorteren';
 $labels['sortdesc'] = 'Aflopend sorteren';

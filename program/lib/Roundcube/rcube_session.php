@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  +-----------------------------------------------------------------------+
  | This file is part of the Roundcube Webmail client                     |
  |                                                                       |
@@ -22,35 +22,32 @@
 
 /**
  * Abstract class to provide database supported session storage
- *
- * @package    Framework
- * @subpackage Core
  */
-abstract class rcube_session
+abstract class rcube_session implements \SessionHandlerInterface
 {
     protected $config;
     protected $key;
     protected $ip;
     protected $cookie;
-    protected $changed;
+    protected $expires_at;
     protected $start;
     protected $vars;
     protected $now;
     protected $lifetime;
-    protected $reloaded     = false;
-    protected $appends      = [];
-    protected $unsets       = [];
-    protected $gc_enabled   = 0;
-    protected $gc_handlers  = [];
-    protected $cookiename   = 'roundcube_sessauth';
-    protected $ip_check     = false;
-    protected $logging      = false;
+    protected $reloaded = false;
+    protected $appends = [];
+    protected $unsets = [];
+    protected $gc_enabled = 0;
+    protected $gc_handlers = [];
+    protected $cookiename = 'roundcube_sessauth';
+    protected $ip_check = false;
+    protected $logging = false;
     protected $ignore_write = false;
-
 
     /**
      * Blocks session data from being written to database.
      * Can be used if write-race conditions are to be expected
+     *
      * @var bool
      */
     public $nowrite = false;
@@ -70,19 +67,15 @@ abstract class rcube_session
         // class name for this storage
         $class = "rcube_session_{$storage}";
 
-        // try to instantiate class
-        if (class_exists($class)) {
-            return new $class($config);
+        if (!class_exists($class)) {
+            rcube::raise_error([
+                'code' => 604,
+                'type' => 'session',
+                'message' => 'Failed to find session driver. Check session_storage config option',
+            ], true, true);
         }
 
-        // no storage found, raise error
-        rcube::raise_error([
-                'code' => 604, 'type' => 'session',
-                'line' => __LINE__, 'file' => __FILE__,
-                'message' => "Failed to find session driver. Check session_storage config option"
-            ],
-            true, true
-        );
+        return new $class($config);
     }
 
     /**
@@ -116,14 +109,7 @@ abstract class rcube_session
         ini_set('session.serialize_handler', 'php');
 
         // set custom functions for PHP session management
-        session_set_save_handler(
-            [$this, 'open'],
-            [$this, 'close'],
-            [$this, 'read'],
-            [$this, 'sess_write'],
-            [$this, 'destroy'],
-            [$this, 'gc']
-        );
+        session_set_save_handler($this);
     }
 
     /**
@@ -131,8 +117,8 @@ abstract class rcube_session
      */
     public function start()
     {
-        $this->start   = microtime(true);
-        $this->ip      = rcube_utils::remote_addr();
+        $this->start = microtime(true);
+        $this->ip = rcube_utils::remote_addr();
         $this->logging = $this->config->get('session_debug', false);
 
         $lifetime = $this->config->get('session_lifetime', 1) * 60;
@@ -144,12 +130,42 @@ abstract class rcube_session
     /**
      * Abstract methods should be implemented by driver classes
      */
-    abstract function open($save_path, $session_name);
-    abstract function close();
-    abstract function destroy($key);
-    abstract function read($key);
-    abstract function write($key, $vars);
-    abstract function update($key, $newvars, $oldvars);
+    #[\Override]
+    #[\ReturnTypeWillChange]
+    abstract public function open($save_path, $session_name);
+
+    #[\Override]
+    #[\ReturnTypeWillChange]
+    abstract public function close();
+
+    #[\Override]
+    #[\ReturnTypeWillChange]
+    abstract public function destroy($key);
+
+    #[\Override]
+    #[\ReturnTypeWillChange]
+    abstract public function read($key);
+
+    /**
+     * Write data to the session store
+     *
+     * @param string $key  Session identifier
+     * @param string $vars Session data
+     *
+     * @return bool True on success, False on failure
+     */
+    abstract protected function save($key, $vars);
+
+    /**
+     * Write data to the session store
+     *
+     * @param string $key     Session identifier
+     * @param string $newvars New session data string
+     * @param string $oldvars Old session data string
+     *
+     * @return bool True on success, False on failure
+     */
+    abstract protected function update($key, $newvars, $oldvars);
 
     /**
      * Session write handler. This calls the implementation methods for write/update after some initial checks.
@@ -159,7 +175,9 @@ abstract class rcube_session
      *
      * @return bool True on success, False on failure
      */
-    public function sess_write($key, $vars)
+    #[\Override]
+    #[\ReturnTypeWillChange]
+    public function write($key, $vars)
     {
         if ($this->nowrite) {
             return true;
@@ -170,12 +188,29 @@ abstract class rcube_session
 
         // if there are cached vars, update store, else insert new data
         if ($oldvars) {
-            $newvars = $this->_fixvars($vars, $oldvars);
+            $newvars = $this->fixvars($vars, $oldvars);
             return $this->update($key, $newvars, $oldvars);
         }
-        else {
-            return $this->write($key, $vars);
-        }
+
+        return $this->save($key, $vars);
+    }
+
+    /**
+     * Execute registered garbage collector routines
+     *
+     * @param int $maxlifetime Maximum session lifetime
+     *
+     * @return int|false Number of deleted sessions on success, False on failure
+     */
+    #[\Override]
+    #[\ReturnTypeWillChange]
+    public function gc($maxlifetime)
+    {
+        // move gc execution to the script shutdown function
+        // see rcube::shutdown() and rcube_session::write_close()
+        $this->gc_enabled = $maxlifetime;
+
+        return 0;
     }
 
     /**
@@ -196,23 +231,25 @@ abstract class rcube_session
      *
      * @param array $data Session data
      *
-     * @return string Session identifier (on success)
+     * @return ?string Session identifier (on success)
      */
     public function create($data)
     {
         $length = strlen(session_id());
-        $key    = rcube_utils::random_bytes($length);
+        $key = rcube_utils::random_bytes($length);
 
         // create new session
-        if ($this->write($key, $this->serialize($data))) {
+        if ($this->save($key, $this->serialize($data))) {
             return $key;
         }
+
+        return null;
     }
 
     /**
      * Merge vars with old vars and apply unsets
      */
-    protected function _fixvars($vars, $oldvars)
+    protected function fixvars($vars, $oldvars)
     {
         $newvars = '';
 
@@ -221,11 +258,10 @@ abstract class rcube_session
 
             if (is_array($a_oldvars)) {
                 // remove unset keys on oldvars
-                foreach ((array)$this->unsets as $var) {
+                foreach ((array) $this->unsets as $var) {
                     if (isset($a_oldvars[$var])) {
                         unset($a_oldvars[$var]);
-                    }
-                    else {
+                    } else {
                         $path = explode('.', $var);
                         $k = array_pop($path);
                         $node = &$this->get_node($path, $a_oldvars);
@@ -234,9 +270,8 @@ abstract class rcube_session
                 }
 
                 $newvars = $this->serialize(array_merge(
-                    (array)$a_oldvars, (array)$this->unserialize($vars)));
-            }
-            else {
+                    (array) $a_oldvars, (array) $this->unserialize($vars)));
+            } else {
                 $newvars = $vars;
             }
         }
@@ -244,22 +279,6 @@ abstract class rcube_session
         $this->unsets = [];
 
         return $newvars;
-    }
-
-    /**
-     * Execute registered garbage collector routines
-     *
-     * @param int $maxlifetime Maximum session lifetime
-     *
-     * @return bool True on success, False on failure
-     */
-    public function gc($maxlifetime)
-    {
-        // move gc execution to the script shutdown function
-        // see rcube::shutdown() and rcube_session::write_close()
-        $this->gc_enabled = $maxlifetime;
-
-        return true;
     }
 
     /**
@@ -308,9 +327,9 @@ abstract class rcube_session
         $this->ignore_write = false;
 
         $this->vars = null;
-        $this->key  = session_id();
+        $this->key = session_id();
 
-        $this->log("Session regenerate: $old_id -> {$this->key}");
+        $this->log("Session regenerate: {$old_id} -> {$this->key}");
 
         return true;
     }
@@ -329,10 +348,9 @@ abstract class rcube_session
             $cache = null;
         }
         // use internal data for fast requests (up to 0.5 sec.)
-        else if ($key == $this->key && (!$this->vars || microtime(true) - $this->start < 0.5)) {
+        elseif ($key == $this->key && (!$this->vars || microtime(true) - $this->start < 0.5)) {
             $cache = $this->vars;
-        }
-        else { // else read data again
+        } else { // else read data again
             $cache = $this->read($key);
         }
 
@@ -344,9 +362,9 @@ abstract class rcube_session
      *
      * Warning: Do not use if you already modified $_SESSION in the same request (#1490608)
      *
-     * @param string $path  Path denoting the session variable where to append the value
-     * @param string $key   Key name under which to append the new value (use null for appending to an indexed list)
-     * @param mixed  $value Value to append to the session data array
+     * @param string  $path  Path denoting the session variable where to append the value
+     * @param ?string $key   Key name under which to append the new value (use null for appending to an indexed list)
+     * @param mixed   $value Value to append to the session data array
      */
     public function append($path, $key, $value)
     {
@@ -362,8 +380,7 @@ abstract class rcube_session
         if ($key !== null) {
             $node[$key] = $value;
             $path .= '.' . $key;
-        }
-        else {
+        } else {
             $node[] = $value;
         }
 
@@ -393,8 +410,7 @@ abstract class rcube_session
 
         if (isset($_SESSION[$var])) {
             unset($_SESSION[$var]);
-        }
-        else {
+        } else {
             $path = explode('.', $var);
             $key = array_pop($path);
             $node = &$this->get_node($path, $_SESSION);
@@ -409,10 +425,10 @@ abstract class rcube_session
      */
     public function kill()
     {
-        $this->log("Session destroy: " . session_id());
+        $this->log('Session destroy: ' . session_id());
 
         $this->vars = null;
-        $this->ip   = rcube_utils::remote_addr(); // update IP (might have changed)
+        $this->ip = rcube_utils::remote_addr(); // update IP (might have changed)
         $this->destroy(session_id());
 
         rcube_utils::setcookie($this->cookiename, '-del-', time() - 60);
@@ -446,8 +462,7 @@ abstract class rcube_session
             foreach ((array) $this->unsets as $var) {
                 if (isset($_SESSION[$var])) {
                     unset($_SESSION[$var]);
-                }
-                else {
+                } else {
                     $path = explode('.', $var);
                     $k = array_pop($path);
                     $node = &$this->get_node($path, $_SESSION);
@@ -485,10 +500,10 @@ abstract class rcube_session
         $data = '';
 
         if (is_array($vars)) {
-            foreach ($vars as $var => $value)
-                $data .= $var.'|'.serialize($value);
-        }
-        else {
+            foreach ($vars as $var => $value) {
+                $data .= $var . '|' . serialize($value);
+            }
+        } else {
             $data = 'b:0;';
         }
 
@@ -501,29 +516,30 @@ abstract class rcube_session
      *
      * @param string $str Serialized data string
      *
-     * @return array Unserialized data
+     * @return array|false Unserialized data
      */
     public static function unserialize($str)
     {
-        $str    = (string) $str;
+        $str = (string) $str;
         $endptr = strlen($str);
-        $p      = 0;
+        $p = 0;
 
         $serialized = '';
-        $items      = 0;
-        $level      = 0;
+        $items = 0;
+        $level = 0;
 
         while ($p < $endptr) {
             $q = $p;
-            while ($str[$q] != '|')
-                if (++$q >= $endptr)
+            while ($str[$q] != '|') {
+                if (++$q >= $endptr) {
                     break 2;
+                }
+            }
 
             if ($str[$p] == '!') {
                 $p++;
                 $has_value = false;
-            }
-            else {
+            } else {
                 $has_value = true;
             }
 
@@ -533,66 +549,73 @@ abstract class rcube_session
             $serialized .= 's:' . strlen($name) . ':"' . $name . '";';
 
             if ($has_value) {
-                for (;;) {
+                while (true) {
                     $p = $q;
                     switch (strtolower($str[$q])) {
-                    case 'n': // null
-                    case 'b': // boolean
-                    case 'i': // integer
-                    case 'd': // decimal
-                        do $q++;
-                        while (($q < $endptr) && ($str[$q] != ';'));
-                        $q++;
-                        $serialized .= substr($str, $p, $q - $p);
-                        if ($level == 0) {
-                            break 2;
-                        }
-                        break;
-                    case 'r': // reference
-                        $q+= 2;
-                        for ($id = ''; ($q < $endptr) && ($str[$q] != ';'); $q++) {
-                            $id .= $str[$q];
-                        }
-                        $q++;
-                        // increment pointer because of outer array
-                        $serialized .= 'R:' . ($id + 1) . ';';
-                        if ($level == 0) {
-                            break 2;
-                        }
-                        break;
-                    case 's': // string
-                        $q+=2;
-                        for ($length=''; ($q < $endptr) && ($str[$q] != ':'); $q++) {
-                            $length .= $str[$q];
-                        }
-                        $q+=2;
-                        $q+= (int)$length + 2;
-                        $serialized .= substr($str, $p, $q - $p);
-                        if ($level == 0) {
-                            break 2;
-                        }
-                        break;
-                    case 'a': // array
-                    case 'o': // object
-                        do $q++;
-                        while ($q < $endptr && $str[$q] != '{');
-                        $q++;
-                        $level++;
-                        $serialized .= substr($str, $p, $q - $p);
-                        break;
-                    case '}': // end of array|object
-                        $q++;
-                        $serialized .= substr($str, $p, $q - $p);
-                        if (--$level == 0) {
-                            break 2;
-                        }
-                        break;
-                    default:
-                        return false;
+                        case 'n': // null
+                        case 'b': // boolean
+                        case 'i': // integer
+                        case 'd': // decimal
+                            do {
+                                $q++;
+                            } while (($q < $endptr) && ($str[$q] != ';'));
+                            $q++;
+                            $serialized .= substr($str, $p, $q - $p);
+                            if ($level == 0) {
+                                break 2;
+                            }
+
+                            break;
+                        case 'r': // reference
+                            $q += 2;
+                            $id = '';
+                            for (; ($q < $endptr) && ($str[$q] != ';'); $q++) {
+                                $id .= $str[$q];
+                            }
+                            $q++;
+                            // increment pointer because of outer array
+                            $serialized .= 'R:' . (intval($id) + 1) . ';';
+                            if ($level == 0) {
+                                break 2;
+                            }
+
+                            break;
+                        case 's': // string
+                            $q += 2;
+                            $length = '';
+                            for (; ($q < $endptr) && ($str[$q] != ':'); $q++) {
+                                $length .= $str[$q];
+                            }
+                            $q += 2;
+                            $q += (int) $length + 2;
+                            $serialized .= substr($str, $p, $q - $p);
+                            if ($level == 0) {
+                                break 2;
+                            }
+
+                            break;
+                        case 'a': // array
+                        case 'o': // object
+                            do {
+                                $q++;
+                            } while ($q < $endptr && $str[$q] != '{');
+                            $q++;
+                            $level++;
+                            $serialized .= substr($str, $p, $q - $p);
+                            break;
+                        case '}': // end of array|object
+                            $q++;
+                            $serialized .= substr($str, $p, $q - $p);
+                            if (--$level == 0) {
+                                break 2;
+                            }
+
+                            break;
+                        default:
+                            return false;
                     }
                 }
-            }
-            else {
+            } else {
                 $serialized .= 'N;';
                 $q += 2;
             }
@@ -638,8 +661,7 @@ abstract class rcube_session
         if (!$secret) {
             if (!empty($_SESSION['auth_secret'])) {
                 $secret = $_SESSION['auth_secret'];
-            }
-            else {
+            } else {
                 $secret = rcube_utils::random_bytes(strlen($this->key));
             }
         }
@@ -676,24 +698,24 @@ abstract class rcube_session
      */
     public function check_auth()
     {
-        $this->cookie = isset($_COOKIE[$this->cookiename]) ? $_COOKIE[$this->cookiename] : null;
+        $this->cookie = $_COOKIE[$this->cookiename] ?? null;
 
         $result = $this->ip_check ? rcube_utils::remote_addr() == $this->ip : true;
-        $prev   = null;
+        $prev = null;
 
         if (!$result) {
-            $this->log("IP check failed for " . $this->key . "; expected " . $this->ip . "; got " . rcube_utils::remote_addr());
+            $this->log('IP check failed for ' . $this->key . '; expected ' . $this->ip . '; got ' . rcube_utils::remote_addr());
         }
 
-        if ($result && $this->_mkcookie($this->now) != $this->cookie) {
-            $this->log("Session auth check failed for " . $this->key . "; timeslot = " . date('Y-m-d H:i:s', $this->now));
+        if ($result && $this->mkcookie($this->now) != $this->cookie) {
+            $this->log('Session auth check failed for ' . $this->key . '; timeslot = ' . date('Y-m-d H:i:s', $this->now));
             $result = false;
 
             // Check if using id from a previous time slot
             for ($i = 1; $i <= 2; $i++) {
                 $prev = $this->now - ($this->lifetime / 2) * $i;
-                if ($this->_mkcookie($prev) == $this->cookie) {
-                    $this->log("Send new auth cookie for " . $this->key . ": " . $this->cookie);
+                if ($this->mkcookie($prev) == $this->cookie) {
+                    $this->log('Send new auth cookie for ' . $this->key . ': ' . $this->cookie);
                     $this->set_auth_cookie();
                     $result = true;
                 }
@@ -701,8 +723,8 @@ abstract class rcube_session
         }
 
         if (!$result) {
-            $this->log("Session authentication failed for " . $this->key
-                . "; invalid auth cookie sent; timeslot = " . date('Y-m-d H:i:s', $prev));
+            $this->log('Session authentication failed for ' . $this->key
+                . '; invalid auth cookie sent; timeslot = ' . date('Y-m-d H:i:s', $prev));
         }
 
         return $result;
@@ -713,7 +735,7 @@ abstract class rcube_session
      */
     public function set_auth_cookie()
     {
-        $this->cookie = $this->_mkcookie($this->now);
+        $this->cookie = $this->mkcookie($this->now);
         rcube_utils::setcookie($this->cookiename, $this->cookie, 0);
         $_COOKIE[$this->cookiename] = $this->cookie;
     }
@@ -725,7 +747,7 @@ abstract class rcube_session
      *
      * @return string Cookie value
      */
-    protected function _mkcookie($timeslot)
+    protected function mkcookie($timeslot)
     {
         // make sure the secret key exists
         $this->set_secret();
@@ -739,7 +761,7 @@ abstract class rcube_session
      *
      * @param string $line Log line
      */
-    function log($line)
+    public function log($line)
     {
         if ($this->logging) {
             rcube::write_log('session', $line);

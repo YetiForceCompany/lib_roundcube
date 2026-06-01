@@ -10,11 +10,10 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/plugin-help/
 */
 
 $labels['help'] = 'Adjuta';
 $labels['about'] = 'A proposito';
 $labels['license'] = 'Licentia';
 $labels['csrfinfo'] = 'Lege plus sur CSRF e como nos te protege';
+$labels['arialabelhelpcontent'] = 'Contento de adjuta';

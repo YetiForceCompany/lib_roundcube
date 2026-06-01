@@ -10,8 +10,6 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/messages/
 */
 
 $messages['errortitle']  = 'Radās kļūda!';
@@ -102,7 +100,7 @@ $messages['nopagesizewarning'] = 'Lūdzu ievadiet lapas izmēru';
 $messages['nosenderwarning'] = 'Lūdzu ievadiet sūtītāja e-pasta adresi';
 $messages['recipientsadded'] = 'Adresāti pievienoti veiksmīgi.';
 $messages['norecipientwarning'] = 'Lūdzu ievadiet vismaz vienu saņēmēju';
-$messages['disclosedrecipwarning'] = 'Katrs adresāts redzēs pārējos adresātus. Lai to novērstu un nodrošinātu adresātu privātumu, lūdzu izmantojiet Bcc lauku.';
+$messages['disclosedrecipwarning'] = 'Katrs adresāts redzēs pārējo adresātu e-pasta adreses. Lai to novērstu un nodrošinātu adresātu privātumu, Jūs varat izmantot Bcc lauku.';
 $messages['disclosedreciptitle'] = 'Pārāk daudz publisku adresātu';
 $messages['nosubjectwarning']  = 'Lauks "temats" ir tukšs. Vai vēlaties to aizpildīt tagad?';
 $messages['nosubjecttitle']  = 'Bez tēmas';
@@ -160,7 +158,9 @@ $messages['nogroupassignmentschanged'] = 'Grupā nekas netika mainīts.';
 $messages['importwait'] = 'Importēju, lūdzu uzgaidiet...';
 $messages['importformaterror'] = 'Imports neizdevās! Augšupielādētais fails nav derīgs importam.';
 $messages['importconfirm'] = '<b>Veiksmīgi ieimportēti $inserted kontakti</b>';
-$messages['importconfirmskipped'] = '<b>Izlaida $skipped jau eksistējošus ierakstus</b>';
+$messages['importconfirmskipped'] = '<b>Izlaida $skipped jau eksistējošus kontaktus</b>';
+$messages['importconfirminvalid'] = '<b>Izlaida $invalid nederīgus kontaktus </b>';
+$messages['importconfirmerrors'] = '<b>Neizdevās ieimportēt $errors derīgus kontaktus</b>';
 $messages['importmessagesuccess'] = 'Veiksmīgi ieimportētas $nr vēstules';
 $messages['importmessageerror'] = 'Importēšanas kļūda! Augšupielādētā datne satur nekorektus datus';
 $messages['opnotpermitted'] = 'Darbība nav atļauta!';
@@ -230,3 +230,5 @@ $messages['listusebutton'] = 'Lai pievienotu jaunu ierakstu, izmantojiet pogu "I
 $messages['keypaircreatesuccess'] = 'Jauns atslēgu pāris identitātei $identity tika veiksmīgi izveidots.';
 $messages['emptyattachment'] = 'Izskatās, ka šis pielikums ir tukšs.<br>Lūdzu, sazinaties ar personu, kura to nosūtīja.';
 $messages['oauthloginfailed'] = 'OAuth autorizācija neizdevās. Lūdzu mēģiniet vēlreiz.';
+$messages['oauthinvalidrequest'] = 'Autorizācijas pieprasījums bija kļūdains vai nepabeigts.';
+$messages['oauthaccessdenied'] = 'Autorizācijas serveris vai lietotājs noraidīja pieprasījumu.';

@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  +-----------------------------------------------------------------------+
  | This file is part of the Roundcube Webmail client                     |
  |                                                                       |
@@ -29,10 +29,11 @@ class rcmail_action_contacts_search_delete extends rcmail_action
      *
      * @param array $args Arguments from the previous step(s)
      */
+    #[\Override]
     public function run($args = [])
     {
         $rcmail = rcmail::get_instance();
-        $id     = rcube_utils::get_input_string('_sid', rcube_utils::INPUT_POST);
+        $id = rcube_utils::get_input_string('_sid', rcube_utils::INPUT_POST);
         $result = false;
 
         if (!empty($id)) {
@@ -40,8 +41,7 @@ class rcmail_action_contacts_search_delete extends rcmail_action
 
             if (empty($plugin['abort'])) {
                 $result = $rcmail->user->delete_search($id);
-            }
-            else {
+            } else {
                 $result = $plugin['result'];
             }
         }
@@ -52,8 +52,7 @@ class rcmail_action_contacts_search_delete extends rcmail_action
             // contact list will be cleared, clear also page counter
             $rcmail->output->command('set_rowcount', $rcmail->gettext('nocontactsfound'));
             $rcmail->output->set_env('pagecount', 0);
-        }
-        else {
+        } else {
             $error = !empty($plugin['message']) ? $plugin['message'] : 'savedsearchdeleteerror';
             $rcmail->output->show_message($error, 'error');
         }

@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  +-----------------------------------------------------------------------+
  | This file is part of the Roundcube Webmail client                     |
  |                                                                       |
@@ -26,10 +26,11 @@ class rcmail_action_mail_list extends rcmail_action_mail_index
      *
      * @param array $args Arguments from the previous step(s)
      */
+    #[\Override]
     public function run($args = [])
     {
-        $rcmail        = rcmail::get_instance();
-        $save_arr      = [];
+        $rcmail = rcmail::get_instance();
+        $save_arr = [];
         $dont_override = (array) $rcmail->config->get('dont_override');
 
         $sort = rcube_utils::get_input_string('_sort', rcube_utils::INPUT_GET);
@@ -39,7 +40,7 @@ class rcmail_action_mail_list extends rcmail_action_mail_index
         // is there a sort type for this request?
         if ($sort && preg_match('/^[a-zA-Z_-]+$/', $sort)) {
             // yes, so set the sort vars
-            list($sort_col, $sort_order) = explode('_', $sort);
+            [$sort_col, $sort_order] = explode('_', $sort);
 
             // set session vars for sort (so next page and task switch know how to sort)
             if (!in_array('message_sort_col', $dont_override)) {
@@ -93,7 +94,7 @@ class rcmail_action_mail_list extends rcmail_action_mail_index
             $multifolder = !empty($_SESSION['search']) && !empty($_SESSION['search'][1]->multi);
         }
         // remove old search data
-        else if (empty($_REQUEST['_search']) && isset($_SESSION['search'])) {
+        elseif (empty($_REQUEST['_search']) && isset($_SESSION['search'])) {
             $rcmail->session->remove('search');
         }
 
@@ -105,8 +106,8 @@ class rcmail_action_mail_list extends rcmail_action_mail_index
         }
 
         // update message count display
-        $pages  = ceil($count / $rcmail->storage->get_pagesize());
-        $page   = $count ? $rcmail->storage->get_page() : 1;
+        $pages = ceil($count / $rcmail->storage->get_pagesize());
+        $page = $count ? $rcmail->storage->get_page() : 1;
         $exists = $rcmail->storage->count($mbox_name, 'EXISTS', true);
 
         $rcmail->output->set_env('messagecount', $count);
@@ -135,16 +136,13 @@ class rcmail_action_mail_list extends rcmail_action_mail_index
             if (!empty($data['HIGHESTMODSEQ'])) {
                 $_SESSION['list_mod_seq'] = $data['HIGHESTMODSEQ'];
             }
-        }
-        else {
+        } else {
             // handle IMAP errors (e.g. #1486905)
             if ($err_code = $rcmail->storage->get_error_code()) {
                 self::display_server_error();
-            }
-            else if (!empty($search_request)) {
+            } elseif (!empty($search_request)) {
                 $rcmail->output->show_message('searchnomatch', 'notice');
-            }
-            else {
+            } else {
                 $rcmail->output->show_message('nomessagesfound', 'notice');
             }
         }

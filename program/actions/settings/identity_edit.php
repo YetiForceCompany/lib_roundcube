@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  +-----------------------------------------------------------------------+
  | This file is part of the Roundcube Webmail client                     |
  |                                                                       |
@@ -27,6 +27,7 @@ class rcmail_action_settings_identity_edit extends rcmail_action
      *
      * @param array $args Arguments from the previous step(s)
      */
+    #[\Override]
     public function run($args = [])
     {
         $rcmail = rcmail::get_instance();
@@ -60,6 +61,10 @@ class rcmail_action_settings_identity_edit extends rcmail_action
             if ($IDENTITIES_LEVEL == 1) {
                 self::$record['email'] = $rcmail->get_user_email();
             }
+
+            // default html editor setting
+            self::$record['html_signature'] = $rcmail->config->get('htmleditor');
+            self::$record['signature'] = '';
         }
 
         $rcmail->output->add_handler('identityform', [$this, 'identity_form']);
@@ -68,7 +73,7 @@ class rcmail_action_settings_identity_edit extends rcmail_action
             'encryptioncreatekey', 'openmailvelopesettings', 'encryptionprivkeysinmailvelope',
             'encryptionnoprivkeysinmailvelope', 'keypaircreatesuccess');
 
-        $rcmail->output->set_pagetitle($rcmail->gettext(($rcmail->action == 'add-identity' ? 'addidentity' : 'editidentity')));
+        $rcmail->output->set_pagetitle($rcmail->gettext($rcmail->action == 'add-identity' ? 'addidentity' : 'editidentity'));
 
         if ($rcmail->action == 'add-identity' && $rcmail->output->template_exists('identityadd')) {
             $rcmail->output->send('identityadd');
@@ -96,47 +101,48 @@ class rcmail_action_settings_identity_edit extends rcmail_action
         // list of available cols
         $form = [
             'addressing' => [
-                'name'    => $rcmail->gettext('settings'),
+                'name' => $rcmail->gettext('settings'),
                 'content' => [
-                    'name'         => ['type' => 'text', 'size' => $i_size],
-                    'email'        => ['type' => 'text', 'size' => $i_size],
+                    'name' => ['type' => 'text', 'size' => $i_size],
+                    'email' => ['type' => 'text', 'size' => $i_size],
                     'organization' => ['type' => 'text', 'size' => $i_size],
-                    'reply-to'     => ['type' => 'text', 'size' => $i_size],
-                    'bcc'          => ['type' => 'text', 'size' => $i_size],
-                    'standard'     => ['type' => 'checkbox', 'label' => $rcmail->gettext('setdefault')],
-                ]
+                    'reply-to' => ['type' => 'text', 'size' => $i_size],
+                    'bcc' => ['type' => 'text', 'size' => $i_size],
+                    'standard' => ['type' => 'checkbox', 'label' => $rcmail->gettext('setdefault')],
+                ],
             ],
             'signature' => [
-                'name'    => $rcmail->gettext('signature'),
+                'name' => $rcmail->gettext('signature'),
                 'content' => [
-                    'signature'      => [
-                        'type'       => 'textarea',
-                        'size'       => $t_cols,
-                        'rows'       => $t_rows,
+                    'signature' => [
+                        'type' => 'textarea',
+                        'size' => $t_cols,
+                        'rows' => $t_rows,
                         'spellcheck' => true,
-                        'data-html-editor' => true
+                        'data-html-editor' => true,
                     ],
                     'html_signature' => [
                         'type' => 'checkbox',
-                        'label'   => $rcmail->gettext('htmlsignature'),
-                        'onclick' => "return rcmail.command('toggle-editor', {id: 'rcmfd_signature', html: this.checked}, '', event)"
+                        'label' => $rcmail->gettext('htmlsignature'),
+                        'onclick' => "return rcmail.command('toggle-editor', {id: 'rcmfd_signature', html: this.checked}, '', event)",
                     ],
-                ]
+                ],
             ],
             'encryption' => [
-                'name'    => $rcmail->gettext('identityencryption'),
-                'attrs'   => ['class' => 'identity-encryption', 'style' => 'display:none'],
-                'content' => html::div('identity-encryption-block', '')
-            ]
+                'name' => $rcmail->gettext('identityencryption'),
+                'attrs' => ['class' => 'identity-encryption', 'style' => 'display:none'],
+                'content' => html::div('identity-encryption-block', ''),
+            ],
         ];
 
         // Enable TinyMCE editor
-        if (!empty(self::$record['html_signature'])) {
-            $form['signature']['content']['signature']['class']      = 'mce_editor';
+        $html_editor = intval(self::$record['html_signature']);
+        if ($html_editor == 1 || $html_editor == 4) {
+            $form['signature']['content']['signature']['class'] = 'mce_editor';
             $form['signature']['content']['signature']['is_escaped'] = true;
 
             // Correctly handle HTML entities in HTML editor (#1488483)
-            self::$record['signature'] = htmlspecialchars(self::$record['signature'], ENT_NOQUOTES, RCUBE_CHARSET);
+            self::$record['signature'] = htmlspecialchars(self::$record['signature'], \ENT_NOQUOTES, RCUBE_CHARSET);
         }
 
         // hide "default" checkbox if only one identity is allowed
@@ -147,13 +153,13 @@ class rcmail_action_settings_identity_edit extends rcmail_action
         // disable some field according to access level
         if ($IDENTITIES_LEVEL == 1 || $IDENTITIES_LEVEL == 3) {
             $form['addressing']['content']['email']['disabled'] = true;
-            $form['addressing']['content']['email']['class']    = 'disabled';
+            $form['addressing']['content']['email']['class'] = 'disabled';
         }
 
         if ($IDENTITIES_LEVEL == 4) {
-            foreach ($form['addressing']['content'] as $formfield => $value){
+            foreach ($form['addressing']['content'] as $formfield => $value) {
                 $form['addressing']['content'][$formfield]['disabled'] = true;
-                $form['addressing']['content'][$formfield]['class']    = 'disabled';
+                $form['addressing']['content'][$formfield]['class'] = 'disabled';
             }
         }
 
@@ -163,15 +169,15 @@ class rcmail_action_settings_identity_edit extends rcmail_action
 
         // Allow plugins to modify identity form content
         $plugin = $rcmail->plugins->exec_hook('identity_form', [
-                'form'   => $form,
-                'record' => self::$record
+            'form' => $form,
+            'record' => self::$record,
         ]);
 
         $form = $plugin['form'];
         self::$record = $plugin['record'];
 
         // Set form tags and hidden fields
-        list($form_start, $form_end) = self::get_form_tags($attrib, 'save-identity',
+        [$form_start, $form_end] = self::get_form_tags($attrib, 'save-identity',
             intval(self::$record['identity_id'] ?? 0),
             ['name' => '_iid', 'value' => self::$record['identity_id'] ?? 0]
         );
@@ -180,7 +186,7 @@ class rcmail_action_settings_identity_edit extends rcmail_action
         unset($attrib['form'], $attrib['id']);
 
         // return the complete edit form as table
-        $out = "$form_start\n";
+        $out = "{$form_start}\n";
 
         foreach ($form as $fieldset) {
             if (empty($fieldset['content'])) {
@@ -192,20 +198,18 @@ class rcmail_action_settings_identity_edit extends rcmail_action
                 $table = new html_table(['cols' => 2]);
 
                 foreach ($fieldset['content'] as $col => $colprop) {
-                    $colprop['id'] = 'rcmfd_'.$col;
+                    $colprop['id'] = 'rcmfd_' . $col;
 
                     if (!empty($colprop['label'])) {
                         $label = $colprop['label'];
-                    }
-                    else {
+                    } else {
                         $label = $rcmail->gettext(str_replace('-', '', $col));
                     }
 
                     if (!empty($colprop['value'])) {
                         $value = $colprop['value'];
-                    }
-                    else {
-                        $val   = self::$record[$col] ?? '';
+                    } else {
+                        $val = self::$record[$col] ?? '';
                         $value = rcube_output::get_edit_field($col, $val, $colprop, $colprop['type']);
                     }
 
@@ -214,8 +218,7 @@ class rcmail_action_settings_identity_edit extends rcmail_action
                 }
 
                 $content = $table->show($attrib);
-            }
-            else {
+            } else {
                 $content = $fieldset['content'];
             }
 
@@ -227,7 +230,7 @@ class rcmail_action_settings_identity_edit extends rcmail_action
 
         // add image upload form
         $max_size = self::upload_init($rcmail->config->get('identity_image_size', 64) * 1024);
-        $form_id  = 'identityImageUpload';
+        $form_id = 'identityImageUpload';
 
         $out .= '<form id="' . $form_id . '" style="display: none">'
             . html::div('hint', $rcmail->gettext(['name' => 'maxuploadsize', 'vars' => ['size' => $max_size]]))

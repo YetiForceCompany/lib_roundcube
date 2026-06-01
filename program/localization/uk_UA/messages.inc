@@ -10,8 +10,6 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/messages/
 */
 
 $messages['errortitle']  = 'Виникла помилка!';
@@ -24,6 +22,7 @@ $messages['servererrormsg'] = 'Помилка сервера: $msg';
 $messages['accountlocked'] = 'Забагато невдалих спроб входу в систему. Спробуйте пізніше. ';
 $messages['connerror'] = 'Помилка з\'єднання (не вдалося зв\'язатися з сервером)!';
 $messages['dberror'] = 'Помилка бази даних!';
+$messages['dbconnerror'] = 'Неможливо підключитися до бази даних!';
 $messages['windowopenerror'] = 'Спливне вікно було заблоковано!';
 $messages['requesttimedout'] = 'Час запиту вийшов';
 $messages['errorreadonly'] = 'Неможливо виконати операцію. Тека доступна тільки для читання.';
@@ -52,7 +51,8 @@ $messages['deleteresponseconfirm'] = 'Справді бажаєте видали
 $messages['addedsuccessfully'] = 'Контакт успішно доданий до адресної книги.';
 $messages['contactexists'] = 'Контакт з такою самою адресою електронної пошти вже існує.';
 $messages['contactnameexists'] = 'Контакт з таким самим іменем вже існує.';
-$messages['blockedimages'] = 'Задля захисту Вашої приватності, зображення з зовнішніх джерел заблоковано у цьому листі.';
+$messages['blockedimages'] = 'Для захисту вашої конфіденційності зображення з зовнішніх джерел було заблоковано.';
+$messages['blockedresources'] = 'Для захисту вашої конфіденційності ресурси з зовнішніх джерел було заблоковано.';
 $messages['encryptedmessage'] = 'Лист зашифровано і не може бути відображено. Перепрошуємо!';
 $messages['externalmessagedecryption'] = 'Лист зашифровано і не може бути розшифровано розширенням Вашого браузера.';
 $messages['nopubkeyfor'] = 'Не знайдено дійсного публічного ключа для $email';
@@ -70,10 +70,13 @@ $messages['errormoving'] = 'Не вдалося перемістити лист(
 $messages['errorcopying'] = 'Не вдалося скопіювати лист(и).';
 $messages['errordeleting'] = 'Не вдалося видалити лист(и).';
 $messages['errormarking'] = 'Не вдалося позначити лист(и).';
+$messages['alerttitle'] = 'Увага!';
+$messages['confirmationtitle'] = 'Ви впевнені...';
 $messages['deletecontactconfirm']  = 'Ви дійсно бажаєте видалити вибрані контакти?';
 $messages['deletegroupconfirm']  = 'Ви дійсно хочете видалити обрану групу?';
 $messages['deletemessagesconfirm'] = 'Ви дійсно бажаєте видалити вибрані листи?';
 $messages['deletefolderconfirm']  = 'Ви дійсно бажаєте видалити цю теку?';
+$messages['movefolderconfirm']  = 'Ви дійсно бажаєте перемістити цю теку?';
 $messages['purgefolderconfirm']  = 'Справді бажаєте видалити усі листи у цій теці?';
 $messages['contactdeleting'] = 'Видалення контакту(ів)...';
 $messages['groupdeleting'] = 'Видалення групи...';
@@ -136,7 +139,6 @@ $messages['nogroupassignmentschanged'] = 'Розподіл за групами �
 $messages['importwait'] = 'Імпортування, будь ласка, зачекайте...';
 $messages['importformaterror'] = 'Помилка імпорту! Завантажений файл має невідомий формат даних.';
 $messages['importconfirm'] = '<b>Успішно імпортовано $inserted контактів</b>';
-$messages['importconfirmskipped'] = '<b>Пропущені $skipped наявні записи</b>';
 $messages['importmessagesuccess'] = 'Успішно імпортовано $nr повідомлень';
 $messages['importmessageerror'] = 'Імпорт не вдався! Завантажений файл не є припустимим повідомленням чи файлом поштової скриньки';
 $messages['opnotpermitted'] = 'Дія заборонена!';
@@ -148,6 +150,8 @@ $messages['smtpautherror'] = 'Помилка SMTP-сервера ($code): Нев
 $messages['smtpfromerror'] = 'Помилка SMTP-сервера ($code): Не вдалося вказати відправника "$from" ($msg)';
 $messages['smtptoerror'] = 'Помилка SMTP-сервера ($code): Не вдалося додати отримувача "$to" ($msg)';
 $messages['smtprecipientserror'] = 'Помилка SMTP: Не вдалося обробити список отримувачів';
+$messages['smtputf8error'] = 'Помилка SMTP: Сервер не підтримує Юнікод в адресі електронної пошти.';
+$messages['smtpsizeerror'] = 'Помилка SMTP: Розмір листа перевищує ліміт сервера ($limit)';
 $messages['smtperror'] = 'Помилка SMTP: $msg';
 $messages['emailformaterror'] = 'Некоректна адреса електронної пошти: $email';
 $messages['toomanyrecipients'] = 'Забагато отримувачів. Зменшіть їх число до $max.';

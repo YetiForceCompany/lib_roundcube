@@ -10,8 +10,6 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/plugin-vcard_attachments/
 */
 
 $labels['addvcardmsg'] = 'Ajouter la vCard au carnet d’adresses';
@@ -20,5 +18,5 @@ $labels['attachvcard'] = 'Joindre la vCard';
 $labels['vcardattached'] = 'Le fichier vCard a été joint.';
 $labels['vcard'] = 'vCard';
 $labels['forwardvcard'] = 'Transférer la vCard';
-$labels['contactsattached'] = '$num contacts sont joints à ce message.';
+$labels['contactsattached'] = '$num contacts sont joints à ce courriel.';
 $labels['importedsuccessfully'] = 'Les contacts ont été importés avec succès au carnet d’adresses.';

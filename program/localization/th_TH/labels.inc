@@ -10,10 +10,7 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/labels/
 */
-
 
 $labels['welcome'] = 'ยินดีต้อนรับสู่ $product';
 $labels['username'] = 'บัญชีผู้ใช้';
@@ -90,7 +87,7 @@ $labels['longjan'] = 'มกราคม';
 $labels['longfeb'] = 'กุมภาพันธ์';
 $labels['longmar'] = 'มีนาคม';
 $labels['longapr'] = 'เมษายน';
-$labels['longmay'] = 'พฤษภาคม';
+$labels['longmay'] = 'พ.ค.';
 $labels['longjun'] = 'มิถุนายน';
 $labels['longjul'] = 'กรกฎาคม';
 $labels['longaug'] = 'สิงหาคม';
@@ -473,8 +470,8 @@ $labels['installedplugins'] = 'ปลั๊กอินที่ติดตั�
 $labels['plugin'] = 'ปลั๊กอิน';
 $labels['version'] = 'รุ่น';
 $labels['license'] = 'สัญญาอนุญาต';
-$labels['B'] = 'ไบต์';
-$labels['KB'] = 'กิโลไบต์';
-$labels['MB'] = 'เมกะไบต์';
-$labels['GB'] = 'จิกะไบต์';
+$labels['B'] = 'B';
+$labels['KB'] = 'KB';
+$labels['MB'] = 'MB';
+$labels['GB'] = 'GB';
 $labels['unicode'] = 'Unicode';

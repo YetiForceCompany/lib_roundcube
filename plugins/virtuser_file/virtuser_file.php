@@ -6,7 +6,7 @@
  * Add it to the plugins list in config.inc.php and set
  * path to a virtuser table file to resolve user names and e-mail
  * addresses
- * $rcmail['virtuser_file'] = '';
+ * $config['virtuser_file'] = '';
  *
  * @license GNU GPLv3+
  * @author Aleksander Machniak
@@ -19,9 +19,10 @@ class virtuser_file extends rcube_plugin
     /**
      * Plugin initialization
      */
-    function init()
+    #[\Override]
+    public function init()
     {
-        $this->app  = rcmail::get_instance();
+        $this->app = rcmail::get_instance();
         $this->file = $this->app->config->get('virtuser_file');
 
         if ($this->file) {
@@ -33,16 +34,18 @@ class virtuser_file extends rcube_plugin
     /**
      * User > Email
      */
-    function user2email($p)
+    public function user2email($p)
     {
         $r = $this->findinvirtual('/\s' . preg_quote($p['user'], '/') . '\s*$/');
         $result = [];
 
-        for ($i=0; $i<count($r); $i++) {
+        for ($i = 0; $i < count($r); $i++) {
             $arr = preg_split('/\s+/', $r[$i]);
 
             if (count($arr) > 0 && strpos($arr[0], '@')) {
-                $result[] = rcube_utils::idn_to_ascii(trim(str_replace('\\@', '@', $arr[0])));
+                $email = rcube_utils::idn_to_ascii(trim(str_replace('\@', '@', $arr[0])));
+                // support opensmtpd file format #9898
+                $result[] = rtrim($email, ':');
 
                 if (!empty($p['first'])) {
                     $p['email'] = $result[0];
@@ -59,11 +62,11 @@ class virtuser_file extends rcube_plugin
     /**
      * Email > User
      */
-    function email2user($p)
+    public function email2user($p)
     {
-        $r = $this->findinvirtual('/^' . preg_quote($p['email'], '/') . '\s/');
+        $r = $this->findinvirtual('/^' . preg_quote($p['email'], '/') . ':?\s/');
 
-        for ($i=0; $i<count($r); $i++) {
+        for ($i = 0; $i < count($r); $i++) {
             $arr = preg_split('/\s+/', trim($r[$i]));
 
             if (count($arr) > 0) {
@@ -86,7 +89,7 @@ class virtuser_file extends rcube_plugin
      */
     private function findinvirtual($pattern)
     {
-        $result  = [];
+        $result = [];
         $virtual = null;
 
         if ($this->file) {

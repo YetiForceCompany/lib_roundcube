@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  +-----------------------------------------------------------------------+
  | This file is part of the Roundcube Webmail client                     |
  |                                                                       |
@@ -22,9 +22,6 @@
 
 /**
  * Class for parsing MIME messages
- *
- * @package    Framework
- * @subpackage Storage
  */
 class rcube_mime_decode
 {
@@ -34,13 +31,12 @@ class rcube_mime_decode
      * @var array
      */
     protected $params = [
-        'include_bodies'  => true,
-        'decode_bodies'   => true,
-        'decode_headers'  => true,
-        'crlf'            => "\r\n",
+        'include_bodies' => true,
+        'decode_bodies' => true,
+        'decode_headers' => true,
+        'crlf' => "\r\n",
         'default_charset' => RCUBE_CHARSET,
     ];
-
 
     /**
      * Constructor.
@@ -48,14 +44,11 @@ class rcube_mime_decode
      * Sets up the object, initialize the variables, and splits and
      * stores the header and body of the input.
      *
-     * @param array $params An array of various parameters that determine
-     *                       various things:
-     *              include_bodies - Whether to include the body in the returned
-     *                               object.
-     *              decode_bodies  - Whether to decode the bodies
-     *                               of the parts. (Transfer encoding)
-     *              decode_headers - Whether to decode headers
-     *              crlf           - CRLF type to use (CRLF/LF/CR)
+     * @param array $params An array of various parameters that determine various things:
+     *                      include_bodies - Whether to include the body in the returned object.
+     *                      decode_bodies  - Whether to decode the bodies of the parts. (Transfer encoding)
+     *                      decode_headers - Whether to decode headers
+     *                      crlf           - CRLF type to use (CRLF/LF/CR)
      */
     public function __construct($params = [])
     {
@@ -70,11 +63,11 @@ class rcube_mime_decode
      * @param string $input   The input to decode
      * @param bool   $convert Convert result to rcube_message_part structure
      *
-     * @return object|bool Decoded results or False on failure
+     * @return rcube_message_part|false Decoded results or False on failure
      */
     public function decode($input, $convert = true)
     {
-        list($header, $body) = $this->splitBodyHeader($input);
+        [$header, $body] = $this->splitBodyHeader($input);
 
         $struct = $this->do_decode($header, $body);
 
@@ -98,55 +91,51 @@ class rcube_mime_decode
      * @param string $body          Body section
      * @param string $default_ctype Default content type
      *
-     * @return object|bool Decoded results or False on error
+     * @return rcube_message_part|false Decoded results or False on error
      */
     protected function do_decode($headers, $body, $default_ctype = 'text/plain')
     {
-        $return  = new rcube_message_part;
+        $return = new rcube_message_part();
         $headers = $this->parseHeaders($headers);
 
         foreach ($headers as $value) {
             $header_name = strtolower($value['name']);
 
             if (isset($return->headers[$header_name]) && !is_array($return->headers[$header_name])) {
-                $return->headers[$header_name]   = [$return->headers[$header_name]];
+                $return->headers[$header_name] = [$return->headers[$header_name]];
                 $return->headers[$header_name][] = $value['value'];
-            }
-            else if (isset($return->headers[$header_name])) {
+            } elseif (isset($return->headers[$header_name])) {
                 $return->headers[$header_name][] = $value['value'];
-            }
-            else {
+            } else {
                 $return->headers[$header_name] = $value['value'];
             }
 
             switch ($header_name) {
-            case 'content-type':
-                $content_type = $this->parseHeaderValue($value['value']);
+                case 'content-type':
+                    $content_type = $this->parseHeaderValue($value['value']);
 
-                if (preg_match('/([0-9a-z+.-]+)\/([0-9a-z+.-]+)/i', $content_type['value'], $regs)) {
-                    $return->ctype_primary   = $regs[1];
-                    $return->ctype_secondary = $regs[2];
-                }
+                    if (preg_match('/([0-9a-z+.-]+)\/([0-9a-z+.-]+)/i', $content_type['value'], $regs)) {
+                        $return->ctype_primary = $regs[1];
+                        $return->ctype_secondary = $regs[2];
+                    }
 
-                if (!empty($content_type['other'])) {
-                    $return->ctype_parameters = array_merge((array) $return->ctype_parameters, (array) $content_type['other']);
-                }
+                    if (!empty($content_type['other'])) {
+                        $return->ctype_parameters = array_merge((array) $return->ctype_parameters, (array) $content_type['other']);
+                    }
 
-                break;
+                    break;
+                case 'content-disposition':
+                    $content_disposition = $this->parseHeaderValue($value['value']);
+                    $return->disposition = $content_disposition['value'];
 
-            case 'content-disposition';
-                $content_disposition = $this->parseHeaderValue($value['value']);
-                $return->disposition = $content_disposition['value'];
+                    if (!empty($content_disposition['other'])) {
+                        $return->d_parameters = array_merge((array) $return->d_parameters, (array) $content_disposition['other']);
+                    }
 
-                if (!empty($content_disposition['other'])) {
-                    $return->d_parameters = array_merge((array) $return->d_parameters, (array) $content_disposition['other']);
-                }
-
-                break;
-
-            case 'content-transfer-encoding':
-                $content_transfer_encoding = $this->parseHeaderValue($value['value']);
-                break;
+                    break;
+                case 'content-transfer-encoding':
+                    $content_transfer_encoding = $this->parseHeaderValue($value['value']);
+                    break;
             }
         }
 
@@ -154,67 +143,62 @@ class rcube_mime_decode
             $ctype = strtolower($content_type['value']);
 
             switch ($ctype) {
-            case 'text/plain':
-                $encoding = $content_transfer_encoding['value'] ?? '7bit';
+                case 'text/plain':
+                    $encoding = $content_transfer_encoding['value'] ?? '7bit';
 
-                if ($this->params['include_bodies']) {
-                    $return->body = $this->params['decode_bodies'] ? rcube_mime::decode($body, $encoding) : $body;
-                }
+                    if ($this->params['include_bodies']) {
+                        $return->body = $this->params['decode_bodies'] ? rcube_mime::decode($body, $encoding) : $body;
+                    }
 
-                break;
+                    break;
+                case 'text/html':
+                    $encoding = $content_transfer_encoding['value'] ?? '7bit';
 
-            case 'text/html':
-                $encoding = $content_transfer_encoding['value'] ?? '7bit';
+                    if ($this->params['include_bodies']) {
+                        $return->body = $this->params['decode_bodies'] ? rcube_mime::decode($body, $encoding) : $body;
+                    }
 
-                if ($this->params['include_bodies']) {
-                    $return->body = $this->params['decode_bodies'] ? rcube_mime::decode($body, $encoding) : $body;
-                }
+                    break;
+                case 'multipart/digest':
+                case 'multipart/alternative':
+                case 'multipart/related':
+                case 'multipart/mixed':
+                case 'multipart/signed':
+                case 'multipart/encrypted':
+                    if (!isset($content_type['other']['boundary'])) {
+                        return false;
+                    }
 
-                break;
+                    $default_ctype = $ctype === 'multipart/digest' ? 'message/rfc822' : 'text/plain';
+                    $parts = $this->boundarySplit($body, $content_type['other']['boundary']);
 
-            case 'multipart/digest':
-            case 'multipart/alternative':
-            case 'multipart/related':
-            case 'multipart/mixed':
-            case 'multipart/signed':
-            case 'multipart/encrypted':
-                if (!isset($content_type['other']['boundary'])) {
-                    return false;
-                }
+                    for ($i = 0; $i < count($parts); $i++) {
+                        [$part_header, $part_body] = $this->splitBodyHeader($parts[$i]);
+                        $return->parts[] = $this->do_decode($part_header, $part_body, $default_ctype);
+                    }
 
-                $default_ctype = $ctype === 'multipart/digest' ? 'message/rfc822' : 'text/plain';
-                $parts         = $this->boundarySplit($body, $content_type['other']['boundary']);
+                    break;
+                case 'message/rfc822':
+                    $obj = new self($this->params);
+                    $return->parts[] = $obj->decode($body, false);
+                    unset($obj);
 
-                for ($i = 0; $i < count($parts); $i++) {
-                    list($part_header, $part_body) = $this->splitBodyHeader($parts[$i]);
-                    $return->parts[] = $this->do_decode($part_header, $part_body, $default_ctype);
-                }
+                    if ($this->params['include_bodies']) {
+                        $return->body = $this->params['decode_bodies'] ? rcube_mime::decode($body) : $body;
+                    }
 
-                break;
+                    break;
+                default:
+                    if ($this->params['include_bodies']) {
+                        $encoding = !empty($content_transfer_encoding['value']) ? $content_transfer_encoding['value'] : '7bit';
+                        $return->body = $this->params['decode_bodies'] ? rcube_mime::decode($body, $encoding) : $body;
+                    }
 
-            case 'message/rfc822':
-                $obj = new rcube_mime_decode($this->params);
-                $return->parts[] = $obj->decode($body, false);
-                unset($obj);
-
-                if ($this->params['include_bodies']) {
-                    $return->body = $this->params['decode_bodies'] ? rcube_mime::decode($body) : $body;
-                }
-
-                break;
-
-            default:
-                if ($this->params['include_bodies']) {
-                    $encoding = !empty($content_transfer_encoding['value']) ? $content_transfer_encoding['value'] : '7bit';
-                    $return->body = $this->params['decode_bodies'] ? rcube_mime::decode($body, $encoding) : $body;
-                }
-
-                break;
+                    break;
             }
-        }
-        else {
+        } else {
             $ctype = explode('/', $default_ctype);
-            $return->ctype_primary   = $ctype[0];
+            $return->ctype_primary = $ctype[0];
             $return->ctype_secondary = $ctype[1];
 
             if ($this->params['include_bodies']) {
@@ -238,14 +222,14 @@ class rcube_mime_decode
     {
         $pos = strpos($input, $this->params['crlf'] . $this->params['crlf']);
         if ($pos === false) {
-            return false;
+            return [$input, ''];
         }
 
         $crlf_len = strlen($this->params['crlf']);
-        $header   = substr($input, 0, $pos);
-        $body     = substr($input, $pos + 2 * $crlf_len);
+        $header = substr($input, 0, $pos);
+        $body = substr($input, $pos + 2 * $crlf_len);
 
-        if (substr_compare($body, $this->params['crlf'], -$crlf_len) === 0) {
+        if (str_ends_with($body, $this->params['crlf'])) {
             $body = substr($body, 0, -$crlf_len);
         }
 
@@ -255,7 +239,7 @@ class rcube_mime_decode
     /**
      * Parse headers given in $input and return as assoc array.
      *
-     * @param string $input Headers to parse
+     * @param ?string $input Headers to parse
      *
      * @return array Contains parsed headers
      */
@@ -263,13 +247,13 @@ class rcube_mime_decode
     {
         $return = [];
 
-        if ($input !== '') {
+        if (is_string($input) && $input !== '') {
             // Unfold the input
-            $input   = preg_replace('/' . $this->params['crlf'] . "(\t| )/", ' ', $input);
+            $input = preg_replace('/' . $this->params['crlf'] . "(\t| )/", ' ', $input);
             $headers = explode($this->params['crlf'], trim($input));
 
             foreach ($headers as $value) {
-                $hdr_name  = substr($value, 0, $pos = strpos($value, ':'));
+                $hdr_name = substr($value, 0, $pos = strpos($value, ':'));
                 $hdr_value = substr($value, $pos + 1);
 
                 if (isset($hdr_value[0]) && $hdr_value[0] == ' ') {
@@ -277,7 +261,7 @@ class rcube_mime_decode
                 }
 
                 $return[] = [
-                    'name'  => $hdr_name,
+                    'name' => $hdr_name,
                     'value' => $this->params['decode_headers'] ? $this->decodeHeader($hdr_value) : $hdr_value,
                 ];
             }
@@ -297,7 +281,7 @@ class rcube_mime_decode
      */
     protected function parseHeaderValue($input)
     {
-        $parts  = preg_split('/;\s*/', $input);
+        $parts = preg_split('/;\s*/', $input);
         $return = [];
 
         if (!empty($parts)) {
@@ -308,7 +292,7 @@ class rcube_mime_decode
                     $return['other'][strtolower($matches[1])] = $matches[2];
                 }
                 // Support RFC2231 encoding
-                else if (preg_match('/^([[:alnum:]]+)\*([0-9]*)\*?="*([^"]+)"*/', $parts[$n], $matches)) {
+                elseif (preg_match('/^([[:alnum:]]+)\*([0-9]*)\*?="*([^"]+)"*/', $parts[$n], $matches)) {
                     $key = strtolower($matches[1]);
                     $val = $matches[3];
 
@@ -318,14 +302,12 @@ class rcube_mime_decode
 
                     if (isset($return['other'][$key])) {
                         $return['other'][$key] .= $val;
-                    }
-                    else {
+                    } else {
                         $return['other'][$key] = $val;
                     }
                 }
             }
-        }
-        else {
+        } else {
             $return['value'] = trim($input);
         }
 
@@ -342,10 +324,10 @@ class rcube_mime_decode
      */
     protected function boundarySplit($input, $boundary)
     {
-        $tmp   = explode('--' . $boundary, $input);
+        $tmp = explode('--' . $boundary, $input);
         $parts = [];
 
-        for ($i = 1; $i < count($tmp)-1; $i++) {
+        for ($i = 1; $i < count($tmp) - 1; $i++) {
             $parts[] = $tmp[$i];
         }
 
@@ -370,22 +352,24 @@ class rcube_mime_decode
      * Recursive method to convert a rcube_mime_decode structure
      * into a rcube_message_part object.
      *
-     * @param object $part   A message part struct
-     * @param int    $count  Part count
-     * @param string $parent Parent MIME ID
+     * @param rcube_message_part $part   A message part struct
+     * @param int                $count  Part count
+     * @param string             $parent Parent MIME ID
      *
-     * @return object rcube_message_part
+     * @return rcube_message_part
+     *
      * @see self::decode()
      */
     protected function structure_part($part, $count = 0, $parent = '')
     {
-        $struct = new rcube_message_part;
-        $struct->mime_id          = $part->mime_id ?: (empty($parent) ? (string)$count : "$parent.$count");
-        $struct->headers          = $part->headers;
-        $struct->mimetype         = $part->ctype_primary . '/' . $part->ctype_secondary;
-        $struct->ctype_primary    = $part->ctype_primary;
-        $struct->ctype_secondary  = $part->ctype_secondary;
+        $struct = new rcube_message_part();
+        $struct->mime_id = $part->mime_id ?: (empty($parent) ? (string) $count : "{$parent}.{$count}");
+        $struct->headers = $part->headers;
+        $struct->mimetype = $part->ctype_primary . '/' . $part->ctype_secondary;
+        $struct->ctype_primary = $part->ctype_primary;
+        $struct->ctype_secondary = $part->ctype_secondary;
         $struct->ctype_parameters = $part->ctype_parameters;
+        $struct->d_parameters = $part->d_parameters;
 
         if (!empty($part->headers['content-transfer-encoding'])) {
             $struct->encoding = $part->headers['content-transfer-encoding'];
@@ -398,8 +382,7 @@ class rcube_mime_decode
         // determine filename
         if (!empty($part->d_parameters['filename'])) {
             $filename = $part->d_parameters['filename'];
-        }
-        else if (!empty($part->ctype_parameters['name'])) {
+        } elseif (!empty($part->ctype_parameters['name'])) {
             $filename = $part->ctype_parameters['name'];
         }
 
@@ -411,8 +394,8 @@ class rcube_mime_decode
             $struct->filename = $filename;
         }
 
-        $struct->body        = $part->body;
-        $struct->size        = is_string($part->body) ? strlen($part->body) : 0;
+        $struct->body = $part->body;
+        $struct->size = is_string($part->body) ? strlen($part->body) : 0;
         $struct->disposition = $part->disposition;
 
         $count = 0;

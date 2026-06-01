@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  +-----------------------------------------------------------------------+
  | Localization file of the Roundcube Webmail Enigma plugin              |
  |                                                                       |
@@ -10,8 +10,6 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/roundcube/roundcube-webmail/plugin-enigma/
 */
 
 $labels['encryption'] = 'Şifreleme';
@@ -19,8 +17,8 @@ $labels['enigmacerts'] = 'S/MIME sertifikaları';
 $labels['enigmakeys'] = 'PGP anahtarları';
 $labels['keysfromto'] = 'Anahtarlar $from - $to / $count';
 $labels['keyname'] = 'Ad';
-$labels['keyid'] = 'Anahtar kodu';
-$labels['keyuserid'] = 'Kullanıcı kodu';
+$labels['keyid'] = 'Anahtar kimliği';
+$labels['keyuserid'] = 'Kullanıcı kimliği';
 $labels['keytype'] = 'Anahtar türü';
 $labels['fingerprint'] = 'Parmak izi';
 $labels['subkeys'] = 'Alt anahtarlar';
@@ -35,7 +33,7 @@ $labels['typesign'] = 'İmza';
 $labels['typeencrypt'] = 'Şifrele';
 $labels['typecert'] = 'Belgele';
 $labels['typeauth'] = 'Kimlik doğrulaması';
-$labels['subkeyid'] = 'Kod';
+$labels['subkeyid'] = 'Kimlik';
 $labels['subkeyalgo'] = 'Algoritma';
 $labels['subkeycreated'] = 'Eklendi';
 $labels['subkeyexpires'] = 'Geçerlilik süresi';
@@ -43,7 +41,7 @@ $labels['subkeyusage'] = 'Kullanım';
 $labels['expiresnever'] = 'asla';
 $labels['unknown'] = 'bilinmeyen';
 $labels['uservalid'] = 'Geçerli';
-$labels['userid'] = 'Kod';
+$labels['userid'] = 'Kimlik';
 $labels['valid'] = 'geçerli';
 $labels['supportencryption'] = 'İletiler şifrelensin ve imzalansın';
 $labels['supportsignatures'] = 'İleti imzaları doğrulansın';
@@ -59,7 +57,7 @@ $labels['importkeys'] = 'Anahtar(lar)ı içe aktar';
 $labels['exportkeys'] = 'Anahtar(lar)ı dışa aktar';
 $labels['keyactions'] = 'Anahtar işlemleri...';
 $labels['keyremove'] = 'Kaldır';
-$labels['keydisable'] = 'Devre dışı';
+$labels['keydisable'] = 'Etkisizleştir';
 $labels['keyrevoke'] = 'Geri al';
 $labels['keysend'] = 'İletilerde herkese açık anahtar gönderilsin';
 $labels['keychpass'] = 'Parolayı değiştir';
@@ -92,18 +90,18 @@ $labels['arialabelkeyexportoptions'] = 'Anahtar dışa aktarma ayarları';
 $labels['arialabelkeysearchform'] = 'Anahtar arama formu';
 $labels['arialabelkeyoptions'] = 'Anahtar seçenekleri';
 $messages['sigvalid'] = '$sender imzası geçerli.';
-$messages['sigvalidpartial'] = '$sender imzası doğrulandı, ancak metnin tümü imzalanmamış.';
+$messages['sigvalidpartial'] = '$sender imzası doğrulandı, ancak içeriğin tümü imzalanmamış.';
 $messages['siginvalid'] = '$sender imzası geçersiz.';
-$messages['sigunverified'] = 'İmza doğrulanmamış. Sertifika doğrulanmamış. Sertifika Kodu: $keyid.';
-$messages['signokey'] = 'İmza doğrulanmamış. Herkese açık anahtar bulunamadı. Anahtar kodu: $keyid.';
+$messages['sigunverified'] = 'İmza doğrulanmamış. Sertifika doğrulanmamış. Sertifika kimliği: $keyid.';
+$messages['signokey'] = 'İmza doğrulanmamış. Herkese açık anahtar bulunamadı. Anahtar kimliği: $keyid.';
 $messages['sigerror'] = 'Sorun var! İmza doğrulanmamış.';
 $messages['decryptok'] = 'İleti şifresi çözüldü.';
 $messages['decrypterror'] = 'Şifre çözülemedi.';
-$messages['decryptnokey'] = 'Şifre çözülemedi. Kişisel anahtar bulunamadı. Anahtar kodu: $keyid.';
+$messages['decryptnokey'] = 'Şifre çözülemedi. Kişisel anahtar bulunamadı. Anahtar kimliği: $keyid.';
 $messages['decryptnomdc'] = 'Şifre çözme işlemi atlandı. İletinin bütünlüğü korunmamış.';
 $messages['decryptbadpass'] = 'Şifre çözülemedi. Parola geçersiz.';
 $messages['decryptnopass'] = 'Şifre çözülemedi. Anahtar parolası gerekli.';
-$messages['decryptpartial'] = 'İletinin şifresi çözüldü, fakat metnin tümü şifrelenmemiş.';
+$messages['decryptpartial'] = 'İletinin şifresi çözüldü, fakat içeriğin tümü şifrelenmemiş.';
 $messages['signerror'] = 'İmzalama geçersiz.';
 $messages['signnokey'] = 'İmzalanamadı. Kişisel anahtar bulunamadı.';
 $messages['signbadpass'] = 'İmzalanamadı. Parola geçersiz.';

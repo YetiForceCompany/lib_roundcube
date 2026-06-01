@@ -10,8 +10,6 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/messages/
 */
 
 $messages['errortitle']  = 'Hi ha hagut un error!';
@@ -102,7 +100,7 @@ $messages['nopagesizewarning'] = 'Si us plau, introduïu una mida de pàgina.';
 $messages['nosenderwarning'] = 'Si us plau, introduïu l\'adreça de correu electrònic del remitent.';
 $messages['recipientsadded'] = 'S\'ha(n) afegit el(s) destinatari(s) correctament.';
 $messages['norecipientwarning'] = 'Si us plau, introduïu com a mínim un destinatari.';
-$messages['disclosedrecipwarning'] = 'Tots els destinataris veuran les adreces de correu electrònic dels altres. Per evitar-ho i protegir la seva privadesa, podeu fer servir el camp Bcc.';
+$messages['disclosedrecipwarning'] = 'Tots els destinataris veuran les adreces de correu electrònic dels altres. Per evitar-ho i protegir la seva privadesa podeu fer servir el camp Cco.';
 $messages['disclosedreciptitle'] = 'Hi ha masses destinataris públics';
 $messages['nosubjectwarning']  = 'El camp "Assumpte" és buit. Voleu introduir-ne un ara?';
 $messages['nosubjecttitle']  = 'Sense assumpte';
@@ -160,7 +158,6 @@ $messages['nogroupassignmentschanged'] = 'No s\'ha canviat cap assignació de gr
 $messages['importwait'] = 'S\'està important, espereu si us plau...';
 $messages['importformaterror'] = 'La importació ha fallat. El fitxer carregat no és un fitxer de dades vàlid.';
 $messages['importconfirm'] = '<b>S\'han importat $inserted contactes correctament</b>';
-$messages['importconfirmskipped'] = '<b>S\'han descartat $skipped entrades ja existents</b>';
 $messages['importmessagesuccess'] = '<b>S\'han importat $nr missatges correctament</b>';
 $messages['importmessageerror'] = 'La importació ha fallat. El fitxer que heu carregat no és un fitxer de missatges vàlid o no és un fitxer de bústia.';
 $messages['opnotpermitted'] = 'Operació no permesa!';

@@ -10,10 +10,7 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/plugin-managesieve/
 */
-
 
 $labels['filters'] = 'Filtros';
 $labels['managefilters'] = 'Gerir filtros';
@@ -60,7 +57,7 @@ $labels['messagedelete'] = 'Eliminar mensagem';
 $labels['messagediscard'] = 'Rejeitar mensagem';
 $labels['messagekeep'] = 'Manter mensagem na Caixa de entrada';
 $labels['messagesrules'] = 'Regras para Filtros';
-$labels['messagesactions'] = 'Acções para Filtros';
+$labels['messagesactions'] = '...executar as seguintes ações:';
 $labels['add'] = 'Adicionar';
 $labels['del'] = 'Eliminar';
 $labels['sender'] = 'Remetente';
@@ -212,7 +209,7 @@ $labels['vacation.addresses'] = 'Os meus endereços de email';
 $labels['vacation.interval'] = 'Intervalo de resposta';
 $labels['vacation.after'] = 'Colocar a regra Ausente-do-Escritório depois';
 $labels['vacation.saving'] = 'A guardar dados...';
-$labels['vacation.action'] = 'Acção para mensagem recebida';
+$labels['vacation.action'] = 'Ação para mensagem recebida';
 $labels['vacation.keep'] = 'Manter';
 $labels['vacation.discard'] = 'Rejeitar';
 $labels['vacation.redirect'] = 'Redireccionar para';
@@ -226,14 +223,14 @@ $labels['forward.status'] = 'Estado:';
 $labels['forward.action'] = 'Executar a seguinte ação para os mails recebidos:';
 $labels['forward.saving'] = 'A guardar dados...';
 $labels['filladdresses'] = 'Preencher com todos os meus endereços';
-$labels['arialabelfiltersetactions'] = 'Acções do conjunto de filtros';
-$labels['arialabelfilteractions'] = 'Acções dos filtros';
-$labels['arialabelfilterform'] = 'Propriedades dos filtro';
+$labels['arialabelfiltersetactions'] = 'Ações do conjunto de filtros';
+$labels['arialabelfilteractions'] = 'Ações de filtros';
+$labels['arialabelfilterform'] = 'Propriedades dos filtros';
 $labels['ariasummaryfilterslist'] = 'Lista de filtros';
 $labels['ariasummaryfiltersetslist'] = 'Lista de conjuntos de filtros';
 $labels['filterstitle'] = 'Editar filtros de mensagens recebidas';
 $labels['vacationtitle'] = 'Editar regra de ausência do escritório';
-$labels['forwardtitle'] = 'Editar regra de reencaminhamento de mail';
+$labels['forwardtitle'] = 'Editar regra de reencaminhamento de email';
 $labels['message'] = 'Mensagem';
 $labels['duplicate'] = 'é duplicado';
 $labels['notduplicate'] = 'não é duplicado';
@@ -251,7 +248,7 @@ $messages['filtersaveerror'] = 'Não foi possível guardar o filtro.  Ocorreu um
 $messages['filterformerror'] = 'O formulário de filtro contém erros.';
 $messages['filterdeleteconfirm'] = 'Tem a certeza que pretende eliminar este filtro?';
 $messages['ruledeleteconfirm'] = 'Tem a certeza que pretende eliminar esta regra?';
-$messages['actiondeleteconfirm'] = 'Tem a certeza que pretende eliminar esta acção?';
+$messages['actiondeleteconfirm'] = 'Tem a certeza que pretende eliminar esta ação?';
 $messages['forbiddenchars'] = 'Caracteres inválidos no campo.';
 $messages['cannotbeempty'] = 'Este campo não pode estar vazio.';
 $messages['ruleexist'] = 'Já existe um Filtro com o nome especificado.';
@@ -284,3 +281,4 @@ $messages['duplicate.conflict.err'] = 'Ambos, cabeçalho e identificador único,
 $messages['disabledaction'] = 'Ação não permitida.';
 $messages['lastindexempty'] = 'É necessário o índice quando se conta a partir do fim';
 $messages['noflagset'] = 'Deve seleccionar pelo menos um sinalizador.';
+$messages['saving.actionordererror'] = 'A ação \'$previous\' deve ocorrer depois da ação \'$current\'.';

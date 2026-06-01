@@ -10,8 +10,6 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/messages/
 */
 
 $messages['errortitle']  = 'Fehlermeldung';
@@ -102,7 +100,6 @@ $messages['nopagesizewarning'] = 'Bitte geben Sie die Einträge pro Seite an.';
 $messages['nosenderwarning'] = 'Bitte geben Sie die E-Mail-Adresse des Senders an.';
 $messages['recipientsadded'] = 'Empfänger erfolgreich hinzugefügt.';
 $messages['norecipientwarning'] = 'Bitte geben Sie mindestens einen Empfänger an.';
-$messages['disclosedrecipwarning'] = 'Alle Empfänger sehen die E-Mail Adressen der anderen Empfänger. Um deren Privatsphäre zu schützen, können Sie das Bcc-Feld verwenden.';
 $messages['disclosedreciptitle'] = 'Zu viele öffentliche Empfänger';
 $messages['nosubjectwarning']  = 'Die Betreffzeile ist leer. Möchten Sie jetzt einen Betreff eingeben?';
 $messages['nosubjecttitle']  = 'Kein Betreff';
@@ -160,7 +157,6 @@ $messages['nogroupassignmentschanged'] = 'Es wurde keine Gruppenzuweisung verän
 $messages['importwait'] = 'Daten werden importiert, bitte warten...';
 $messages['importformaterror'] = 'Import fehlgeschlagen! Die hochgeladene Datei enthält keines der unterstützten Datenformate.';
 $messages['importconfirm'] = '<b>Es wurden $inserted Adressen erfolgreich importiert</b>';
-$messages['importconfirmskipped'] = '<b>$skipped bestehende Einträge wurden übersprungen</b>';
 $messages['importmessagesuccess'] = '$nr Nachricht(n) erfolgreich importiert';
 $messages['importmessageerror'] = 'Import fehlgeschlagen! Die hochgeladene Datei ist keine E-Mail-Nachricht oder Mailbox-Datei.';
 $messages['opnotpermitted'] = 'Operation nicht erlaubt!';

@@ -10,8 +10,6 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/messages/
 */
 
 $messages['errortitle']  = 'Xatolik yuzaga keldi!';
@@ -87,7 +85,6 @@ $messages['nonamewarning']  = 'Iltimos, Ismni kiriting.';
 $messages['nopagesizewarning'] = 'Iltimos, sahifa o‘lchamini kiriting.';
 $messages['nosenderwarning'] = 'Iltimos, jo‘natuvchi elektron manzilini kirting.';
 $messages['norecipientwarning'] = 'Iltimos, kamida bir dona qabul qiluvchini kiriting.';
-$messages['disclosedrecipwarning'] = 'Barcha qabul qiluvchilar boshqalarning elektron manzilini ko‘ra olishadi, buni oldini olish va ularning shaxiy daxlsizligini ta’minlash uchun BCC maydonidan foydalaning.';
 $messages['disclosedreciptitle'] = 'Tashqi qabul qiluvchilar juda ko‘p.';
 $messages['nosubjectwarning']  = '"Mavzu" maydoni to‘ldirilmagan. Uni to‘ldirishni istaysizmi?';
 $messages['nosubjecttitle']  = 'Mavzusiz';
@@ -141,7 +138,6 @@ $messages['nogroupassignmentschanged'] = 'Guruhlar bo‘yicha taqsimlash o‘zga
 $messages['importwait'] = 'Import qilinmoqda, iltimos kuting...';
 $messages['importformaterror'] = 'Import amalga oshmadi. Yuklanayotgan fayl no’malum ma’lumotlar formatiga ega.';
 $messages['importconfirm'] = '<b> $inserted kontaktlar import qilindi</b>';
-$messages['importconfirmskipped'] = '<b> $skipped  mavjud yozuvlar o‘tkazib yuborildi</b>';
 $messages['importmessagesuccess'] = '$nr ta xat import qilindi.';
 $messages['importmessageerror'] = 'Import muvaffaqqiyatsiz amalga oshdi. Yuklanayotgan fayl xat fayli yoki pochta qutisi fayli emas.';
 $messages['opnotpermitted'] = 'Harakat ta’qiqlangan!';

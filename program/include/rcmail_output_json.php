@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  +-----------------------------------------------------------------------+
  | This file is part of the Roundcube Webmail client                     |
  |                                                                       |
@@ -20,21 +20,17 @@
 
 /**
  * View class to produce JSON responses
- *
- * @package    Webmail
- * @subpackage View
  */
 class rcmail_output_json extends rcmail_output
 {
-    protected $texts     = [];
-    protected $commands  = [];
+    protected $texts = [];
+    protected $commands = [];
     protected $callbacks = [];
-    protected $message   = null;
+    protected $message;
     protected $header_sent = false;
 
-    public $type      = 'js';
+    public $type = 'js';
     public $ajax_call = true;
-
 
     /**
      * Object constructor
@@ -58,12 +54,12 @@ class rcmail_output_json extends rcmail_output
      *
      * @param string $title New page title
      */
+    #[\Override]
     public function set_pagetitle($title)
     {
         if ($this->config->get('devel_mode') && !empty($_SESSION['username'])) {
             $name = $_SESSION['username'];
-        }
-        else {
+        } else {
             $name = $this->config->get('product_name');
         }
 
@@ -73,9 +69,10 @@ class rcmail_output_json extends rcmail_output
     /**
      * Register a template object handler
      *
-     * @param string $obj  Object name
+     * @param string   $obj  Object name
      * @param callable $func Function name to call
      */
+    #[\Override]
     public function add_handler($obj, $func)
     {
         // ignore
@@ -86,6 +83,7 @@ class rcmail_output_json extends rcmail_output
      *
      * @param array $arr Hash array with object=>handler pairs
      */
+    #[\Override]
     public function add_handlers($arr)
     {
         // ignore
@@ -94,17 +92,17 @@ class rcmail_output_json extends rcmail_output
     /**
      * Call a client method
      *
-     * @param string $cmd    Method to call
-     * @param mixed ...$args Additional arguments
+     * @param string $cmd     Method to call
+     * @param mixed  ...$args Additional arguments
      */
+    #[\Override]
     public function command($cmd, ...$args)
     {
         array_unshift($args, $cmd);
 
-        if (strpos($args[0], 'plugin.') === 0) {
+        if (str_starts_with($args[0], 'plugin.')) {
             $this->callbacks[] = $args;
-        }
-        else {
+        } else {
             $this->commands[] = $args;
         }
     }
@@ -114,6 +112,7 @@ class rcmail_output_json extends rcmail_output
      *
      * @param mixed ...$args Labels (an array of strings, or many string arguments)
      */
+    #[\Override]
     public function add_label(...$args)
     {
         if (count($args) == 1 && is_array($args[0])) {
@@ -136,6 +135,7 @@ class rcmail_output_json extends rcmail_output
      *
      * @uses self::command()
      */
+    #[\Override]
     public function show_message($message, $type = 'notice', $vars = null, $override = true, $timeout = 0)
     {
         if ($override || !$this->message) {
@@ -144,8 +144,7 @@ class rcmail_output_json extends rcmail_output
                     $vars = array_map(['rcmail', 'Q'], $vars);
                 }
                 $msgtext = $this->app->gettext(['name' => $message, 'vars' => $vars]);
-            }
-            else {
+            } else {
                 $msgtext = $message;
             }
 
@@ -157,10 +156,11 @@ class rcmail_output_json extends rcmail_output
     /**
      * Delete all stored env variables and commands
      */
+    #[\Override]
     public function reset()
     {
         parent::reset();
-        $this->texts    = [];
+        $this->texts = [];
         $this->commands = [];
     }
 
@@ -172,6 +172,7 @@ class rcmail_output_json extends rcmail_output
      *
      * @see rcmail::url()
      */
+    #[\Override]
     public function redirect($p = [], $delay = 1)
     {
         $location = $this->app->url($p);
@@ -183,6 +184,7 @@ class rcmail_output_json extends rcmail_output
     /**
      * Send an AJAX response to the client.
      */
+    #[\Override]
     public function send()
     {
         $this->remote_response();
@@ -195,14 +197,15 @@ class rcmail_output_json extends rcmail_output
      * @param int    $code    Error code
      * @param string $message Error message
      */
+    #[\Override]
     public function raise_error($code, $message)
     {
         if ($code == 403) {
-            $this->header('HTTP/1.1 403 Forbidden');
-            die("Invalid Request");
+            http_response_code(403);
+            exit('Invalid Request');
         }
 
-        $this->show_message("Application Error ($code): $message", 'error');
+        $this->show_message("Application Error ({$code}): {$message}", 'error');
         $this->remote_response();
         exit;
     }
@@ -224,7 +227,7 @@ class rcmail_output_json extends rcmail_output
         unset($this->env['task'], $this->env['action'], $this->env['comm_path']);
 
         $rcmail = rcmail::get_instance();
-        $response['action'] = $rcmail->action;
+        $response = ['action' => $rcmail->action];
 
         if ($unlock = rcube_utils::get_input_string('_unlock', rcube_utils::INPUT_GPC)) {
             $response['unlock'] = $unlock;
@@ -246,7 +249,7 @@ class rcmail_output_json extends rcmail_output
         }
 
         // trigger generic hook where plugins can put additional content to the response
-        $hook = $this->app->plugins->exec_hook("render_response", ['response' => $response]);
+        $hook = $this->app->plugins->exec_hook('render_response', ['response' => $response]);
 
         // save some memory
         $response = $hook['response'];
@@ -262,7 +265,7 @@ class rcmail_output_json extends rcmail_output
     {
         $out = '';
 
-        foreach ($this->commands as $i => $args) {
+        foreach ($this->commands as $args) {
             $method = array_shift($args);
             foreach ($args as $i => $arg) {
                 $args[$i] = self::json_serialize($arg, $this->devel_mode, false);

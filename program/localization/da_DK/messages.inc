@@ -10,8 +10,6 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/messages/
 */
 
 $messages['errortitle']  = 'Der opstod en fejl!';
@@ -148,7 +146,6 @@ $messages['nogroupassignmentschanged'] = 'Ingen gruppetildelinger ændret.';
 $messages['importwait'] = 'Importerer, vent venligst...';
 $messages['importformaterror'] = 'Importering mislykkedes! Den uploadede fil er ikke en gyldig import-datafil.';
 $messages['importconfirm'] = '<b>Importerede $inserted kontakter</b>';
-$messages['importconfirmskipped'] = '<b>Sprang over $skipped eksisterende kontakter</b>';
 $messages['importmessagesuccess'] = 'Importerede $nr beskeder';
 $messages['importmessageerror'] = 'Import mislykkedes! Den uploadede fil er ikke en gyldig besked- eller mailbox-fil.';
 $messages['opnotpermitted'] = 'Handling ikke tilladt!';

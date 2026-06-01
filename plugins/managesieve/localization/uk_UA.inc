@@ -10,10 +10,7 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/plugin-managesieve/
 */
-
 
 $labels['filters'] = 'Фільтри';
 $labels['managefilters'] = 'Керування фільтрами вхідної пошти';
@@ -21,6 +18,8 @@ $labels['filtername'] = 'Назва фільтру';
 $labels['newfilter'] = 'Новий фільтр';
 $labels['filteradd'] = 'Додати фільтр';
 $labels['filterdel'] = 'Вилучити фільтр';
+$labels['rules'] = 'Правила';
+$labels['actions'] = 'Дії';
 $labels['scope'] = 'Масштаб';
 $labels['moveup'] = 'Пересунути вгору';
 $labels['movedown'] = 'Пересунути вниз';
@@ -39,6 +38,11 @@ $labels['filterregex'] = 'відповідає регулярному вираз
 $labels['filternotregex'] = 'не відповідає регулярному виразу';
 $labels['filterunder'] = 'менше, ніж';
 $labels['filterover'] = 'більше, ніж';
+$labels['mime'] = 'MIME:';
+$labels['mimepart'] = 'MIME part:';
+$labels['mime-message'] = 'лист';
+$labels['mime-type'] = 'тип';
+$labels['mime-contenttype'] = 'content-type';
 $labels['addrule'] = 'Додати правило';
 $labels['delrule'] = 'Видалити правило';
 $labels['messagemoveto'] = 'Пересунути повідомлення до';
@@ -72,6 +76,7 @@ $labels['none'] = 'нічого';
 $labels['fromset'] = 'з набору';
 $labels['fromfile'] = 'з файлу';
 $labels['filterdisabled'] = 'Фільтр вимкнено';
+$labels['filterenabled'] = 'Фільтр увімкнено';
 $labels['countisgreaterthan'] = 'лічильник більший за';
 $labels['countisgreaterthanequal'] = 'лічильник більший або рівний ';
 $labels['countislessthan'] = 'лічильник менший';
@@ -92,6 +97,12 @@ $labels['flagdeleted'] = 'Вилучено';
 $labels['flaganswered'] = 'З відповіддю';
 $labels['flagflagged'] = 'Позначено';
 $labels['flagdraft'] = 'Чернетка';
+$labels['headername'] = 'Назва заголовка';
+$labels['headervalue'] = 'Значення заголовка';
+$labels['headeratstart'] = 'на початку';
+$labels['headeratend'] = 'в кінці';
+$labels['headerfromstart'] = 'з початку';
+$labels['headerfromend'] = 'з кінця';
 $labels['setvariable'] = 'Встановити змінну';
 $labels['setvarname'] = 'Назва змінної:';
 $labels['setvarvalue'] = 'Значення змінної:';
@@ -156,8 +167,13 @@ $labels['asciicasemap'] = 'чутливий до регістру (ascii-casemap
 $labels['asciinumeric'] = 'числовий (ascii-numeric)';
 $labels['index'] = 'індекс:';
 $labels['indexlast'] = 'назад';
+$labels['spamtestisgreaterthan'] = 'більше, ніж';
+$labels['spamtestisgreaterthanequal'] = 'більше або дорівнює';
+$labels['spamtestislessthan'] = 'менше, ніж';
+$labels['spamtestislessthanequal'] = 'менше або дорівнює';
 $labels['spamtestequals'] = 'ідентичний до';
 $labels['spamtestnotequals'] = 'не ідентичний до';
+$labels['spamtestisunknown'] = 'невідомо';
 $labels['vacation.reply'] = 'Повідомлення-відповідь';
 $labels['vacation.advanced'] = 'Розширені налаштування';
 $labels['vacation.from'] = 'Адреса відправника відповіді';
@@ -174,10 +190,12 @@ $labels['vacation.keep'] = 'Залишити';
 $labels['vacation.discard'] = 'Відкинути';
 $labels['vacation.redirect'] = 'Перенаправити до ';
 $labels['vacation.copy'] = 'Надсилати копію до ';
+$labels['forward'] = 'Переадресація';
 $labels['forward.redirect'] = 'Перенаправити до ';
 $labels['forward.copy'] = 'Надсилати копію до ';
 $labels['forward.on'] = 'Увімкнено';
 $labels['forward.off'] = 'Вимкнено';
+$labels['forward.status'] = 'Статус:';
 $labels['forward.saving'] = 'Збереження даних…';
 $labels['filladdresses'] = 'Заповнити усіма моїми адресами ';
 $labels['arialabelfiltersetactions'] = 'Дії набору фільтрів';
@@ -187,6 +205,7 @@ $labels['ariasummaryfilterslist'] = 'Список фільтрів';
 $labels['ariasummaryfiltersetslist'] = 'Список наборів фільтрів';
 $labels['filterstitle'] = 'Редагувати фільтри вхідної пошти';
 $labels['vacationtitle'] = 'Редагувати правило поза-офісом';
+$labels['forwardtitle'] = 'Редагування правил переадресації пошти';
 $labels['message'] = 'Лист';
 $labels['duplicate'] = 'є дублікатем';
 $labels['notduplicate'] = 'не є дублікатем';
@@ -222,3 +241,4 @@ $messages['invaliddateformat'] = 'Недійсний формат дати аб�
 $messages['saveerror'] = 'Неможливо зберегти дані. Сталася помилка сервера.';
 $messages['emptyvacationbody'] = 'Тіло повідомлення про відпустку обов\'язкове!';
 $messages['duplicate.conflict.err'] = 'Заголовок та унікальний ідентифікатор не допускаються разом.';
+$messages['disabledaction'] = 'Дія не дозволена.';
