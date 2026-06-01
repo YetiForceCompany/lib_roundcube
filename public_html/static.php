@@ -93,8 +93,6 @@ function validateStaticFile(string $path): ?string
 
     // Only supported file types
     if (empty($ext) || !isset(SUPPORTED_TYPES[strtolower($ext)])) {
-		file_put_contents('round.log', print_r(['source' => $source, 'null_2' => $path, 'ext' => $ext], true), FILE_APPEND);
-
 		return null;
     }
 

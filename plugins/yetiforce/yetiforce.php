@@ -88,9 +88,9 @@ class yetiforce extends rcube_plugin
 		$this->register_action('plugin.yetiforce-loadMailAnalysis', [$this, 'loadMailAnalysis']);
 
 		if ('mail' == $this->rc->task) {
-			$this->include_stylesheet('../../../../../layouts/resources/icons/yfm.css');
-			$this->include_stylesheet('../../../../../layouts/resources/icons/additionalIcons.css');
-			$this->include_stylesheet('../../../../../libraries/@fortawesome/fontawesome-free/css/all.css');
+			$this->include_stylesheet('/../../../../../../layouts/resources/icons/yfm.css');
+			$this->include_stylesheet('/../../../../../../layouts/resources/icons/additionalIcons.css');
+			$this->include_stylesheet('/../../../../../../libraries/@fortawesome/fontawesome-free/css/all.css');
 			$currentPath = getcwd();
 			chdir($this->rc->config->get('root_directory'));
 			if ($this->loadCurrentUser()) {
