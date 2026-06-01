@@ -10,8 +10,6 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/plugin-password/
 */
 
 $labels['changepasswd']  = 'Mainīt paroli';
@@ -38,5 +36,6 @@ $messages['samepasswd'] = 'Jaunā parole nedrīkst būt tāda pati kā vecā.';
 $messages['passwdexpirewarning'] = 'UZMANĪBU! Jūsu parolei drīz beigsies derīguma termiņš, lūdzu nomainiet to pirms $expirationdatetime.';
 $messages['passwdexpired'] = 'Jūsu parolei ir beidzies derīguma termiņš un Jums tā tagad ir jānomaina.';
 $messages['passwdconstraintviolation'] = 'Paroles veidošanas nosacījumu pārkāpums. Parole, iespējams, pārāk nedroša.';
+$messages['pwned_mustnotbedisclosed'] = 'Parole nedrīkst būt&nbsp;<a href="https://haveibeenpwned.com/Passwords" target="_blank">vispārzināma</a>.';
 $messages['pwned_isdisclosed'] = 'Šī ir vispārzināma parole.';
 $messages['pwned_fetcherror'] = 'Neizdevās pārbaudīt paroles drošumu.';

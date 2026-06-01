@@ -10,8 +10,6 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/messages/
 */
 
 $messages['errortitle']  = 'Degouezhet ez eus bet ur fazi !';
@@ -118,7 +116,7 @@ $messages['movingmessage'] = 'O tilec\'hiañ kemennadennoù...';
 $messages['copyingmessage'] = 'Oc\'h eilañ kemennadennoù...';
 $messages['copyingcontact'] = 'Oc\'h eilañ darempredoù...';
 $messages['movingcontact'] = 'O fiñval an darempred(où)';
-$messages['deletingmessage'] = 'O tilemel darempredoù...';
+$messages['deletingmessage'] = 'O tilemel kemennadennoù...';
 $messages['markingmessage'] = 'O verkañ darempredoù...';
 $messages['addingmember'] = 'Oc\'h ouzhpennañ darempredoù d\'ar strollad...';
 $messages['removingmember'] = 'O tilemel darempredoù eus ar strollad...';
@@ -135,7 +133,6 @@ $messages['nogroupassignmentschanged'] = 'N\'eo bet kemmet deverkadur strollad e
 $messages['importwait'] = 'Oc\'h enporzhiañ, gortozit...';
 $messages['importformaterror'] = 'C\'hwitadenn war an enporzhiañ! N\'eo ket ur restr roadennoù enporzhiañ talvoudek an hini a zo bet pellgaset.';
 $messages['importconfirm'] = '<b>Enporzhiet eo bet $inserted a zarempredoù gant berzh</b>';
-$messages['importconfirmskipped'] = '<b>Tremenet eo bet $skipped elfennoù a oa outo endeo</b>';
 $messages['importmessagesuccess'] = 'Enporzhiet $nr a gemennadennoù gant berzh';
 $messages['importmessageerror'] = 'C\'hwitadenn war an enporzhiañ! Ar restr pellgaset n\'eo ket ur restr kemennadenn talvoudek peur restr boest lizhiri';
 $messages['opnotpermitted'] = 'N\'eo ket aotreet ar gwezhiadur!';

@@ -10,10 +10,8 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/plugin-hide_blockquote/
 */
 
 $labels['hide'] = 'Elrejtés';
 $labels['show'] = 'Megjelenítés';
-$labels['quotelimit'] = 'Idézet elrejtése ha a sorok száma több mint';
+$labels['quotelimit'] = 'Idézet elrejtése, ha a sorok száma több, mint';

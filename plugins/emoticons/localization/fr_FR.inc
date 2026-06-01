@@ -10,9 +10,7 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/plugin-emoticons/
 */
 
-$labels['emoticonsdisplay'] = 'Afficher les frimousses dans les messages texte en clair';
-$labels['emoticonscompose'] = 'Activer les frimousses';
+$labels['emoticonsdisplay'] = 'Afficher les émoticônes dans les courriels en texte brut';
+$labels['emoticonscompose'] = 'Activer les émoticônes';

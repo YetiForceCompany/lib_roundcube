@@ -10,8 +10,6 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/messages/
 */
 
 $messages['errortitle']  = 'Възникна грешка!';
@@ -102,7 +100,7 @@ $messages['nopagesizewarning'] = 'Въведете брой редове на с
 $messages['nosenderwarning'] = 'Моля въведете валиден адрес на ел. поща на подателя.';
 $messages['recipientsadded'] = 'Получателят е добавен успешно.';
 $messages['norecipientwarning'] = 'Моля въведете поне един получател.';
-$messages['disclosedrecipwarning'] = 'Всеки получател ще вижда адресите на ел. поща на останалите получатели. За да предотвратите това и за да се погрижите за тяхна конфиденциалност може да използвате поле Bcc.';
+$messages['disclosedrecipwarning'] = 'Всички получатели ще виждат взаимно имейл адресите си. За да предотвратите това и да защитите тяхната поверителност, можете да използвате полето Скрито копие до.';
 $messages['disclosedreciptitle'] = 'Твърде много публични получатели';
 $messages['nosubjectwarning']  = 'Полето "Заглавие" е празно. Желаете ли да въведете заглавие сега?';
 $messages['nosubjecttitle']  = 'Няма Заглавие';
@@ -161,6 +159,8 @@ $messages['importwait'] = 'Импортиране, моля изчакайте..
 $messages['importformaterror'] = 'Неуспешен импорт! Данните в каченият файл не са във валиден формат.';
 $messages['importconfirm'] = '<b>Успешно са импортирани $inserted контакта, вече съществуващите $skipped контакта са пропуснати</b>:<p><em>$names</em></p>';
 $messages['importconfirmskipped'] = '<b>Пропуснати са $skipped съществуващи записи</b>';
+$messages['importconfirminvalid'] = '<b>Пропуснати са $skipped невалидни записи</b>';
+$messages['importconfirmerrors'] = '<b>Невъзмоно импортиране на $errors валидни записи</b>';
 $messages['importmessagesuccess'] = 'Успешно импортирани $nr писма';
 $messages['importmessageerror'] = 'Неуспешен импорт! Каченият файл не е валиден файл на писма или пощенска кутия';
 $messages['opnotpermitted'] = 'Непозволена операция!';
@@ -230,3 +230,5 @@ $messages['listusebutton'] = 'Използвайте бутона Създай, 
 $messages['keypaircreatesuccess'] = 'Успешно е създадена нова двойка ключове за $identity.';
 $messages['emptyattachment'] = 'Изглежда, че този прикачен файл е празен.<br>Моля, консултирайте се с лицето, което го е изпратило.';
 $messages['oauthloginfailed'] = 'OAuth автентикацията не бе успешна. Моля опитайте отново.';
+$messages['oauthinvalidrequest'] = 'Заявката за оторизация е невалидна или непълна';
+$messages['oauthaccessdenied'] = 'Оторизационният сървър или потребителят отказаха заявката';

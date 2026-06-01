@@ -10,8 +10,6 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/messages/
 */
 
 $messages['errortitle']  = 'Errore bat gertatu da!';
@@ -160,7 +158,9 @@ $messages['nogroupassignmentschanged'] = 'Talde-esleipena ez da aldatu.';
 $messages['importwait'] = 'Inportatzen, itxaron mesedez...';
 $messages['importformaterror'] = 'Huts egin du inportatzean. Kargatu duzun fitxategia ez da inportatzeko fitxategi baliozkoa.';
 $messages['importconfirm'] = '<b>Ongi inportatu dira $inserted kontaktu</b>';
-$messages['importconfirmskipped'] = '<b>Saltatu dira  $skipped sarrera</b>';
+$messages['importconfirmskipped'] = '<b>Saltatu dira zeuden $skipped kontaktu</b>';
+$messages['importconfirminvalid'] = '<b>Saltatu dira baliogabeko $invalid contacts</b>';
+$messages['importconfirmerrors'] = '<b>Huts egin du $errors baliozko kontaktuen inportazioak</b>';
 $messages['importmessagesuccess'] = '$nr mezu ongi inportatu dira.';
 $messages['importmessageerror'] = 'Inportazio akatsa! Kargatutako fitxategia ez da baliozko mezua edo postontzi-fitxategia';
 $messages['opnotpermitted'] = 'Ekintza ez baimendua!';
@@ -230,3 +230,5 @@ $messages['listusebutton'] = 'Erabili Sortu botoia erregistro berri bat gehitzek
 $messages['keypaircreatesuccess'] = 'Gako pare berria behar bezala sortu da $identity-(r)entzat.';
 $messages['emptyattachment'] = 'Eranskin hau hutsik dagoela dirudi. Mesedez, egiaztatu bidali duenarekin.';
 $messages['oauthloginfailed'] = 'OAuth saioa hasteak huts egin du. Saiatu berriro.';
+$messages['oauthinvalidrequest'] = 'Baimen eskaera baliogabea edo osatu gabea da.';
+$messages['oauthaccessdenied'] = 'Baimen zerbitzariak edo erabiltzaileak eskaera ukatu du.';

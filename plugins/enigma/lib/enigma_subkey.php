@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  +-------------------------------------------------------------------------+
  | SubKey class for the Enigma Plugin                                      |
  |                                                                         |
@@ -26,14 +26,13 @@ class enigma_subkey
     public $length;
     public $usage;
 
-
     /**
      * Converts internal ID to short ID
      * Crypt_GPG uses internal, but e.g. Thunderbird's Enigmail displays short ID
      *
      * @return string Key ID
      */
-    function get_short_id()
+    public function get_short_id()
     {
         // E.g. 04622F2089E037A5 => 89E037A5
         return enigma_key::format_id($this->id);
@@ -44,7 +43,7 @@ class enigma_subkey
      *
      * @return string Formatted fingerprint
      */
-    function get_fingerprint()
+    public function get_fingerprint()
     {
         return enigma_key::format_fingerprint($this->fingerprint);
     }
@@ -52,30 +51,32 @@ class enigma_subkey
     /**
      * Returns human-readable name of the key's algorithm
      *
-     * @return string Algorithm name
+     * @return ?string Algorithm name
      */
-    function get_algorithm()
+    public function get_algorithm()
     {
         // https://datatracker.ietf.org/doc/html/rfc4880#section-9.1
         switch ($this->algorithm) {
-        case 1:
-        case 2:
-        case 3:
-            return 'RSA';
-        case 16:
-        case 20:
-            return 'Elgamal';
-        case 17:
-            return 'DSA';
-        case 18:
-            return 'Elliptic Curve';
-        case 19:
-            return 'ECDSA';
-        case 21:
-            return 'Diffie-Hellman';
-        case 22:
-            return 'EdDSA';
+            case 1:
+            case 2:
+            case 3:
+                return 'RSA';
+            case 16:
+            case 20:
+                return 'Elgamal';
+            case 17:
+                return 'DSA';
+            case 18:
+                return 'Elliptic Curve';
+            case 19:
+                return 'ECDSA';
+            case 21:
+                return 'Diffie-Hellman';
+            case 22:
+                return 'EdDSA';
         }
+
+        return null;
     }
 
     /**
@@ -83,9 +84,9 @@ class enigma_subkey
      *
      * @return bool
      */
-    function is_expired()
+    public function is_expired()
     {
-        $now = new DateTime('now');
+        $now = new \DateTime('now');
 
         return !empty($this->expires) && $this->expires < $now;
     }
@@ -93,12 +94,18 @@ class enigma_subkey
     /**
      * Returns subkey creation date-time string
      *
-     * @return string|null
+     * @param bool $asInt Return the date as an integer
+     *
+     * @return string|int|null
      */
-    function get_creation_date()
+    public function get_creation_date($asInt = false)
     {
         if (empty($this->created)) {
-            return null;
+            return $asInt ? 0 : null;
+        }
+
+        if ($asInt) {
+            return (int) $this->created->format('U');
         }
 
         $date_format = rcube::get_instance()->config->get('date_format', 'Y-m-d');
@@ -111,7 +118,7 @@ class enigma_subkey
      *
      * @return string|null
      */
-    function get_expiration_date()
+    public function get_expiration_date()
     {
         if (empty($this->expires)) {
             return null;

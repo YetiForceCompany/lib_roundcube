@@ -10,8 +10,6 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/messages/
 */
 
 $messages['errortitle']  = 'A avut loc o EROARE!';
@@ -87,7 +85,6 @@ $messages['nonamewarning']  = 'Vă rugăm să introduceţi un nume';
 $messages['nopagesizewarning'] = 'Vă rugăm să introduceţi mărimea paginii';
 $messages['nosenderwarning'] = 'Vă rugăm introduceți adresa de e-mail a expeditorului.';
 $messages['norecipientwarning'] = 'Vă rugăm să introduceţi cel puţin un destinatar';
-$messages['disclosedrecipwarning'] = 'Toți destinatarii vor vedea adresele email ale celorlalți. Pentru a preveni acest lucru și pentru a le proteja confidențialitatea, puteți folosi câmpul Bcc.';
 $messages['disclosedreciptitle'] = 'Prea mulți destinatari';
 $messages['nosubjectwarning']  = 'Mesajul nu are subiect. Vreţi să introduceţi unul acum?';
 $messages['nosubjecttitle']  = 'Fără subiect';
@@ -141,7 +138,6 @@ $messages['nogroupassignmentschanged'] = 'Atribuirile la grupuri nu au fost modi
 $messages['importwait'] = 'Datele sunt importate, vă rugăm să aşteptaţi...';
 $messages['importformaterror'] = 'Importul a eșuat! Fișierul încărcat nu este un fișier valid pentru import de date.';
 $messages['importconfirm'] = '<b>$inserted contacte au fost importate cu succes, $skipped intrări au fost ignorate deoarece ele există deja: $names</b>';
-$messages['importconfirmskipped'] = '<b>Am sărit peste $skipped înregistrări</b>';
 $messages['importmessagesuccess'] = 'Am importat cu succes $nr mesaje.';
 $messages['importmessageerror'] = 'Importarea a esuat. Fisierul incarca nu este un mesaj valid pentru email.';
 $messages['opnotpermitted'] = 'Operaţiunea nu este permisă!';

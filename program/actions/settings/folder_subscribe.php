@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  +-----------------------------------------------------------------------+
  | This file is part of the Roundcube Webmail client                     |
  |                                                                       |
@@ -27,11 +27,12 @@ class rcmail_action_settings_folder_subscribe extends rcmail_action
      *
      * @param array $args Arguments from the previous step(s)
      */
+    #[\Override]
     public function run($args = [])
     {
-        $rcmail  = rcmail::get_instance();
+        $rcmail = rcmail::get_instance();
         $storage = $rcmail->get_storage();
-        $mbox    = rcube_utils::get_input_string('_mbox', rcube_utils::INPUT_POST, true);
+        $mbox = rcube_utils::get_input_string('_mbox', rcube_utils::INPUT_POST, true);
 
         if (strlen($mbox)) {
             $result = $storage->subscribe([$mbox]);
@@ -56,8 +57,7 @@ class rcmail_action_settings_folder_subscribe extends rcmail_action
             }
 
             $rcmail->output->show_message('foldersubscribed', 'confirmation');
-        }
-        else {
+        } else {
             self::display_server_error('errorsaving');
             $rcmail->output->command('reset_subscription', $mbox, false);
         }

@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  +-----------------------------------------------------------------------+
  | This file is part of the Roundcube Webmail client                     |
  |                                                                       |
@@ -20,9 +20,6 @@
 /**
  * Database independent query interface.
  * This is a wrapper for the PHP PDO.
- *
- * @package   Framework
- * @subpackage Database
  */
 class rcube_db
 {
@@ -40,10 +37,10 @@ class rcube_db
     protected $dbhs = [];
     protected $table_connections = [];
 
-    protected $db_error     = false;
+    protected $db_error = false;
     protected $db_error_msg = '';
     protected $conn_failure = false;
-    protected $db_index     = 0;
+    protected $db_index = 0;
     protected $last_result;
     protected $tables;
     protected $variables;
@@ -51,20 +48,19 @@ class rcube_db
     protected $options = [
         // column/table quotes
         'identifier_start' => '"',
-        'identifier_end'   => '"',
+        'identifier_end' => '"',
         // date/time input format
-        'datetime_format'  => 'Y-m-d H:i:s',
-        'table_prefix'     => '',
+        'datetime_format' => 'Y-m-d H:i:s',
+        'table_prefix' => '',
     ];
 
-    const DEBUG_LINE_LENGTH = 4096;
-    const DEFAULT_QUOTE     = '`';
+    public const DEBUG_LINE_LENGTH = 4096;
+    public const DEFAULT_QUOTE = '`';
 
-    const TYPE_SQL    = 'sql';
-    const TYPE_INT    = 'integer';
-    const TYPE_BOOL   = 'bool';
-    const TYPE_STRING = 'string';
-
+    public const TYPE_SQL = 'sql';
+    public const TYPE_INT = 'integer';
+    public const TYPE_BOOL = 'bool';
+    public const TYPE_STRING = 'string';
 
     /**
      * Factory, returns driver-specific instance of the class
@@ -77,28 +73,22 @@ class rcube_db
      */
     public static function factory($db_dsnw, $db_dsnr = '', $pconn = false)
     {
-        $db_dsnw    = (string) $db_dsnw;
-        $driver     = strtolower(substr($db_dsnw, 0, strpos($db_dsnw, ':')));
+        $db_dsnw = (string) $db_dsnw;
+        $driver = strtolower(substr($db_dsnw, 0, strpos($db_dsnw, ':')));
         $driver_map = [
             'sqlite2' => 'sqlite',
-            'sybase'  => 'mssql',
-            'dblib'   => 'mssql',
-            'mysqli'  => 'mysql',
-            'oci'     => 'oracle',
-            'oci8'    => 'oracle',
+            'mysqli' => 'mysql',
         ];
 
         $driver = $driver_map[$driver] ?? $driver;
-        $class  = "rcube_db_$driver";
+        $class = "rcube_db_{$driver}";
 
         if (!$driver || !class_exists($class)) {
             rcube::raise_error([
-                    'code' => 600, 'type' => 'db',
-                    'line' => __LINE__, 'file' => __FILE__,
-                    'message' => "Configuration error. Unsupported database driver: $driver"
-                ],
-                true, true
-            );
+                'code' => 600,
+                'type' => 'db',
+                'message' => "Configuration error. Unsupported database driver: {$driver}",
+            ], true, true);
         }
 
         return new $class($db_dsnw, $db_dsnr, $pconn);
@@ -117,8 +107,8 @@ class rcube_db
             $db_dsnr = $db_dsnw;
         }
 
-        $this->db_dsnw  = $db_dsnw;
-        $this->db_dsnr  = $db_dsnr;
+        $this->db_dsnw = $db_dsnw;
+        $this->db_dsnr = $db_dsnr;
         $this->db_pconn = $pconn;
 
         $this->db_dsnw_array = self::parse_dsn($db_dsnw);
@@ -126,8 +116,8 @@ class rcube_db
 
         $config = rcube::get_instance()->config;
 
-        $this->options['table_prefix']  = $config->get('db_prefix');
-        $this->options['dsnw_noread']   = $config->get('db_dsnw_noread', false);
+        $this->options['table_prefix'] = $config->get('db_prefix');
+        $this->options['dsnw_noread'] = $config->get('db_dsnw_noread', false);
         $this->options['table_dsn_map'] = array_map([$this, 'table_name'], $config->get('db_table_dsn', []));
     }
 
@@ -139,12 +129,12 @@ class rcube_db
      */
     protected function dsn_connect($dsn, $mode)
     {
-        $this->db_error     = false;
+        $this->db_error = false;
         $this->db_error_msg = null;
 
         // return existing handle
         if (!empty($this->dbhs[$mode])) {
-            $this->dbh     = $this->dbhs[$mode];
+            $this->dbh = $this->dbhs[$mode];
             $this->db_mode = $mode;
 
             return $this->dbh;
@@ -152,8 +142,8 @@ class rcube_db
 
         // connect to database
         if ($dbh = $this->conn_create($dsn)) {
-            $this->dbhs[$mode]  = $dbh;
-            $this->db_mode      = $mode;
+            $this->dbhs[$mode] = $dbh;
+            $this->db_mode = $mode;
             $this->db_connected = true;
         }
     }
@@ -164,14 +154,14 @@ class rcube_db
     protected function conn_create($dsn)
     {
         // Get database specific connection options
-        $dsn_string  = $this->dsn_string($dsn);
+        $dsn_string = $this->dsn_string($dsn);
         $dsn_options = $this->dsn_options($dsn);
 
         // Connect
         try {
             // with this check we skip fatal error on PDO object creation
             if (!class_exists('PDO', false)) {
-                throw new Exception('PDO extension not loaded. See https://php.net/manual/en/intro.pdo.php');
+                throw new \Exception('PDO extension not loaded. See https://php.net/manual/en/intro.pdo.php');
             }
 
             $this->conn_prepare($dsn);
@@ -179,30 +169,25 @@ class rcube_db
             $username = $dsn['username'] ?? null;
             $password = $dsn['password'] ?? null;
 
-            $this->dbh = new PDO($dsn_string, $username, $password, $dsn_options);
+            $this->dbh = new \PDO($dsn_string, $username, $password, $dsn_options);
 
             // don't throw exceptions or warnings
-            $this->dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_SILENT);
+            $this->dbh->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_SILENT);
 
             // Return numbers as strings consistently for all supported PHP versions
             // Since PHP 8.1 native data types are used by default
-            if (defined('PDO::ATTR_STRINGIFY_FETCHES')) {
-                $this->dbh->setAttribute(PDO::ATTR_STRINGIFY_FETCHES, 1);
-            }
+            $this->dbh->setAttribute(\PDO::ATTR_STRINGIFY_FETCHES, 1);
 
             $this->conn_configure($dsn, $this->dbh);
-        }
-        catch (Exception $e) {
-            $this->db_error     = true;
+        } catch (\Exception $e) {
+            $this->db_error = true;
             $this->db_error_msg = $e->getMessage();
 
             rcube::raise_error([
-                    'code' => 500, 'type' => 'db',
-                    'line' => __LINE__, 'file' => __FILE__,
-                    'message' => $this->db_error_msg
-                ],
-                true, false
-            );
+                'code' => 500,
+                'type' => 'db',
+                'message' => $this->db_error_msg,
+            ], true, false);
 
             return null;
         }
@@ -215,19 +200,15 @@ class rcube_db
      *
      * @param array $dsn DSN for DB connections
      */
-    protected function conn_prepare($dsn)
-    {
-    }
+    protected function conn_prepare($dsn) {}
 
     /**
      * Driver-specific configuration of database connection
      *
      * @param array $dsn DSN for DB connections
-     * @param PDO   $dbh Connection handler
+     * @param \PDO  $dbh Connection handler
      */
-    protected function conn_configure($dsn, $dbh)
-    {
-    }
+    protected function conn_configure($dsn, $dbh) {}
 
     /**
      * Connect to appropriate database depending on the operation
@@ -280,11 +261,11 @@ class rcube_db
         $mode = preg_match('/^(select|show|set)/i', $query) ? 'r' : 'w';
 
         $start = '[' . $this->options['identifier_start'] . self::DEFAULT_QUOTE . ']';
-        $end   = '[' . $this->options['identifier_end']   . self::DEFAULT_QUOTE . ']';
-        $regex = '/(?:^|\s)(from|update|into|join)\s+'.$start.'?([a-z0-9._]+)'.$end.'?\s+/i';
+        $end = '[' . $this->options['identifier_end'] . self::DEFAULT_QUOTE . ']';
+        $regex = '/(?:^|\s)(from|update|into|join)\s+' . $start . '?([a-z0-9._]+)' . $end . '?\s+/i';
 
         // find tables involved in this query
-        if (preg_match_all($regex, $query, $matches, PREG_SET_ORDER)) {
+        if (preg_match_all($regex, $query, $matches, \PREG_SET_ORDER)) {
             foreach ($matches as $m) {
                 $table = $m[2];
 
@@ -292,8 +273,7 @@ class rcube_db
                 if (!empty($this->options['table_dsn_map'][$table])) {
                     $mode = $this->options['table_dsn_map'][$table];
                     break;  // primary table rules
-                }
-                else if ($mode == 'r') {
+                } elseif ($mode == 'r') {
                     // connected to db with the same or "higher" mode for this table
                     if (isset($this->table_connections[$table])) {
                         $db_mode = $this->table_connections[$table];
@@ -331,9 +311,9 @@ class rcube_db
     {
         if (!empty($this->options['debug_mode'])) {
             if (($len = strlen($query)) > self::DEBUG_LINE_LENGTH) {
-                $diff  = $len - self::DEBUG_LINE_LENGTH;
+                $diff = $len - self::DEBUG_LINE_LENGTH;
                 $query = substr($query, 0, self::DEBUG_LINE_LENGTH)
-                    . "... [truncated $diff bytes]";
+                    . "... [truncated {$diff} bytes]";
             }
 
             rcube::write_log('sql', '[' . (++$this->db_index) . '] ' . $query . ';');
@@ -383,7 +363,7 @@ class rcube_db
      */
     public function is_replicated()
     {
-      return !empty($this->db_dsnr) && $this->db_dsnw != $this->db_dsnr;
+        return !empty($this->db_dsnr) && $this->db_dsnw != $this->db_dsnr;
     }
 
     /**
@@ -406,7 +386,7 @@ class rcube_db
      * @param string $query     SQL query to execute
      * @param mixed  ...$params Query parameter values
      *
-     * @return PDOStatement|false  Query handle or False on error
+     * @return \PDOStatement|false Query handle or False on error
      */
     public function query($query, ...$params)
     {
@@ -426,7 +406,7 @@ class rcube_db
      * @param int    $limit     Number of rows for LIMIT statement
      * @param mixed  ...$params Query parameter values
      *
-     * @return PDOStatement|false Query handle or False on error
+     * @return \PDOStatement|false Query handle or False on error
      */
     public function limitquery($query, $offset, $limit, ...$params)
     {
@@ -441,7 +421,7 @@ class rcube_db
      * @param int    $limit  Number of rows for LIMIT statement
      * @param array  $params Values to be inserted in query
      *
-     * @return PDOStatement|false Query handle or False on error
+     * @return \PDOStatement|false Query handle or False on error
      */
     protected function _query($query, $offset, $limit, $params)
     {
@@ -468,12 +448,11 @@ class rcube_db
 
         if (count($params)) {
             while ($pos = strpos($query, '?', $pos)) {
-                if (isset($query[$pos+1]) && $query[$pos+1] == '?') {  // skip escaped '?'
+                if (isset($query[$pos + 1]) && $query[$pos + 1] == '?') {  // skip escaped '?'
                     $pos += 2;
-                }
-                else {
+                } else {
                     $val = $this->quote($params[$idx++]);
-                    unset($params[$idx-1]);
+                    unset($params[$idx - 1]);
                     $query = substr_replace($query, $val, $pos, 1);
                     $pos += strlen($val);
                 }
@@ -484,7 +463,7 @@ class rcube_db
 
         // replace escaped '?' and quotes back to normal, see self::quote()
         $query = str_replace(
-            ['??', self::DEFAULT_QUOTE.self::DEFAULT_QUOTE],
+            ['??', self::DEFAULT_QUOTE . self::DEFAULT_QUOTE],
             ['?', self::DEFAULT_QUOTE],
             $query
         );
@@ -501,7 +480,7 @@ class rcube_db
     protected function query_execute($query)
     {
         // destroy reference to previous result, required for SQLite driver (#1488874)
-        $this->last_result  = null;
+        $this->last_result = null;
         $this->db_error_msg = null;
 
         // send query
@@ -524,7 +503,7 @@ class rcube_db
     protected function query_parse($query)
     {
         $start = $this->options['identifier_start'];
-        $end   = $this->options['identifier_end'];
+        $end = $this->options['identifier_end'];
         $quote = self::DEFAULT_QUOTE;
 
         if ($start == $quote) {
@@ -532,19 +511,17 @@ class rcube_db
         }
 
         $pos = 0;
-        $in  = false;
+        $in = false;
 
         while ($pos = strpos($query, $quote, $pos)) {
-            if (isset($query[$pos+1]) && $query[$pos+1] == $quote) {  // skip escaped quote
+            if (isset($query[$pos + 1]) && $query[$pos + 1] == $quote) {  // skip escaped quote
                 $pos += 2;
-            }
-            else {
+            } else {
                 if ($in) {
-                    $q  = $end;
+                    $q = $end;
                     $in = false;
-                }
-                else {
-                    $q  = $start;
+                } else {
+                    $q = $start;
                     $in = true;
                 }
 
@@ -574,9 +551,10 @@ class rcube_db
 
             if (empty($this->options['ignore_errors'])) {
                 rcube::raise_error([
-                        'code' => 500, 'type' => 'db', 'line' => __LINE__, 'file' => __FILE__,
-                        'message' => $this->db_error_msg . " (SQL Query: $query)"
-                    ], true, false);
+                    'code' => 500,
+                    'type' => 'db',
+                    'message' => $this->db_error_msg . " (SQL Query: {$query})",
+                ], true, false);
             }
         }
 
@@ -593,31 +571,40 @@ class rcube_db
      * @param array  $values  List of values to update (number of elements
      *                        should be the same as in $columns)
      *
-     * @return PDOStatement|bool Query handle or False on error
+     * @return \PDOStatement|bool Query handle or False on error
+     *
      * @todo Multi-insert support
      */
     public function insert_or_update($table, $keys, $columns, $values)
     {
-        $columns = array_map(function($i) { return "`$i`"; }, $columns);
-        $sets    = array_map(function($i) { return "$i = ?"; }, $columns);
-        $where   = $keys;
+        $columns = array_map(static function ($i) {
+            return "`{$i}`";
+        }, $columns);
+        $sets = array_map(static function ($i) {
+            return "{$i} = ?";
+        }, $columns);
+        $where = $keys;
 
-        array_walk($where, function(&$val, $key) {
-            $val = $this->quote_identifier($key) . " = " . $this->quote($val);
+        array_walk($where, function (&$val, $key) {
+            $val = $this->quote_identifier($key) . ' = ' . $this->quote($val);
         });
 
         // First try UPDATE
-        $result = $this->query("UPDATE $table SET " . implode(", ", $sets)
-            . " WHERE " . implode(" AND ", $where), $values);
+        $result = $this->query("UPDATE {$table} SET " . implode(', ', $sets)
+            . ' WHERE ' . implode(' AND ', $where), $values);
 
         // if UPDATE fails use INSERT
         if ($result && !$this->affected_rows($result)) {
-            $cols  = implode(', ', array_map(function($i) { return "`$i`"; }, array_keys($keys)));
+            $cols = implode(', ', array_map(static function ($i) {
+                return "`{$i}`";
+            }, array_keys($keys)));
             $cols .= ', ' . implode(', ', $columns);
-            $vals  = implode(', ', array_map(function($i) { return $this->quote($i); }, $keys));
+            $vals = implode(', ', array_map(function ($i) {
+                return $this->quote($i);
+            }, $keys));
             $vals .= ', ' . rtrim(str_repeat('?, ', count($columns)), ', ');
 
-            $result = $this->query("INSERT INTO $table ($cols) VALUES ($vals)", $values);
+            $result = $this->query("INSERT INTO {$table} ({$cols}) VALUES ({$vals})", $values);
         }
 
         return $result;
@@ -648,21 +635,22 @@ class rcube_db
      * @param mixed $result Optional query handle
      *
      * @return mixed Number of rows or false on failure
-     * @deprecated This method shows very poor performance and should be avoided.
+     *
+     * @deprecated this method shows very poor performance and should be avoided
      */
     public function num_rows($result = null)
     {
         if (($result || ($result === null && ($result = $this->last_result))) && $result !== true) {
             // repeat query with SELECT COUNT(*) ...
             if (preg_match('/^SELECT\s+(?:ALL\s+|DISTINCT\s+)?(?:.*?)\s+FROM\s+(.*)$/ims', $result->queryString, $m)) {
-                $query = $this->dbh->query('SELECT COUNT(*) FROM ' . $m[1], PDO::FETCH_NUM);
+                $query = $this->dbh->query('SELECT COUNT(*) FROM ' . $m[1], \PDO::FETCH_NUM);
                 return $query ? intval($query->fetchColumn(0)) : false;
             }
-            else {
-                $num = count($result->fetchAll());
-                $result->execute();  // re-execute query because there's no seek(0)
-                return $num;
-            }
+
+            $num = count($result->fetchAll());
+            $result->execute();  // re-execute query because there's no seek(0)
+
+            return $num;
         }
 
         return false;
@@ -699,7 +687,7 @@ class rcube_db
      */
     public function fetch_assoc($result = null)
     {
-        return $this->_fetch_row($result, PDO::FETCH_ASSOC);
+        return $this->_fetch_row($result, \PDO::FETCH_ASSOC);
     }
 
     /**
@@ -712,7 +700,7 @@ class rcube_db
      */
     public function fetch_array($result = null)
     {
-        return $this->_fetch_row($result, PDO::FETCH_NUM);
+        return $this->_fetch_row($result, \PDO::FETCH_NUM);
     }
 
     /**
@@ -765,12 +753,12 @@ class rcube_db
     {
         // get tables if not cached
         if ($this->tables === null) {
-            $q = $this->query("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES"
+            $q = $this->query('SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES'
                 . " WHERE TABLE_TYPE = 'BASE TABLE'"
-                . " ORDER BY TABLE_NAME"
+                . ' ORDER BY TABLE_NAME'
             );
 
-            $this->tables = $q ? $q->fetchAll(PDO::FETCH_COLUMN, 0) : [];
+            $this->tables = $q ? $q->fetchAll(\PDO::FETCH_COLUMN, 0) : [];
         }
 
         return $this->tables;
@@ -788,7 +776,7 @@ class rcube_db
         $q = $this->query('SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = ?', $table);
 
         if ($q) {
-            return $q->fetchAll(PDO::FETCH_COLUMN, 0);
+            return $q->fetchAll(\PDO::FETCH_COLUMN, 0);
         }
 
         return [];
@@ -867,12 +855,12 @@ class rcube_db
     public function closeConnection()
     {
         $this->db_connected = false;
-        $this->db_index     = 0;
+        $this->db_index = 0;
 
         // release statement and connection resources
-        $this->last_result  = null;
-        $this->dbh          = null;
-        $this->dbhs         = [];
+        $this->last_result = null;
+        $this->dbh = null;
+        $this->dbhs = [];
     }
 
     /**
@@ -891,14 +879,14 @@ class rcube_db
 
         // handle int directly for better performance
         if ($type == 'integer' || $type == 'int') {
-            return intval($input);
+            return (string) intval($input);
         }
 
-        if (is_null($input)) {
+        if ($input === null) {
             return 'NULL';
         }
 
-        if ($input instanceof DateTime) {
+        if ($input instanceof \DateTime) {
             return $this->quote($input->format($this->options['datetime_format']));
         }
 
@@ -913,15 +901,19 @@ class rcube_db
 
         if ($this->dbh) {
             $map = [
-                'bool'    => PDO::PARAM_BOOL,
-                'integer' => PDO::PARAM_INT,
+                'bool' => \PDO::PARAM_BOOL,
+                'integer' => \PDO::PARAM_INT,
             ];
 
-            $type = $map[$type] ?? PDO::PARAM_STR;
+            if (isset($type) && isset($map[$type])) {
+                $type = $map[$type];
+            } else {
+                $type = \PDO::PARAM_STR;
+            }
 
             return strtr($this->dbh->quote($input, $type),
                 // escape ? and `
-                ['?' => '??', self::DEFAULT_QUOTE => self::DEFAULT_QUOTE.self::DEFAULT_QUOTE]
+                ['?' => '??', self::DEFAULT_QUOTE => self::DEFAULT_QUOTE . self::DEFAULT_QUOTE]
             );
         }
 
@@ -931,17 +923,15 @@ class rcube_db
     /**
      * Escapes a string so it can be safely used in a query
      *
-     * @param string $str A string to escape
+     * @param string|int|null $input A value to escape
      *
      * @return string Escaped string for use in a query
      */
-    public function escape($str)
+    public function escape($input)
     {
-        if (is_null($str)) {
-            return 'NULL';
-        }
+        $input = $this->quote($input);
 
-        return substr($this->quote($str), 1, -1);
+        return $input === 'NULL' ? 'NULL' : substr($input, 1, -1);
     }
 
     /**
@@ -950,8 +940,9 @@ class rcube_db
      * @param string $str Value to quote
      *
      * @return string Quoted string for use in query
+     *
      * @deprecated    Replaced by rcube_db::quote_identifier
-     * @see           rcube_db::quote_identifier
+     * @see rcube_db::quote_identifier
      */
     public function quoteIdentifier($str)
     {
@@ -964,8 +955,9 @@ class rcube_db
      * @param string $str A string to escape
      *
      * @return string Escaped string for use in a query
+     *
      * @deprecated    Replaced by rcube_db::escape
-     * @see           rcube_db::escape
+     * @see rcube_db::escape
      */
     public function escapeSimple($str)
     {
@@ -982,8 +974,8 @@ class rcube_db
     public function quote_identifier($str)
     {
         $start = $this->options['identifier_start'];
-        $end   = $this->options['identifier_end'];
-        $name  = [];
+        $end = $this->options['identifier_end'];
+        $name = [];
 
         foreach (explode('.', $str) as $elem) {
             $elem = str_replace([$start, $end], '', $elem);
@@ -1034,6 +1026,7 @@ class rcube_db
      */
     public function array2list($arr, $type = null)
     {
+        // @phpstan-ignore-next-line
         if (!is_array($arr)) {
             return $this->quote($arr, $type);
         }
@@ -1054,11 +1047,12 @@ class rcube_db
      * @param string $field Field name
      *
      * @return string SQL statement to use in query
+     *
      * @deprecated
      */
     public function unixtimestamp($field)
     {
-        return "UNIX_TIMESTAMP($field)";
+        return "UNIX_TIMESTAMP({$field})";
     }
 
     /**
@@ -1067,6 +1061,7 @@ class rcube_db
      * @param int $timestamp Unix timestamp
      *
      * @return string Date string in db-specific format
+     *
      * @deprecated
      */
     public function fromunixtime($timestamp)
@@ -1102,7 +1097,8 @@ class rcube_db
     }
 
     /**
-     * Encodes non-UTF-8 characters in string/array/object (recursive)
+     * Makes sure the input can be stored in database.
+     * With $serialize=false non-UTF-8 characters will be removed.
      *
      * @param mixed $input      Data to fix
      * @param bool  $serialized Enable serialization
@@ -1119,12 +1115,13 @@ class rcube_db
 
         if (is_object($input)) {
             foreach (get_object_vars($input) as $idx => $value) {
-                $input->$idx = self::encode($value);
+                $input->{$idx} = self::encode($value);
             }
 
             return $input;
         }
-        else if (is_array($input)) {
+
+        if (is_array($input)) {
             foreach ($input as $idx => $value) {
                 $input[$idx] = self::encode($value);
             }
@@ -1132,14 +1129,18 @@ class rcube_db
             return $input;
         }
 
-        return utf8_encode($input);
+        // Note: We used to use utf8_encode() which was deprecated in PHP 8.2
+        //       The mb_convert_encoding() works the same, but we really should
+        //       find a better way.
+
+        return mb_convert_encoding((string) $input, 'UTF-8', 'ISO-8859-1');
     }
 
     /**
-     * Decodes encoded UTF-8 string/object/array (recursive)
+     * Decodes the data encoded using self::encode().
      *
-     * @param mixed $input      Input data
-     * @param bool  $serialized Enable serialization
+     * @param string $input      Input data
+     * @param bool   $serialized Enable serialization
      *
      * @return mixed Decoded data
      */
@@ -1149,29 +1150,14 @@ class rcube_db
         // or null characters in serialized string (#1489142)
         if ($serialized) {
             // Keep backward compatibility where base64 wasn't used
-            if (strpos(substr($input, 0, 16), ':') !== false) {
+            if (str_contains(substr($input, 0, 16), ':')) {
                 return self::decode(@unserialize($input));
             }
 
             return @unserialize(base64_decode($input));
         }
 
-        if (is_object($input)) {
-            foreach (get_object_vars($input) as $idx => $value) {
-                $input->$idx = self::decode($value);
-            }
-
-            return $input;
-        }
-        else if (is_array($input)) {
-            foreach ($input as $idx => $value) {
-                $input[$idx] = self::decode($value);
-            }
-
-            return $input;
-        }
-
-        return utf8_decode($input);
+        return mb_convert_encoding((string) $input, 'ISO-8859-1', 'UTF-8');
     }
 
     /**
@@ -1189,7 +1175,7 @@ class rcube_db
         $table = $plugin['table'];
 
         // add prefix to the table name if configured
-        if (($prefix = $this->options['table_prefix']) && strpos($table, $prefix) !== 0) {
+        if (($prefix = $this->options['table_prefix']) && !str_starts_with($table, $prefix)) {
             $table = $prefix . $table;
         }
 
@@ -1232,27 +1218,27 @@ class rcube_db
     public static function parse_dsn($dsn)
     {
         if (empty($dsn)) {
-            return null;
+            return [];
         }
 
         // Find phptype and dbsyntax
         if (($pos = strpos($dsn, '://')) !== false) {
             $str = substr($dsn, 0, $pos);
             $dsn = substr($dsn, $pos + 3);
-        }
-        else {
+        } else {
             $str = $dsn;
             $dsn = null;
         }
 
+        $parsed = [];
+
         // Get phptype and dbsyntax
         // $str => phptype(dbsyntax)
         if (preg_match('|^(.+?)\((.*?)\)$|', $str, $arr)) {
-            $parsed['phptype']  = $arr[1];
+            $parsed['phptype'] = $arr[1];
             $parsed['dbsyntax'] = !$arr[2] ? $arr[1] : $arr[2];
-        }
-        else {
-            $parsed['phptype']  = $str;
+        } else {
+            $parsed['phptype'] = $str;
             $parsed['dbsyntax'] = $str;
         }
 
@@ -1262,14 +1248,13 @@ class rcube_db
 
         // Get (if found): username and password
         // $dsn => username:password@protocol+hostspec/database
-        if (($at = strrpos($dsn,'@')) !== false) {
+        if (($at = strrpos($dsn, '@')) !== false) {
             $str = substr($dsn, 0, $at);
             $dsn = substr($dsn, $at + 1);
             if (($pos = strpos($str, ':')) !== false) {
                 $parsed['username'] = rawurldecode(substr($str, 0, $pos));
                 $parsed['password'] = rawurldecode(substr($str, $pos + 1));
-            }
-            else {
+            } else {
                 $parsed['username'] = rawurldecode($str);
             }
         }
@@ -1277,31 +1262,18 @@ class rcube_db
         // Find protocol and hostspec
         // $dsn => proto(proto_opts)/database
         if (preg_match('|^([^(]+)\((.*?)\)/?(.*?)$|', $dsn, $match)) {
-            $proto       = $match[1];
-            $proto_opts  = $match[2] ? $match[2] : false;
-            $dsn         = $match[3];
+            $proto = $match[1];
+            $proto_opts = $match[2] ?: false;
+            $dsn = $match[3];
         }
         // $dsn => protocol+hostspec/database (old format)
         else {
-            if (strpos($dsn, '+') !== false) {
-                list($proto, $dsn) = explode('+', $dsn, 2);
+            if (str_contains($dsn, '+')) {
+                [$proto, $dsn] = explode('+', $dsn, 2);
             }
-            if (   strpos($dsn, '//') === 0
-                && strpos($dsn, '/', 2) !== false
-                && $parsed['phptype'] == 'oci8'
-            ) {
-                // Oracle's "Easy Connect" syntax:
-                // "username/password@[//]host[:port][/service_name]"
-                // e.g. "scott/tiger@//mymachine:1521/oracle"
-                $proto_opts = $dsn;
-                $pos = strrpos($proto_opts, '/');
-                $dsn = substr($proto_opts, $pos + 1);
-                $proto_opts = substr($proto_opts, 0, $pos);
-            }
-            else if (strpos($dsn, '/') !== false) {
-                list($proto_opts, $dsn) = explode('/', $dsn, 2);
-            }
-            else {
+            if (str_contains($dsn, '/')) {
+                [$proto_opts, $dsn] = explode('/', $dsn, 2);
+            } else {
                 $proto_opts = $dsn;
                 $dsn = null;
             }
@@ -1318,8 +1290,8 @@ class rcube_db
                 $parsed['port'] = substr($proto_opts, $pos + 1);
             }
             $proto_opts = $matches[1];
-        } elseif (strpos($proto_opts, ':') !== false) {
-            list($proto_opts, $parsed['port']) = explode(':', $proto_opts);
+        } elseif (str_contains($proto_opts, ':')) {
+            [$proto_opts, $parsed['port']] = explode(':', $proto_opts);
         }
 
         if ($parsed['protocol'] == 'tcp' && strlen($proto_opts)) {
@@ -1335,21 +1307,21 @@ class rcube_db
             // /database
             if (($pos = strpos($dsn, '?')) === false) {
                 $parsed['database'] = rawurldecode($dsn);
-            }
-            else {
+            } else {
                 // /database?param1=value1&param2=value2
                 $parsed['database'] = rawurldecode(substr($dsn, 0, $pos));
                 $dsn = substr($dsn, $pos + 1);
 
-                if (strpos($dsn, '&') !== false) {
+                if (str_contains($dsn, '&')) {
                     $opts = explode('&', $dsn);
-                }
-                else { // database?param1=value1
+                } else { // database?param1=value1
                     $opts = [$dsn];
                 }
+
                 foreach ($opts as $opt) {
-                    list($key, $value) = explode('=', $opt);
-                    if (!array_key_exists($key, $parsed) || false === $parsed[$key]) {
+                    [$key, $value] = explode('=', $opt);
+                    // @phpstan-ignore-next-line
+                    if (!array_key_exists($key, $parsed) || $parsed[$key] === false) {
                         // don't allow params overwrite
                         $parsed[$key] = rawurldecode($value);
                     }
@@ -1364,7 +1336,7 @@ class rcube_db
             if (!empty($parsed['phptype']) && !empty($parsed['database'])
                 && stripos($parsed['phptype'], 'sqlite') === 0
                 && $parsed['database'][0] != '/'
-                && strpos($parsed['database'], ':') === false
+                && !str_contains($parsed['database'], ':')
             ) {
                 $parsed['database'] = INSTALL_PATH . $parsed['database'];
             }
@@ -1416,15 +1388,15 @@ class rcube_db
         $result = [];
 
         if ($this->db_pconn) {
-            $result[PDO::ATTR_PERSISTENT] = true;
+            $result[\PDO::ATTR_PERSISTENT] = true;
         }
 
         if (!empty($dsn['prefetch'])) {
-            $result[PDO::ATTR_PREFETCH] = (int) $dsn['prefetch'];
+            $result[\PDO::ATTR_PREFETCH] = (int) $dsn['prefetch'];
         }
 
         if (!empty($dsn['timeout'])) {
-            $result[PDO::ATTR_TIMEOUT] = (int) $dsn['timeout'];
+            $result[\PDO::ATTR_TIMEOUT] = (int) $dsn['timeout'];
         }
 
         return $result;
@@ -1439,7 +1411,7 @@ class rcube_db
      */
     public function exec_script($sql)
     {
-        $sql  = $this->fix_table_names($sql);
+        $sql = $this->fix_table_names($sql);
         $buff = '';
         $exec = '';
 
@@ -1449,10 +1421,7 @@ class rcube_db
                 continue;
             }
 
-            if ($trimmed == 'GO') {
-                $exec = $buff;
-            }
-            else if ($trimmed[strlen($trimmed)-1] == ';') {
+            if ($trimmed[strlen($trimmed) - 1] == ';') {
                 $exec = $buff . substr(rtrim($line), 0, -1);
             }
 
@@ -1463,8 +1432,7 @@ class rcube_db
                 if ($this->db_error) {
                     break;
                 }
-            }
-            else {
+            } else {
                 $buff .= $line . "\n";
             }
         }
@@ -1500,14 +1468,13 @@ class rcube_db
         $prefix = $this->options['table_prefix'];
 
         // Schema prefix (ends with a dot)
-        if ($prefix[strlen($prefix)-1] === '.') {
+        if ($prefix[strlen($prefix) - 1] === '.') {
             // These can't have a schema prefix
             if (preg_match('/(CONSTRAINT|UNIQUE|INDEX)[\s\t`"]*$/', $matches[1])) {
                 $prefix = '';
-            }
-            else {
+            } else {
                 // check if the identifier is quoted, then quote the prefix
-                $last = $matches[1][strlen($matches[1])-1];
+                $last = $matches[1][strlen($matches[1]) - 1];
 
                 if ($last === '`' || $last === '"') {
                     $prefix = substr($prefix, 0, -1) . $last . '.' . $last;
@@ -1515,6 +1482,6 @@ class rcube_db
             }
         }
 
-        return $matches[1] . $prefix . $matches[count($matches)-1];
+        return $matches[1] . $prefix . $matches[count($matches) - 1];
     }
 }

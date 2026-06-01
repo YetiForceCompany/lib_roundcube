@@ -10,8 +10,6 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/messages/
 */
 
 $messages['errortitle']  = 'Villa kom upp!';
@@ -160,7 +158,9 @@ $messages['nogroupassignmentschanged'] = 'Engin breyting á úthlutun hópa.';
 $messages['importwait'] = 'Flyt inn, bíddu aðeins...';
 $messages['importformaterror'] = 'Innflutningur mistókst! Innsenda skráin er ekki gild gagnainnflutningsskrá';
 $messages['importconfirm'] = '<b>Tókst að flytja inn $inserted tengiliði</b>';
-$messages['importconfirmskipped'] = '<b>Sleppti $skipped fyrirliggjandi færslum</b>';
+$messages['importconfirmskipped'] = '<b>Sleppti $skipped fyrirliggjandi tengiliðum</b>';
+$messages['importconfirminvalid'] = '<b>Sleppti $skipped ógildum tengiliðum</b>';
+$messages['importconfirmerrors'] = 'Mistókst að flytja inn $skipped gilda tengiliði</b>';
 $messages['importmessagesuccess'] = 'Tókst að flytja inn $nr skilaboð';
 $messages['importmessageerror'] = 'Innflutningur mistókst! Innsenda skráin er ekki gild skilaboða- eða pósthólfsskrá';
 $messages['opnotpermitted'] = 'Aðgerð ekki leyfð!';
@@ -230,3 +230,5 @@ $messages['listusebutton'] = 'Notaðu \'Búa til\' hnappinn til að bæta við f
 $messages['keypaircreatesuccess'] = 'Tókst að útbúa nýtt lyklapar fyrir $identity.';
 $messages['emptyattachment'] = 'Þetta viðhengi lítur út fyrir að vera tómt. <br>Hafðu samband við þann sem sendi þetta.';
 $messages['oauthloginfailed'] = 'OAuth-innskráning mistókst. Reyndu aftur.';
+$messages['oauthinvalidrequest'] = 'Auðkenningarbeiðni var ógild eða ófullgerð.';
+$messages['oauthaccessdenied'] = 'Auðkenningarþjónn eða notandi höfnuðu beiðninni.';

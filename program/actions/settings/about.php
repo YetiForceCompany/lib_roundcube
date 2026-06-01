@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  +-----------------------------------------------------------------------+
  | This file is part of the Roundcube Webmail client                     |
  |                                                                       |
@@ -27,6 +27,7 @@ class rcmail_action_settings_about extends rcmail_action
      *
      * @param array $args Arguments from the previous step(s)
      */
+    #[\Override]
     public function run($args = [])
     {
         $rcmail = rcmail::get_instance();
@@ -34,19 +35,20 @@ class rcmail_action_settings_about extends rcmail_action
         $rcmail->output->set_pagetitle($rcmail->gettext('about'));
 
         $rcmail->output->add_handlers([
-                'supportlink' => [$this, 'supportlink'],
-                'pluginlist'  => [$this, 'plugins_list'],
-                'copyright'   => function() {
-                    return 'Copyright &copy; 2005-2025, The Roundcube Dev Team';
-                },
-                'license' => function() {
-                    return 'This program is free software; you can redistribute it and/or modify it under the terms '
-                        . 'of the <a href="https://www.gnu.org/licenses/gpl.html" target="_blank">GNU General Public License</a> '
-                        . 'as published by the Free Software Foundation, either version 3 of the License, '
-                        . 'or (at your option) any later version.<br/>'
-                        . 'Some <a href="https://roundcube.net/license" target="_blank">exceptions</a> '
-                        . 'for skins &amp; plugins apply.';
-                },
+            'supportlink' => [$this, 'supportlink'],
+            'pluginlist' => [$this, 'plugins_list'],
+            'skininfo' => [$this, 'skin_info'],
+            'copyright' => static function () {
+                return 'Copyright &copy; The Roundcube Dev Team';
+            },
+            'license' => static function () {
+                return 'This program is free software; you can redistribute it and/or modify it under the terms '
+                    . 'of the <a href="https://www.gnu.org/licenses/gpl.html" target="_blank" rel="noopener">GNU General Public License</a> '
+                    . 'as published by the Free Software Foundation, either version 3 of the License, '
+                    . 'or (at your option) any later version.<br/>'
+                    . 'Some <a href="https://roundcube.net/license" target="_blank" rel="noopener">exceptions</a> '
+                    . 'for skins &amp; plugins apply.';
+            },
         ]);
 
         $rcmail->output->send('about');
@@ -72,7 +74,7 @@ class rcmail_action_settings_about extends rcmail_action
             $attrib['id'] = 'rcmpluginlist';
         }
 
-        $plugins     = array_filter($rcmail->plugins->active_plugins);
+        $plugins = array_filter($rcmail->plugins->active_plugins);
         $plugin_info = [];
 
         foreach ($plugins as $name) {
@@ -96,7 +98,7 @@ class rcmail_action_settings_about extends rcmail_action
             return '';
         }
 
-        ksort($plugin_info, SORT_LOCALE_STRING);
+        ksort($plugin_info, \SORT_LOCALE_STRING);
 
         $table = new html_table($attrib);
 
@@ -115,23 +117,24 @@ class rcmail_action_settings_about extends rcmail_action
             if ($uri) {
                 $uri = html::a([
                         'target' => '_blank',
-                        'href'   => rcube::Q($uri)
+                        'rel' => 'noopener',
+                        'href' => rcube::Q($uri),
                     ],
                     rcube::Q($rcmail->gettext('download'))
                 );
             }
 
-            $license = isset($data['license']) ? $data['license'] : '';
+            $license = $data['license'] ?? '';
 
             if (!empty($data['license_uri'])) {
                 $license = html::a([
                         'target' => '_blank',
-                        'href' => rcube::Q($data['license_uri'])
+                        'rel' => 'noopener',
+                        'href' => rcube::Q($data['license_uri']),
                     ],
                     rcube::Q($data['license'])
                 );
-            }
-            else {
+            } else {
                 $license = rcube::Q($license);
             }
 
@@ -143,5 +146,20 @@ class rcmail_action_settings_about extends rcmail_action
         }
 
         return $table->show();
+    }
+
+    public static function skin_info($attrib)
+    {
+        $rcmail = rcmail::get_instance();
+        $meta = $rcmail->output->get_skin_info();
+
+        $content = html::p(null,
+            html::span('skinitem', html::span('skinname', rcube::Q($meta['name'])) . (!empty($meta['version']) ? '&nbsp;(' . $meta['version'] . ')' : '') . html::br()
+                . (!empty($meta['author_link']) ? html::span('skinauthor', $rcmail->gettext(['name' => 'skinauthor', 'vars' => ['author' => $meta['author_link']]])) . html::br() : '')
+                . (!empty($meta['license_link']) ? html::span('skinlicense', $rcmail->gettext('license') . ':&nbsp;' . $meta['license_link']) . html::br() : '')
+                . (!empty($meta['uri']) ? html::span('skinhomepage', $rcmail->gettext('source') . ':&nbsp;' . html::a(['href' => $meta['uri'], 'target' => '_blank', 'rel' => 'noopener', 'tabindex' => '-1'], rcube::Q($rcmail->gettext('download')))) : ''))
+        );
+
+        return $content;
     }
 }

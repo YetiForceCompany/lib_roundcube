@@ -33,12 +33,12 @@ class markasjunk_sa_detach
 
     public function ham(&$uids, $src_mbox, $dst_mbox)
     {
-        $rcube    = rcube::get_instance();
-        $storage  = $rcube->storage;
+        $rcube = rcmail::get_instance();
+        $storage = $rcube->storage;
         $new_uids = [];
 
         foreach ($uids as $uid) {
-            $saved   = false;
+            $saved = false;
             $message = new rcube_message($uid);
 
             foreach ($message->attachments as $part) {
@@ -52,7 +52,7 @@ class markasjunk_sa_detach
 
                     if ($saved = $storage->save_message($dst_mbox, $orig_message_raw)) {
                         $rcube->output->command('markasjunk_move', null, [$uid]);
-                        array_push($new_uids, $saved);
+                        $new_uids[] = $saved;
                     }
                 }
             }

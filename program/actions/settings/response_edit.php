@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  +-----------------------------------------------------------------------+
  | This file is part of the Roundcube Webmail client                     |
  |                                                                       |
@@ -27,15 +27,15 @@ class rcmail_action_settings_response_edit extends rcmail_action_settings_respon
      *
      * @param array $args Arguments from the previous step(s)
      */
+    #[\Override]
     public function run($args = [])
     {
         $rcmail = rcmail::get_instance();
-        $title  = $rcmail->gettext($rcmail->action == 'add-response' ? 'addresponse' : 'editresponse');
+        $title = $rcmail->gettext($rcmail->action == 'add-response' ? 'addresponse' : 'editresponse');
 
         if (!empty($args['post'])) {
             self::$response = $args['post'];
-        }
-        else if ($id = rcube_utils::get_input_string('_id', rcube_utils::INPUT_GP)) {
+        } elseif ($id = rcube_utils::get_input_string('_id', rcube_utils::INPUT_GP)) {
             self::$response = $rcmail->get_compose_response($id);
 
             if (!is_array(self::$response)) {
@@ -66,33 +66,33 @@ class rcmail_action_settings_response_edit extends rcmail_action_settings_respon
 
         // Set form tags and hidden fields
         $readonly = !empty(self::$response['static']);
-        $is_html  = self::$response['is_html'] ?? false;
-        $id       = self::$response['id'] ?? '';
-        $hidden   = ['name' => '_id', 'value' => $id];
+        $is_html = self::$response['is_html'] ?? false;
+        $id = self::$response['id'] ?? '';
+        $hidden = ['name' => '_id', 'value' => $id];
 
-        list($form_start, $form_end) = self::get_form_tags($attrib, 'save-response', $id, $hidden);
+        [$form_start, $form_end] = self::get_form_tags($attrib, 'save-response', $id, $hidden);
         unset($attrib['form'], $attrib['id']);
 
         $name_attr = [
-            'id'       => 'ffname',
-            'size'     => $attrib['size'] ?? null,
+            'id' => 'ffname',
+            'size' => $attrib['size'] ?? null,
             'readonly' => $readonly,
             'required' => true,
         ];
 
         $text_attr = [
-            'id'       => 'fftext',
-            'size'     => $attrib['textareacols'] ?? null,
-            'rows'     => $attrib['textarearows'] ?? null,
+            'id' => 'fftext',
+            'size' => $attrib['textareacols'] ?? null,
+            'rows' => $attrib['textarearows'] ?? null,
             'readonly' => $readonly,
-            'spellcheck'       => true,
-            'data-html-editor' => true
+            'spellcheck' => true,
+            'data-html-editor' => true,
         ];
 
         $chk_attr = [
-            'id'       => 'ffis_html',
+            'id' => 'ffis_html',
             'disabled' => $readonly,
-            'onclick'  => "return rcmail.command('toggle-editor', {id: 'fftext', html: this.checked}, '', event)"
+            'onclick' => "return rcmail.command('toggle-editor', {id: 'fftext', html: this.checked}, '', event)",
         ];
 
         // Add HTML editor script(s)
@@ -100,11 +100,11 @@ class rcmail_action_settings_response_edit extends rcmail_action_settings_respon
 
         // Enable TinyMCE editor
         if ($is_html) {
-            $text_attr['class']      = 'mce_editor';
+            $text_attr['class'] = 'mce_editor';
             $text_attr['is_escaped'] = true;
 
             // Correctly handle HTML entities in HTML editor (#1488483)
-            self::$response['data'] = htmlspecialchars(self::$response['data'], ENT_NOQUOTES, RCUBE_CHARSET);
+            self::$response['data'] = htmlspecialchars(self::$response['data'], \ENT_NOQUOTES, RCUBE_CHARSET);
         }
 
         $table = new html_table(['cols' => 2]);
@@ -119,6 +119,6 @@ class rcmail_action_settings_response_edit extends rcmail_action_settings_respon
         $table->add(null, rcube_output::get_edit_field('is_html', $is_html, $chk_attr, 'checkbox'));
 
         // return the complete edit form as table
-        return "$form_start\n" . $table->show($attrib) . $form_end;
+        return "{$form_start}\n" . $table->show($attrib) . $form_end;
     }
 }

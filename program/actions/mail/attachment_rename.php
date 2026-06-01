@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  +-----------------------------------------------------------------------+
  | This file is part of the Roundcube Webmail client                     |
  |                                                                       |
@@ -27,6 +27,7 @@ class rcmail_action_mail_attachment_rename extends rcmail_action_mail_attachment
      *
      * @param array $args Arguments from the previous step(s)
      */
+    #[\Override]
     public function run($args = [])
     {
         $rcmail = rcmail::get_instance();
@@ -36,16 +37,7 @@ class rcmail_action_mail_attachment_rename extends rcmail_action_mail_attachment
         $filename = rcube_utils::get_input_string('_name', rcube_utils::INPUT_POST);
         $filename = trim($filename);
 
-        if (
-            strlen($filename)
-            && ($attachment = self::get_attachment())
-            && is_array($attachment)
-        ) {
-            $attachment['name'] = $filename;
-
-            $rcmail->session->remove(self::$SESSION_KEY . '.attachments. ' . self::$file_id);
-            $rcmail->session->append(self::$SESSION_KEY . '.attachments', $attachment['id'], $attachment);
-
+        if (strlen($filename) && $rcmail->update_uploaded_file(self::$file_id, ['name' => $filename])) {
             $rcmail->output->command('rename_attachment_handler', 'rcmfile' . self::$file_id, $filename);
         }
 

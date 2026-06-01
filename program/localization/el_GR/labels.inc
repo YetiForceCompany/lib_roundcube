@@ -10,10 +10,7 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/labels/
 */
-
 
 $labels['welcome'] = 'Καλώς ήρθατε στο $product';
 $labels['username'] = 'Όνομα Χρήστη';
@@ -120,6 +117,7 @@ $labels['forwardmessage'] = 'Προώθηση μηνύματος';
 $labels['bouncemsg'] = 'Επαναποστολή (απαραδότου)';
 $labels['bounce'] = 'Επαναποστολή';
 $labels['deletemessage'] = 'Διαγραφή μηνύματος';
+$labels['undeletemessage'] = 'Αναίρεση διαγραφής';
 $labels['movemessagetotrash'] = 'Διαγραφή μηνύματος';
 $labels['printmessage'] = 'Εκτύπωση μηνύματος';
 $labels['previousmessage'] = 'Εμφάνιση του προηγούμενου μηνύματος';
@@ -132,9 +130,13 @@ $labels['mark'] = 'Μαρκάρισμα';
 $labels['markmessages'] = 'Μαρκάρισμα μηνυμάτων';
 $labels['markread'] = 'Ως αναγνωσμένα';
 $labels['markunread'] = 'Ως μη-αναγνωσμένα';
-$labels['markflagged'] = 'ως με σήμανση';
-$labels['markunflagged'] = 'ως Χωρίς σήμανση';
+$labels['markflagged'] = 'Ως με σήμανση';
+$labels['markunflagged'] = 'Ως χωρίς σήμανση';
 $labels['markundeleted'] = 'Ως μη διεγραμμένο';
+$labels['markasread'] = 'Επισήμανση ως διαβασμένο';
+$labels['markasunread'] = 'Επισήμανση ως μη διαβασμένο';
+$labels['markasflagged'] = 'Προσθήκη σημαίας';
+$labels['markasunflagged'] = 'Αφαίρεση σημαίας';
 $labels['moreactions'] = 'Περισσότερες ενέργειες...';
 $labels['markallread'] = 'Σημείωση όλων ως αναγνωσμένων';
 $labels['folders-cur'] = 'Μόνο αυτός ο φάκελος';
@@ -263,7 +265,6 @@ $labels['keylength'] = 'Bits';
 $labels['keyexpired'] = 'Έχει λήξει';
 $labels['keyrevoked'] = 'Έχει αποσυρθεί';
 $labels['bccinstead'] = 'Χρήση Bcc';
-$labels['addheader'] = 'Προσθήκη παραλήπτη (κεφαλίδα)';
 $labels['insert'] = 'Εισαγωγή';
 $labels['insertcontact'] = 'Προσθήκη επαφής(-ων)';
 $labels['recipient'] = 'Παραλήπτης';
@@ -360,6 +361,8 @@ $labels['instantmessenger'] = 'IM';
 $labels['notes'] = 'Σημειώσεις';
 $labels['male'] = 'άνδρας';
 $labels['female'] = 'γυναίκα';
+$labels['nonbinary'] = 'μη δυαδικό';
+$labels['othergender'] = 'άλλο';
 $labels['manager'] = 'Υπεύθυνος';
 $labels['assistant'] = 'Υπάλληλος';
 $labels['spouse'] = 'Σύζυγος';
@@ -571,7 +574,7 @@ $labels['addtodict'] = 'Προσθήκη στο λεξικό';
 $labels['mailtoprotohandler'] = 'Καταχώρηση διαχείρισης πρωτοκόλλου δεσμών mailto:';
 $labels['standardwindows'] = 'Χειριστείτε τα αναδυόμενα παράθυρα ως πρότυπο των Windows';
 $labels['forwardmode'] = 'Προώθηση μηνυμάτων';
-$labels['inline'] = 'με εσνωμάτωση';
+$labels['inline'] = 'με ενσωμάτωση';
 $labels['asattachment'] = 'σαν επισύναψη';
 $labels['replyallmode'] = 'Προεπιλεγμένη ενέργεια του κουμπιού [Απάντηση σε όλους]';
 $labels['replyalldefault'] = 'απάντηση σε όλους';
@@ -616,6 +619,7 @@ $labels['encryption'] = 'Κρυπτογράφηση';
 $labels['mailvelopeoptions'] = 'Ρυθμίσεις Mailvelope';
 $labels['mailvelopemainkeyring'] = 'Χρήση κύριας κλειδοθήκης Mailvelope';
 $labels['mailvelopenotfound'] = 'Η επέκταση Mailvelope δεν είναι ενεργοποιημένη/εγκατεστημένη στον browser σας.';
+$labels['mailvelopeenable'] = 'Ενεργοποίηση';
 $labels['sortby'] = 'Ταξινόμηση κατά';
 $labels['sortasc'] = 'Αύξουσα ταξινόμηση';
 $labels['sortdesc'] = 'Φθίνουσα ταξινόμηση';
@@ -626,6 +630,7 @@ $labels['version'] = 'Έκδοση';
 $labels['source'] = 'Προέλευση';
 $labels['destination'] = 'Προορισμός';
 $labels['license'] = 'Άδεια χρήσης';
+$labels['skinauthor'] = 'με βάση το $author';
 $labels['support'] = 'Υποστήριξη';
 $labels['savedsearches'] = 'Αποθηκευμένες αναζητήσεις';
 $labels['dateformatY'] = 'YYYY';

@@ -10,10 +10,7 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/plugin-managesieve/
 */
-
 
 $labels['filters'] = 'Iragazkiak';
 $labels['managefilters'] = 'Kudeatu sarrerako posta-iragazkiak';
@@ -134,6 +131,7 @@ $labels['varlowerfirst'] = 'lehenengo karakterea minuskulan';
 $labels['varupperfirst'] = 'lehenengo karakterea maiuskulan';
 $labels['varquotewildcard'] = 'aipatu karaktere bereziak';
 $labels['varlength'] = 'luzera';
+$labels['varencodeurl'] = 'kodetutako ehunekoa (URLtarako)';
 $labels['notify'] = 'Bidali jakinarazpena';
 $labels['notifytarget'] = 'Jakinarazpenaren xedea:';
 $labels['notifymessage'] = 'Jakinarazpenaren mezua (aukerakoa):';
@@ -283,3 +281,4 @@ $messages['duplicate.conflict.err'] = 'Goiburua eta identifikatzaile bakarra ez 
 $messages['disabledaction'] = 'Ekintza ez da onartzen.';
 $messages['lastindexempty'] = 'Indizea beharrezkoa da amaieratik zenbatzen denean';
 $messages['noflagset'] = 'Gutxienez bandera bat hautatu behar da.';
+$messages['saving.actionordererror'] = '\'$previous\' ekintza \'$current\' ekintzaren aurretik izan behar du.';

@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  +-----------------------------------------------------------------------+
  | This file is part of the Roundcube Webmail client                     |
  |                                                                       |
@@ -27,10 +27,11 @@ class rcmail_action_mail_folder_expunge extends rcmail_action
      *
      * @param array $args Arguments from the previous step(s)
      */
+    #[\Override]
     public function run($args = [])
     {
         $rcmail = rcmail::get_instance();
-        $mbox   = rcube_utils::get_input_string('_mbox', rcube_utils::INPUT_POST, true);
+        $mbox = rcube_utils::get_input_string('_mbox', rcube_utils::INPUT_POST, true);
 
         $success = $rcmail->storage->expunge_folder($mbox);
 
@@ -44,8 +45,7 @@ class rcmail_action_mail_folder_expunge extends rcmail_action
                 $rcmail->action = 'list';
                 return;
             }
-        }
-        else {
+        } else {
             self::display_server_error();
         }
 

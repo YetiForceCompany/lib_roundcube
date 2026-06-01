@@ -10,10 +10,7 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/plugin-managesieve/
 */
-
 
 $labels['filters'] = 'Filtrai';
 $labels['managefilters'] = 'Tvarkyti gaunamų laiškų filtrus';
@@ -63,7 +60,7 @@ $labels['messagesrules'] = 'Gaunamiems laiškams:';
 $labels['messagesactions'] = '…vykdyti šiuos veiksmus:';
 $labels['add'] = 'Pridėti';
 $labels['del'] = 'Pašalinti';
-$labels['sender'] = 'Siuntėjas';
+$labels['sender'] = 'Siuntikas';
 $labels['recipient'] = 'Gavėjas';
 $labels['vacationaddr'] = 'Mano el. pašto adresai:';
 $labels['vacationdays'] = 'Kaip dažnai išsiųsti laiškus (dienomis):';
@@ -134,6 +131,7 @@ $labels['varlowerfirst'] = 'pirmoji raidė mažoji';
 $labels['varupperfirst'] = 'pirmoji raidė didžioji';
 $labels['varquotewildcard'] = 'cituoti specialius simbolius';
 $labels['varlength'] = 'ilgis';
+$labels['varencodeurl'] = 'procentinė koduotė (skirta URL adresams)';
 $labels['notify'] = 'Siųsti priminimą';
 $labels['notifytarget'] = 'Priminimo gavėjas:';
 $labels['notifymessage'] = 'Priminimo laiškas (nebūtina):';

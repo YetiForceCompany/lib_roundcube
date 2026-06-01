@@ -10,10 +10,7 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/labels/
 */
-
 
 $labels['welcome'] = 'Degemer mat war $product';
 $labels['username'] = 'Anv an arveriad';
@@ -187,6 +184,7 @@ $labels['quotaused'] = 'Arveret';
 $labels['quotastorage'] = 'Egor kantenn';
 $labels['quotamessage'] = 'Niver a gemenadennoù';
 $labels['quicksearch'] = 'Klask prim';
+$labels['searchplaceholder'] = 'Klask...';
 $labels['resetsearch'] = 'Aderaouekaat ar c\'hlask';
 $labels['searchmod'] = 'Kemmer klask';
 $labels['msgtext'] = 'Kemennadenn a-bezh';
@@ -224,7 +222,7 @@ $labels['selectmedia'] = 'Diuzañ ur film';
 $labels['addmedia'] = 'Ouzhpennañ ur film';
 $labels['encrypt'] = 'Enringegañ';
 $labels['encryptmessage'] = 'Enrinegañ ar gemennadenn';
-$labels['encryptmessagemailvelope'] = 'Enrinegañ ar gemennadenn gant ';
+$labels['encryptmessagemailvelope'] = 'Enrinegañ ar gemennadenn gant Mailvelope';
 $labels['importpubkeys'] = 'Enporzhiañ an alc\'hwezioù foran';
 $labels['encryptedsendialog'] = 'O kas ur gemennadenn enrineget';
 $labels['keyid'] = 'Naoudi an alc\'hwez';
@@ -347,6 +345,7 @@ $labels['cancel'] = 'Nullañ';
 $labels['save'] = 'Enrollañ';
 $labels['delete'] = 'Dilemel';
 $labels['discard'] = 'Dilezel';
+$labels['ok'] = 'Mat eo';
 $labels['rename'] = 'Adenvel';
 $labels['addphoto'] = 'Ouzhpennañ';
 $labels['replacephoto'] = 'Amsaviñ';
@@ -475,6 +474,7 @@ $labels['replyandforwardonly'] = 'evit ar respontoù hag an treuzkasoù hepken';
 $labels['insertsignature'] = 'Enlakaat ar sinadur';
 $labels['sigbelow'] = 'Lakaat ar sinadur a-us d\'ar gemennadenn veneget';
 $labels['sigseparator'] = 'Rediañ an disranner skoueriek er sinadurioù';
+$labels['automarkread'] = 'Merkañ ar c\'hemennadennoù evel lennet';
 $labels['afternseconds'] = 'goude $n eilenn';
 $labels['reqmdn'] = 'Atav goulenn un testeni degemer';
 $labels['reqdsn'] = 'Atav goulenn ur rebuziñ stad ar c\'has';
@@ -521,6 +521,8 @@ $labels['findfolders'] = 'Kavout teuliadoù';
 $labels['namespace.personal'] = 'Personel';
 $labels['namespace.other'] = 'Arveriaded all';
 $labels['namespace.shared'] = 'Rannet';
+$labels['dualusemail'] = 'kemennadennoù';
+$labels['dualusefolder'] = 'teuliadoù';
 $labels['encryptioncreatekey'] = 'Krouiñ un daouad alc\'hwezioù nevez';
 $labels['encryption'] = 'Enrinegañ';
 $labels['sortby'] = 'Rummañ dre';

@@ -1,41 +1,204 @@
 # Changelog Roundcube Webmail
 
-## Release 1.6.15
+This file includes only changes we consider noteworthy for users, admins and plugin authors. For a full view please look at the git history.
 
-- Fix regression where mail search would fail on non-ascii search criteria (#10121)
+## Release 1.7.1
+
+- Enigma: Support automatic public key lookup (import) using HKP v1 protocol (#5314)
+- Managesieve: Fix error when a mail message contains duplicate List-Id header (#10186)
+- Clarified Elastic installation instructions (#10163)
+- Added HTMLFormElement.requestSubmit() polyfill for older browsers (#10179)
+- Fix so "has:attachment" search uses $HasAttachment/$HasNoAttachment keywords (#10168)
+- Fix potential too long value in IMAP ID command (#10136)
+- Fix redis/memcache disconnection in rcube::sleep() (#10127)
+- Fix so static resources, e.g. skin_logo can be put inside the public_html directory (#10160)
+- Fix so `REQUEST_URI` is used as a fallback if `PATH_INFO` is not set in static.php (#10181)
+- Fix `assets_path` feature and remove dependency on `PATH_INFO` (#10185)
+- Fix MySQL upgrade on MySQL < 8.0 and MariaDB < 10.5.3 (#10188)
+- Security: Fix stored XSS/HTML/CSS injection in subject field of the draft restore dialog
+- Security: Fix CSS injection bypass in HTML sanitizer via SVG `<animate attributeName="style">`
+- Security: Fix pre-auth SQL injection in `virtuser_query` plugin via preg_replace backslash escape bypass
+- Security: Fix SSRF bypass via specific local address URLs
+- Security: Fix bypass of remote image blocking via CSS var()
+- Security: Fix local/private URL fetch bypass when remote resources were not allowed
+- Security: Fix pre-auth arbitrary file delete via redis/memcache session poisoning bypass
+- Security: Fix code injection vulnerability - remove support for code evaluation in LDAP `autovalues` option 
+
+## Release 1.7.0
+
+- Bump OpenPGPjs version to 6.3.0
+- Allow cidr (subnets) in proxy_whitelist (#7103)
+- Zipdownload: Fix message date time zone in mbox export (#10147)
+
+## Release 1.7-rc6
+
+- Added support for arrays in `smtp_user` and `smtp_pass` config options (#10083)
+- Added system health checker CLI script (#10106)
+- Stricter recognition of an Ajax request (#10118)
+- Password: Added Stalwart driver (#10114)
 - Fix regression where some data url images could get ignored/lost (#10128)
-- Fix SVG Animate FUNCIRI Attribute Bypass — Remote Image Loading via fill/filter/stroke
+- Fix SVG Animate FUNCIRI Attribute Bypass — Remote Image Loading via fill/filter/stroke [CVE-2026-35545]
 
-## Release 1.6.14
+## Release 1.7-rc5
 
+- Password: Add nt-binary hashing method (#10096)
+- Fix URL matching for domain names with port numbers (#10105)
+- Fix PHP fatal error when using IMAP cache (#10102)
 - Fix Postgres connection using IPv6 address (#10104)
-- Security: Fix pre-auth arbitrary file write via unsafe deserialization in redis/memcache session handler
-- Security: Fix bug where a password could get changed without providing the old password
-- Security: Fix IMAP Injection + CSRF bypass in mail search
-- Security: Fix remote image blocking bypass via various SVG animate attributes
-- Security: Fix remote image blocking bypass via a crafted body background attribute
-- Security: Fix fixed position mitigation bypass via use of !important
-- Security: Fix XSS issue in a HTML attachment preview
-- Security: Fix SSRF + Information Disclosure via stylesheet links to a local network hosts
+- Fix bug where `rel=stylesheet` part of a `<link>` could get removed
+- Security: Fix pre-auth arbitrary file write via unsafe deserialization in redis/memcache session handler [CVE-2026-35537]
+- Security: Fix bug where a password could get changed without providing the old password [CVE-2026-35541]
+- Security: Fix IMAP Injection + CSRF bypass in mail search [CVE-2026-35538]
+- Security: Fix remote image blocking bypass via various SVG animate attributes [CVE-2026-35543]
+- Security: Fix remote image blocking bypass via a crafted body background attribute [CVE-2026-35542]
+- Security: Fix fixed position mitigation bypass via use of !important [CVE-2026-35544]
+- Security: Fix XSS issue in a HTML attachment preview [CVE-2026-35539]
+- Security: Fix SSRF + Information Disclosure via stylesheet links to a local network hosts [CVE-2026-35540]
 
-## Release 1.6.13
+## Release 1.7-rc4
 
+- Ensure correct file permissions when building a release.
+- Installer: Fix broken link to download the created configuration file (#10092)
+
+## Release 1.7-rc3
+
+- Support `request_url` config option for resolving relative URLs (#9868)
+- Support X-Forwarded-Host/X-Forwarded-Port in self URLs generation (#9952)
+- Support $HasAttachment/$HasNoAttachment keywords for "With attachment" search filter (#10053)
+- OAuth: Fix bug where it was impossible to login again after logout (#10073)
+- OAuth: Add `oauth_auth_type` option
 - Managesieve: Fix handling of string-list format values for date tests in Out of Office (#10075)
-- Fix remote image blocking bypass via SVG content reported by nullcathedral
-- Fix CSS injection vulnerability reported by CERT Polska
+- Password: Extend Dovecot passwdfile driver with dynamic file path support (#10036)
+- Fix a UI issue on using browser Back button after allowing remote resources (#10062)
+- Fix syntax error in DDL scripts for Postgres (#10070)
+- Fix remote image blocking bypass via SVG content reported by nullcathedral [CVE-2026-25916]
+- Fix CSS injection vulnerability reported by CERT Polska [CVE-2026-26079]
 
-## Release 1.6.12
+## Release 1.7-rc2
 
+- Fix syntax error in DDL scripts for Postgres (#10052)
+- Fix Cross-Site-Scripting vulnerability via SVG's animate tag [CVE-2025-68461]
+- Fix Information Disclosure vulnerability in the HTML style sanitizer [CVE-2025-68460]
+- Support $HasAttachment/$HasNoAttachment keywords for "With attachment" search filter (#10053)
+
+## Release 1.7-rc
+
+- Move autocomplete list rendering to client-side (#9832)
+- Remove `contact_search_name` option in favor of `contactlist_name_template` (#9832)
+- Add scope parameter to contact search (#9863)
+- Add tooltip with folder name to widescreen list of multi-folder listing (#9989, #7950)
+- Add ability to chose from all available contact fields on CSV import (#9419)
+- Add a new plugin called `markdown_editor` that provides an alternative editor to compose emails using Markdown syntax
+- Allow links with "target" attribute in signatures and stored responses (#10017)
+- Preserve requested url on OIDC login (#10033)
+- Managesieve: Show a warning when actions in wrong order (#10015, #6590)
+- Password: Removed the (insecure) virtualmin driver (#8007)
+- Fix jqueryui plugin's minicolors.css issue with custom skins (#9967)
+- Fix `skin_logo` with a relative URL (#10030)
+- Replace session attribute `changed` by `expires_at` to allow for variable session lengths per-user.
+- Add rel='noopener' to all links opening in a new window to mitigate against misuse in older browsers.
+
+## Release 1.7-beta2
+
+- Support PHP v8.5(-pre) without deprecation warnings.
 - Support IPv6 in database DSN (#9937)
-- Don't force specific error_reporting setting
-- Fix compatibility with PHP 8.5 regarding array_first()
-- Remove X-XSS-Protection example from .htaccess file (#9875)
+- Use `htmleditor` setting also for indentity signature (#9954)
+- Fix regression in handling of non-unicode characters in a plain text message (#9953)
+- Fix parsing of inline styles that aren't well-formatted (#9948)
+- Support early MIME types for S/MIME encrypted messages (#9973)
+- Only apply fix_path for href attrib in <link>s (#9943)
+- Show homograph-warning-icon before email address, unify warning wording (#9945)
+- Show full details with warning icon in case of phishing suspicion (#9945)
+- Prepend group-names to display-name (#9945)
+- Wash the `name` attribute also on more elements (#9949)
+- Sanitize filename on download (#9960)
+- Drop Internet Explorer from supported browsers (#9963)
+- Enforce leading backslash for non-namespaced non-Roundcube uses (#9935)
+- Use asset_url() instead of get_skin_file() for deleteicon on contact edit form (#9933)
+- Several changes to the test tooling.
+
+## Release 1.7-beta
+
+- Set minimum required PHP version to 8.1 (#9599)
+- Update to jQuery 3.7.1
+- Drop dependency on JsTimeZoneDetect (#8965)
+- Added apcu cache driver (#9828)
+- Removed apc cache driver
+- Renamed composer.json.dist to composer.json (#9279)
+- Make public_html/ entry-point mandatory, all static resources are served via static.php (#9294, #8851)
+- Removed support for MS SQL Server and Oracle (#7854)
+- Added more strict code quality/style validation
+- Added text/markdown mail rendering (#8873)
+- Store uploads metadata in a separate sql database table instead of a session (#8415)
+- Mouse-over menu on messages list (#7141)
+- Advanced mail search syntax with more possibilities (without UI) (#8502)
+- Added an option for a default mail search scope (#9077, #7556)
+- Added an option for default "Keep formatting" state, option can be hidden via `dont_override` (#8987, #9703)
+- Added option to define font list and font-size list for HTML editor - available_fonts/available_font_sizes (#5700)
+- IMAP: Support for HAproxy protocol header in IMAP connections (#8625)
+- Change 'smtp_log' option default value to False
+- Add 'php' logging driver (#6138)
+- Delete messages directly from Junk on folder purge if delete_junk is enabled (#8766)
+- Hide information about quota, when there is no quota (#8994)
+- Set timeout=30, connect_timeout=5, read_timeout=120 as defaults for HTTP client (#8865)
+- Remove use of utf8_encode() and utf8_decode() functions deprecated in PHP 8.2
+- Support PHP Zip extension and 7z in install-jsdeps.sh (#8935)
+- Add identities management script - bin/identity.sh (#8887)
+- Add skin information into the About dialog (#9441)
+- Prefer 8bit over quoted-printable for HTML parts, when force_7bit is disabled (#8477)
+- Convert images in HTML content pasted into HTML editor to `data:` URIs (and later to attachments) (#6938)
+- Add possibility to change ATTR_EMULATE_PREPARES via config file (#9213)
+- Use draft settings (like DSN) on "Edit as new" (#9349)
+- Add more detailed feedback on vCard import errors (#9591)
+- Use new HTML5 parser available on PHP >= 8.4
+- Clear "list is empty" message on loading a new list (#9006)
+- Add `enable_autolink` option for HTML editor (#9818, #9762)
+- Rework/fix zoom and rotate of attached images (#9843, #7669)
+- Installer: Show NOT OK if none of the database extensions is installed (#9594, #9604)
+- Plugin API: Added message_delete hook (#9499)
+- Plugin API: Added message_move hook (#9499)
+- Mailvelope: Add a button to enable the extension for webmail domain (#9498)
+- OAuth: Add support for SMTP without authentication (#9183)
+- OAuth: Add support for OAuth/OpenIDC discovery (#8201)
+- OAuth: Add support for invalidating the OAuth-session on logout (#8057)
+- OAuth: Add support for OpenID Connect RP-Initiated Logout (#9109)
+- OAuth: Add support for OpenID Connect Back-Channel Logout (#9110)
+- OAuth: Add support for PKCE (#8757)
+- OAuth: Add support for OAUTHBEARER (#9217)
+- OAuth: Add `oauth_debug` option (#9217)
+- OAuth: Fix: missing config `oauth_provider_name` in rcmail_oauth's constructor (#9217)
+- OAuth: Fix Bearer authentication for Kinde (#9244)
+- OAuth: Refactor: move display to the rcmail_oauth class and use `loginform_content` hook (#9217)
+- OAuth: Add a flag to the 'authenticate' hook arguments indicating SSO is in use
+- Additional_Message_Headers: Added %u, %d and %l variables (#8746, #8732)
+- ACL: Set default of 'acl_specials' option to ['anyone'] (#8911)
+- Enigma: Support Kolab's Web Of Anti-Trust feature (#8626)
+- Enigma: Add key icon to passphrase input (#9894)
+- Managesieve: Support :encodeurl (RFC 5435) (#8917)
+- Managesieve: Add List-ID to the list of headers for creating new sieve-filters (#8307)
+- Managesieve: Support an array in managesieve_host option (#9447)
+- Managesieve: Fix the frontend datetime picker not respecting the 12h format and apending a dangling 's' to the seconds (#9688)
+- Managesieve: Add parsing for all PHP time formatters from `time_format` config to frontend the time picker (#9655)
+- Password: Add `ldap_samba_ad` driver (#8525)
+- Password: Allow LDAP access using LDAP URI and SASL binding (#8402)
+- Password: Use Guzzle HTTP Client in the `pwned` driver
+- Password: Use Guzzle HTTP Client in the `directadmin` driver
+- Password: Use Guzzle HTTP Client in the `plesk` driver
+- Password: Use Guzzle HTTP Client in the `modoboa` driver
+- Password: Use Guzzle HTTP Client in the `domainfactory` driver
+- Password: Use Guzzle HTTP Client in the `cpanel` driver
+- Password: Check that a user email is part of password in the `zxcvbn` checker (#9404)
+- Virtuser_file: Support opensmtpd file format (#9898)
+- Zipdownload: Change "Download..." menu label into "Export..." (#9713)
+- Fix bug in handling rcmail::format_date()'s $convert argument (#9666)
+- Fix use of Bootstrap's `box-sizing` inside a HTML message content (#9727)
+- Fix folders hierarchy when special folders are subfolders of INBOX, with no personal namespace prefix (#9452)
+- Fix attachment name decoding when 'charset' parameter exists in the headers (#9376)
+- Fix deprecated (in PHP 8.4) use of session_set_save_handler() (#9060)
+- Fix potential HTTP protocol version mismatch (#8982)
 - Fix "Assign to group" action state after creation of a first group (#9889)
 - Fix bug where contacts search would fail if `contactlist_fields` contained vcard fields (#9850)
 - Fix bug where an mbox export file could include inconsistent message delimiters (#9879)
-- Fix parsing of inline styles that aren't well-formatted (#9948)
-- Fix Cross-Site-Scripting vulnerability via SVG's animate tag
-- Fix Information Disclosure vulnerability in the HTML style sanitizer
 
 ## Release 1.6.11
 
@@ -53,7 +216,7 @@
 - Fix connecting to LDAP using ldapi:// URI (#8990)
 - Fix cursor position on "below the quote" reply in HTML mode (#8700)
 - Fix bug where attachments with content type of `application/vnd.ms-tnef` were not parsed (#7119)
-- Fix Post-Auth RCE via PHP Object Deserialization reported by firs0v
+- Fix Post-Auth RCE via PHP Object Deserialization reported by firs0v [CVE-2025-49113]
 
 ## Release 1.6.10
 
@@ -102,9 +265,9 @@
 - Fix bug in collapsing/expanding folders with some special characters in names (#9324)
 - Fix PHP8 warnings (#9363, #9365, #9429)
 - Fix missing field labels in CSV import, for some locales (#9393)
-- Fix command injection via crafted im_convert_path/im_identify_path on Windows
-- Fix cross-site scripting (XSS) vulnerability in handling list columns from user preferences
-- Fix cross-site scripting (XSS) vulnerability in handling SVG animate attributes
+- Fix command injection via crafted im_convert_path/im_identify_path on Windows [CVE-2024-37385]
+- Fix cross-site scripting (XSS) vulnerability in handling list columns from user preferences [CVE-2024-37384]
+- Fix cross-site scripting (XSS) vulnerability in handling SVG animate attributes [CVE-2024-37383]
 
 ## Release 1.6.6
 
@@ -128,7 +291,7 @@
 - Fix bug where images attached to application/smil messages weren't displayed (#8870)
 - Fix PHP string replacement error in utils/error.php (#9185)
 - Fix regression where `smtp_user` did not allow pre/post strings before/after `%u` placeholder (#9162)
-- Fix cross-site scripting (XSS) vulnerability in setting Content-Type/Content-Disposition for attachment preview/download
+- Fix cross-site scripting (XSS) vulnerability in setting Content-Type/Content-Disposition for attachment preview/download [CVE-2023-47272]
 
 ## Release 1.6.4
 
@@ -219,7 +382,7 @@
 - Fix SMTP XCLIENT extension when not using STARTTLS (#8581)
 - Fix call to undefined method rcube_ldap_generic::option_set() (#8564)
 - Fix PHP Fatal error on incompatible method declaration of rcmail_output_json::command() and rcmail_output::command() (#8579)
-- Fix support for DSN specification without host e.g. `pgsql:///dbname` (#8558)
+- Fix support for DSN specification without host e.g. pgsql:///dbname (#8558)
 - Fix TinyMCE configuration for handling styles of pasted content in webkit browsers (#8555)
 - Fix bug where some checkboxes could be selected unintentinally (#8565)
 - Fix css styles of the email recipient element while dragging (#8580)
@@ -332,7 +495,7 @@
 - Fix some PHP8 compatibility issues (#8363)
 - Fix chpass-wrapper.py helper compatibility with Python 3 (#8324)
 - Fix scrolling and missing Close button in the Select image dialog in Elastic/mobile (#8367)
-- Security: Fix cross-site scripting (XSS) via HTML messages with malicious CSS content
+- Security: Fix cross-site scripting (XSS) via HTML messages with malicious CSS content [CVE-2021-46144]
 
 ## Release 1.5.1
 
@@ -378,8 +541,8 @@
 - Fix a couple of PHP8 warnings (#8175, #8176)
 - Fix bug where "from my contacts" and "from trusted senders" values were mixed up (#8177)
 - Fix password/token length check on OAuth login (#8178)
-- Fix XSS issue in handling attachment filename extension in mimetype mismatch warning (#8193)
-- Fix SQL injection via some session variables
+- Fix XSS issue in handling attachment filename extension in mimetype mismatch warning [CVE-2021-44025] (#8193)
+- Fix SQL injection via some session variables [CVE-2021-44026]
 - Fix handling of dark_mode_support:false setting in skins meta.json (#8186)
 - Fix security issues regarding server name and trusted_host_patterns setting
 
@@ -529,7 +692,7 @@
 - Elastic: Fix compatibility with Less v3 and v4 (#7813)
 - Fix bug with managesieve_domains in Settings > Forwarding form (#7849)
 - Fix errors in MSSQL database update scripts (#7853)
-- Security: Fix cross-site scripting (XSS) via HTML messages with malicious CSS content
+- Security: Fix cross-site scripting (XSS) via HTML messages with malicious CSS content [CVE-2021-26925]
 
 ## Release 1.4.10
 
@@ -599,10 +762,10 @@
 - Fix error when user-configured skin does not exist anymore (#7271)
 - Elastic: Fix aspect ratio of a contact photo in mail preview (#7339)
 - Fix bug where PDF attachments marked as inline could have not been attached on mail forward (#7382)
-- Security: Fix a couple of XSS issues in Installer (#7406)
-- Security: Fix XSS issue in template object 'username' (#7406)
-- Security: Better fix for CVE-2020-12641
-- Security: Fix cross-site scripting (XSS) via malicious XML attachment
+- Security: Fix a couple of XSS issues in Installer [CVE-2020-18671, CVE-2020-18670] (#7406)
+- Security: Fix XSS issue in template object 'username' [CVE-2020-13964] (#7406)
+- Security: Better fix for remote code execution via crafted 'im_convert_path' or 'im_identify_path' settings [CVE-2020-12641]
+- Security: Fix cross-site scripting (XSS) via malicious XML attachment [CVE-2020-13965]
 
 ## Release 1.4.4
 
@@ -928,6 +1091,7 @@
 - Enigma: Add button to send mail unencrypted if no key was found (#5913)
 - Enigma: Add options to set PGP cipher/digest algorithms (#5645)
 - Enigma: Multi-host support
+- Enigma: Remove default for enigma_pgp_homedir [CVE-2018-1000071] (#6173)
 - Managesieve: Add ability to disable filter sets and other actions (#5496, #5898)
 - Managesieve: Add option managesieve_forward to enable settings dialog for simple forwarding (#6021)
 - Managesieve: Support filter action with custom IMAP flags (#6011)
@@ -1008,7 +1172,7 @@
 - Fix bug where only attachments with the same name would be ignored on zip download (#6301)
 - Fix bug where unicode contact names could have been broken/emptied or caused DB errors (#6299)
 - Fix bug where after "mark all folders as read" action message counters were not reset (#6307)
-- Enigma: [EFAIL] Don't decrypt PGP messages with no MDC protection (#6289)
+- Enigma: [EFAIL] Don't decrypt PGP messages with no MDC protection [CVE-2018-19205] (#6289)
 - Fix bug where some HTML comments could have been malformed by HTML parser (#6333)
 
 ## Release 1.3.6
@@ -1245,7 +1409,7 @@
 ## Release 1.2.3
 
 - Searching in both contacts and groups when LDAP addressbook with group_filters option is used
-- Fix vulnerability in handling of mail()'s 5th argument
+- Fix vulnerability in handling of mail()'s 5th argument [CVE-2016-9920]
 - Fix To: header encoding in mail sent with mail() method (#5475)
 - Fix flickering of header topline in min-mode (#5426)
 - Fix bug where folders list would scroll to top when clicking on subscription checkbox (#5447)
@@ -1324,7 +1488,7 @@
 - Fix bug where contact search menu fields where always unchecked in Larry skin
 - Fix autoloading of 'html' class
 - Fix bug where Encrypt button appears when switching editor to HTML (#5235)
-- Fix XSS issue in href attribute on area tag (#5240)
+- Fix XSS issue in href attribute on area tag [CVE-2016-4552] (#5240)
 
 ## Release 1.2-rc
 
@@ -1476,16 +1640,16 @@
 - Fix mouseup event handling when dragging a list record (#4808)
 - Fix bug where preview_pane setting wasn't always saved into user preferences (#4809)
 - Fix bug where messages count was not updated after message move/delete with skip_deleted=false (#4814)
-- Fix security issue in contact photo handling (#4817)
+- Fix security issue in contact photo handling [CVE-2015-8794, CVE-2015-5382] (#4817)
 - Fix possible memcache/apc cache data consistency issues (#4820)
 - Fix bug where imap_conn_options were ignored in IMAP connection test (#4822)
 - Fix bug where some files could have "executable" extension when stored in temp folder (#4815)
 - Fix attached file path unsetting in database_attachments plugin (#4823)
 - Fix issues when using moduserprefs.sh without --user argument (#4825)
-- Fix potential info disclosure issue by protecting directory access (#4816)
+- Fix potential info disclosure issue by protecting directory access [CVE-2015-5383] (#4816)
 - Fix blank image in html_signature when saving identity changes (#4833)
 - Installer: Use openssl_random_pseudo_bytes() (if available) to generate des_key (#4827)
-- Fix XSS vulnerability in _mbox argument handling (#4837)
+- Fix XSS vulnerability in _mbox argument handling [CVE-2015-8793, CVE-2015-5381] (#4837)
 
 ## Release 1.1.1
 
@@ -1545,7 +1709,7 @@
 - Fix keyboard navigation and css in datepicker widget across many Firefox versions
 - Fix false warning when opening attached text/plain files (#4748)
 - Fix bug where signature could have been inserted twice after plain-to-html switch (#4746)
-- Fix security issue in DBMail driver of password plugin (#4757)
+- Fix security issue in DBMail driver of password plugin [CVE-2015-2180] (#4757)
 - Enable FollowSymLinks option in .htaccess file which is required by rewrite rules (#4754)
 - Fix so JSON.parse() errors on localStorage items are ignored (#4752)
 
@@ -2009,7 +2173,7 @@
 
 ## Release 0.9-rc2
 
-- Fix security issue in save-pref command
+- Fix security issue in save-pref command [CVE-2013-1904]
 - Remove sig_above configuration option, use reply_mode only (#4135)
 - Refresh current folder in opener window after draft save or message sent (#4132)
 - Fix saving draft just after entering compose window (#4141)
@@ -2876,7 +3040,7 @@
 - Fix checking for new mail: now checks unseen count of inbox (#2123)
 - Improve performance by avoiding unnecessary updates to the session table (#2552)
 - Fix invalid `<font>` tags which cause HTML message rendering problems (#2687)
-- Fix CVE-2010-0464: Disable DNS prefetching (#2639)
+- Disable DNS prefetching [CVE-2010-0464] (#2639)
 - Fix Received headers to behave better with SpamAssassin (#2682)
 - Password: Make passwords encoding consistent with core, add 'password_charset' global option (#2658)
 - Fix adding contacts SQL error on mysql (#2645)
@@ -3374,6 +3538,7 @@
 - Fixed some iconv/mb_string problems (#1202)
 - Correctly quote mailbox name when using in URL (#1016)
 - Fixed "headers already sent" errors (#1399)
+- Fix CSS Expression Input Validation Vulnerability [CVE-2007-6321] (#1276)
 
 ## Release 0.1-STABLE
 

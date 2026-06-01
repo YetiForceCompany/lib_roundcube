@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  +-----------------------------------------------------------------------+
  | This file is part of the Roundcube Webmail client                     |
  |                                                                       |
@@ -27,6 +27,7 @@ class rcmail_action_mail_search extends rcmail_action_mail_index
      *
      * @param array $args Arguments from the previous step(s)
      */
+    #[\Override]
     public function run($args = [])
     {
         $rcmail = rcmail::get_instance();
@@ -39,50 +40,35 @@ class rcmail_action_mail_search extends rcmail_action_mail_index
         $_SESSION['page'] = 1;
 
         // get search string
-        $str      = rcube_utils::get_input_string('_q', rcube_utils::INPUT_GET, true);
-        $mbox     = rcube_utils::get_input_string('_mbox', rcube_utils::INPUT_GET, true);
-        $filter   = rcube_utils::get_input_string('_filter', rcube_utils::INPUT_GET);
-        $headers  = rcube_utils::get_input_string('_headers', rcube_utils::INPUT_GET);
-        $scope    = rcube_utils::get_input_string('_scope', rcube_utils::INPUT_GET);
-        $interval = rcube_utils::get_input_string('_interval', rcube_utils::INPUT_GET);
-        $continue = rcube_utils::get_input_string('_continue', rcube_utils::INPUT_GET);
+        $str = trim(rcube_utils::get_input_string('_q', rcube_utils::INPUT_GET, true));
+        $mbox = trim(rcube_utils::get_input_string('_mbox', rcube_utils::INPUT_GET, true));
+        $filter = trim(rcube_utils::get_input_string('_filter', rcube_utils::INPUT_GET));
+        $headers = trim(rcube_utils::get_input_string('_headers', rcube_utils::INPUT_GET));
+        $scope = trim(rcube_utils::get_input_string('_scope', rcube_utils::INPUT_GET));
+        $interval = trim(rcube_utils::get_input_string('_interval', rcube_utils::INPUT_GET));
+        $continue = trim(rcube_utils::get_input_string('_continue', rcube_utils::INPUT_GET));
 
-        $filter         = trim((string) $filter);
-        $search_request = md5($mbox . $scope . $interval . $filter . $str);
+        // Set message set for already stored (but incomplete) search request
+        if (!empty($continue) && isset($_SESSION['search']) && $_SESSION['search_request'] == $continue) {
+            $rcmail->storage->set_search_set($_SESSION['search']);
+            $search = $_SESSION['search'][0];
+            $search_request = $continue;
+        } else {
+            // Parse input parameters into an IMAP search criteria
+            $search = self::search_input($str, $headers, $filter, $interval);
+            $search_request = md5($mbox . $scope . $interval . $filter . $str);
 
-        // Parse input
-        list($subject, $search) = self::search_input($str, $headers, $scope, $mbox);
-
-        // add list filter string
-        $search_str = $filter && $filter != 'ALL' ? $filter : '';
-
-        // We pass the filter as-is into IMAP SEARCH command. A newline could be used
-        // to inject extra commands, so we remove these.
-        $search_str = preg_replace('/[\r\n]+/', ' ', $search_str);
-
-        if ($search_interval = self::search_interval_criteria($interval)) {
-            $search_str .= ' ' . $search_interval;
-        }
-
-        if (!empty($subject)) {
-            $search_str .= str_repeat(' OR', count($subject)-1);
-            foreach ($subject as $sub) {
-                $search_str .= ' ' . $sub . ' ' . rcube_imap_generic::escape($search);
+            // Save search modifiers for the current folder to user prefs
+            if (strlen($search) && strlen($headers) && strlen($mbox) && $scope != 'all') {
+                self::update_search_mods($mbox, $headers);
             }
         }
 
-        $search_str  = trim($search_str);
         $sort_column = self::sort_column();
-        $sort_order  = self::sort_order();
-
-        // set message set for already stored (but incomplete) search request
-        if (!empty($continue) && isset($_SESSION['search']) && $_SESSION['search_request'] == $continue) {
-            $rcmail->storage->set_search_set($_SESSION['search']);
-            $search_str = $_SESSION['search'][0];
-        }
+        $sort_order = self::sort_order();
 
         // execute IMAP search
-        if ($search_str) {
+        if ($search) {
             $mboxes = [];
 
             // search all, current or subfolders folders
@@ -90,9 +76,8 @@ class rcmail_action_mail_search extends rcmail_action_mail_index
                 $mboxes = $rcmail->storage->list_folders_subscribed('', '*', 'mail', null, true);
                 // we want natural alphabetic sorting of folders in the result set
                 natcasesort($mboxes);
-            }
-            else if ($scope == 'sub') {
-                $delim  = $rcmail->storage->get_hierarchy_delimiter();
+            } elseif ($scope == 'sub') {
+                $delim = $rcmail->storage->get_hierarchy_delimiter();
                 $mboxes = $rcmail->storage->list_folders_subscribed($mbox . $delim, '*', 'mail');
                 array_unshift($mboxes, $mbox);
             }
@@ -103,7 +88,7 @@ class rcmail_action_mail_search extends rcmail_action_mail_index
                 $rcmail->output->set_env('mailbox', $mbox);
             }
 
-            $result = $rcmail->storage->search($mboxes, $search_str, RCUBE_CHARSET, $sort_column);
+            $result = $rcmail->storage->search($mboxes, $search, RCUBE_CHARSET, $sort_column);
         }
 
         // save search results in session
@@ -111,15 +96,15 @@ class rcmail_action_mail_search extends rcmail_action_mail_index
             $_SESSION['search'] = [];
         }
 
-        if ($search_str) {
+        if ($search) {
             $_SESSION['search'] = $rcmail->storage->get_search_set();
             $_SESSION['last_text_search'] = $str;
         }
 
-        $_SESSION['search_request']  = $search_request;
-        $_SESSION['search_scope']    = $scope;
+        $_SESSION['search_request'] = $search_request;
+        $_SESSION['search_scope'] = $scope;
         $_SESSION['search_interval'] = $interval;
-        $_SESSION['search_filter']   = $filter;
+        $_SESSION['search_filter'] = $filter;
 
         // Get the headers
         if (!isset($result) || empty($result->incomplete)) {
@@ -132,14 +117,14 @@ class rcmail_action_mail_search extends rcmail_action_mail_index
 
             self::js_message_list($result_h, false);
 
-            if ($search_str) {
+            if ($search) {
                 $all_count = $rcmail->storage->count(null, 'ALL');
                 $rcmail->output->show_message('searchsuccessful', 'confirmation', ['nr' => $all_count]);
             }
 
             // remember last HIGHESTMODSEQ value (if supported)
             // we need it for flag updates in check-recent
-            if ($mbox !== null) {
+            if (strlen($mbox)) {
                 $data = $rcmail->storage->folder_data($mbox);
                 if (!empty($data['HIGHESTMODSEQ'])) {
                     $_SESSION['list_mod_seq'] = $data['HIGHESTMODSEQ'];
@@ -147,16 +132,15 @@ class rcmail_action_mail_search extends rcmail_action_mail_index
             }
         }
         // handle IMAP errors (e.g. #1486905)
-        else if ($err_code = $rcmail->storage->get_error_code()) {
+        elseif ($err_code = $rcmail->storage->get_error_code()) {
             $count = 0;
             self::display_server_error();
         }
         // advice the client to re-send the (cross-folder) search request
-        else if (!empty($result) && !empty($result->incomplete)) {
+        elseif (!empty($result) && !empty($result->incomplete)) {
             $count = 0;  // keep UI locked
             $rcmail->output->command('continue_search', $search_request);
-        }
-        else {
+        } else {
             $count = 0;
 
             $rcmail->output->show_message('searchnomatch', 'notice');
@@ -168,17 +152,17 @@ class rcmail_action_mail_search extends rcmail_action_mail_index
         }
 
         // update message count display
-        $rcmail->output->set_env('search_request', $search_str ? $search_request : '');
+        $rcmail->output->set_env('search_request', $search ? $search_request : '');
         $rcmail->output->set_env('search_filter', $_SESSION['search_filter']);
         $rcmail->output->set_env('messagecount', $count);
         $rcmail->output->set_env('pagecount', ceil($count / $rcmail->storage->get_pagesize()));
-        $rcmail->output->set_env('exists', $mbox === null ? 0 : $rcmail->storage->count($mbox, 'EXISTS'));
+        $rcmail->output->set_env('exists', !strlen($mbox) ? 0 : $rcmail->storage->count($mbox, 'EXISTS'));
         $rcmail->output->command('set_rowcount', self::get_messagecount_text($count, 1), $mbox);
 
         self::list_pagetitle();
 
         // update unseen messages count
-        if ($search_str === '') {
+        if ($search === '') {
             self::send_unread_count($mbox, false, empty($result_h) ? 0 : null);
         }
 
@@ -199,16 +183,17 @@ class rcmail_action_mail_search extends rcmail_action_mail_index
             return;
         }
 
+        $interval = strtoupper($interval);
+
         if ($interval[0] == '-') {
-            $search   = 'BEFORE';
+            $search = 'BEFORE';
             $interval = substr($interval, 1);
-        }
-        else {
+        } else {
             $search = 'SINCE';
         }
 
-        $date     = new DateTime('now');
-        $interval = new DateInterval('P' . $interval);
+        $date = new \DateTime('now');
+        $interval = new \DateInterval('P' . $interval);
 
         $date->sub($interval);
 
@@ -218,74 +203,248 @@ class rcmail_action_mail_search extends rcmail_action_mail_index
     /**
      * Parse search input.
      *
-     * @param string $str     Search string
-     * @param string $headers Comma-separated list of headers/fields to search in
-     * @param string $scope   Search scope (all | base | sub)
-     * @param string $mbox    Folder name
+     * @param string $str      Search string
+     * @param string $headers  Comma-separated list of headers/fields to search in
+     * @param string $filter   Additional IMAP filter query
+     * @param string $interval Additional interval filter
      *
-     * @return array Search criteria (1st element) and search value (2nd element)
+     * @return string IMAP search query
      */
-    public static function search_input($str, $headers, $scope, $mbox)
+    public static function search_input($str, $headers = '', $filter = 'ALL', $interval = null)
     {
-        $rcmail    = rcmail::get_instance();
-        $subject   = [];
-        $srch      = null;
+        $headers = $headers ? explode(',', $headers) : ['subject'];
+
+        // Add list filter string
+        $result = $filter && $filter != 'ALL' ? $filter : '';
+
+        // We pass the filter as-is into IMAP SEARCH command. A newline could be used
+        // to inject extra commands, so we remove these. Keep the filter simple, please.
+        $result = preg_replace('/[\r\n]+/', ' ', $result);
+
+        // Add the interval filter string
+        if ($search_interval = self::search_interval_criteria($interval)) {
+            $result .= ' ' . $search_interval;
+        }
+
+        $value_function = static function ($value) {
+            $value = trim($value);
+            $value = preg_replace('/(^"|"$)/', '', $value);
+            $value = str_replace('\"', '"', $value);
+
+            return $value;
+        };
+
+        // Explode the search input into "tokens"
+        $parts = rcube_utils::explode_quoted_string('\s+', $str);
+        $parts = array_filter($parts);
+
+        foreach ($parts as $idx => $part) {
+            if (strcasecmp($part, 'OR') === 0) {
+                $parts[$idx] = 'OR';
+                continue;
+            }
+
+            if (strcasecmp($part, 'AND') === 0) {
+                $parts[$idx] = 'AND';
+                continue;
+            }
+
+            $not = '';
+
+            if (preg_match('/^(-?[a-zA-Z-]+):(.*)$/', $part, $matches)) {
+                $option = $matches[1];
+                $value = $value_function($matches[2]);
+
+                if ($option[0] == '-') {
+                    $not = 'NOT ';
+                    $option = substr($option, 1);
+                }
+
+                if ($imap_query = self::search_input_option($option, $value)) {
+                    $parts[$idx] = $not . $imap_query;
+                    continue;
+                }
+            }
+
+            if (preg_match('/^-".*"$/', $part)) {
+                $not = 'NOT ';
+                $part = substr($part, 1);
+            }
+
+            if ($imap_query = self::search_input_text($value_function($part), $headers)) {
+                $parts[$idx] = $not . $imap_query;
+            }
+        }
+
+        foreach ($parts as $idx => $part) {
+            if ($part == 'OR') {
+                // Ignore OR on the start and end, and successive ORs
+                if ($idx === 0 || !isset($parts[$idx + 1]) || $parts[$idx + 1] == 'OR') {
+                    unset($parts[$idx]);
+                    continue;
+                }
+
+                $index = $idx;
+
+                while ($index-- >= 0) {
+                    if (isset($parts[$index])) {
+                        $parts[$index] = 'OR ' . $parts[$index];
+                        break;
+                    }
+                }
+
+                unset($parts[$idx]);
+            } elseif ($part == 'AND') {
+                unset($parts[$idx]);
+            }
+        }
+
+        $result = trim($result . ' ' . implode(' ', $parts));
+
+        return $result != 'ALL' ? $result : '';
+    }
+
+    /**
+     * Parse search input token.
+     *
+     * @param string $option Option name
+     * @param string $value  Option value
+     *
+     * @return ?string IMAP search query, NULL if the option is unsupported
+     */
+    protected static function search_input_option($option, $value)
+    {
+        if (!strlen($value)) {
+            return null;
+        }
+
         $supported = ['subject', 'from', 'to', 'cc', 'bcc'];
+        $option = strtolower($option);
+        $escaped = rcube_imap_generic::escape($value);
 
-        // Check the search string for type of search
-        if (preg_match("/^(from|to|reply-to|cc|bcc|subject):.*/i", $str, $m)) {
-            list(, $srch) = explode(":", $str);
-            $subject[$m[1]] = 'HEADER ' . strtoupper($m[1]);
-        }
-        else if (preg_match("/^body:.*/i", $str)) {
-            list(, $srch) = explode(":", $str);
-            $subject['body'] = 'BODY';
-        }
-        else if (strlen(trim($str))) {
-            if ($headers) {
-                foreach (explode(',', $headers) as $header) {
-                    switch ($header) {
-                    case 'text':
-                        // #1488208: get rid of other headers when searching by "TEXT"
-                        $subject = ['text' => 'TEXT'];
-                        break 2;
-                    case 'body':
-                        $subject['body'] = 'BODY';
-                        break;
-                    case 'replyto':
-                    case 'reply-to':
-                        $subject['reply-to'] = 'HEADER REPLY-TO';
-                        $subject['mail-reply-to'] = 'HEADER MAIL-REPLY-TO';
-                        break;
-                    case 'followupto':
-                    case 'followup-to':
-                        $subject['followup-to'] = 'HEADER FOLLOWUP-TO';
-                        $subject['mail-followup-to'] = 'HEADER MAIL-FOLLOWUP-TO';
-                        break;
-                    default:
-                        if (in_array_nocase($header, $supported)) {
-                            $subject[$header] = 'HEADER ' . strtoupper($header);
-                        }
-                    }
+        switch ($option) {
+            case 'body':
+                return "BODY {$escaped}";
+            case 'text':
+                return "TEXT {$escaped}";
+            case 'replyto':
+            case 'reply-to':
+                return "OR HEADER REPLY-TO {$escaped} HEADER MAIL-REPLY-TO {$escaped}";
+            case 'followupto':
+            case 'followup-to':
+                return "OR HEADER FOLLOWUP-TO {$escaped} HEADER MAIL-FOLLOWUP-TO {$escaped}";
+            case 'larger':
+            case 'smaller':
+                if (preg_match('/([0-9\.]+)(k|m|g|b|kb|mb|gb)/i', $value)) {
+                    return strtoupper($option) . ' ' . parse_bytes($value);
                 }
 
-                // save search modifiers for the current folder to user prefs
-                if ($scope != 'all') {
-                    $search_mods       = self::search_mods();
-                    $search_mods_value = array_fill_keys(array_keys($subject), 1);
+                break;
+            case 'is':
+                $map = [
+                    'unread' => 'UNSEEN',
+                    'read' => 'SEEN',
+                    'unseen' => 'UNSEEN',
+                    'seen' => 'SEEN',
+                    'flagged' => 'FLAGGED',
+                    'unflagged' => 'UNFLAGGED',
+                    'deleted' => 'DELETED',
+                    'undeleted' => 'UNDELETED',
+                    'answered' => 'ANSWERED',
+                    'unanswered' => 'UNANSWERED',
+                ];
 
-                    if (!isset($search_mods[$mbox]) || $search_mods[$mbox] != $search_mods_value) {
-                        $search_mods[$mbox] = $search_mods_value;
-                        $rcmail->user->save_prefs(['search_mods' => $search_mods]);
-                    }
+                $value = strtolower($value);
+                if (isset($map[$value])) {
+                    return $map[$value];
                 }
-            }
-            else {
-                // search in subject by default
-                $subject['subject'] = 'HEADER SUBJECT';
+
+                break;
+            case 'has':
+                if ($value == 'attachment') {
+                    return self::search_has_attachment();
+                }
+
+                break;
+            case 'older_than': // GMail alias
+                $option = 'before';
+            case 'newer_than': // GMail alias
+                $option = 'since';
+            case 'since':
+            case 'before':
+                if (preg_match('/^[0-9]+[WMY]$/i', $value)) {
+                    if ($option == 'before') {
+                        $value = "-{$value}";
+                    }
+
+                    if ($search_interval = self::search_interval_criteria(strtoupper($value))) {
+                        return $search_interval;
+                    }
+                } elseif (preg_match('|^([0-9]{4})[-/]([0-9]{1,2})[-/]([0-9]{1,2})$|i', $value, $m)) {
+                    $dt = new \DateTime(sprintf('%04d-%02d-%02d', $m[1], $m[2], $m[3]) . 'T00:00:00Z');
+                    return strtoupper($option) . ' ' . $dt->format('j-M-Y');
+                }
+
+                break;
+            default:
+                if (in_array($option, $supported)) {
+                    $header = strtoupper($option);
+                    return "HEADER {$header} {$escaped}";
+                }
+        }
+
+        return null;
+    }
+
+    /**
+     * Converts search text into an imap query
+     *
+     * @param string $text    Search text
+     * @param array  $headers List of headers/fields to search in
+     *
+     * @return string IMAP search query
+     */
+    protected static function search_input_text($text, $headers)
+    {
+        $query = [];
+
+        foreach ($headers as $header) {
+            if ($imap = self::search_input_option($header, $text)) {
+                $query[$header] = $imap;
             }
         }
 
-        return [$subject, isset($srch) ? trim($srch) : trim($str)];
+        $result = '';
+
+        if (!empty($query)) {
+            if (($size = count($query)) > 1) {
+                $result .= str_repeat('OR ', $size - 1);
+            }
+
+            $result .= implode(' ', $query);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Update search mods for the specified folder
+     *
+     * @param string $mbox    Folder name
+     * @param string $headers Headers list input (comma-separated)
+     */
+    protected static function update_search_mods($mbox, $headers)
+    {
+        $supported = ['subject', 'from', 'to', 'cc', 'bcc', 'replyto', 'followupto', 'body', 'text'];
+        $headers = explode(',', strtolower($headers));
+        $headers = array_intersect($headers, $supported);
+
+        $search_mods = self::search_mods();
+        $search_mods_value = array_fill_keys($headers, 1);
+
+        if (!isset($search_mods[$mbox]) || $search_mods[$mbox] != $search_mods_value) {
+            $search_mods[$mbox] = $search_mods_value;
+            rcmail::get_instance()->user->save_prefs(['search_mods' => $search_mods]);
+        }
     }
 }

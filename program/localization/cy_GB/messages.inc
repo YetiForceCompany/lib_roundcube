@@ -10,8 +10,6 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/messages/
 */
 
 $messages['errortitle']  = 'Cafwyd gwall!';
@@ -102,7 +100,7 @@ $messages['nopagesizewarning'] = 'Rhowch maint tudalen';
 $messages['nosenderwarning'] = 'Rhowch gyfeiriad e-bost y danfonwr';
 $messages['recipientsadded'] = 'Ychwanegwyd derbynnydd/wyr yn llwyddiannus.';
 $messages['norecipientwarning'] = 'Rhowch o leiaf un derbynnydd';
-$messages['disclosedrecipwarning'] = 'Fe fydd pob derbynnydd yn gweld cyfeiriadau ebost pawb arall. I atal hyn ac amddiffyn eu preifatrwydd rhaid i chi ddefnyddio\'r maes Bcc.';
+$messages['disclosedrecipwarning'] = 'Fe fydd pob derbynnydd yn gweld cyfeiriadau ebost pawb arall. I atal hyn ac amddiffyn eu preifatrwydd mae\'n bosib defnyddio\'r maes Bcc.';
 $messages['disclosedreciptitle'] = 'Gormod o dderbynnwyr cyhoeddus';
 $messages['nosubjectwarning']  = 'Mae\'r pennawd "Pwnc" yn wag. Hoffech chi roi un fewn nawr?';
 $messages['nosubjecttitle']  = 'Dim pwnc';
@@ -159,8 +157,10 @@ $messages['contactremovedfromgroup'] = 'Dilëwyd y cysylltiadau o\'r grŵp yma y
 $messages['nogroupassignmentschanged'] = 'Ni newidwyd aseiniadiau grŵp.';
 $messages['importwait'] = 'Yn mewnforio, arhoswch os gwelwch yn dda...';
 $messages['importformaterror'] = 'Methwyd mewnforio! Nid yw\'r ffeil a lwythwyd yn ffeil ddata dilys.';
-$messages['importconfirm'] = '<b>Fe mewnforiwyd $inserted cyswllt yn llwyddiannus, anwybyddwyd $skipped cofnod presennol</b>:<p><em>$names</em></p>';
-$messages['importconfirmskipped'] = '<b>Neidiwyd $skipped cofnod oedd yn bodoli</b>';
+$messages['importconfirm'] = '<b>Fe mewnforiwyd $inserted cyswllt yn llwyddiannus</b>';
+$messages['importconfirmskipped'] = '<b>Neidiwyd $skipped cyswllt oedd yn bodoli</b>';
+$messages['importconfirminvalid'] = '<b>Neidiwyd $skipped cyswllt annilys</b>';
+$messages['importconfirmerrors'] = '<b>Methwyd mewnforio $errors cyswllt annilys</b>';
 $messages['importmessagesuccess'] = 'Mewnforiwyd $nr neges yn llwyddiannus';
 $messages['importmessageerror'] = 'Methwyd mewnforio! Nid yw\'r ffeil a lwythwyd yn ffeil neges neu blwch ebost dilys';
 $messages['opnotpermitted'] = 'Ni chaniateir y weithred!';
@@ -176,7 +176,7 @@ $messages['smtputf8error'] = 'Gwall SMTP: Nid yw\'r gweinydd yn cefnogi Unicode 
 $messages['smtpsizeerror'] = 'Gwall SMTP: Mae maint y neges yn fwy na cyfyngiad y gweinydd ($limit)';
 $messages['smtperror'] = 'Gwall SMTP: $msg';
 $messages['emailformaterror'] = 'Cyfeiriad e-bost anghywir: $email';
-$messages['toomanyrecipients'] = 'Gormod o dderbynnwyr. Lleihewch y nifer i $max';
+$messages['toomanyrecipients'] = 'Gormod o dderbynnwyr. Lleihawch y nifer i $max';
 $messages['maxgroupmembersreached'] = 'Mae nifer o aelodau\'r grŵp yn fwy na\'r uchafswm o $max';
 $messages['internalerror'] = 'Fe gafwyd gwall mewnol. Rhowch gynnig arni eto.';
 $messages['contactdelerror'] = 'Methwyd dileu cyswllt';
@@ -230,3 +230,5 @@ $messages['listusebutton'] = 'Defnyddiwch y botwm Creu i ychwanegu cofnod newydd
 $messages['keypaircreatesuccess'] = 'Creuwyd pâr allwedd newydd yn llwyddiannus ar gyfer $identity.';
 $messages['emptyattachment'] = 'Mae\'n ymddangos fod yr atodiad hwn yn wag.<br>Gwiriwch hwn gyda\'r person a ddanfonodd y neges.';
 $messages['oauthloginfailed'] = 'Methwyd mewngofnodi OAuth. Rhowch gynnig arall arni.';
+$messages['oauthinvalidrequest'] = 'Roedd y cais awdurdodi yn annilys neu\'n anghyflawn';
+$messages['oauthaccessdenied'] = 'Gwaharddwyd y cais gan y gweinydd neu ddefnyddiwr awdurdodi';

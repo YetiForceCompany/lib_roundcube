@@ -10,8 +10,6 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/messages/
 */
 
 $messages['errortitle']  = 'خطایی رخ داد!';
@@ -129,7 +127,6 @@ $messages['nogroupassignmentschanged'] = 'هیچ تکلیف گروهی تغیی�
 $messages['importwait'] = 'در حال وارد کردن، لطفا صبر کنید...';
 $messages['importformaterror'] = 'وارد کردن ناموفق! فایل بارگذاری شده یک فایل اطلاعات معتبر نیست.';
 $messages['importconfirm'] = '<b>$inserted مخاطب با کام‌یابی وارد شدند</b>';
-$messages['importconfirmskipped'] = '<b>$skipped ورودی موجود نادیده گرفته شدند</b>';
 $messages['importmessagesuccess'] = 'با کام‌یابی $nr پیام وارد شد.';
 $messages['importmessageerror'] = 'وارد کردن ناموفق! فایل بارگذاری شده یک پیام یا صندوق‌پستی معتبر نیست.';
 $messages['opnotpermitted'] = 'عملیات مجاز نیست!';

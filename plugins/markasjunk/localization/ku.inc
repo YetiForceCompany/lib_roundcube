@@ -10,8 +10,14 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/plugin-markasjunk/
 */
 
-$labels['buttonjunk'] = 'Ev peyam nebaş e';
+$labels['buttonjunk'] = 'Ev peyam spam e';
+$labels['asjunk'] = 'Wekî spam';
+$labels['markasjunk'] = 'Wekî spam nîşan bide';
+$labels['buttonnotjunk'] = 'Ev peyam ne spam e';
+$labels['asnotjunk'] = 'Wekî ne spam';
+$labels['markasnotjunk'] = 'Wekî spam nîşan nede';
+$labels['notjunk'] = 'Ne spam e';
+$messages['reportedasjunk'] = 'Bi serkeftî wekî spam hate ragihandin';
+$messages['reportedasnotjunk'] = 'Bi serkeftî wekî ne spam hat ragihandin';

@@ -10,8 +10,6 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/messages/
 */
 
 $messages['errortitle']  = 'Įvyko klaida!';
@@ -59,6 +57,8 @@ $messages['contactnameexists'] = 'Adresatas tokiu vardu jau egzistuoja.';
 $messages['blockedimages'] = 'Siekiant apsaugoti Jūsų privatumą, paveikslėliai iš interneto neįkelti.';
 $messages['blockedresources'] = 'Siekiant apsaugoti jūsų privatumą, nuotoliniai ištekliai buvo užblokuoti.';
 $messages['suspiciousemail'] = 'Šiame laiške yra įtartinų el. pašto adresų, kurie gali būti apgaulingi.';
+$messages['bccemail'] = 'Persiunčiamame laiške (laiškuose) yra nurodyti slaptųjų kopijų gavėjai.';
+$messages['bouncehint'] = 'Laiškas bus išsiųstas be jokių pakeitimų jo tekste, antraštėse ar gavėjų sąrašuose.';
 $messages['encryptedmessage'] = 'Apgailestaujame, tačiau šis laiškas užšifruotas ir negali būti parodytas.';
 $messages['externalmessagedecryption'] = 'Šis laiškas šifruotas. Jį iššifruoti galima jūsų naršyklės priedo pagalba.';
 $messages['nopubkeyfor'] = 'Adresui $email nerastas galiojantis viešasis raktas. Ar norite šifruoti laišką tiktai gavėjams?';
@@ -100,7 +100,7 @@ $messages['nopagesizewarning'] = 'Prašom įvesti puslapio dydį.';
 $messages['nosenderwarning'] = 'Prašom įvesti siuntėjo el. pašto adresą.';
 $messages['recipientsadded'] = 'Gavėjas(-ai) sėkmingai pridėtas(-i).';
 $messages['norecipientwarning'] = 'Prašom įvesti bent vieną gavėją.';
-$messages['disclosedrecipwarning'] = 'Visi gavėjai matys vieni kitų el. pašto adresus. Tam, kad to neleistumėte ir apsaugotumėte jų privatumą, galite naudoti Bcc lauką.';
+$messages['disclosedrecipwarning'] = 'Visi gavėjai matys vieni kitų el. pašto adresus. Norėdami to neleisti ir apsaugoti jų privatumą, galite naudoti Bcc lauką.';
 $messages['disclosedreciptitle'] = 'Per daug viešų gavėjų';
 $messages['nosubjectwarning']  = 'Temos laukelis tuščias. Ar norite temą įvesti dabar?';
 $messages['nosubjecttitle']  = 'Nenurodyta tema';
@@ -119,6 +119,8 @@ $messages['nospellerrors'] = 'Rašybos klaidų nerasta.';
 $messages['folderdeleted'] = 'Aplankas sėkmingai pašalintas.';
 $messages['foldersubscribed'] = 'Aplankas sėkmingai užprenumeruotas.';
 $messages['folderunsubscribed'] = 'Aplanko prenumeratos sėkmingai atsisakyta.';
+$messages['folderpurged'] = 'Aplankas sėkmingai ištuštintas.';
+$messages['folderexpunged'] = 'Aplankas sėkmingai suglaudintas.';
 $messages['deletedsuccessfully'] = 'Sėkmingai pašalinta.';
 $messages['converting'] = 'Šalinamas laiško formatavimas…';
 $messages['messageopenerror'] = 'Nepavyko įkelti laiško iš serverio.';
@@ -157,6 +159,8 @@ $messages['importwait'] = 'Importuojama, prašome palaukti…';
 $messages['importformaterror'] = 'Importas nepavyko! Įkeltasis failas nėra tinkamas importavimui duomenų failas.';
 $messages['importconfirm'] = '<b>Sėkmingai importuoti $inserted adresatai(-ų)</b>';
 $messages['importconfirmskipped'] = '<b>Praleisti $skipped jau egzistuojantys adresatai(-ų)</b>';
+$messages['importconfirminvalid'] = '<b>Praleisti $invalid neteisingi adresatai(-ų)</b>';
+$messages['importconfirmerrors'] = '<b>Nepavyko importuoti $errors teisingų adresatų</b>';
 $messages['importmessagesuccess'] = 'Importuota laiškų: $nr';
 $messages['importmessageerror'] = 'Importas nepavyko! Įkeltasis failas nėra tinkamas importavimui laiško arba pašto dėžutės failas';
 $messages['opnotpermitted'] = 'Veiksmas neleistinas!';
@@ -208,7 +212,7 @@ $messages['messageissent'] = 'Laiškas jau buvo išsiųstas, bet dar neišsaugot
 $messages['errnotfound'] = 'Failas nerastas';
 $messages['errnotfoundexplain'] = 'Ieškomas šaltinis nerastas';
 $messages['errfailedrequest'] = 'Nesėkminga užklausa';
-$messages['errauthorizationfailed'] = 'Autorizacija nepavyko';
+$messages['errauthorizationfailed'] = 'Nepavyko suteikti įgaliojimų';
 $messages['errunauthorizedexplain'] = 'Nepavyko patvirtinti ar jums leista naudotis šia paslauga.';
 $messages['errrequestcheckfailed'] = 'Patikrinimas nepavyko';
 $messages['errcsrfprotectionexplain'] = "Jūsų saugumui, prieiga prie šio išteklio yra apsaugota nuo CSRF.\nlfJeigu jūs tai matote, tai reiškia, kad taisyklingai neatsijungėte prieš baigdamas darbąsu programa.\n\nNorint tęsti reikalingas žmogaus įsikišimas.";
@@ -226,3 +230,5 @@ $messages['listusebutton'] = 'Norėdami sukurti naują įrašą, naudokite mygtu
 $messages['keypaircreatesuccess'] = 'Nauja raktų pora buvo sėkmingai sukurta tapatybei $identity.';
 $messages['emptyattachment'] = 'Atrodo, kad šis priedas yra tuščias.<br>Pasiteiraukite asmens, kuris atsiuntė jums šį priedą.';
 $messages['oauthloginfailed'] = 'OAuth prisijungimas nepavyko. Bandykite dar kartą.';
+$messages['oauthinvalidrequest'] = 'Įgaliojimų suteikimo užklausa buvo neteisinga arba neužbaigta.';
+$messages['oauthaccessdenied'] = 'Įgaliojimų suteikimo serveris arba naudotojas atmetė užklausą.';

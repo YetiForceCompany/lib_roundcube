@@ -19,15 +19,15 @@ class show_additional_headers extends rcube_plugin
     /**
      * Plugin initialization
      */
-    function init()
+    #[\Override]
+    public function init()
     {
         $rcmail = rcmail::get_instance();
 
         if ($rcmail->action == 'show' || $rcmail->action == 'preview') {
             $this->add_hook('storage_init', [$this, 'storage_init']);
             $this->add_hook('message_headers_output', [$this, 'message_headers']);
-        }
-        else if ($rcmail->action == '') {
+        } elseif ($rcmail->action == '') {
             // with enabled_caching we're fetching additional headers before show/preview
             $this->add_hook('storage_init', [$this, 'storage_init']);
         }
@@ -37,21 +37,20 @@ class show_additional_headers extends rcube_plugin
      * Handler for 'storage_init' hook, where we tell the core to
      * fetch specified additional headers from IMAP.
      *
-     * @params array @p Hook parameters
+     * @params array $p Hook parameters
      *
      * @return array Modified hook parameters
      */
-    function storage_init($p)
+    public function storage_init($p)
     {
-        $rcmail      = rcmail::get_instance();
+        $rcmail = rcmail::get_instance();
         $add_headers = $rcmail->config->get('show_additional_headers', []);
 
         if (!empty($add_headers)) {
-            $add_headers = strtoupper(join(' ', (array) $add_headers));
+            $add_headers = strtoupper(implode(' ', (array) $add_headers));
             if (isset($p['fetch_headers'])) {
                 $p['fetch_headers'] .= ' ' . $add_headers;
-            }
-            else {
+            } else {
                 $p['fetch_headers'] = $add_headers;
             }
         }
@@ -63,23 +62,22 @@ class show_additional_headers extends rcube_plugin
      * Handler for 'message_headers_output' hook, where we add the additional
      * headers to the output.
      *
-     * @params array @p Hook parameters
+     * @params array $p Hook parameters
      *
      * @return array Modified hook parameters
      */
-    function message_headers($p)
+    public function message_headers($p)
     {
-        $rcmail      = rcmail::get_instance();
+        $rcmail = rcmail::get_instance();
         $add_headers = $rcmail->config->get('show_additional_headers', []);
 
         foreach ((array) $add_headers as $header) {
             if ($value = $p['headers']->get($header)) {
                 if (is_array($value)) {
                     foreach ($value as $idx => $v) {
-                        $p['output']["$header:$idx"] = ['title' => $header, 'value' => $v];
+                        $p['output']["{$header}:{$idx}"] = ['title' => $header, 'value' => $v];
                     }
-                }
-                else {
+                } else {
                     $p['output'][$header] = ['title' => $header, 'value' => $value];
                 }
             }

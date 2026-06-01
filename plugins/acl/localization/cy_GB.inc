@@ -10,8 +10,6 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/plugin-acl/
 */
 
 $labels['sharing'] = 'Rhannu';
@@ -23,7 +21,7 @@ $labels['newuser'] = 'Ychwanegu cofnod';
 $labels['editperms'] = 'Golygu hawliau';
 $labels['actions'] = 'Gweithredoedd hawl mynediad...';
 $labels['anyone'] = 'Pob defnyddiwr (unrhywun)';
-$labels['anonymous'] = 'Gwestai (anhysbys)';
+$labels['anonymous'] = 'Gwesteion (anhysbys)';
 $labels['identifier'] = 'Dynodwr';
 $labels['acll'] = 'Chwilio';
 $labels['aclr'] = 'Darllen negeseuon';
@@ -35,7 +33,7 @@ $labels['aclc'] = 'Creu is-ffolderi';
 $labels['aclk'] = 'Creu is-ffolderi';
 $labels['acld'] = 'Dileu negeseuon';
 $labels['aclt'] = 'Dileu negeseuon';
-$labels['acle'] = 'Dileu';
+$labels['acle'] = 'Gwaredu';
 $labels['aclx'] = 'Dileu ffolder';
 $labels['acla'] = 'Gweinyddu';
 $labels['acln'] = 'Anodi negeseuon';
@@ -54,7 +52,7 @@ $labels['shortaclc'] = 'Creu';
 $labels['shortaclk'] = 'Creu';
 $labels['shortacld'] = 'Dileu';
 $labels['shortaclt'] = 'Dileu';
-$labels['shortacle'] = 'Dileu';
+$labels['shortacle'] = 'Gwaredu';
 $labels['shortaclx'] = 'Dileu ffolder';
 $labels['shortacla'] = 'Gweinyddu';
 $labels['shortacln'] = 'Anodi';
@@ -62,7 +60,7 @@ $labels['shortaclother'] = 'Arall';
 $labels['shortaclread'] = 'Darllen';
 $labels['shortaclwrite'] = 'Ysgrifennu';
 $labels['shortacldelete'] = 'Dileu';
-$labels['longacll'] = 'Mae\'r ffolder hwn i\'w weld ar y rhestrau a mae\'n bosib tanysgrifio iddo';
+$labels['longacll'] = 'Mae\'r ffolder hwn i\'w weld ar y rhestrau ac mae\'n bosib tanysgrifio iddo';
 $labels['longaclr'] = 'Gellir agor y ffolder hwn i\'w ddarllen';
 $labels['longacls'] = 'Gellir newid y fflag negeseuon Gwelwyd';
 $labels['longaclw'] = 'Gellir newid y fflagiau negeseuon a allweddeiriau, heblaw Gwelwyd a Dilëuwyd';

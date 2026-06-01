@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  +-----------------------------------------------------------------------+
  | Localization file of the Roundcube Webmail Enigma plugin              |
  |                                                                       |
@@ -10,8 +10,6 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/roundcube/roundcube-webmail/plugin-enigma/
 */
 
 $labels['encryption'] = 'Enkripsi';
@@ -63,10 +61,14 @@ $labels['keydisable'] = 'Nonaktifkan';
 $labels['keyrevoke'] = 'Cabut';
 $labels['keysend'] = 'Kirim kunci publik dalam pesan';
 $labels['keychpass'] = 'Ubah kata sandi';
+$labels['keyadd'] = 'Tambah kunci';
 $labels['newkeyident'] = 'Identitas';
 $labels['newkeypass'] = 'Password';
 $labels['newkeypassconfirm'] = 'Konfirmasi password / kata kunci';
 $labels['newkeytype'] = 'Tipe kunci';
+$labels['rsa2048'] = 'RSA - 2048 bit';
+$labels['rsa4096'] = 'RSA - 4096 bit';
+$labels['ecckeypair'] = 'ECC (Elliptic Curve)';
 $labels['keygenerating'] = 'Membuat kunci...';
 $labels['encryptionoptions'] = 'Opsi enkripsi...';
 $labels['encryptmsg'] = 'Enkripsikan pesan ini';
@@ -81,6 +83,7 @@ $labels['withprivkeys'] = 'Ekspor Kunci Rahasia';
 $labels['findkey'] = 'Cari pada server kunci';
 $labels['keyimportlabel'] = 'Impor dari berkas';
 $labels['keyimportsearchlabel'] = 'Cari pada server kunci';
+$labels['managekeys'] = 'Kelola kunci PGP';
 $labels['arialabelkeyexportoptions'] = 'Opsi ekspor kunci';
 $messages['sigvalid'] = 'Tanda tangan terverifikasi dari $sender.';
 $messages['sigvalidpartial'] = 'Tanda tangan terverifikasi dari $sender, tapi sebagian pesan tidak ditandatangani.';

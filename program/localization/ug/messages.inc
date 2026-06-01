@@ -10,8 +10,6 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/messages/
 */
 
 $messages['errortitle']  = 'بىر خاتالىق كۆرۈلدى!';
@@ -102,7 +100,6 @@ $messages['nopagesizewarning'] = 'بەت چوڭلۇقىنى كىرگۈزۈڭ.';
 $messages['nosenderwarning'] = 'ئەۋەتكۈچى ئېلىخەت ئادىرسىنى كىرگۈزۈڭ.';
 $messages['recipientsadded'] = 'تاپشۇرۋالغۇچى(لار) مۇۋاپىقىيەتلىك قۇشۇلدى.';
 $messages['norecipientwarning'] = 'ئەڭ كەمدە بىر تاپشۇرۋالغۇچى كىرگۈزۈڭ.';
-$messages['disclosedrecipwarning'] = 'بارلىق تاپشۇرۋالغۇچىلار بىر-بىرىنىڭ ئېلىخەت ئادىرىسلىرىنى كۆرەلەيدۇ. بۇنىڭدىن ساقلىنىش ھەمدە مەخپىيەتلىكنى ساقلاش ئۈچۈن، سىز Bcc ئورنىنى ئىشلىتەلەيسىز.';
 $messages['disclosedreciptitle'] = 'بەك كۆپ ئاممىۋىي تاپشۇرۋالغۇچىلار';
 $messages['nosubjectwarning']  = '"تېما" كاتەكچىسى قۇرۇق. بىرنى كىرگۈزۈشنى خالامسىز؟';
 $messages['nosubjecttitle']  = 'تېما يوق';
@@ -160,7 +157,6 @@ $messages['nogroupassignmentschanged'] = 'ھېچقانداق توپ تاپشۇر
 $messages['importwait'] = 'كىرگۈزىۋاتىدۇ، بىردەم ساقلاڭ...';
 $messages['importformaterror'] = 'كىرگۈزۈش مەغلۇپ بولدى! چىقىرىلغان ھۆججەتنىڭ تىپى ئىناۋەتلىك ئەمەس.';
 $messages['importconfirm'] = '<b>inserted$ تۇنۇشلار مۇۋاپىقىيەتلىك كىرگۈزۈلدى </b>';
-$messages['importconfirmskipped'] = '<b> مەۋجۇت skipped$ قۇر ئۆتكۈزۈلدى </b>';
 $messages['importmessagesuccess'] = 'nr$ خەتلەر مۇۋاپىقىيەتلىك كىرگۈزۈلدى';
 $messages['importmessageerror'] = 'كىرگۈزۈش مەغلۇپ بولدى! چىقىرىلغان ھۆججەت ئىناۋەتلىك ئېلىخەت ياكى خەت ھۆججىتى ئەمەس.';
 $messages['opnotpermitted'] = 'مەشخۇلاتقا ئىجازەت بېرىلمىدى!';

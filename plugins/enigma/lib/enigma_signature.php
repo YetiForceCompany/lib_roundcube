@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  +-------------------------------------------------------------------------+
  | Signature class for the Enigma Plugin                                   |
  |                                                                         |
@@ -44,19 +44,21 @@ class enigma_signature
             return $this->name;
         }
 
-        if ($this->fingerprint && ($key = $engine->get_key($this->fingerprint))) {
-            $from    = $message->headers->from;
+        $key = $this->fingerprint ? $engine->get_key($this->fingerprint) : null;
+
+        if ($key) {
+            $from = $message->headers->from;
             $charset = $message->headers->charset;
 
             // Get From: header from the parent part, if it's a forwarded message
-            if ($part_id && strpos($part_id, '.') !== false) {
+            if ($part_id && str_contains($part_id, '.')) {
                 $level = explode('.', $part_id);
                 $parts = $message->mime_parts();
 
                 while (array_pop($level) !== null) {
-                    $parent = join('.', $level);
+                    $parent = implode('.', $level);
                     if (!empty($parts[$parent]) && $parts[$parent]->mimetype == 'message/rfc822') {
-                        $from    = $parts[$parent]->headers['from'];
+                        $from = $parts[$parent]->headers['from'];
                         $charset = $parts[$parent]->charset;
                         break;
                     }

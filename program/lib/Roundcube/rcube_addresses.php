@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  +-----------------------------------------------------------------------+
  | This file is part of the Roundcube Webmail client                     |
  |                                                                       |
@@ -19,40 +19,35 @@
 
 /**
  * Collected addresses database
- *
- * @package    Framework
- * @subpackage Addressbook
  */
 class rcube_addresses extends rcube_contacts
 {
-    protected $db_name       = 'collected_addresses';
-    protected $type          = 0;
-    protected $table_cols    = ['name', 'email'];
+    protected $db_name = 'collected_addresses';
+    protected $type = 0;
+    protected $table_cols = ['name', 'email'];
     protected $fulltext_cols = ['name'];
 
     // public properties
     public $primary_key = 'address_id';
-    public $readonly    = true;
-    public $groups      = false;
-    public $undelete    = false;
-    public $deletable   = true;
-    public $coltypes    = ['name', 'email'];
-    public $date_cols   = [];
-
+    public $readonly = true;
+    public $groups = false;
+    public $undelete = false;
+    public $deletable = true;
+    public $coltypes = ['name', 'email'];
+    public $date_cols = [];
 
     /**
      * Object constructor
      *
-     * @param object $dbconn Instance of the rcube_db class
-     * @param int    $user   User-ID
-     * @param int    $type   Type of the address (1 - recipient, 2 - trusted sender)
+     * @param rcube_db $dbconn Instance of the rcube_db class
+     * @param int      $user   User-ID
+     * @param int      $type   Type of the address (1 - recipient, 2 - trusted sender)
      */
     public function __construct($dbconn, $user, $type)
     {
-        $this->db      = $dbconn;
-        $this->user_id = $user;
-        $this->type    = $type;
-        $this->ready   = $this->db && !$this->db->is_error();
+        parent::__construct($dbconn, $user);
+
+        $this->type = $type;
     }
 
     /**
@@ -60,6 +55,7 @@ class rcube_addresses extends rcube_contacts
      *
      * @return string
      */
+    #[\Override]
     public function get_name()
     {
         if ($this->type == self::TYPE_RECIPIENT) {
@@ -76,31 +72,31 @@ class rcube_addresses extends rcube_contacts
     /**
      * List the current set of contact records
      *
-     * @param  array $cols    List of cols to show, Null means all
-     * @param  int   $subset  Only return this number of records, use negative values for tail
-     * @param  bool  $nocount True to skip the count query (select only)
+     * @param ?array $cols    List of cols to show, Null means all
+     * @param int    $subset  Only return this number of records, use negative values for tail
+     * @param bool   $nocount True to skip the count query (select only)
      *
-     * @return array Indexed list of contact records, each a hash array
+     * @return rcube_result_set Indexed list of contact records, each a hash array
      */
+    #[\Override]
     public function list_records($cols = null, $subset = 0, $nocount = false)
     {
         if ($nocount || $this->list_page <= 1) {
             // create dummy result, we don't need a count now
             $this->result = new rcube_result_set();
-        }
-        else {
+        } else {
             // count all records
             $this->result = $this->count();
         }
 
-        $start_row  = $subset < 0 ? $this->result->first + $this->page_size + $subset : $this->result->first;
-        $length     = $subset != 0 ? abs($subset) : $this->page_size;
+        $start_row = $subset < 0 ? $this->result->first + $this->page_size + $subset : $this->result->first;
+        $length = $subset != 0 ? abs($subset) : $this->page_size;
 
         $sql_result = $this->db->limitquery(
-            "SELECT * FROM " . $this->db->table_name($this->db_name, true)
-            . " WHERE `user_id` = ? AND `type` = ?"
-            . ($this->filter ? " AND ".$this->filter : "")
-            . " ORDER BY `name` " . $this->sort_order . ", `email` " . $this->sort_order,
+            'SELECT * FROM ' . $this->db->table_name($this->db_name, true)
+            . ' WHERE `user_id` = ? AND `type` = ?'
+            . ($this->filter ? ' AND ' . $this->filter : '')
+            . ' ORDER BY `name` ' . $this->sort_order . ', `email` ' . $this->sort_order,
             $start_row,
             $length,
             $this->user_id,
@@ -117,15 +113,12 @@ class rcube_addresses extends rcube_contacts
         // update counter
         if ($nocount) {
             $this->result->count = $cnt;
-        }
-        else if ($this->list_page <= 1) {
+        } elseif ($this->list_page <= 1) {
             if ($cnt < $this->page_size && $subset == 0) {
                 $this->result->count = $cnt;
-            }
-            else if (isset($this->cache['count'])) {
+            } elseif (isset($this->cache['count'])) {
                 $this->result->count = $this->cache['count'];
-            }
-            else {
+            } else {
                 $this->result->count = $this->_count();
             }
         }
@@ -136,15 +129,16 @@ class rcube_addresses extends rcube_contacts
     /**
      * Search contacts
      *
-     * @param mixed $fields   The field name or array of field names to search in
-     * @param mixed $value    Search value (or array of values when $fields is array)
-     * @param int   $mode     Search mode. Sum of rcube_addressbook::SEARCH_*
-     * @param bool  $select   True if results are requested, False if count only
-     * @param bool  $nocount  True to skip the count query (select only)
-     * @param array $required List of fields that cannot be empty
+     * @param mixed        $fields   The field name or array of field names to search in
+     * @param mixed        $value    Search value (or array of values when $fields is array)
+     * @param int          $mode     Search mode. Sum of rcube_addressbook::SEARCH_*
+     * @param bool         $select   True if results are requested, False if count only
+     * @param bool         $nocount  True to skip the count query (select only)
+     * @param array|string $required List of fields that cannot be empty
      *
      * @return rcube_result_set Contact records and 'count' value
      */
+    #[\Override]
     public function search($fields, $value, $mode = 0, $select = true, $nocount = false, $required = [])
     {
         if (!is_array($required) && !empty($required)) {
@@ -152,15 +146,14 @@ class rcube_addresses extends rcube_contacts
         }
 
         $where = $post_search = [];
-        $mode  = intval($mode);
+        $mode = intval($mode);
 
         // direct ID search
         if ($fields == 'ID' || $fields == $this->primary_key) {
-            $ids     = !is_array($value) ? explode(self::SEPARATOR, $value) : $value;
-            $ids     = $this->db->array2list($ids, 'integer');
+            $ids = !is_array($value) ? explode(self::SEPARATOR, $value) : $value;
+            $ids = $this->db->array2list($ids, 'integer');
             $where[] = $this->primary_key . ' IN (' . $ids . ')';
-        }
-        else if (is_array($value)) {
+        } elseif (is_array($value)) {
             foreach ((array) $fields as $idx => $col) {
                 $val = $value[$idx];
 
@@ -171,16 +164,13 @@ class rcube_addresses extends rcube_contacts
                 // table column
                 if ($col == 'email' && ($mode & rcube_addressbook::SEARCH_STRICT)) {
                     $where[] = $this->db->ilike($col, $val);
-                }
-                else if (in_array($col, $this->table_cols)) {
+                } elseif (in_array($col, $this->table_cols)) {
                     $where[] = $this->fulltext_sql_where($val, $mode, $col);
-                }
-                else {
+                } else {
                     $where[] = '1 = 0'; // unsupported column
                 }
             }
-        }
-        else {
+        } else {
             // fulltext search in all fields
             if ($fields == '*') {
                 $fields = ['name', 'email'];
@@ -193,8 +183,7 @@ class rcube_addresses extends rcube_contacts
                 foreach ((array) $fields as $idx => $col) {
                     if ($col == 'email' && ($mode & rcube_addressbook::SEARCH_STRICT)) {
                         $groups[] = $this->db->ilike($col, $word);
-                    }
-                    else if (in_array($col, $this->table_cols)) {
+                    } elseif (in_array($col, $this->table_cols)) {
                         $groups[] = $this->fulltext_sql_where($word, $mode, $col);
                     }
                 }
@@ -214,12 +203,10 @@ class rcube_addresses extends rcube_contacts
 
             if ($select) {
                 $this->list_records(null, 0, $nocount);
-            }
-            else {
+            } else {
                 $this->result = $this->count();
             }
-        }
-        else {
+        } else {
             $this->result = new rcube_result_set();
         }
 
@@ -231,14 +218,15 @@ class rcube_addresses extends rcube_contacts
      *
      * @return int Contacts count
      */
+    #[\Override]
     protected function _count()
     {
         // count contacts for this user
         $sql_result = $this->db->query(
-            "SELECT COUNT(`address_id`) AS cnt"
-            . " FROM " . $this->db->table_name($this->db_name, true)
-            . " WHERE `user_id` = ? AND `type` = ?"
-            . ($this->filter ? " AND (" . $this->filter . ")" : ""),
+            'SELECT COUNT(`address_id`) AS cnt'
+            . ' FROM ' . $this->db->table_name($this->db_name, true)
+            . ' WHERE `user_id` = ? AND `type` = ?'
+            . ($this->filter ? ' AND (' . $this->filter . ')' : ''),
             $this->user_id,
             $this->type
         );
@@ -256,9 +244,10 @@ class rcube_addresses extends rcube_contacts
      * @param mixed $id    Record identifier(s)
      * @param bool  $assoc Enables returning associative array
      *
-     * @return rcube_result_set|array Result object with all record fields
+     * @return rcube_result_set|array|null Result object with all record fields
      */
-    function get_record($id, $assoc = false)
+    #[\Override]
+    public function get_record($id, $assoc = false)
     {
         // return cached result
         if ($this->result && ($first = $this->result->first()) && $first[$this->primary_key] == $id) {
@@ -266,8 +255,8 @@ class rcube_addresses extends rcube_contacts
         }
 
         $this->db->query(
-            "SELECT * FROM " . $this->db->table_name($this->db_name, true)
-            . " WHERE `address_id` = ? AND `user_id` = ?",
+            'SELECT * FROM ' . $this->db->table_name($this->db_name, true)
+            . ' WHERE `address_id` = ? AND `user_id` = ?',
             $id,
             $this->user_id
         );
@@ -290,8 +279,9 @@ class rcube_addresses extends rcube_contacts
      * @param array &$save_data Associative array with data to save
      * @param bool  $autofix    Try to fix/complete record automatically
      *
-     * @return bool True if input is valid, False if not.
+     * @return bool true if input is valid, False if not
      */
+    #[\Override]
     public function validate(&$save_data, $autofix = false)
     {
         $email = array_filter($this->get_col_values('email', $save_data, true));
@@ -321,15 +311,13 @@ class rcube_addresses extends rcube_contacts
      * @param array $save_data Associative array with save data
      * @param bool  $check     Enables validity checks
      *
-     * @return int|bool The created record ID on success, False on error
+     * @return mixed The created record ID on success, False on error
      */
-    function insert($save_data, $check = false)
+    #[\Override]
+    public function insert($save_data, $check = false)
     {
-        if (!is_array($save_data)) {
-            return false;
-        }
-
-        if ($check && ($existing = $this->search('email', $save_data['email'], false, false))) {
+        if ($check) {
+            $existing = $this->search('email', $save_data['email'], false, false);
             if ($existing->count) {
                 return false;
             }
@@ -338,9 +326,9 @@ class rcube_addresses extends rcube_contacts
         $this->cache = null;
 
         $this->db->query(
-            "INSERT INTO " . $this->db->table_name($this->db_name, true)
-            . " (`user_id`, `changed`, `type`, `name`, `email`)"
-            . " VALUES (?, " . $this->db->now() . ", ?, ?, ?)",
+            'INSERT INTO ' . $this->db->table_name($this->db_name, true)
+            . ' (`user_id`, `changed`, `type`, `name`, `email`)'
+            . ' VALUES (?, ' . $this->db->now() . ', ?, ?, ?)',
             $this->user_id,
             $this->type,
             $save_data['name'],
@@ -358,7 +346,8 @@ class rcube_addresses extends rcube_contacts
      *
      * @return bool True on success, False on error
      */
-    function update($id, $save_cols)
+    #[\Override]
+    public function update($id, $save_cols)
     {
         return false;
     }
@@ -366,12 +355,13 @@ class rcube_addresses extends rcube_contacts
     /**
      * Delete one or more contact records
      *
-     * @param array $ids   Record identifiers
-     * @param bool  $force Remove record(s) irreversible (unsupported)
+     * @param array|string $ids   Record identifiers as an array or a string with self::SEPARATOR
+     * @param bool         $force Remove record(s) irreversible (unsupported)
      *
      * @return int|false Number of removed records
      */
-    function delete($ids, $force = true)
+    #[\Override]
+    public function delete($ids, $force = true)
     {
         if (!is_array($ids)) {
             $ids = explode(self::SEPARATOR, $ids);
@@ -381,8 +371,8 @@ class rcube_addresses extends rcube_contacts
 
         // flag record as deleted (always)
         $this->db->query(
-            "DELETE FROM " . $this->db->table_name($this->db_name, true)
-            . " WHERE `user_id` = ? AND `type` = ? AND `address_id` IN ($ids)",
+            'DELETE FROM ' . $this->db->table_name($this->db_name, true)
+            . " WHERE `user_id` = ? AND `type` = ? AND `address_id` IN ({$ids})",
             $this->user_id, $this->type
         );
 
@@ -398,10 +388,11 @@ class rcube_addresses extends rcube_contacts
      *
      * @return int Number of removed records
      */
-    function delete_all($with_groups = false)
+    #[\Override]
+    public function delete_all($with_groups = false)
     {
-        $this->db->query("DELETE FROM " . $this->db->table_name($this->db_name, true)
-            . " WHERE `user_id` = ? AND `type` = ?",
+        $this->db->query('DELETE FROM ' . $this->db->table_name($this->db_name, true)
+            . ' WHERE `user_id` = ? AND `type` = ?',
             $this->user_id, $this->type
         );
 

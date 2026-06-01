@@ -1,13 +1,24 @@
 - Fix handling of string-list format values for date tests in Out of Office (#10075)
+- Fix error when a mail message contains duplicate List-Id header (#10186)
+
+* version 9.6 [2025-11-29]
+-----------------------------------------------------------
+- Show a warning when actions in wrong order (#10015, #6590)
 - Fix invalid line break characters in multi-line text in Sieve scripts (#9543)
 - Fix javascript error when relational or spamtest extension is not enabled (#9139)
-- Removed managesieve_usetls option (in favor of the scheme prefix in managesieve_host)
-- Plugin API: Removed `port` parameter in `managesieve_connect` hook
-- Plugin API: Removed `usetls` parameter in `managesieve_connect` hook
+- Support an array in managesieve_host option (#9447)
 - Protect special scripts in managesieve_kolab_master mode
 - Fix infinite loop when parsing a malformed script (#9562)
 - Fix current script state after initial scripts creation in managesieve_kolab_master mode
 - Fix match-type selector (remove unsupported options) in delete header action (#9610)
+
+* version 9.5 [2023-03-26]
+-----------------------------------------------------------
+- Add List-ID to the list of headers for creating new sieve-filters (#8307)
+- Support :encodeurl from RFC 5435 (#8917)
+- Removed managesieve_usetls option (in favor of the scheme prefix in managesieve_host)
+- Plugin API: Removed `port` parameter in `managesieve_connect` hook
+- Plugin API: Removed `usetls` parameter in `managesieve_connect` hook
 
 * version 9.4 [2021-06-06]
 -----------------------------------------------------------
@@ -332,7 +343,7 @@
 -----------------------------------------------------------
 - Support multiple managesieve hosts using %h variable
   in managesieve_host option
-- Fix first rule deleting (#1486140) 
+- Fix first rule deleting (#1486140)
 
 * version 1.6 [2009-09-08]
 -----------------------------------------------------------

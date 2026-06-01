@@ -10,8 +10,6 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/messages/
 */
 
 $messages['errortitle']  = 'エラーが発生しました!';
@@ -160,7 +158,9 @@ $messages['nogroupassignmentschanged'] = 'グループの割り当てを変更�
 $messages['importwait'] = 'インポート中です。しばらくお待ちください...';
 $messages['importformaterror'] = 'インポートできませんでした!  アップロードしたファイルは正しいデータをインポートするファイルではありません。';
 $messages['importconfirm'] = '<b>$inserted件の連絡先をインポートしました。</b>';
-$messages['importconfirmskipped'] = '<b>$skipped件の既存する項目を飛ばした。</b>';
+$messages['importconfirmskipped'] = '<b>$skipped件の既存する連絡先を飛ばしました。</b>';
+$messages['importconfirminvalid'] = '<b>$invalid件の無効な連絡先を飛ばしました。</b>';
+$messages['importconfirmerrors'] = '<b>$errors件の有効な連絡先のインポートに失敗しました。</b>';
 $messages['importmessagesuccess'] = '$nr件のメッセージをインポートしました。';
 $messages['importmessageerror'] = 'インポートできませんでした!  アップロードしたファイルは有効なメッセージやメールボックスのファイルではありません。';
 $messages['opnotpermitted'] = '許可されていない操作です。';
@@ -230,3 +230,5 @@ $messages['listusebutton'] = '新しいレコードを追加するには作成�
 $messages['keypaircreatesuccess'] = '$identity用の新しい鍵ペアを作成しました。';
 $messages['emptyattachment'] = 'この添付ファイルは空の様です。<br>送信した方に確認をお願いします。';
 $messages['oauthloginfailed'] = 'OAuthでログインできませんでした。もう一度試してください。';
+$messages['oauthinvalidrequest'] = '認可要求が正しくないか不完全です。';
+$messages['oauthaccessdenied'] = '認可サーバーまたはユーザーが要求を拒否しました。';

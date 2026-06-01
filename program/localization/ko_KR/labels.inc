@@ -10,10 +10,7 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/labels/
 */
-
 
 $labels['welcome'] = '$product에 오신 것을 환영합니다';
 $labels['username'] = '사용자명';
@@ -120,6 +117,7 @@ $labels['forwardmessage'] = '메시지 전달';
 $labels['bouncemsg'] = '재전송 (반송)';
 $labels['bounce'] = '재전송';
 $labels['deletemessage'] = '메시지 삭제';
+$labels['undeletemessage'] = '메시지 삭제 취소';
 $labels['movemessagetotrash'] = '메시지를 지운 편지함으로 이동';
 $labels['printmessage'] = '이 메시지 인쇄';
 $labels['previousmessage'] = '이전 메시지 표시';
@@ -135,6 +133,10 @@ $labels['markunread'] = '읽지 않은 상태로 표시';
 $labels['markflagged'] = '플래그 추가 상태';
 $labels['markunflagged'] = '플래그 제거 상태';
 $labels['markundeleted'] = '삭제안함으로';
+$labels['markasread'] = '읽은 상태로 표시';
+$labels['markasunread'] = '읽지 않은 상태로 표시';
+$labels['markasflagged'] = '플래그 지정으로 표시';
+$labels['markasunflagged'] = '플래그 미지정으로 표시';
 $labels['moreactions'] = '추가 동작...';
 $labels['markallread'] = '모두 읽은 상태로 표시';
 $labels['folders-cur'] = '선택한 폴더에만 적용';
@@ -263,7 +265,6 @@ $labels['keylength'] = '비트';
 $labels['keyexpired'] = '만료됨';
 $labels['keyrevoked'] = '해지됨';
 $labels['bccinstead'] = 'Bcc 사용';
-$labels['addheader'] = '받는 사람 추가 (헤더)';
 $labels['insert'] = '삽입';
 $labels['insertcontact'] = '연락처 삽입';
 $labels['recipient'] = '받는 사람';

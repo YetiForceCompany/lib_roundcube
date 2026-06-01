@@ -10,8 +10,6 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/messages/
 */
 
 $messages['errortitle']  = 'Tharla botún!';
@@ -91,7 +89,6 @@ $messages['nopagesizewarning'] = 'Cuir isteach méid leathanaigh le do thoil.';
 $messages['nosenderwarning'] = 'Cuir isteach seoladh ríomhphoist an tseoltóra.';
 $messages['recipientsadded'] = 'Cuireadh faighteoir(í) go rathúil leis.';
 $messages['norecipientwarning'] = 'Abair liom faighteoir amhain ar a laghad';
-$messages['disclosedrecipwarning'] = 'Feicfidh gach faighteoir seoltaí ríomhphoist a chéile. Chun sin a sheachaint agus a bpríobháideachas a chosaint, is féidir feidhm a bhaint as an réimse Bcc.';
 $messages['disclosedreciptitle'] = 'An iomarca faighteoirí poiblí';
 $messages['nosubjectwarning']  = 'Níl aon ábhair ar an teachtaireacht, ba mhaith tú déarfaidh mé ábair?';
 $messages['nosubjecttitle']  = 'Gan ábhar';

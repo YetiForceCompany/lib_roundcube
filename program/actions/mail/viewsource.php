@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  +-----------------------------------------------------------------------+
  | This file is part of the Roundcube Webmail client                     |
  |                                                                       |
@@ -24,6 +24,7 @@ class rcmail_action_mail_viewsource extends rcmail_action
      *
      * @param array $args Arguments from the previous step(s)
      */
+    #[\Override]
     public function run($args = [])
     {
         $rcmail = rcmail::get_instance();
@@ -40,27 +41,25 @@ class rcmail_action_mail_viewsource extends rcmail_action
                 $message = new rcube_message($uid);
                 $headers = $message->headers;
                 $part_id = substr($uid, $pos + 1);
-            }
-            else {
+            } else {
                 $headers = $rcmail->storage->get_message_headers($uid);
             }
 
-            $charset  = $headers->charset ?: $rcmail->config->get('default_charset', RCUBE_CHARSET);
+            $charset = $headers->charset ?: $rcmail->config->get('default_charset', RCUBE_CHARSET);
             $filename = '';
-            $params   = [
-                'type'         => 'text/plain',
+            $params = [
+                'type' => 'text/plain',
                 'type_charset' => $charset,
             ];
 
             if (!empty($_GET['_save'])) {
-                $subject  = rcube_mime::decode_header($headers->subject, $headers->charset);
+                $subject = rcube_mime::decode_header($headers->subject, $headers->charset);
                 $filename = self::filename_from_subject(mb_substr($subject, 0, 128));
-                $filename = ($filename ?: $uid)  . '.eml';
+                $filename = ($filename ?: $uid) . '.eml';
 
                 $params['length'] = $headers->size;
                 $params['disposition'] = 'attachment';
-            }
-            else {
+            } else {
                 // Make sure it works in an iframe (#9084)
                 $rcmail->output->page_headers();
 
@@ -71,20 +70,11 @@ class rcmail_action_mail_viewsource extends rcmail_action
 
             if (isset($part_id) && isset($message)) {
                 $message->get_part_body($part_id, empty($_GET['_save']), 0, -1);
-            }
-            else {
+            } else {
                 $rcmail->storage->print_raw_body($uid, empty($_GET['_save']));
             }
-        }
-        else {
-            rcube::raise_error([
-                    'code'    => 500,
-                    'file'    => __FILE__,
-                    'line'    => __LINE__,
-                    'message' => "Message UID $uid not found"
-                ],
-                true, true
-            );
+        } else {
+            rcube::raise_error("Message UID {$uid} not found", true, true);
         }
 
         exit;

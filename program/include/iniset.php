@@ -21,16 +21,17 @@ use GuzzleHttp\Cookie\FileCookieJar;
  +-----------------------------------------------------------------------+
 */
 
-if (PHP_VERSION_ID < 70300) {
-    die("Unsupported PHP version. Required PHP >= 7.3.");
+// @phpstan-ignore-next-line
+if (\PHP_VERSION_ID < 80100) {
+    exit('Unsupported PHP version. Required PHP >= 8.1.');
 }
 
 // application constants
-define('RCMAIL_VERSION', '1.6.15');
+define('RCMAIL_VERSION', '1.7.1');
 define('RCMAIL_START', microtime(true));
 
 if (!defined('INSTALL_PATH')) {
-    define('INSTALL_PATH', dirname($_SERVER['SCRIPT_FILENAME']).'/');
+    define('INSTALL_PATH', realpath(__DIR__ . '/../..') . '/');
 }
 
 if (!defined('RCMAIL_CONFIG_DIR')) {
@@ -42,7 +43,7 @@ if (!defined('RCUBE_LOCALIZATION_DIR')) {
 }
 
 define('RCUBE_INSTALL_PATH', INSTALL_PATH);
-define('RCUBE_CONFIG_DIR',  RCMAIL_CONFIG_DIR.'/');
+define('RCUBE_CONFIG_DIR', RCMAIL_CONFIG_DIR . '/');
 
 // Show basic error message on fatal PHP error
 register_shutdown_function('rcmail_error_handler');
@@ -50,11 +51,11 @@ register_shutdown_function('rcmail_error_handler');
 // RC include folders MUST be included FIRST to avoid other
 // possible not compatible libraries (i.e PEAR) to be included
 // instead the ones provided by RC
-$include_path = INSTALL_PATH . 'program/lib' . PATH_SEPARATOR;
-$include_path.= ini_get('include_path');
+$include_path = INSTALL_PATH . 'program/lib' . \PATH_SEPARATOR;
+$include_path .= ini_get('include_path');
 
 if (set_include_path($include_path) === false) {
-    die("Fatal error: ini_set/set_include_path does not work.");
+    exit('Fatal error: ini_set/set_include_path does not work.');
 }
 
 // increase maximum execution time for php scripts
@@ -66,18 +67,8 @@ if (@file_exists(INSTALL_PATH . 'vendor/autoload.php')) {
     require INSTALL_PATH . 'vendor/autoload.php';
 }
 
-// translate PATH_INFO to _task and _action GET parameters
-if (!empty($_SERVER['PATH_INFO']) && preg_match('!^/([a-z]+)/([a-z]+)$!', $_SERVER['PATH_INFO'], $m)) {
-    if (!isset($_GET['_task'])) {
-        $_GET['_task'] = $m[1];
-    }
-    if (!isset($_GET['_action'])) {
-        $_GET['_action'] = $m[2];
-    }
-}
-
 // include Roundcube Framework
-require_once 'Roundcube/bootstrap.php';
+require_once __DIR__ . '/../lib/Roundcube/bootstrap.php';
 
 // register autoloader for rcmail app classes
 spl_autoload_register('rcmail_autoload');
@@ -89,17 +80,26 @@ spl_autoload_register(static function ($classname) {
     }
 }, true, true);
 
+// translate PATH_INFO to _task and _action GET parameters
+if (($path = rcmail_output::path_info()) && preg_match('!^([a-z]+)/([a-z]+)$!', $path, $m)) {
+    if (!isset($_GET['_task'])) {
+        $_GET['_task'] = $m[1];
+    }
+    if (!isset($_GET['_action'])) {
+        $_GET['_action'] = $m[2];
+    }
+}
+
 /**
  * PHP5 autoloader routine for dynamic class loading
  */
-function rcmail_autoload($classname)
+function rcmail_autoload(string $classname): bool
 {
-    if (strpos($classname, 'rcmail') === 0) {
+    if (str_starts_with($classname, 'rcmail')) {
         if (preg_match('/^rcmail_action_([^_]+)_(.*)$/', $classname, $matches)) {
             $filepath = INSTALL_PATH . "program/actions/{$matches[1]}/{$matches[2]}.php";
-        }
-        else {
-            $filepath = INSTALL_PATH . "program/include/$classname.php";
+        } else {
+            $filepath = INSTALL_PATH . "program/include/{$classname}.php";
         }
 
         if (is_readable($filepath)) {
@@ -118,7 +118,7 @@ function rcmail_error_handler()
 {
     $error = error_get_last();
 
-    if ($error && ($error['type'] === E_ERROR || $error['type'] === E_PARSE)) {
+    if ($error && ($error['type'] === \E_ERROR || $error['type'] === \E_PARSE)) {
         rcmail_fatal_error();
     }
 }
@@ -128,15 +128,13 @@ function rcmail_error_handler()
  */
 function rcmail_fatal_error()
 {
-    if (php_sapi_name() === 'cli') {
+    if (\PHP_SAPI === 'cli') {
         echo "Fatal error: Please check the Roundcube error log and/or server error logs for more information.\n";
-    }
-    elseif (!empty($_REQUEST['_remote'])) {
+    } elseif (rcube_utils::request_header('X-Roundcube-Request')) {
         // Ajax request from UI
         header('Content-Type: application/json; charset=UTF-8');
-        echo json_encode(['code' => 500, 'message' => "Internal Server Error"]);
-    }
-    else {
+        echo json_encode(['code' => 500, 'message' => 'Internal Server Error']);
+    } else {
         if (!defined('RCUBE_FATAL_ERROR_MSG')) {
             define('RCUBE_FATAL_ERROR_MSG', INSTALL_PATH . 'program/resources/error.html');
         }

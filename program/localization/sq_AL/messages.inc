@@ -10,8 +10,6 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/messages/
 */
 
 $messages['errortitle']  = 'Ndodhi një gabim!';
@@ -102,7 +100,7 @@ $messages['nopagesizewarning'] = 'Ju lutemi, jepni një madhësi faqeje.';
 $messages['nosenderwarning'] = 'Ju lutemi, jepni adresë email të dërguesit.';
 $messages['recipientsadded'] = 'Marrësi(at) u shtuan me sukses.';
 $messages['norecipientwarning'] = 'Ju lutemi, jepni të paktën një marrës.';
-$messages['disclosedrecipwarning'] = 'Krejt pjesëmarrësit do të shohin adresat email të njëri-tjetrit.';
+$messages['disclosedrecipwarning'] = 'Krejt pjesëmarrësit do të shohin adresat email të njëri-tjetrit. Për të parandaluar  këtë dhe mbrojtur privatësinë e tyre, mund të përdorni fushën Bcc.';
 $messages['disclosedreciptitle'] = 'Shumë pjesëmarrës publikë';
 $messages['nosubjectwarning']  = 'Fusha "Subjekt" është e zbrazët. Do të donit të jepnit një tani?';
 $messages['nosubjecttitle']  = 'S’ka subjekt';
@@ -160,7 +158,9 @@ $messages['nogroupassignmentschanged'] = 'S’pati ndryshime në përshoqërime 
 $messages['importwait'] = 'Po importohet, ju lutemi, prisni…';
 $messages['importformaterror'] = 'Importimi dështoi! Kartela e ngarkuar s’është kartelë e vlefshme të dhënash importimi.';
 $messages['importconfirm'] = '<b>U importuan me sukses $inserted kontakte</b>';
-$messages['importconfirmskipped'] = '<b>U anashkaluan $skipped zëra ekzistues</b>';
+$messages['importconfirmskipped'] = '<b>U anashkaluan $skipped kontakte ekzistuese</b>';
+$messages['importconfirminvalid'] = '<b>U anashkaluan $invalid kontakte të pavlefshme</b>';
+$messages['importconfirmerrors'] = '<b>S’u arrit të importohen $errors kontakte të vlefshme</b>';
 $messages['importmessagesuccess'] = 'U importuan me sukses $nr mesazhe';
 $messages['importmessageerror'] = 'Importimi dështoi! Kartela e ngarkuar s’është kartelë e vlefshme mesazhi apo kutie postare';
 $messages['opnotpermitted'] = 'Veprim i palejuar!';
@@ -230,3 +230,5 @@ $messages['listusebutton'] = 'Përdorni butonin Krijoje që të shtoni një zë 
 $messages['keypaircreatesuccess'] = 'Për $identity u krijua me sukses një dyshe e re kyçesh.';
 $messages['emptyattachment'] = 'Kjo bashkëngjitje duket të jetë e zbrazët. <br>Ju lutemi, kontrolloni duke u lidhur me personin që e dërgoi.';
 $messages['oauthloginfailed'] = 'Hyrja me OAuth dështoi. Ju lutemi, riprovoni.';
+$messages['oauthinvalidrequest'] = 'Kërkesa për autorizim qe e pavlefshme, ose jo e plotë.';
+$messages['oauthaccessdenied'] = 'Shërbyesi i autorizimit, ose përdoruesi nuk pranuan kërkesën.';

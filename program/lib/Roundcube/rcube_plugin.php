@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  +-----------------------------------------------------------------------+
  | This file is part of the Roundcube Webmail client                     |
  |                                                                       |
@@ -20,9 +20,6 @@
 
 /**
  * Plugin interface class
- *
- * @package    Framework
- * @subpackage PluginAPI
  */
 abstract class rcube_plugin
 {
@@ -81,7 +78,6 @@ abstract class rcube_plugin
     /** @var array List of plugin configuration files already loaded */
     private $loaded_config = [];
 
-
     /**
      * Default constructor.
      *
@@ -89,29 +85,29 @@ abstract class rcube_plugin
      */
     public function __construct($api)
     {
-        $this->ID      = get_class($this);
-        $this->api     = $api;
-        $this->home    = $api->dir . $this->ID;
+        $this->ID = static::class;
+        $this->api = $api;
+        $this->home = $api->dir . $this->ID;
         $this->urlbase = $api->url . $this->ID . '/';
     }
 
     /**
      * Initialization method, needs to be implemented by the plugin itself
      */
-    abstract function init();
+    abstract public function init();
 
     /**
      * Provide information about this
      *
-     * @return array Meta information about a plugin or false if not implemented.
-     * As hash array with the following keys:
-     *      name: The plugin name
-     *    vendor: Name of the plugin developer
-     *   version: Plugin version name
-     *   license: License name (short form according to https://spdx.org/licenses/)
-     *       uri: The URL to the plugin homepage or source repository
-     *   src_uri: Direct download URL to the source code of this plugin
-     *   require: List of plugins required for this one (as array of plugin names)
+     * @return array|false Meta information about a plugin or false if not implemented.
+     *                     As hash array with the following keys:
+     *                     - name: The plugin name
+     *                     - vendor: Name of the plugin developer
+     *                     - version: Plugin version name
+     *                     - license: License name (short form according to https://spdx.org/licenses/)
+     *                     - uri: The URL to the plugin homepage or source repository
+     *                     - src_uri: Direct download URL to the source code of this plugin
+     *                     - require: List of plugins required for this one (as array of plugin names)
      */
     public static function info()
     {
@@ -163,13 +159,11 @@ abstract class rcube_plugin
 
         if (($is_local = is_file($fpath)) && !$rcube->config->load_from_file($fpath)) {
             rcube::raise_error([
-                    'code' => 527, 'file' => __FILE__, 'line' => __LINE__,
-                    'message' => "Failed to load config from $fpath"
-                ], true, false
-            );
+                'code' => 527,
+                'message' => "Failed to load config from {$fpath}",
+            ], true, false);
             return false;
-        }
-        else if (!$is_local) {
+        } elseif (!$is_local) {
             // Search plugin_name.inc.php file in any configured path
             return $rcube->config->load_from_file($this->ID . '.inc.php');
         }
@@ -216,20 +210,19 @@ abstract class rcube_plugin
         // prepend domain to text keys and add to the application texts repository
         if (!empty($texts)) {
             $domain = $this->ID;
-            $add    = [];
+            $add = [];
 
             foreach ($texts as $key => $value) {
-                $add[$domain.'.'.$key] = $value;
+                $add[$domain . '.' . $key] = $value;
             }
 
-            $rcube->load_language($_SESSION['language'], $add);
+            $rcube->load_language($_SESSION['language'] ?? null, $add);
 
             // add labels to client
             if ($add2client && method_exists($rcube->output, 'add_label')) {
                 if (is_array($add2client)) {
                     $js_labels = array_map([$this, 'label_map_callback'], $add2client);
-                }
-                else {
+                } else {
                     $js_labels = array_keys($add);
                 }
 
@@ -261,6 +254,7 @@ abstract class rcube_plugin
      * @param string|array $p Named parameters array or label name
      *
      * @return string Localized text
+     *
      * @see rcube::gettext()
      */
     public function gettext($p)
@@ -314,9 +308,9 @@ abstract class rcube_plugin
      *
      * @param string $fn File path; absolute or relative to the plugin directory
      */
-    public function include_script($fn)
+    public function include_script($fn, $tag_attributes = [])
     {
-        $this->api->include_script($this->resource_url($fn));
+        $this->api->include_script($this->resource_url($fn), $tag_attributes);
     }
 
     /**
@@ -372,26 +366,26 @@ abstract class rcube_plugin
     private function resource_url($fn)
     {
         // pattern "skins/[a-z0-9-_]+/plugins/$this->ID/" used to identify plugin resources loaded from the core skin folder
-        if ($fn[0] != '/' && !preg_match("#^(https?://|skins/[a-z0-9-_]+/plugins/$this->ID/)#i", $fn)) {
+        if ($fn[0] != '/' && !preg_match("#^(https?://|skins/[a-z0-9-_]+/plugins/{$this->ID}/)#i", $fn)) {
             return $this->ID . '/' . $fn;
         }
-        else {
-            return $fn;
-        }
+
+        return $fn;
     }
 
     /**
      * Provide path to the currently selected skin folder within the plugin directory
      * with a fallback to the default skin folder.
      *
-     * @param  string $extra_dir Additional directory to search in (optional)
-     * @param  mixed  $skin_name Specific skin name(s) to look for, string or array (optional)
-     * @return string            Skin path relative to plugins directory
+     * @param string $extra_dir Additional directory to search in (optional)
+     * @param mixed  $skin_name Specific skin name(s) to look for, string or array (optional)
+     *
+     * @return string Skin path relative to plugins directory
      */
     public function local_skin_path($extra_dir = null, $skin_name = null)
     {
-        $rcube     = rcube::get_instance();
-        $skins     = array_keys((array)$rcube->output->skins);
+        $rcube = rcube::get_instance();
+        $skins = array_keys((array) $rcube->output->skins);
         $skin_path = '';
 
         if (empty($skins)) {
@@ -418,8 +412,7 @@ abstract class rcube_plugin
                     if (is_dir(realpath(slashify(RCUBE_INSTALL_PATH) . $skin_path))) {
                         break 2;
                     }
-                }
-                else {
+                } else {
                     break 2;
                 }
             }
@@ -431,16 +424,16 @@ abstract class rcube_plugin
     /**
      * Callback function for array_map
      *
-     * @param string $key Array key.
+     * @param string $key array key
      *
      * @return string
      */
     private function label_map_callback($key)
     {
-        if (strpos($key, $this->ID.'.') === 0) {
+        if (str_starts_with($key, $this->ID . '.')) {
             return $key;
         }
 
-        return $this->ID.'.'.$key;
+        return $this->ID . '.' . $key;
     }
 }

@@ -10,8 +10,6 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/messages/
 */
 
 $messages['errortitle']  = 'დაფიქსირდა შეცდომა!';
@@ -60,6 +58,7 @@ $messages['errormoving'] = 'შეტყობინების გადატ
 $messages['errorcopying'] = 'შეტყობინების კოპირება შეუძლებელია.';
 $messages['errordeleting'] = 'შეტყობინების წაშლა შეუძლებელია';
 $messages['errormarking'] = 'შეტყობინების მონიშვნა შეუძლებელია';
+$messages['alerttitle'] = 'ყურადღება';
 $messages['deletecontactconfirm']  = 'ნამდვილად გსურთ მონიშნული კონტაქტების წაშლა?';
 $messages['deletegroupconfirm']  = 'ნამდვილად გსურთ მონიშნული ჯგუფის წაშლა?';
 $messages['deletemessagesconfirm'] = 'ნამდვილად გსურთ მონიშნული შეტყობინებების წაშლა?';

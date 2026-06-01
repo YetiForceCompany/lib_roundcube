@@ -10,8 +10,6 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/messages/
 */
 
 $messages['errortitle']  = 'Došlo k chybě!';
@@ -160,7 +158,9 @@ $messages['nogroupassignmentschanged'] = 'Nebylo změněno přiřazení do skupi
 $messages['importwait'] = 'Importuji, prosím čekejte...';
 $messages['importformaterror'] = 'Import se nezdařil! Typ souboru není podporován.';
 $messages['importconfirm'] = 'Úspěšně naimportováno $inserted kontaktů, $skipped existujících záznamů přeskočeno: $names';
-$messages['importconfirmskipped'] = '<b>Přeskočeno $skipped existujících položek</b>';
+$messages['importconfirmskipped'] = '<b>Přeskočeno $skipped existujících kontaktů</b>';
+$messages['importconfirminvalid'] = '<b>Přeskočeno $skipped neplatných kontaktů</b>';
+$messages['importconfirmerrors'] = '<b>Selhal import $errors platných kontaktů</b>';
 $messages['importmessagesuccess'] = 'Naimportováno $nr zpráv';
 $messages['importmessageerror'] = 'Import se nezdařil! Nahraný soubor není platnou zprávou nebo souborem mailboxu';
 $messages['opnotpermitted'] = 'Operace není povolena!';
@@ -230,3 +230,5 @@ $messages['listusebutton'] = 'Použijte tlačítko "Vytvořit" pro přidání no
 $messages['keypaircreatesuccess'] = 'Pro $identity byl vytvořen nový pár klíčů.';
 $messages['emptyattachment'] = 'Příloha je prázdná.<br>Zkontrolujte její stav s odesílatelem.';
 $messages['oauthloginfailed'] = 'Přihlášení přes OAuth selhalo. Prosím, zkuste to znovu';
+$messages['oauthinvalidrequest'] = 'Žádost o autorizaci byla neplatná nebo neúplná.';
+$messages['oauthaccessdenied'] = 'Uživatel nebo autorizační server zamítl požadavek.';

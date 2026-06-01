@@ -10,9 +10,7 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/plugin-new_user_dialog/
 */
 
-$labels['identitydialogtitle'] = 'Per favor, completa vostre identitate de expeditor';
+$labels['identitydialogtitle'] = 'Per favor, completa tu identitate de expeditor';
 $labels['identitydialoghint'] = 'Iste quadro solmente appare un vice al prime apertura de session.';

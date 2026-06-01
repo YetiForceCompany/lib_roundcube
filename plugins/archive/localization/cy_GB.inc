@@ -10,8 +10,6 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/plugin-archive/
 */
 
 $labels['buttontext'] = 'Archif';
@@ -21,7 +19,7 @@ $labels['archivedreload'] = 'Archifwyd yn llwyddiannus. Ail-lwythwch y dudalen i
 $labels['archiveerror'] = 'Nid oedd yn bosib archifo rhai negeseuon';
 $labels['archivefolder'] = 'Archif';
 $labels['settingstitle'] = 'Archif';
-$labels['archivetype'] = 'Rhannu archif gyda';
+$labels['archivetype'] = 'Rhannu archif yn ôl';
 $labels['archivetypeyear'] = 'Blwyddyn (e.g. Archif/2012)';
 $labels['archivetypemonth'] = 'Mis (e.g. Archif/2012/06)';
 $labels['archivetypetbmonth'] = 'Mis - Cydnaws a Thunderbird (e.e. Archif/2012/2012-06)';

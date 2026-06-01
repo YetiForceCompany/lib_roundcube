@@ -10,10 +10,7 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/plugin-managesieve/
 */
-
 
 $labels['filters'] = 'フィルター';
 $labels['managefilters'] = '受信メールのフィルターを管理';
@@ -284,3 +281,4 @@ $messages['duplicate.conflict.err'] = 'ヘッダーと一意な識別子の両�
 $messages['disabledaction'] = '許可されていない動作です。';
 $messages['lastindexempty'] = '最後から数える時はインデックスが必要';
 $messages['noflagset'] = '少なくともフラッグを1つ選択しなければなりません。';
+$messages['saving.actionordererror'] = '\'$previous\'の処理は\'$current\'の処理の後でなければなりません。';

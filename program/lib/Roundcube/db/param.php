@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  +-----------------------------------------------------------------------+
  | This file is part of the Roundcube Webmail client                     |
  |                                                                       |
@@ -19,16 +19,12 @@
 
 /**
  * Database query parameter
- *
- * @package    Framework
- * @subpackage Database
  */
-class rcube_db_param
+class rcube_db_param implements \Stringable
 {
     protected $db;
     protected $type;
     protected $value;
-
 
     /**
      * Object constructor
@@ -39,14 +35,15 @@ class rcube_db_param
      */
     public function __construct($db, $value, $type = null)
     {
-        $this->db    = $db;
+        $this->db = $db;
         $this->value = $value;
-        $this->type  = $type;
+        $this->type = $type;
     }
 
     /**
      * Returns the value as string for inlining into SQL query
      */
+    #[\Override]
     public function __toString()
     {
         if ($this->type === rcube_db::TYPE_SQL) {

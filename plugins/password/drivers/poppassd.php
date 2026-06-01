@@ -6,6 +6,7 @@
  * Driver to change passwords via Poppassd/Courierpassd
  *
  * @version 2.0
+ *
  * @author Philip Weir
  *
  * Copyright (C) The Roundcube Dev Team
@@ -26,7 +27,7 @@
 
 class rcube_poppassd_password
 {
-    function format_error_result($code, $line)
+    public function format_error_result($code, $line)
     {
         if (preg_match('/^\d\d\d\s+(\S.*)\s*$/', $line, $matches)) {
             return ['code' => $code, 'message' => $matches[1]];
@@ -35,10 +36,10 @@ class rcube_poppassd_password
         return $code;
     }
 
-    function save($curpass, $passwd, $username)
+    public function save($curpass, $passwd, $username)
     {
-        $rcmail   = rcmail::get_instance();
-        $poppassd = new Net_Socket();
+        $rcmail = rcmail::get_instance();
+        $poppassd = new \Net_Socket();
 
         $port = $rcmail->config->get('password_pop_port', 106);
         $host = $rcmail->config->get('password_pop_host', 'localhost');
@@ -57,7 +58,7 @@ class rcube_poppassd_password
             return $this->format_error_result(PASSWORD_ERROR, $result);
         }
 
-        $poppassd->writeLine("user ". $username);
+        $poppassd->writeLine('user ' . $username);
         $result = $poppassd->readLine();
 
         if (!preg_match('/^[23]\d\d/', $result)) {
@@ -65,7 +66,7 @@ class rcube_poppassd_password
             return $this->format_error_result(PASSWORD_CONNECT_ERROR, $result);
         }
 
-        $poppassd->writeLine("pass ". $curpass);
+        $poppassd->writeLine('pass ' . $curpass);
         $result = $poppassd->readLine();
 
         if (!preg_match('/^[23]\d\d/', $result)) {
@@ -73,7 +74,7 @@ class rcube_poppassd_password
             return $this->format_error_result(PASSWORD_ERROR, $result);
         }
 
-        $poppassd->writeLine("newpass ". $passwd);
+        $poppassd->writeLine('newpass ' . $passwd);
         $result = $poppassd->readLine();
         $poppassd->disconnect();
 

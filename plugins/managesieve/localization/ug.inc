@@ -10,10 +10,7 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/plugin-managesieve/
 */
-
 
 $labels['filters'] = 'سۈزگۈچلەر';
 $labels['managefilters'] = 'كەلگەن خەت سۈزگۈچلىرىنى باشقۇرۇش';
@@ -134,6 +131,7 @@ $labels['varlowerfirst'] = 'تۇنجى ھەرىپ كىچىك';
 $labels['varupperfirst'] = 'تۇنجى ھەرىپ چوڭ';
 $labels['varquotewildcard'] = 'ئالاھىدە ھەرىپلەرنى نەقىللەش';
 $labels['varlength'] = 'ئۇزۇنلۇق';
+$labels['varencodeurl'] = 'پىرسەنت-شىفىرلىق(ئۇلىنىشلار ئۈچۈن)';
 $labels['notify'] = 'ئۇقتۇرۇش ئەۋەتىش';
 $labels['notifytarget'] = 'ئۇقتۇرۇش نىشانى:';
 $labels['notifymessage'] = 'ئۇقتۇرۇش ئۇچۇرى (ئىختىيارى):';

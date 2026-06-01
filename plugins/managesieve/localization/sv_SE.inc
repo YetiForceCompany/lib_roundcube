@@ -10,10 +10,7 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/plugin-managesieve/
 */
-
 
 $labels['filters'] = 'Filter';
 $labels['managefilters'] = 'Administrera filter';
@@ -134,6 +131,7 @@ $labels['varlowerfirst'] = 'Första tecken gement';
 $labels['varupperfirst'] = 'Första tecken versalt';
 $labels['varquotewildcard'] = 'Koda specialtecken';
 $labels['varlength'] = 'Längd';
+$labels['varencodeurl'] = 'sätt in procentkodning (i länkar)';
 $labels['notify'] = 'Skicka avisering';
 $labels['notifytarget'] = 'Aviseringsmål:';
 $labels['notifymessage'] = 'Aviseringsmeddelande (valfritt):';
@@ -283,3 +281,4 @@ $messages['duplicate.conflict.err'] = 'Både huvud och unik identifikation är i
 $messages['disabledaction'] = 'Otillåten åtgärd.';
 $messages['lastindexempty'] = 'Index är nödvändigt för att räkna från slutet';
 $messages['noflagset'] = 'Minst en flagga måste väljas.';
+$messages['saving.actionordererror'] = 'Föregående \'$previous\' åtgärd måste läggas efter \'$current\' åtgärd.';

@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  +-----------------------------------------------------------------------+
  | This file is part of the Roundcube Webmail client                     |
  |                                                                       |
@@ -19,9 +19,6 @@
 
 /**
  * Class to create an empty HTML page with some default styles
- *
- * @package    Webmail
- * @subpackage View
  */
 class rcmail_html_page extends rcmail_output_html
 {
@@ -32,6 +29,7 @@ class rcmail_html_page extends rcmail_output_html
      *
      * @param string $contents HTML page content
      */
+    #[\Override]
     public function write($contents = '')
     {
         self::reset(true);
@@ -40,12 +38,11 @@ class rcmail_html_page extends rcmail_output_html
         $embed_css = $this->config->get('embed_css_location', '/embed.css');
         if ($embed_css = $this->get_skin_file($embed_css, $path, null, true)) {
             $this->include_css($embed_css);
-        }
-        else {  // set default styles for warning blocks inside the attachment part frame
+        } else {  // set default styles for warning blocks inside the attachment part frame
             $this->add_header(html::tag('style', ['type' => 'text/css'],
-                ".rcmail-inline-message { font-family: sans-serif; border:2px solid #ffdf0e;"
-                                        . "background:#fef893; padding:0.6em 1em; margin-bottom:0.6em }\n" .
-                ".rcmail-inline-buttons { margin-bottom:0 }"
+                '.rcmail-inline-message { font-family: sans-serif; border:2px solid #ffdf0e;'
+                                        . "background:#fef893; padding:0.6em 1em; margin-bottom:0.6em }\n"
+                . '.rcmail-inline-buttons { margin-bottom:0 }'
             ));
         }
 
@@ -77,9 +74,9 @@ class rcmail_html_page extends rcmail_output_html
         $text = html::span(null, $text);
 
         if ($button_label) {
-            $onclick = "location.href = '$button_url'";
-            $button  = html::tag('button', ['onclick' => $onclick], rcube::Q($button_label));
-            $text   .= html::p(['class' => 'rcmail-inline-buttons'], $button);
+            $onclick = "location.href = '{$button_url}'";
+            $button = html::tag('button', ['onclick' => $onclick], rcube::Q($button_label));
+            $text .= html::p(['class' => 'rcmail-inline-buttons'], $button);
         }
 
         $this->inline_warning = html::div(['class' => 'rcmail-inline-message rcmail-inline-warning'], $text);

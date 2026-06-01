@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  +-----------------------------------------------------------------------+
  | This file is part of the Roundcube Webmail client                     |
  |                                                                       |
@@ -27,6 +27,7 @@ class rcmail_action_mail_copy extends rcmail_action_mail_index
      *
      * @param array $args Arguments from the previous step(s)
      */
+    #[\Override]
     public function run($args = [])
     {
         $rcmail = rcmail::get_instance();
@@ -36,16 +37,15 @@ class rcmail_action_mail_copy extends rcmail_action_mail_index
             $rcmail->output->show_message('internalerror', 'error');
         }
 
-        $uids    = self::get_uids(null, null, $multifolder, rcube_utils::INPUT_POST);
-        $target  = rcube_utils::get_input_string('_target_mbox', rcube_utils::INPUT_POST, true);
+        $post_uids = self::get_uids(null, null, $multifolder, rcube_utils::INPUT_POST);
+        $target = rcube_utils::get_input_string('_target_mbox', rcube_utils::INPUT_POST, true);
         $sources = [];
-        $copied  = false;
+        $copied = false;
 
-        foreach ($uids as $mbox => $uids) {
+        foreach ($post_uids as $mbox => $uids) {
             if ($mbox === $target) {
                 $copied++;
-            }
-            else {
+            } else {
                 $copied += (int) $rcmail->storage->copy_message($uids, $target, $mbox);
                 $sources[] = $mbox;
             }
@@ -53,8 +53,7 @@ class rcmail_action_mail_copy extends rcmail_action_mail_index
 
         if (!$copied) {
             self::display_server_error('errorcopying');
-        }
-        else {
+        } else {
             $rcmail->output->show_message('messagecopied', 'confirmation');
 
             self::send_unread_count($target, true);

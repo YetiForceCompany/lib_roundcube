@@ -10,8 +10,6 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/plugin-password/
 */
 
 $labels['changepasswd']  = 'Bytt passord';
@@ -38,5 +36,6 @@ $messages['samepasswd'] = 'Det nye passordet må være anderledes fra det gamle.
 $messages['passwdexpirewarning'] = 'Advarsel! Ditt passord løper snart ut, bytt det før $expirationdatetime.';
 $messages['passwdexpired'] = 'Ditt passord har løpt ut, du må bytte det nå!';
 $messages['passwdconstraintviolation'] = 'Brudd på passordbegrensning. Passordet er sannsynligvis for svakt.';
+$messages['pwned_mustnotbedisclosed'] = 'Passordet må ikke være <a href="$href" target="_blank">alminnelig brukt</a>.';
 $messages['pwned_isdisclosed'] = 'Dette passordet er allment kjent.';
 $messages['pwned_fetcherror'] = 'Feilet i verifiseringen av passordstyrke.';

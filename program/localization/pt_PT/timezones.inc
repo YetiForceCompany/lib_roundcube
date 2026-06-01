@@ -10,12 +10,10 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/timezones/
 */
 
 $labels['tz:utc'] = 'UTC';
-$labels['tz:africa'] = 'Africa';
+$labels['tz:africa'] = 'África';
 $labels['tz:africa:abidjan'] = 'Abidjan';
 $labels['tz:africa:accra'] = 'Accra';
 $labels['tz:africa:addis_ababa'] = 'Addis Ababa';

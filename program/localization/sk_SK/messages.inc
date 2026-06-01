@@ -10,8 +10,6 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/messages/
 */
 
 $messages['errortitle']  = 'Vyskytla sa chyba!';
@@ -102,7 +100,7 @@ $messages['nopagesizewarning'] = 'Prosím zadajte počet záznamov na stranu.';
 $messages['nosenderwarning'] = 'Prosím zadajte e-mailovú adresu odosielateľa.';
 $messages['recipientsadded'] = 'Pridanie príjemcu/príjemcov bolo úspešné.';
 $messages['norecipientwarning'] = 'Prosím zadajte aspoň jedného príjemcu.';
-$messages['disclosedrecipwarning'] = 'Všetci používatelia navzájom uvidia svoje e-mailové adresy. Ak si to neželáte a chcete chrániť ich súkromie, použite pole Skrytá kópia.';
+$messages['disclosedrecipwarning'] = 'Všetci príjemcovia uvidia e-mailové adresy ostatných príjemcov. Ak tomu chcete zabrániť, môžete použiť pole Skrytá kópia.';
 $messages['disclosedreciptitle'] = 'Priveľa verejných príjemcov';
 $messages['nosubjectwarning']  = '"Predmet" správy je prázdny. Chcete ho teraz zadať?';
 $messages['nosubjecttitle']  = 'Bez predmetu';
@@ -160,7 +158,9 @@ $messages['nogroupassignmentschanged'] = 'Priradenia do skupín sa nezmenili.';
 $messages['importwait'] = 'Prebieha importovanie, prosím čakajte...';
 $messages['importformaterror'] = 'Importovanie nebolo úspešné! Nahraný súbor nie je platným súborom údajov pre importovanie.';
 $messages['importconfirm'] = '<b>Počet úspešne naimportovaných kontaktov: $inserted</b>';
-$messages['importconfirmskipped'] = '<b>Počet preskočených existujúcich záznamov: $skipped</b>';
+$messages['importconfirmskipped'] = '<b>Počet preskočených existujúcich kontaktov: $skipped</b>';
+$messages['importconfirminvalid'] = '<b>Počet preskočených neplatných kontaktov: $invalid</b>';
+$messages['importconfirmerrors'] = '<b>Počet platných kontaktov, ktoré sa nepodarilo importovať: $errors</b>';
 $messages['importmessagesuccess'] = 'Počet úspešne naimportovaných správ: $nr';
 $messages['importmessageerror'] = 'Importovanie bolo neúspešné! Odoslaný súbor nie je platným súborom pre importovanie';
 $messages['opnotpermitted'] = 'Táto operácia nie je povolená!';
@@ -230,3 +230,5 @@ $messages['listusebutton'] = 'Na pridanie nového záznamu použite tlačidlo Vy
 $messages['keypaircreatesuccess'] = 'Pre identitu $identity bol úspešne vytvorený nový pár kľúčov.';
 $messages['emptyattachment'] = 'Zdá sa, že táto príloha je prázdna.<br>Prosím overte to u osoby, ktorá ju odoslala.';
 $messages['oauthloginfailed'] = 'Prihlásenie OAuth bolo neúspešné. Prosím skúste to znovu.';
+$messages['oauthinvalidrequest'] = 'Požiadavka na autorizáciu bola neplatná alebo neúplná.';
+$messages['oauthaccessdenied'] = 'Autorizačný server alebo používateľ odmietol požiadavku.';

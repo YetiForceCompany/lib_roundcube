@@ -10,8 +10,6 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/messages/
 */
 
 $messages['errortitle']  = 'Настана грешка!';
@@ -87,7 +85,6 @@ $messages['nonamewarning']  = 'Внесете име';
 $messages['nopagesizewarning'] = 'Внесете големина на страницата';
 $messages['nosenderwarning'] = 'Ве молиме внесете е-пошта на праќач';
 $messages['norecipientwarning'] = 'Внесете барем еден примач';
-$messages['disclosedrecipwarning'] = 'Сите приматели ке ги разгледуваат емаил адресите. За да го спречите ова и да ја заштитите нивната приватност, можете да го користите полето Bcc.';
 $messages['disclosedreciptitle'] = 'Бремногу јавни приматели';
 $messages['nosubjectwarning']  = 'Немате внесено „Наслов“. Дали сакате да внесете?';
 $messages['nosubjecttitle']  = 'Нема предмет';
@@ -141,7 +138,6 @@ $messages['nogroupassignmentschanged'] = 'Не се промениле груп�
 $messages['importwait'] = 'Убезувам,, почекајте...';
 $messages['importformaterror'] = 'Внесувањето не успеа! Пркачената датотека не е валидна датотека за внес.';
 $messages['importconfirm'] = '<b>Успешно се увезени $inserted имиња, $skipped веќе постојат и се прескокнати</b>:<p><em>$names</em></p>';
-$messages['importconfirmskipped'] = '<b>Скокнато $skipped постоечки записи</b>';
 $messages['importmessagesuccess'] = 'Успешно внесени $nr пораки';
 $messages['importmessageerror'] = 'Внесувањето не успеа! Прикачената датотека не е валидна порака или датотека од сандаче';
 $messages['opnotpermitted'] = 'Операцијата не е дозволена';

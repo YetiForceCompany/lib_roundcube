@@ -10,12 +10,10 @@
  | any later version with exceptions for skins & plugins.                |
  | See the README file for a full license statement.                     |
  +-----------------------------------------------------------------------+
-
- For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/plugin-zipdownload/
 */
 
 $labels['downloadall'] = 'Alle taheaksels ynlade';
-$labels['download'] = 'Ynlade...';
 $labels['downloadmbox'] = 'Mbox formaat (.zip)';
 $labels['downloadmaildir'] = 'Maildir formaat (.zip)';
 $labels['downloademl'] = 'Boarne (.eml)';
+$labels['download'] = 'Ynlade...';
