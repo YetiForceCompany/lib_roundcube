@@ -912,8 +912,8 @@ class rcmail_output_html extends rcmail_output
     /**
      * Modify path by adding URL prefix if configured
      *
-     * @param string $path    Asset path
-     * @param bool   $abs_url Pass to self::abs_url() first
+     * @param ?string $path    Asset path
+     * @param bool    $abs_url Pass to self::abs_url() first
      *
      * @return string Asset path
      */
@@ -921,6 +921,10 @@ class rcmail_output_html extends rcmail_output
     {
         // iframe content can't be in a different domain
         // @TODO: check if assets are on a different domain
+
+        if ($path === '' || $path === null) {
+            return '';
+        }
 
         if ($abs_url) {
             $path = $this->abs_url($path, true);
@@ -1478,7 +1482,7 @@ class rcmail_output_html extends rcmail_output
                     }
 
                     if (($template_logo = $this->get_template_logo($logo_type, $logo_match)) !== null) {
-                        $attrib['src'] = $template_logo;
+                        $attrib['src'] = $this->asset_url($template_logo, true);
                     }
 
                     if (($link = $this->get_template_logo('link')) !== null) {
@@ -2249,7 +2253,7 @@ class rcmail_output_html extends rcmail_output
             $username = $this->app->user->get_username();
         }
 
-        $username = rcube_utils::idn_to_utf8($username);
+        $username = rcube_utils::idn_to_utf8($username ?? '');
 
         return html::quote($username);
     }
