@@ -57,9 +57,10 @@ const ALLOWED_PATHS = [
 
 define('INSTALL_PATH', realpath(__DIR__ . '/..') . '/');
 
-$path = ($_SERVER['PATH_INFO'] ?? null)
-    ?: explode('static.php/', $_SERVER['REQUEST_URI'] ?? '')[1]
-    ?? '';
+$path = !empty($_SERVER['PATH_INFO'])
+    ? $_SERVER['PATH_INFO']
+    : explode('static.php/', $_SERVER['REQUEST_URI'] ?? '')[1] ?? '';
+
 $path = validateStaticFile($path);
 
 if (!$path) {
@@ -78,7 +79,6 @@ serveStaticFile($path);
  */
 function validateStaticFile(string $path): ?string
 {
-	$source = $path;
     $path = trim($path, "/ \t\r\n");
 
     // Remove query params from the path (e.g. cache buster)
@@ -86,19 +86,19 @@ function validateStaticFile(string $path): ?string
 
     // Potential hack attempts, don't allow ".."
     if (str_contains($path, '..')) {
-		return null;
+        return null;
     }
 
     $ext = pathinfo($path, \PATHINFO_EXTENSION);
 
     // Only supported file types
     if (empty($ext) || !isset(SUPPORTED_TYPES[strtolower($ext)])) {
-		return null;
+        return null;
     }
 
     // Ignore some sensitive files
     if (preg_match('/(README.*|CHANGELOG.*|SECURITY.*|meta\.json|composer\..*)/', $path)) {
-		return null;
+        return null;
     }
 
     $found = false;
@@ -117,13 +117,13 @@ function validateStaticFile(string $path): ?string
     }
 
     if (!$found) {
-		return null;
+        return null;
     }
 
     $path = realpath(INSTALL_PATH . $path);
 
     if ($path === false) {
-		return null;
+        return null;
     }
 
     return $path;
@@ -154,10 +154,18 @@ function serveStaticFile($path): void
 
     $headers = [
         'Accept-Ranges' => 'bytes',
+        'Content-Length' => $size,
         'Content-Type' => SUPPORTED_TYPES[strtolower($ext)],
         'Cache-Control' => 'public, max-age=604800',
         'Expires' => gmdate('D, d M Y H:i:s \G\M\T', time() + 30 * 86400),
     ];
+
+    if ($_SERVER['REQUEST_METHOD'] == 'HEAD') {
+        foreach ($headers as $k => $v) {
+            header("{$k}: {$v}", true);
+        }
+        exit;
+    }
 
     $start = 0;
     $end = $size - 1;
@@ -178,7 +186,7 @@ function serveStaticFile($path): void
             $start = max(0, $size - (int) $range[1]);
         } else {
             $start = (int) $range[0];
-            $end = $range[1] === '' ? $size - 1 : (int) $range[1];
+            $end = $range[1] === '' || $range[1] > ($size - 1) ? $size - 1 : (int) $range[1];
         }
 
         if ($start < 0 || $end > $size - 1 || $start > $end) {
