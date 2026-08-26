@@ -86,6 +86,7 @@ class yetiforce extends rcube_plugin
 		$this->register_action('plugin.yetiforce-addFilesToMail', [$this, 'addFilesToMail']);
 		$this->register_action('plugin.yetiforce-getContentEmailTemplate', [$this, 'getContentEmailTemplate']);
 		$this->register_action('plugin.yetiforce-loadMailAnalysis', [$this, 'loadMailAnalysis']);
+		$this->register_action('plugin.yetiforce-autocomplete', [$this, 'autocomplete']);
 
 		if ('mail' == $this->rc->task) {
 			$this->include_stylesheet('/../../../../../../layouts/resources/icons/yfm.css');
@@ -166,6 +167,9 @@ class yetiforce extends rcube_plugin
 	 */
 	public function startup($args): array
 	{
+		if ('mail' === $args['task'] && 'autocomplete' === $args['action']) {
+			$args['action'] = 'plugin.yetiforce-autocomplete';
+		}
 		if (empty($_GET['_autologin']) || !($row = $this->getAutoLogin())) {
 			return $args;
 		}
@@ -1364,4 +1368,44 @@ class yetiforce extends rcube_plugin
 		}
 		return $attachments;
 	}
+	
+	/**
+	 * @see rcmail_action_mail_autocomplete
+	 * 
+	 * Overrides the autocomplete action.
+	 * 
+	 * @return void
+	 */
+	public function autocomplete(): void
+	{
+		$rcmail = rcmail::get_instance();
+		$search = rcube_utils::get_input_string('_search', rcube_utils::INPUT_GPC, true);
+		$reqid = rcube_utils::get_input_string('_reqid', rcube_utils::INPUT_GPC);
+		$contacts = [];
+
+		if (\strlen($search)) {
+			$contacts = [];
+			$crmUserId = false;
+			if (isset($_SESSION['crm']['id'])) {
+				$crmUserId = $_SESSION['crm']['id'];
+			} elseif ($rcmail->user->data['crm_user_id']) {
+				$crmUserId = $rcmail->user->data['crm_user_id'];
+			}
+			if ($crmUserId) {
+				$addressBookFile = $rcmail->config->get('root_directory') . 'cache/addressBook/mails_' . $crmUserId . '.php';
+				if (is_file($addressBookFile)) {
+					include $addressBookFile;
+					$contacts = preg_grep(
+						'/' . preg_quote($search, '/') . '/i',
+						$bookMails,
+					);
+				}
+			}
+			$contacts = array_values($contacts);
+		}
+
+		$rcmail->output->command('ksearch_query_results', $contacts, $search, $reqid);
+		$rcmail->output->send();
+	}
+
 }
