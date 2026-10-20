@@ -2,6 +2,51 @@
 
 This file includes only changes we consider noteworthy for users, admins and plugin authors. For a full view please look at the git history.
 
+## Release 1.7.5
+
+- Installer: Add possibility to detsroy the installer session/cookie
+- Enigma: Fix db_sync() never restoring keyring files (#10343)
+- Markasjunk: Skip messages whose %s/%h values start with '-' (#10344)
+- Password: Replace SQL query placeholders in a single pass (#10345)
+- Fix exit code of the healthcheck.sh script (#10337)
+- Security: Fix IMAP command injection via CRLF in `_uid` parameter of mail/headers and mail/viewsource action
+- Security: Fix bug where an alias login wasn't qualified by IMAP host
+- Security: Add a size limit to the CSS proxy content processing
+- Security: Fix SSRF filter (is_local_url()) bypass via NAT64 64:ff9b::/96
+- Security: Fix remote content blocking bypass via SVG SMIL `by` attribute
+- Security: Fix remote content blocking bypass via CSS escapes in FuncIRI attributes (again)
+- Security: Fix passing potentally unsafe attachment content into ImageMagick on image resize
+- Security: Fix mail header injection via the From display-name in the Bounce (resend) action
+- Security: Fix mail header injection via References/In-Reply-To/Message-ID/From parameters
+- Security: Fix object injection primitive in rcube_session::unserialize() via "!"-prefixed session keys
+- Security: Fix ImageMagick resource limits bypass by GD fallback during thumbnail generation
+- Security: Fix CSS scoping bypass in HTML messages using at-rules
+- Security: Fix bug where deprecated action aliases bypassed `disabled_actions` setting
+- Security: Fix IMAP command injection via CRLF in `_flag` parameter of mail/mark action
+- Security: Fix CSRF validation bypass in the mark-as-junk action
+- Security: Fix XSS issue in handling of password driver error responses
+- Security: Fix mail header injection via subject of a message forwarded as attachment
+- Security: Fix mail header injection via media type in an inline image data URI
+- Security: Fix bug where Password Modoboa driver could change password for another account
+- Security: Fix unsafe use of a login name in SquirrelMail import file path
+
+## Release 1.7.4
+
+- Use `X-Content-Type-Options:nosniff` for attachment previews and downloads (#10308)
+- zipdownload: Fix attachment filename sanitisation of backslash and control characters (#10325)
+- Security: Fix CSS declaration smuggling via un-encoded ampersand emission
+- Security: Fix CSS property injection via body `background` attribute
+- Security: Fix email header injection via bare CR in the subject field
+- Security: Fix email header injection via C-escape \r in the recipient display name
+- Security: Fix email header injection via identity's organization field
+- Security: Fix zero-click stored XSS via TNEF MIME tag injection in the attachment URL
+- Security: Fix XSS in the HTML editor using text/enriched part content
+- Security: Fix cross-user access in contact group membership (add/remove) in the SQL address book
+- Security: Fix is_local_url() bypass via trailing-dot FQDN in stylesheet URL
+- Security: Fix remote content blocking bypass via CSS escapes in FuncIRI attributes
+- Security: Fix remote-content blocker bypass via SVG SMIL src animation
+- Security: Fix SSRF bypass in Roundcube CSS proxy via hexadecimal IPv6-mapped IPv4 addresses
+
 ## Release 1.7.3
 
 - OAuth: Don't log an error when a refreshed token's TTL is below refresh_interval (#10213)
@@ -14,17 +59,17 @@ This file includes only changes we consider noteworthy for users, admins and plu
 - Fix decoding of multi-segment RFC2231 extended attachment filenames (#10268)
 - Fix vCard import silently dropping properties with a non-item group prefix (#10271)
 - Fix so `REQUEST_URI` is used as a fallback if `PATH_INFO` is empty in static.php (#10181)
-- Security: Add basic validation for content proxied by the css proxy
-- Security: Fix SSRF bypass via specific local address URLs using 100.64.0.0/10 and fe80::/10 nets
-- Security: Fix SSRF filter bypass via various forms of nip.io/sslip.io hostnames evading is_local_url() check
-- Security: Fix remote content blocking bypass via unclosed url() in a FuncIRI attribute
-- Security: Fix LDAP filter injection via unescaped %u/%fu/%d substitution into the `search_filter`
-- Security: Fix arbitrary Sieve script injection via a filter rule name bypassing `managesieve_disabled_actions`
-- Security: Fix RCE via `cmd_learn` driver of markasjunk plugin
-- Security: Fix IMAP command injection via mail search and LITERAL+ byte-count desynchronization
-- Security: Fix password's modoboa driver leak of an authentication token to a user-controlled host
-- Security: Fix stored XSS in "Add to address book" action
-- Security: Fix HTML/CSS sanitization bypass via SVG animate `by` attribute
+- Security: Add basic validation for content proxied by the css proxy [CVE-2026-74998]
+- Security: Fix SSRF bypass via specific local address URLs using 100.64.0.0/10 and fe80::/10 nets [CVE-2026-75006]
+- Security: Fix SSRF filter bypass via various forms of nip.io/sslip.io hostnames evading is_local_url() check [CVE-2026-75006]
+- Security: Fix remote content blocking bypass via unclosed url() in a FuncIRI attribute [CVE-2026-75003]
+- Security: Fix LDAP filter injection via unescaped %u/%fu/%d substitution into the `search_filter` [CVE-2026-75007]
+- Security: Fix arbitrary Sieve script injection via a filter rule name bypassing `managesieve_disabled_actions` [CVE-2026-75004]
+- Security: Fix RCE via `cmd_learn` driver of markasjunk plugin [CVE-2026-74997]
+- Security: Fix IMAP command injection via mail search and LITERAL+ byte-count desynchronization [CVE-2026-75002]
+- Security: Fix password's modoboa driver leak of an authentication token to a user-controlled host [CVE-2026-75010]
+- Security: Fix stored XSS in "Add to address book" action [CVE-2026-74999]
+- Security: Fix HTML/CSS sanitization bypass via SVG animate `by` attribute [CVE-2026-75000]
 
 ## Release 1.7.2
 
