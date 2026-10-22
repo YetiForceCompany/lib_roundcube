@@ -191,23 +191,23 @@
         },
         {
             "name": "guzzlehttp/guzzle",
-            "version": "7.15.3",
-            "version_normalized": "7.15.3.0",
+            "version": "7.16.0",
+            "version_normalized": "7.16.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/guzzle.git",
-                "reference": "ae311b8f045ea93ce7b1c9cdb7cec06c53f944bc"
+                "reference": "ffb62ec787050ae4fa9449cdd6b80335db69bda2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/ae311b8f045ea93ce7b1c9cdb7cec06c53f944bc",
-                "reference": "ae311b8f045ea93ce7b1c9cdb7cec06c53f944bc",
+                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/ffb62ec787050ae4fa9449cdd6b80335db69bda2",
+                "reference": "ffb62ec787050ae4fa9449cdd6b80335db69bda2",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
-                "guzzlehttp/promises": "^2.5.2",
-                "guzzlehttp/psr7": "^2.13",
+                "guzzlehttp/promises": "^2.6",
+                "guzzlehttp/psr7": "^2.13.2",
                 "php": "^7.2.5 || ^8.0",
                 "psr/http-client": "^1.0",
                 "symfony/deprecation-contracts": "^2.5 || ^3.0",
@@ -230,7 +230,7 @@
                 "ext-intl": "Required for Internationalized Domain Name (IDN) support",
                 "psr/log": "Required for using the Log middleware"
             },
-            "time": "2026-08-05T19:48:21+00:00",
+            "time": "2026-10-18T13:38:36+00:00",
             "type": "library",
             "extra": {
                 "bamarni-bin": {
@@ -302,7 +302,7 @@
             ],
             "support": {
                 "issues": "https://github.com/guzzle/guzzle/issues",
-                "source": "https://github.com/guzzle/guzzle/tree/7.15.3"
+                "source": "https://github.com/guzzle/guzzle/tree/7.16.0"
             },
             "funding": [
                 {
@@ -322,17 +322,17 @@
         },
         {
             "name": "guzzlehttp/promises",
-            "version": "2.5.2",
-            "version_normalized": "2.5.2.0",
+            "version": "2.6.0",
+            "version_normalized": "2.6.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/promises.git",
-                "reference": "2823687acff28b2dbe67b2508a6b300e2c3fa4ce"
+                "reference": "3d88c829bd5f13d13847b39067dbf09a60af2154"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/promises/zipball/2823687acff28b2dbe67b2508a6b300e2c3fa4ce",
-                "reference": "2823687acff28b2dbe67b2508a6b300e2c3fa4ce",
+                "url": "https://api.github.com/repos/guzzle/promises/zipball/3d88c829bd5f13d13847b39067dbf09a60af2154",
+                "reference": "3d88c829bd5f13d13847b39067dbf09a60af2154",
                 "shasum": ""
             },
             "require": {
@@ -343,7 +343,7 @@
                 "bamarni/composer-bin-plugin": "^1.8.2",
                 "phpunit/phpunit": "^8.5.52 || ^9.6.34"
             },
-            "time": "2026-08-05T19:30:54+00:00",
+            "time": "2026-10-18T12:46:59+00:00",
             "type": "library",
             "extra": {
                 "bamarni-bin": {
@@ -389,7 +389,7 @@
             ],
             "support": {
                 "issues": "https://github.com/guzzle/promises/issues",
-                "source": "https://github.com/guzzle/promises/tree/2.5.2"
+                "source": "https://github.com/guzzle/promises/tree/2.6.0"
             },
             "funding": [
                 {
@@ -409,17 +409,17 @@
         },
         {
             "name": "guzzlehttp/psr7",
-            "version": "2.13.0",
-            "version_normalized": "2.13.0.0",
+            "version": "2.13.2",
+            "version_normalized": "2.13.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/psr7.git",
-                "reference": "dad89620b7a6edb60c15858442eb2e408b45d8f4"
+                "reference": "adee536f95101929f262b8c59e8a61472f347d58"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/psr7/zipball/dad89620b7a6edb60c15858442eb2e408b45d8f4",
-                "reference": "dad89620b7a6edb60c15858442eb2e408b45d8f4",
+                "url": "https://api.github.com/repos/guzzle/psr7/zipball/adee536f95101929f262b8c59e8a61472f347d58",
+                "reference": "adee536f95101929f262b8c59e8a61472f347d58",
                 "shasum": ""
             },
             "require": {
@@ -443,7 +443,7 @@
             "suggest": {
                 "laminas/laminas-httphandlerrunner": "Emit PSR-7 responses"
             },
-            "time": "2026-07-16T22:23:49+00:00",
+            "time": "2026-10-17T23:49:46+00:00",
             "type": "library",
             "extra": {
                 "bamarni-bin": {
@@ -511,7 +511,7 @@
             ],
             "support": {
                 "issues": "https://github.com/guzzle/psr7/issues",
-                "source": "https://github.com/guzzle/psr7/tree/2.13.0"
+                "source": "https://github.com/guzzle/psr7/tree/2.13.2"
             },
             "funding": [
                 {
@@ -582,17 +582,17 @@
         },
         {
             "name": "league/commonmark",
-            "version": "2.9.0",
-            "version_normalized": "2.9.0.0",
+            "version": "2.10.4",
+            "version_normalized": "2.10.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/commonmark.git",
-                "reference": "5703d83ba3da3b2e356a5fedc848ed6d8ffb6529"
+                "reference": "40821b7606d8d946bac57dbd2290076c722e3a65"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/commonmark/zipball/5703d83ba3da3b2e356a5fedc848ed6d8ffb6529",
-                "reference": "5703d83ba3da3b2e356a5fedc848ed6d8ffb6529",
+                "url": "https://api.github.com/repos/thephpleague/commonmark/zipball/40821b7606d8d946bac57dbd2290076c722e3a65",
+                "reference": "40821b7606d8d946bac57dbd2290076c722e3a65",
                 "shasum": ""
             },
             "require": {
@@ -626,11 +626,11 @@
             "suggest": {
                 "symfony/yaml": "v2.3+ required if using the Front Matter extension"
             },
-            "time": "2026-08-03T13:42:31+00:00",
+            "time": "2026-10-17T19:59:50+00:00",
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-main": "2.10-dev"
+                    "dev-main": "2.11-dev"
                 }
             },
             "installation-source": "dist",
@@ -847,17 +847,17 @@
         },
         {
             "name": "mlocati/ip-lib",
-            "version": "1.22.0",
-            "version_normalized": "1.22.0.0",
+            "version": "1.22.1",
+            "version_normalized": "1.22.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mlocati/ip-lib.git",
-                "reference": "4e40ffd3bf9989db19403d89c4d8be44b87b8a91"
+                "reference": "f096c0e9ec8bd4691ee45394cfb77c97c6bba272"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mlocati/ip-lib/zipball/4e40ffd3bf9989db19403d89c4d8be44b87b8a91",
-                "reference": "4e40ffd3bf9989db19403d89c4d8be44b87b8a91",
+                "url": "https://api.github.com/repos/mlocati/ip-lib/zipball/f096c0e9ec8bd4691ee45394cfb77c97c6bba272",
+                "reference": "f096c0e9ec8bd4691ee45394cfb77c97c6bba272",
                 "shasum": ""
             },
             "require": {
@@ -867,7 +867,7 @@
                 "ext-pdo_sqlite": "*",
                 "phpunit/phpunit": "^4.8 || ^5.7 || ^6.5 || ^7.5 || ^8.5 || ^9.5"
             },
-            "time": "2025-10-15T12:35:09+00:00",
+            "time": "2026-09-17T09:24:44+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -905,7 +905,7 @@
             ],
             "support": {
                 "issues": "https://github.com/mlocati/ip-lib/issues",
-                "source": "https://github.com/mlocati/ip-lib/tree/1.22.0"
+                "source": "https://github.com/mlocati/ip-lib/tree/1.22.1"
             },
             "funding": [
                 {
@@ -921,17 +921,17 @@
         },
         {
             "name": "nette/schema",
-            "version": "v1.3.5",
-            "version_normalized": "1.3.5.0",
+            "version": "v1.3.6",
+            "version_normalized": "1.3.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/schema.git",
-                "reference": "f0ab1a3cda782dbc5da270d28545236aa80c4002"
+                "reference": "c54350438cd6914616f790a49cb424605f421562"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/schema/zipball/f0ab1a3cda782dbc5da270d28545236aa80c4002",
-                "reference": "f0ab1a3cda782dbc5da270d28545236aa80c4002",
+                "url": "https://api.github.com/repos/nette/schema/zipball/c54350438cd6914616f790a49cb424605f421562",
+                "reference": "c54350438cd6914616f790a49cb424605f421562",
                 "shasum": ""
             },
             "require": {
@@ -945,7 +945,7 @@
                 "phpstan/phpstan": "^2.1.39@stable",
                 "tracy/tracy": "^2.8"
             },
-            "time": "2026-02-23T03:47:12+00:00",
+            "time": "2026-08-16T21:58:41+00:00",
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -985,7 +985,7 @@
             ],
             "support": {
                 "issues": "https://github.com/nette/schema/issues",
-                "source": "https://github.com/nette/schema/tree/v1.3.5"
+                "source": "https://github.com/nette/schema/tree/v1.3.6"
             },
             "install-path": "../nette/schema"
         },
@@ -1571,7 +1571,6 @@
                 "issues": "http://pear.php.net/bugs/search.php?cmd=display&package_name[]=Net_Socket",
                 "source": "https://github.com/pear/Net_Socket"
             },
-            "abandoned": true,
             "install-path": "../pear/net_socket"
         },
         {
@@ -2157,23 +2156,23 @@
         },
         {
             "name": "symfony/polyfill-php80",
-            "version": "v1.37.0",
-            "version_normalized": "1.37.0.0",
+            "version": "v1.43.0",
+            "version_normalized": "1.43.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-php80.git",
-                "reference": "dfb55726c3a76ea3b6459fcfda1ec2d80a682411"
+                "reference": "9c6a5d6b01ca51d486c813e9a9c0ed55f208bb74"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-php80/zipball/dfb55726c3a76ea3b6459fcfda1ec2d80a682411",
-                "reference": "dfb55726c3a76ea3b6459fcfda1ec2d80a682411",
+                "url": "https://api.github.com/repos/symfony/polyfill-php80/zipball/9c6a5d6b01ca51d486c813e9a9c0ed55f208bb74",
+                "reference": "9c6a5d6b01ca51d486c813e9a9c0ed55f208bb74",
                 "shasum": ""
             },
             "require": {
                 "php": ">=7.2"
             },
-            "time": "2026-04-10T16:19:22+00:00",
+            "time": "2026-09-25T15:50:05+00:00",
             "type": "library",
             "extra": {
                 "thanks": {
@@ -2220,7 +2219,7 @@
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-php80/tree/v1.37.0"
+                "source": "https://github.com/symfony/polyfill-php80/tree/v1.43.0"
             },
             "funding": [
                 {
@@ -2244,23 +2243,23 @@
         },
         {
             "name": "symfony/polyfill-php85",
-            "version": "v1.41.0",
-            "version_normalized": "1.41.0.0",
+            "version": "v1.43.0",
+            "version_normalized": "1.43.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-php85.git",
-                "reference": "255fab485aaa1006ed411040c42aecd7b5302d7a"
+                "reference": "86a42cbcc07adc331481a5ab310a4024bfc227f6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-php85/zipball/255fab485aaa1006ed411040c42aecd7b5302d7a",
-                "reference": "255fab485aaa1006ed411040c42aecd7b5302d7a",
+                "url": "https://api.github.com/repos/symfony/polyfill-php85/zipball/86a42cbcc07adc331481a5ab310a4024bfc227f6",
+                "reference": "86a42cbcc07adc331481a5ab310a4024bfc227f6",
                 "shasum": ""
             },
             "require": {
                 "php": ">=7.2"
             },
-            "time": "2026-07-01T12:47:55+00:00",
+            "time": "2026-09-25T15:46:47+00:00",
             "type": "library",
             "extra": {
                 "thanks": {
@@ -2303,7 +2302,7 @@
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-php85/tree/v1.41.0"
+                "source": "https://github.com/symfony/polyfill-php85/tree/v1.43.0"
             },
             "funding": [
                 {
