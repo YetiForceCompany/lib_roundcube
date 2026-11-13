@@ -31,6 +31,7 @@
                 "ext-imagick": "to generate QR code images"
             },
             "time": "2026-04-05T21:06:35+00:00",
+            "published-time": "2026-04-05T21:07:28+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -81,6 +82,7 @@
                 "squizlabs/php_codesniffer": "*"
             },
             "time": "2025-09-16T12:23:56+00:00",
+            "published-time": "2025-09-16T12:25:04+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -137,6 +139,7 @@
                 "vimeo/psalm": "^4.0.0"
             },
             "time": "2024-07-08T12:26:09+00:00",
+            "published-time": "2024-07-08T12:27:13+00:00",
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -191,17 +194,17 @@
         },
         {
             "name": "guzzlehttp/guzzle",
-            "version": "7.16.0",
-            "version_normalized": "7.16.0.0",
+            "version": "7.16.1",
+            "version_normalized": "7.16.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/guzzle.git",
-                "reference": "ffb62ec787050ae4fa9449cdd6b80335db69bda2"
+                "reference": "81755d989b3007ca7f88a069857553cd08e7dc2e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/ffb62ec787050ae4fa9449cdd6b80335db69bda2",
-                "reference": "ffb62ec787050ae4fa9449cdd6b80335db69bda2",
+                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/81755d989b3007ca7f88a069857553cd08e7dc2e",
+                "reference": "81755d989b3007ca7f88a069857553cd08e7dc2e",
                 "shasum": ""
             },
             "require": {
@@ -230,7 +233,8 @@
                 "ext-intl": "Required for Internationalized Domain Name (IDN) support",
                 "psr/log": "Required for using the Log middleware"
             },
-            "time": "2026-10-18T13:38:36+00:00",
+            "time": "2026-10-25T21:35:21+00:00",
+            "published-time": "2026-10-25T21:37:23+00:00",
             "type": "library",
             "extra": {
                 "bamarni-bin": {
@@ -302,7 +306,7 @@
             ],
             "support": {
                 "issues": "https://github.com/guzzle/guzzle/issues",
-                "source": "https://github.com/guzzle/guzzle/tree/7.16.0"
+                "source": "https://github.com/guzzle/guzzle/tree/7.16.1"
             },
             "funding": [
                 {
@@ -344,6 +348,7 @@
                 "phpunit/phpunit": "^8.5.52 || ^9.6.34"
             },
             "time": "2026-10-18T12:46:59+00:00",
+            "published-time": "2026-10-18T12:47:39+00:00",
             "type": "library",
             "extra": {
                 "bamarni-bin": {
@@ -444,6 +449,7 @@
                 "laminas/laminas-httphandlerrunner": "Emit PSR-7 responses"
             },
             "time": "2026-10-17T23:49:46+00:00",
+            "published-time": "2026-10-17T23:51:00+00:00",
             "type": "library",
             "extra": {
                 "bamarni-bin": {
@@ -543,6 +549,7 @@
                 "php": ">=5.3.3"
             },
             "time": "2023-06-07T08:32:15+00:00",
+            "published-time": "2023-06-29T20:39:48+00:00",
             "type": "library",
             "installation-source": "source",
             "autoload": {
@@ -582,17 +589,17 @@
         },
         {
             "name": "league/commonmark",
-            "version": "2.10.4",
-            "version_normalized": "2.10.4.0",
+            "version": "2.10.7",
+            "version_normalized": "2.10.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/commonmark.git",
-                "reference": "40821b7606d8d946bac57dbd2290076c722e3a65"
+                "reference": "8eb53e906fd60c67038d22f1f1cab420ed58b8be"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/commonmark/zipball/40821b7606d8d946bac57dbd2290076c722e3a65",
-                "reference": "40821b7606d8d946bac57dbd2290076c722e3a65",
+                "url": "https://api.github.com/repos/thephpleague/commonmark/zipball/8eb53e906fd60c67038d22f1f1cab420ed58b8be",
+                "reference": "8eb53e906fd60c67038d22f1f1cab420ed58b8be",
                 "shasum": ""
             },
             "require": {
@@ -626,7 +633,8 @@
             "suggest": {
                 "symfony/yaml": "v2.3+ required if using the Front Matter extension"
             },
-            "time": "2026-10-17T19:59:50+00:00",
+            "time": "2026-10-31T13:35:37+00:00",
+            "published-time": "2026-10-31T13:35:57+00:00",
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -718,6 +726,7 @@
                 "vimeo/psalm": "^4.7.3"
             },
             "time": "2022-12-11T20:36:23+00:00",
+            "published-time": "2022-12-11T20:36:45+00:00",
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -798,6 +807,7 @@
                 "phpunit/phpunit": "^4.8.35 || ^5.7.21 || ^6 || ^7 || ^8 || ^9"
             },
             "time": "2024-03-31T07:05:07+00:00",
+            "published-time": "2024-04-03T14:00:42+00:00",
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -868,6 +878,7 @@
                 "phpunit/phpunit": "^4.8 || ^5.7 || ^6.5 || ^7.5 || ^8.5 || ^9.5"
             },
             "time": "2026-09-17T09:24:44+00:00",
+            "published-time": "2026-09-17T09:27:00+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -921,35 +932,36 @@
         },
         {
             "name": "nette/schema",
-            "version": "v1.3.6",
-            "version_normalized": "1.3.6.0",
+            "version": "v1.4.0",
+            "version_normalized": "1.4.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/schema.git",
-                "reference": "c54350438cd6914616f790a49cb424605f421562"
+                "reference": "af9fa8a86bfca9b02b10346220db26e62ef942ec"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/schema/zipball/c54350438cd6914616f790a49cb424605f421562",
-                "reference": "c54350438cd6914616f790a49cb424605f421562",
+                "url": "https://api.github.com/repos/nette/schema/zipball/af9fa8a86bfca9b02b10346220db26e62ef942ec",
+                "reference": "af9fa8a86bfca9b02b10346220db26e62ef942ec",
                 "shasum": ""
             },
             "require": {
                 "nette/utils": "^4.0",
-                "php": "8.1 - 8.5"
+                "php": "8.1 - 8.6"
             },
             "require-dev": {
-                "nette/phpstan-rules": "^1.0",
+                "nette/phpstan-rules": "^1.0.7",
                 "nette/tester": "^2.6",
                 "phpstan/extension-installer": "^1.4@stable",
-                "phpstan/phpstan": "^2.1.39@stable",
+                "phpstan/phpstan": "^2.3@stable",
                 "tracy/tracy": "^2.8"
             },
-            "time": "2026-08-16T21:58:41+00:00",
+            "time": "2026-10-22T02:12:50+00:00",
+            "published-time": "2026-10-22T02:14:45+00:00",
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.3-dev"
+                    "dev-master": "1.4-dev"
                 }
             },
             "installation-source": "dist",
@@ -971,41 +983,41 @@
                 {
                     "name": "David Grudl",
                     "homepage": "https://davidgrudl.com"
-                },
-                {
-                    "name": "Nette Community",
-                    "homepage": "https://nette.org/contributors"
                 }
             ],
-            "description": "📐 Nette Schema: validating data structures against a given Schema.",
-            "homepage": "https://nette.org",
+            "description": "📐 Nette Schema: validates and normalizes data such as configuration or API input against a schema described in a few readable lines of PHP, with precise error messages.",
+            "homepage": "https://doc.nette.org/schema",
             "keywords": [
-                "config",
-                "nette"
+                "configuration",
+                "data validation",
+                "nette",
+                "normalization",
+                "schema",
+                "validation"
             ],
             "support": {
                 "issues": "https://github.com/nette/schema/issues",
-                "source": "https://github.com/nette/schema/tree/v1.3.6"
+                "source": "https://github.com/nette/schema/tree/v1.4.0"
             },
             "install-path": "../nette/schema"
         },
         {
             "name": "nette/utils",
-            "version": "v4.0.10",
-            "version_normalized": "4.0.10.0",
+            "version": "v4.0.11",
+            "version_normalized": "4.0.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/utils.git",
-                "reference": "2778deb6aab136c8db4ed1f4d6e9f465ca2dbee3"
+                "reference": "c9958d457077885860569245ffbf66f8131f36cb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/utils/zipball/2778deb6aab136c8db4ed1f4d6e9f465ca2dbee3",
-                "reference": "2778deb6aab136c8db4ed1f4d6e9f465ca2dbee3",
+                "url": "https://api.github.com/repos/nette/utils/zipball/c9958d457077885860569245ffbf66f8131f36cb",
+                "reference": "c9958d457077885860569245ffbf66f8131f36cb",
                 "shasum": ""
             },
             "require": {
-                "php": "8.0 - 8.5"
+                "php": "8.0 - 8.6"
             },
             "conflict": {
                 "nette/finder": "<3",
@@ -1025,7 +1037,8 @@
                 "ext-mbstring": "to use Strings::lower() etc...",
                 "ext-tokenizer": "to use Nette\\Utils\\Reflection::getUseStatements()"
             },
-            "time": "2025-12-01T17:30:42+00:00",
+            "time": "2026-10-21T16:50:30+00:00",
+            "published-time": "2026-10-21T16:52:36+00:00",
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -1077,7 +1090,7 @@
             ],
             "support": {
                 "issues": "https://github.com/nette/utils/issues",
-                "source": "https://github.com/nette/utils/tree/v4.0.10"
+                "source": "https://github.com/nette/utils/tree/v4.0.11"
             },
             "install-path": "../nette/utils"
         },
@@ -1100,6 +1113,7 @@
                 "phpunit/phpunit": "@stable"
             },
             "time": "2023-12-21T21:52:08+00:00",
+            "published-time": "2023-12-21T21:55:45+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -1155,6 +1169,7 @@
                 "shasum": ""
             },
             "time": "2019-11-20T18:27:48+00:00",
+            "published-time": "2019-11-20T18:28:59+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -1221,6 +1236,7 @@
                 "ext-posix": "May require the posix PHP extension"
             },
             "time": "2026-05-07T16:55:52+00:00",
+            "published-time": "2026-05-07T17:08:00+00:00",
             "bin": [
                 "scripts/crypt-gpg-pinentry"
             ],
@@ -1268,24 +1284,28 @@
         },
         {
             "name": "pear/mail_mime",
-            "version": "1.10.13",
-            "version_normalized": "1.10.13.0",
+            "version": "1.11.0",
+            "version_normalized": "1.11.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pear/Mail_Mime.git",
-                "reference": "cda56082cc1a3722d6929caa66abfe95b7406e12"
+                "reference": "ed0f65ca0c0a2bcb18a512f67d3ac27ba4ea0924"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pear/Mail_Mime/zipball/cda56082cc1a3722d6929caa66abfe95b7406e12",
-                "reference": "cda56082cc1a3722d6929caa66abfe95b7406e12",
+                "url": "https://api.github.com/repos/pear/Mail_Mime/zipball/ed0f65ca0c0a2bcb18a512f67d3ac27ba4ea0924",
+                "reference": "ed0f65ca0c0a2bcb18a512f67d3ac27ba4ea0924",
                 "shasum": ""
             },
             "require": {
                 "pear/pear-core-minimal": "*",
                 "php": ">=5.2.0"
             },
-            "time": "2026-08-08T07:08:35+00:00",
+            "require-dev": {
+                "phpunit/phpunit": "^4.8.35 || ^5.7.21 || ^6 || ^7 || ^9 || ^10 || ^11"
+            },
+            "time": "2026-11-06T10:03:43+00:00",
+            "published-time": "2026-11-06T10:08:23+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -1343,6 +1363,7 @@
                 "phpunit/phpunit": "^9 || ^10.3"
             },
             "time": "2023-10-12T20:00:01+00:00",
+            "published-time": "2023-10-12T20:00:26+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -1396,6 +1417,7 @@
                 "pear/auth_sasl": "Install optionally via your project's composer.json"
             },
             "time": "2025-10-22T09:34:30+00:00",
+            "published-time": "2025-10-22T09:35:15+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -1468,6 +1490,7 @@
                 "pear/auth_sasl": "Install optionally via your project's composer.json"
             },
             "time": "2026-01-04T22:03:47+00:00",
+            "published-time": "2026-01-04T22:04:18+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -1535,6 +1558,7 @@
                 "phpunit/phpunit": "*"
             },
             "time": "2015-03-22T15:48:19+00:00",
+            "published-time": "2018-09-09T07:18:18+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -1597,6 +1621,7 @@
                 "rsky/pear-core-min": "self.version"
             },
             "time": "2025-12-14T20:37:07+00:00",
+            "published-time": "2026-01-25T18:45:15+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -1647,6 +1672,7 @@
                 "phpunit/phpunit": "<9"
             },
             "time": "2021-03-21T15:43:46+00:00",
+            "published-time": "2021-03-21T15:44:58+00:00",
             "type": "class",
             "extra": {
                 "branch-alias": {
@@ -1706,6 +1732,7 @@
                 "php": ">=7.2.0"
             },
             "time": "2019-01-08T18:20:26+00:00",
+            "published-time": "2019-03-25T15:31:44+00:00",
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -1760,6 +1787,7 @@
                 "psr/http-message": "^1.0 || ^2.0"
             },
             "time": "2023-09-23T14:17:50+00:00",
+            "published-time": "2023-09-23T14:18:12+00:00",
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -1815,6 +1843,7 @@
                 "psr/http-message": "^1.0 || ^2.0"
             },
             "time": "2024-04-15T12:06:14+00:00",
+            "published-time": "2024-05-10T07:32:19+00:00",
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -1872,6 +1901,7 @@
                 "php": "^7.2 || ^8.0"
             },
             "time": "2023-04-04T09:54:51+00:00",
+            "published-time": "2023-04-04T09:55:35+00:00",
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -1932,6 +1962,7 @@
                 "phpunit/phpunit": "^5 || ^6.5"
             },
             "time": "2019-03-08T08:55:37+00:00",
+            "published-time": "2019-03-08T09:01:32+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -1958,22 +1989,22 @@
         },
         {
             "name": "roundcube/plugin-installer",
-            "version": "0.3.11",
-            "version_normalized": "0.3.11.0",
+            "version": "0.3.12",
+            "version_normalized": "0.3.12.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/roundcube/plugin-installer.git",
-                "reference": "93c5cfc660d47929aaca64585791e7e3887948ed"
+                "reference": "f42b8f2bf3de8c3035cf0b1e95b7fa2f64902ef5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/roundcube/plugin-installer/zipball/93c5cfc660d47929aaca64585791e7e3887948ed",
-                "reference": "93c5cfc660d47929aaca64585791e7e3887948ed",
+                "url": "https://api.github.com/repos/roundcube/plugin-installer/zipball/f42b8f2bf3de8c3035cf0b1e95b7fa2f64902ef5",
+                "reference": "f42b8f2bf3de8c3035cf0b1e95b7fa2f64902ef5",
                 "shasum": ""
             },
             "require": {
                 "composer-plugin-api": "^2.1",
-                "php": ">=7.3 <8.6",
+                "php": ">=7.3",
                 "roundcube/roundcubemail": "*"
             },
             "require-dev": {
@@ -1985,7 +2016,8 @@
                 "phpstan/phpstan-deprecation-rules": "^1.0",
                 "phpstan/phpstan-strict-rules": "^1.3"
             },
-            "time": "2025-10-03T12:54:12+00:00",
+            "time": "2026-10-21T18:45:28+00:00",
+            "published-time": "2026-10-21T18:46:48+00:00",
             "type": "composer-plugin",
             "extra": {
                 "class": [
@@ -2019,7 +2051,7 @@
             "description": "A composer-installer for Roundcube plugins and skins.",
             "support": {
                 "issues": "https://github.com/roundcube/plugin-installer/issues",
-                "source": "https://github.com/roundcube/plugin-installer/tree/0.3.11"
+                "source": "https://github.com/roundcube/plugin-installer/tree/0.3.12"
             },
             "install-path": "../roundcube/plugin-installer"
         },
@@ -2048,6 +2080,7 @@
                 "phpunit/phpunit": "^4.8.36 || ^5.7.21 || ^6 || ^7 | ^9.6"
             },
             "time": "2023-12-31T14:01:02+00:00",
+            "published-time": "2023-12-31T14:01:47+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -2082,23 +2115,24 @@
         },
         {
             "name": "symfony/deprecation-contracts",
-            "version": "v3.7.1",
-            "version_normalized": "3.7.1.0",
+            "version": "v3.8.1",
+            "version_normalized": "3.8.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/deprecation-contracts.git",
-                "reference": "f3202fa1b5097b0af062dc978b32ecf63404e31d"
+                "reference": "feb1edf4e546af3b85c5caebe8359a20db230ca3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/deprecation-contracts/zipball/f3202fa1b5097b0af062dc978b32ecf63404e31d",
-                "reference": "f3202fa1b5097b0af062dc978b32ecf63404e31d",
+                "url": "https://api.github.com/repos/symfony/deprecation-contracts/zipball/feb1edf4e546af3b85c5caebe8359a20db230ca3",
+                "reference": "feb1edf4e546af3b85c5caebe8359a20db230ca3",
                 "shasum": ""
             },
             "require": {
                 "php": ">=8.1"
             },
-            "time": "2026-06-05T06:23:12+00:00",
+            "time": "2026-09-16T14:15:10+00:00",
+            "published-time": "2026-11-04T11:25:34+00:00",
             "type": "library",
             "extra": {
                 "thanks": {
@@ -2106,7 +2140,7 @@
                     "name": "symfony/contracts"
                 },
                 "branch-alias": {
-                    "dev-main": "3.7-dev"
+                    "dev-main": "3.8-dev"
                 }
             },
             "installation-source": "dist",
@@ -2132,7 +2166,7 @@
             "description": "A generic function and convention to trigger deprecation notices",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/deprecation-contracts/tree/v3.7.1"
+                "source": "https://github.com/symfony/deprecation-contracts/tree/v3.8.1"
             },
             "funding": [
                 {
@@ -2173,6 +2207,7 @@
                 "php": ">=7.2"
             },
             "time": "2026-09-25T15:50:05+00:00",
+            "published-time": "2026-09-30T10:23:35+00:00",
             "type": "library",
             "extra": {
                 "thanks": {
@@ -2242,6 +2277,90 @@
             "install-path": "../symfony/polyfill-php80"
         },
         {
+            "name": "symfony/polyfill-php84",
+            "version": "v1.43.0",
+            "version_normalized": "1.43.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/polyfill-php84.git",
+                "reference": "22c6548499cbe5c5bb072fc0c42312dff062a015"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/polyfill-php84/zipball/22c6548499cbe5c5bb072fc0c42312dff062a015",
+                "reference": "22c6548499cbe5c5bb072fc0c42312dff062a015",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.2"
+            },
+            "time": "2026-09-23T22:01:09+00:00",
+            "published-time": "2026-09-30T10:23:33+00:00",
+            "type": "library",
+            "extra": {
+                "thanks": {
+                    "url": "https://github.com/symfony/polyfill",
+                    "name": "symfony/polyfill"
+                }
+            },
+            "installation-source": "dist",
+            "autoload": {
+                "files": [
+                    "bootstrap.php"
+                ],
+                "psr-4": {
+                    "Symfony\\Polyfill\\Php84\\": ""
+                },
+                "classmap": [
+                    "Resources/stubs"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Nicolas Grekas",
+                    "email": "p@tchwork.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony polyfill backporting some PHP 8.4+ features to lower PHP versions",
+            "homepage": "https://symfony.com",
+            "keywords": [
+                "compatibility",
+                "polyfill",
+                "portable",
+                "shim"
+            ],
+            "support": {
+                "source": "https://github.com/symfony/polyfill-php84/tree/v1.43.0"
+            },
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://github.com/nicolas-grekas",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
+            "install-path": "../symfony/polyfill-php84"
+        },
+        {
             "name": "symfony/polyfill-php85",
             "version": "v1.43.0",
             "version_normalized": "1.43.0.0",
@@ -2260,6 +2379,7 @@
                 "php": ">=7.2"
             },
             "time": "2026-09-25T15:46:47+00:00",
+            "published-time": "2026-09-30T10:23:32+00:00",
             "type": "library",
             "extra": {
                 "thanks": {

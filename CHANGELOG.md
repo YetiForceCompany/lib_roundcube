@@ -2,6 +2,37 @@
 
 This file includes only changes we consider noteworthy for users, admins and plugin authors. For a full view please look at the git history.
 
+## Release 1.7.6
+
+- Enable PHP 8.6 support (#10368, #10362)
+- LDAP: Fix TypeError on group members listing with PHP 8 (#10364)
+- Fix/Improve handling of IMAP literal strings
+- Fix fatal error when a SORT/THREAD/SEARCH/ESEARCH command response includes untagged responses (#10361)
+- Fix TypeError when archiving all messages via select-all (#10107)
+- Fix temporary files permissions to 0600 (#10328)
+- Fix refresh interval setting showing "never" when the configured value is not one of the predefined intervals (#10292)
+- Fix installto.sh and update.sh reporting success when an upgrade step fails (#10326)
+- Newmail_notifier: Fix restoring skin favicons defined with rel="icon" (#9575)
+- LDAP: Fix website link including the labeledURI label (#8816)
+- Fix non-ASCII special folder names displayed in UTF7-IMAP encoding when real names are shown (#10375)
+- Security: Fix open redirect via IMAP error recovery on attachment get
+- Security: Fix so Received: header includes only trusted hostname and forwarded IP from a trusted proxy
+- Security: Fix bug where some managesieve destructive actions could have been triggered cross-site via GET
+- Security: Fix Sieve script injection via a rule operator
+- Security: Fix Sieve script injection via set/include modifiers
+- Security: Fix bug where resolve_url() ignored trusted host setting
+- Security: Fix mail header injection via a MDN subject
+- Security: Fix HTTP request injection via the spellcheck ATD backend
+- Security: Fix IMAP command injection via CRLF in _uid parameter with messages_cache enabled
+- Security: Fix SSRF in CSS proxy via incomplete is_local_url() nip.io/sslip.io bypass
+- Security: Fix CSRF validation bypass for file-only POST requests
+- Security: Fix `disabled_actions` restriction bypass by writing '_' instead of '-' in the action name
+- Security: Fix CSRF validation bypass for mail purge/expunge commands
+- Security: Fix passing potentally unsafe attachment content into ImageMagick on image type conversion
+- Security: Fix Unbounded CPU loop/DoS in rcube_session::unserialize() via a negative length token
+- Security: Fix SSRF filter (is_local_url()) bypass via 6to4 (2002::/16) addresses
+- Security: Fix so IMAP host input is validated more strictly
+
 ## Release 1.7.5
 
 - Installer: Add possibility to detsroy the installer session/cookie
@@ -9,26 +40,26 @@ This file includes only changes we consider noteworthy for users, admins and plu
 - Markasjunk: Skip messages whose %s/%h values start with '-' (#10344)
 - Password: Replace SQL query placeholders in a single pass (#10345)
 - Fix exit code of the healthcheck.sh script (#10337)
-- Security: Fix IMAP command injection via CRLF in `_uid` parameter of mail/headers and mail/viewsource action
-- Security: Fix bug where an alias login wasn't qualified by IMAP host
-- Security: Add a size limit to the CSS proxy content processing
-- Security: Fix SSRF filter (is_local_url()) bypass via NAT64 64:ff9b::/96
-- Security: Fix remote content blocking bypass via SVG SMIL `by` attribute
-- Security: Fix remote content blocking bypass via CSS escapes in FuncIRI attributes (again)
-- Security: Fix passing potentally unsafe attachment content into ImageMagick on image resize
-- Security: Fix mail header injection via the From display-name in the Bounce (resend) action
-- Security: Fix mail header injection via References/In-Reply-To/Message-ID/From parameters
-- Security: Fix object injection primitive in rcube_session::unserialize() via "!"-prefixed session keys
-- Security: Fix ImageMagick resource limits bypass by GD fallback during thumbnail generation
-- Security: Fix CSS scoping bypass in HTML messages using at-rules
-- Security: Fix bug where deprecated action aliases bypassed `disabled_actions` setting
-- Security: Fix IMAP command injection via CRLF in `_flag` parameter of mail/mark action
-- Security: Fix CSRF validation bypass in the mark-as-junk action
-- Security: Fix XSS issue in handling of password driver error responses
-- Security: Fix mail header injection via subject of a message forwarded as attachment
-- Security: Fix mail header injection via media type in an inline image data URI
-- Security: Fix bug where Password Modoboa driver could change password for another account
-- Security: Fix unsafe use of a login name in SquirrelMail import file path
+- Security: Fix IMAP command injection via CRLF in `_uid` parameter of mail/headers and mail/viewsource action [CVE-2026-113386]
+- Security: Fix bug where an alias login wasn't qualified by IMAP host [CVE-2026-114732]
+- Security: Add a size limit to the CSS proxy content processing [CVE-2026-114731]
+- Security: Fix SSRF filter (is_local_url()) bypass via NAT64 64:ff9b::/96 [CVE-2026-114730]
+- Security: Fix remote content blocking bypass via SVG SMIL `by` attribute [CVE-2026-114729]
+- Security: Fix remote content blocking bypass via CSS escapes in FuncIRI attributes (again) [CVE-2026-114728]
+- Security: Fix passing potentally unsafe attachment content into ImageMagick on image resize [CVE-2026-114727]
+- Security: Fix mail header injection via the From display-name in the Bounce (resend) action [CVE-2026-114726]
+- Security: Fix mail header injection via References/In-Reply-To/Message-ID/From parameters [CVE-2026-114725]
+- Security: Fix object injection primitive in rcube_session::unserialize() via "!"-prefixed session keys [CVE-2026-114724]
+- Security: Fix ImageMagick resource limits bypass by GD fallback during thumbnail generation [CVE-2026-114723]
+- Security: Fix CSS scoping bypass in HTML messages using at-rules [CVE-2026-114722]
+- Security: Fix bug where deprecated action aliases bypassed `disabled_actions` setting [CVE-2026-114721]
+- Security: Fix IMAP command injection via CRLF in `_flag` parameter of mail/mark action [CVE-2026-114720]
+- Security: Fix CSRF validation bypass in the mark-as-junk action [CVE-2026-114719]
+- Security: Fix XSS issue in handling of password driver error responses [CVE-2026-114718]
+- Security: Fix mail header injection via subject of a message forwarded as attachment [CVE-2026-114717]
+- Security: Fix mail header injection via media type in an inline image data URI [CVE-2026-114716]
+- Security: Fix bug where Password Modoboa driver could change password for another account [CVE-2026-114715]
+- Security: Fix unsafe use of a login name in SquirrelMail import file path [CVE-2026-114714]
 
 ## Release 1.7.4
 

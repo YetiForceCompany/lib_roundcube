@@ -7,6 +7,7 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'Symfony\\Polyfill\\Php85\\' => array($vendorDir . '/symfony/polyfill-php85'),
+    'Symfony\\Polyfill\\Php84\\' => array($vendorDir . '/symfony/polyfill-php84'),
     'Symfony\\Polyfill\\Php80\\' => array($vendorDir . '/symfony/polyfill-php80'),
     'RtfHtmlPhp\\' => array($vendorDir . '/roundcube/rtf-html-php/src'),
     'Roundcube\\Composer\\' => array($vendorDir . '/roundcube/plugin-installer/src'),

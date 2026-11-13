@@ -307,7 +307,7 @@ class rcube_sieve_engine
 
         // Handle user requests
         if ($action = rcube_utils::get_input_string('_act', rcube_utils::INPUT_GPC)) {
-            $fid = (int) rcube_utils::get_input_value('_fid', rcube_utils::INPUT_POST);
+            $fid = rcube_utils::get_input_string('_fid', rcube_utils::INPUT_POST);
 
             if ($action == 'delete' && !$error) {
                 if (!in_array('delete_filter', $this->disabled_actions)) {
@@ -610,7 +610,7 @@ class rcube_sieve_engine
             if (!$error && empty($this->errors)) {
                 // Find position of the new script on the list
                 $list[] = $name;
-                asort($list, \SORT_LOCALE_STRING);
+                rcube_utils::asort($list);
                 $list = array_values($list);
                 $index = array_search($name, $list);
 
@@ -1304,7 +1304,7 @@ class rcube_sieve_engine
         $list = $this->list_scripts();
 
         if ($list) {
-            asort($list, \SORT_LOCALE_STRING);
+            rcube_utils::asort($list);
         }
 
         if (!empty($attrib['type']) && $attrib['type'] == 'list') {
@@ -1444,7 +1444,7 @@ class rcube_sieve_engine
         $select = new html_select(['name' => '_copy', 'id' => '_copy', 'class' => 'custom-select']);
 
         if (is_array($list)) {
-            asort($list, \SORT_LOCALE_STRING);
+            rcube_utils::asort($list);
 
             if (!$copy && isset($_SESSION['managesieve_current'])) {
                 $copy = $_SESSION['managesieve_current'];
@@ -3036,7 +3036,7 @@ class rcube_sieve_engine
                     $list[] = $name;
 
                     // Sort and find current script position
-                    asort($list, \SORT_LOCALE_STRING);
+                    rcube_utils::asort($list);
                     $list = array_values($list);
                     $index = array_search($name, $list);
 
