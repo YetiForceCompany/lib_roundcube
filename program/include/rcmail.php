@@ -240,8 +240,7 @@ class rcmail extends rcube
         $task = $task == 'addressbook' ? 'contacts' : $task;
 
         // check access to disabled actions
-        $disabled_actions = (array) $this->config->get('disabled_actions');
-        if (in_array($task . '.' . ($this->action ?: 'index'), $disabled_actions)) {
+        if ($this->is_action_disabled($task, $this->action ?: 'index')) {
             self::raise_error(['code' => 404, 'message' => 'Action disabled'], true, true);
         }
 
@@ -252,7 +251,7 @@ class rcmail extends rcube
 
             // check access to disabled actions (resolve an alias)
             if ($this->action && !empty($task_handler::$aliases[$this->action])) {
-                if (in_array($task . '.' . $task_handler::$aliases[$this->action], $disabled_actions)) {
+                if ($this->is_action_disabled($task, $task_handler::$aliases[$this->action])) {
                     self::raise_error(['code' => 404, 'message' => 'Action disabled'], true, true);
                 }
             }
@@ -312,6 +311,17 @@ class rcmail extends rcube
         // if we arrive here, something went wrong
         $error = ['code' => 404, 'message' => 'Invalid request'];
         self::raise_error($error, true, true);
+    }
+
+    /**
+     * Check if the action is disabled
+     */
+    public function is_action_disabled(string $task, string $action)
+    {
+        $disabled_actions = (array) $this->config->get('disabled_actions');
+
+        return in_array($task . '.' . str_replace('_', '-', $action), $disabled_actions)
+            || in_array($task . '.' . str_replace('-', '_', $action), $disabled_actions);
     }
 
     /**
@@ -535,7 +545,7 @@ class rcmail extends rcube
             }
 
             if (!empty($additional)) {
-                ksort($additional, \SORT_LOCALE_STRING);
+                rcube_utils::ksort($additional);
                 $responses = array_merge(array_values($additional), $responses);
             }
         }
@@ -992,6 +1002,9 @@ class rcmail extends rcube
             }
         } elseif (empty($default_host)) {
             $host = rcube_utils::get_input_string('_host', rcube_utils::INPUT_POST);
+            if (!preg_match('~^((imap|imaps|tls|ssl)://)?[\w.-]+(:[0-9]+)?\z~', $host)) {
+                $host = null;
+            }
         } else {
             $host = rcube_utils::parse_host($default_host);
         }
@@ -1646,17 +1659,16 @@ class rcmail extends rcube
 
         // define date format depending on current time
         if (!$format) {
-            $now = time();
-            $now_date = getdate($now);
-            $today_limit = mktime(0, 0, 0, $now_date['mon'], $now_date['mday'], $now_date['year']);
-            $week_limit = mktime(0, 0, 0, $now_date['mon'], $now_date['mday'] - 6, $now_date['year']);
+            $now = new \DateTimeImmutable('now', $date->getTimezone());
+            $today_limit = $now->setTime(0, 0)->getTimestamp();
+            $week_limit = $now->setTime(0, 0)->modify('-6 days')->getTimestamp();
             $pretty_date = $this->config->get('prettydate');
-            $timestamp = $date->format('U');
+            $timestamp = $date->getTimestamp();
 
-            if ($pretty_date && $timestamp > $today_limit && $timestamp <= $now) {
+            if ($pretty_date && $timestamp > $today_limit && $timestamp <= $now->getTimestamp()) {
                 $format = $this->config->get('date_today', $this->config->get('time_format', 'H:i'));
                 $today = true;
-            } elseif ($pretty_date && $timestamp > $week_limit && $timestamp <= $now) {
+            } elseif ($pretty_date && $timestamp > $week_limit && $timestamp <= $now->getTimestamp()) {
                 $format = $this->config->get('date_short', 'D H:i');
             } else {
                 $format = $this->config->get('date_long', 'Y-m-d H:i');
