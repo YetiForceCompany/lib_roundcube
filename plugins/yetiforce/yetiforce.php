@@ -81,12 +81,12 @@ class yetiforce extends rcube_plugin
 		$this->add_hook('message_before_send', [$this, 'message_before_send']);
 		$this->add_hook('message_sent', [$this, 'message_sent']);
 		$this->add_hook('smtp_connect', [$this, 'smtp_connect']);
+		$this->add_hook('contacts_autocomplete_after', [$this, 'contactsAutocompleteAfter']);
 
 		$this->register_action('plugin.yetiforce-importIcs', [$this, 'importIcs']);
 		$this->register_action('plugin.yetiforce-addFilesToMail', [$this, 'addFilesToMail']);
 		$this->register_action('plugin.yetiforce-getContentEmailTemplate', [$this, 'getContentEmailTemplate']);
 		$this->register_action('plugin.yetiforce-loadMailAnalysis', [$this, 'loadMailAnalysis']);
-		$this->register_action('plugin.yetiforce-autocomplete', [$this, 'autocomplete']);
 
 		if ('mail' == $this->rc->task) {
 			$this->include_stylesheet('/../../../../../../layouts/resources/icons/yfm.css');
@@ -167,9 +167,6 @@ class yetiforce extends rcube_plugin
 	 */
 	public function startup($args): array
 	{
-		if ('mail' === $args['task'] && 'autocomplete' === $args['action']) {
-			$args['action'] = 'plugin.yetiforce-autocomplete';
-		}
 		if (empty($_GET['_autologin']) || !($row = $this->getAutoLogin())) {
 			return $args;
 		}
@@ -1370,17 +1367,20 @@ class yetiforce extends rcube_plugin
 	}
 	
 	/**
+	 * 'contacts_autocomplete_after' hook handler.
+	 *
+	 * Replaces the results of the Roundcube address books with the CRM address book.
+	 *
 	 * @see rcmail_action_mail_autocomplete
-	 * 
-	 * Overrides the autocomplete action.
-	 * 
-	 * @return void
+	 *
+	 * @param array $args Hook arguments
+	 *
+	 * @return array Hook arguments
 	 */
-	public function autocomplete(): void
+	public function contactsAutocompleteAfter(array $args): array
 	{
 		$rcmail = rcmail::get_instance();
-		$search = rcube_utils::get_input_string('_search', rcube_utils::INPUT_GPC, true);
-		$reqid = rcube_utils::get_input_string('_reqid', rcube_utils::INPUT_GPC);
+		$search = (string) ($args['search'] ?? '');
 		$contacts = [];
 
 		if (\strlen($search)) {
@@ -1404,8 +1404,8 @@ class yetiforce extends rcube_plugin
 			$contacts = array_values($contacts);
 		}
 
-		$rcmail->output->command('ksearch_query_results', $contacts, $search, $reqid);
-		$rcmail->output->send();
+		$args['contacts'] = $contacts;
+		return $args;
 	}
 
 }

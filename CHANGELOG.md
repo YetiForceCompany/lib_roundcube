@@ -2,6 +2,29 @@
 
 This file includes only changes we consider noteworthy for users, admins and plugin authors. For a full view please look at the git history.
 
+## Release 1.7.7
+
+- Fix handling of multiple responses for the same message in a single IMAP FETCH command (#10045)
+- Fix unreadable syntax colors and invisible cursor in the raw sieve script editor in dark mode (#10382)
+- Password: Support alias username in the hmail driver (#10411)
+- Fix hide_blockquote plugin adding a quadratic number of text nodes on messages with many quote blocks (#10422)
+- Fix bug where deleting a search result with "select all" could delete all messages in the folder (#9671)
+- Fix run time growing with the square of the input in rcube_text2html and rcube_vcard (#10423)
+- Fix contact import error on a vCard value that ends with a single backslash (#10427)
+- Fix import of contact e-mails, phones and addresses from current Google CSV exports (#10410)
+- Security: Fix (again) HTTP request injection via the spellcheck ATD backend
+- Security: Fix CSS-scoping bypass via html comments in inline style
+- Security: Fix remote content blocking bypass via CSS comments in SVG FuncIRI attributes
+- Security: Fix CSS-scoping bypass via a direct access to CSS proxy and multiple style links
+- Security: Fix response disclosure in the CSS proxy using leading whitespace/BOM
+- Security: Fix namespace-prefixed attribute bypass of the washtml attribute allowlist (PHP < 8.4)
+- Security: Fix (again) bug where insecure attachment content (PDF/PostScript/SVG) was passed to ImageMagick
+- Security: Fix sieve script injection via a comparator name
+- Security: Fix DoS via uncapped MAPI multi-value loop in rcube_tnef_decoder
+- Security: Fix XML injection in XIMSS driver of the password plugin
+- Security: Fix falling back to insecure IMAP/SMTP/Managesieve connection when TLS is configured but no capability reported
+- Security: Fix Sieve script injection via the body/address/envelope part fields
+
 ## Release 1.7.6
 
 - Enable PHP 8.6 support (#10368, #10362)

@@ -281,7 +281,7 @@ class rcube_washtml
     /**
      * Take a node and return allowed attributes and check values
      *
-     * @param \DOMElement $node Document element
+     * @param \DOMElement|\Dom\Element $node Document element
      *
      * @return string Washed element attributes
      */
@@ -350,6 +350,11 @@ class rcube_washtml
                 } elseif ($key == 'xmlns' && !strpos($value, '://')) {
                     continue;
                 } elseif ($key) {
+                    // Namespace-prefixed attribute bypass prevention for DOMDocument and libxml2 < 2.14
+                    if ($node instanceof \DOMElement && preg_match('/[^a-z:-]/i', $attr->nodeName)) {
+                        continue;
+                    }
+
                     $out = $value;
                 }
 
@@ -599,8 +604,11 @@ class rcube_washtml
      */
     public static function css_unescape($value)
     {
-        if (!str_contains((string) $value, '\\')) {
-            return (string) $value;
+        // Remove comments
+        $value = preg_replace('#/\*.*\*/#Ums', '', (string) $value);
+
+        if (!str_contains($value, '\\')) {
+            return $value;
         }
 
         return preg_replace_callback(
@@ -618,7 +626,7 @@ class rcube_washtml
 
                 return $m[2];
             },
-            (string) $value
+            $value
         );
     }
 
